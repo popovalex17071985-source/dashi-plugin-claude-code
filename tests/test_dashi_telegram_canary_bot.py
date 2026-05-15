@@ -143,6 +143,36 @@ class CanaryBotTestCase(unittest.TestCase):
         self.assertNotIn("dashi canary ack", client.sent_messages[0]["text"])
         self.assertNotIn(self.token_value, json.dumps(client.sent_messages))
 
+    def test_run_once_normalizes_goat_command_to_goal_before_claude_reply(self):
+        bot = load_bot()
+        client = FakeClient(
+            [
+                {
+                    "update_id": 45,
+                    "message": {
+                        "message_id": 100,
+                        "chat": {"id": 777},
+                        "from": {"id": 555, "username": "tester"},
+                        "text": "/goat migrate parity",
+                    },
+                }
+            ]
+        )
+        provider = FakeReplyProvider("goal accepted")
+
+        code = bot.run_once(
+            bot.CanaryBotConfig.from_runtime_root(self.runtime_root),
+            client,
+            poll_timeout=1,
+            stdout=io.StringIO(),
+            stderr=io.StringIO(),
+            reply_provider=provider,
+        )
+
+        self.assertEqual(code, 0)
+        self.assertEqual(provider.messages[0].text, "/goal migrate parity")
+        self.assertEqual(client.sent_messages, [{"chat_id": 777, "text": "goal accepted"}])
+
     def test_run_once_reports_claude_failure_without_leaking_secret_like_text(self):
         bot = load_bot()
         client = FakeClient(

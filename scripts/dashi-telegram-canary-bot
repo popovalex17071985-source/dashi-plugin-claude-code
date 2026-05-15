@@ -266,8 +266,18 @@ def update_text(update: dict[str, object]) -> str:
     for key in ("text", "caption"):
         value = message.get(key)
         if isinstance(value, str) and value.strip():
-            return value.strip()
+            return normalize_inbound_text(value.strip())
     return "(non-text Telegram message)"
+
+
+def normalize_inbound_text(text: str) -> str:
+    if not text.startswith("/"):
+        return text
+    command, separator, rest = text.partition(" ")
+    command_base = command.split("@", 1)[0].lower()
+    if command_base != "/goat":
+        return text
+    return "/goal" + (separator + rest if separator else "")
 
 
 def inbound_from_update(update: dict[str, object], chat_id: int) -> InboundMessage:
