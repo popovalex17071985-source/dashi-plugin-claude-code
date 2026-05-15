@@ -67,7 +67,7 @@ visual_board:
     command: "npx goalbuddy extend github-projects"
     missing: []
 
-active_task: T004
+active_task: T005
 
 tasks:
   - id: T001
@@ -168,7 +168,7 @@ tasks:
   - id: T004
     type: pm
     assignee: PM
-    status: active
+    status: done
     reasoning_hint: default
     objective: "Smoke-test or prepare smoke-test handoff for the /goat -> /goal canary slice without starting a second Telegram consumer."
     inputs:
@@ -183,6 +183,33 @@ tasks:
     expected_output:
       - "Either a safe smoke-test receipt or a blocked receipt naming the missing host/operator evidence."
       - "Next migration slice recommendation after smoke evidence."
+    receipt:
+      result: done
+      summary: "Prepared live canary smoke handoff for the verified /goat alias by reloading the existing orgrimmar-canary tmux session with the same command after local tests and tmux host evidence. No second Telegram consumer was started and no token values were read or printed."
+      evidence:
+        - "Fresh local verification: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -> 16 tests OK."
+        - "GoalBuddy checker: ok true, goal active, no warnings."
+        - "Remote main: refs/heads/main at 6ceab11bfad097eacd02d2ae05d15e06d970b457."
+        - "tmux list-panes confirmed the canary command before reload and after reload."
+        - "tmux capture-pane showed canary status running at 2026-05-15T11:54:35.991989Z."
+      next: "Operator can now send /goat ... to the test Telegram bot for live smoke. If it replies through Claude as a /goal request, proceed to the next command-router parity slice."
+  - id: T005
+    type: pm
+    assignee: PM
+    status: active
+    reasoning_hint: default
+    objective: "Capture the operator Telegram smoke result for /goat and then choose the next safe gateway parity slice."
+    inputs:
+      - "T004 receipt."
+      - "Operator Telegram message to the test bot: /goat ..."
+      - "tmux canary logs, without printing token values."
+    constraints:
+      - "Do not run a second polling process against the canary token."
+      - "Do not read or print token values."
+      - "Do not touch production token files, launchd jobs, gateway config, or production tmux sessions."
+    expected_output:
+      - "Telegram-visible smoke receipt for /goat -> /goal."
+      - "Decision for next local implementation slice, likely /help and /status command router."
     receipt: null
   - id: T999
     type: judge
@@ -209,7 +236,11 @@ checks:
   dirty_fingerprint: unknown
   last_verification:
     result: pass
-    task: T003
+    task: T004
     commands:
-      - "python3 -m unittest tests/test_dashi_telegram_canary_bot.py"
+      - "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests"
       - "git diff --check"
+      - "node /Users/jasonqwwen/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.6/skills/goalbuddy/scripts/check-goal-state.mjs docs/goals/gateway-parity-migration/state.yaml"
+      - "git ls-remote origin refs/heads/main"
+      - "tmux list-panes -t orgrimmar-canary -F '#{pane_current_command} #{pane_start_command}'"
+      - "tmux capture-pane -t orgrimmar-canary -p -S -20"
