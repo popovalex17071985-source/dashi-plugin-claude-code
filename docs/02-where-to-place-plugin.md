@@ -5,13 +5,19 @@
 ## TL;DR
 
 ```
-✓ ПРАВИЛЬНО:  ~/.claude-lab/<agent>/.claude/dashi-plugin-claude-code/plugin/
+✓ ПРАВИЛЬНО (Linux):  /home/<user>/.claude-lab/<agent>/.claude/dashi-plugin-claude-code/plugin/
+✓ ПРАВИЛЬНО (macOS):  /Users/<user>/.claude-lab/<agent>/.claude/dashi-plugin-claude-code/plugin/
+✓ ПРАВИЛЬНО (оба):    ~/.claude-lab/<agent>/.claude/dashi-plugin-claude-code/plugin/
+
 ✗ НЕПРАВИЛЬНО: ~/dashi-plugin-claude-code/plugin/
-✗ НЕПРАВИЛЬНО: /opt/dashi-plugin/plugin/
+✗ НЕПРАВИЛЬНО: /opt/dashi-plugin/plugin/                 (Linux — выше workspace)
+✗ НЕПРАВИЛЬНО: /Applications/dashi-plugin/plugin/        (macOS — outside workspace)
 ✗ НЕПРАВИЛЬНО: /home/<user>/projects/dashi-plugin-claude-code/plugin/
 ```
 
-Каталог плагина должен лежать **внутри workspace вашего агента** (`~/.claude-lab/<agent>/.claude/`). Если положить рядом или в `/opt` — плагин запустится, но Claude Code не подхватит ваш агентский `CLAUDE.md` с идентичностью и настройками. Агент будет вести себя как «default Claude», без памяти, без инструкций, без identity.
+Каталог плагина должен лежать **внутри workspace вашего агента** (`~/.claude-lab/<agent>/.claude/`). Если положить рядом или в `/opt` / `/Applications/` — плагин запустится, но Claude Code не подхватит ваш агентский `CLAUDE.md` с идентичностью и настройками. Агент будет вести себя как «default Claude», без памяти, без инструкций, без identity.
+
+Tilde `~` корректно раскрывается и на Linux (`/home/<user>/`), и на macOS (`/Users/<user>/`) — поэтому везде ниже используем универсальную форму с `~`.
 
 Дальше — почему так и что именно ломается.
 
@@ -134,9 +140,11 @@ Result: project CLAUDE.md НЕ найден.
 
 ---
 
-## systemd unit с правильным `WorkingDirectory`
+## Process supervisor с правильным CWD
 
-Production-запуск через systemd. Полный пример unit-файла — [examples/systemd-unit.service.example](../examples/systemd-unit.service.example), но критичная часть выглядит так:
+### Linux — systemd
+
+Полный пример unit-файла — [examples/systemd-unit.service.example](../examples/systemd-unit.service.example). Критичная часть:
 
 ```ini
 [Service]
@@ -147,7 +155,25 @@ ExecStart=/usr/bin/tmux new-session -d -s channel-<agent> \
   claude --dangerously-load-development-channels server:dashi-channel
 ```
 
-`WorkingDirectory=` — это и есть CWD процесса. Если опечатаетесь в этом пути — Claude Code не найдёт workspace `CLAUDE.md`, и агент потеряет identity.
+### macOS — launchd
+
+Полный пример plist — [examples/launchd-plist.example.plist](../examples/launchd-plist.example.plist). Критичная часть:
+
+```xml
+<key>WorkingDirectory</key>
+<string>/Users/&lt;you&gt;/.claude-lab/&lt;agent&gt;/.claude/dashi-plugin-claude-code/plugin</string>
+
+<key>ProgramArguments</key>
+<array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>set -a; . /Users/&lt;you&gt;/.claude-lab/&lt;agent&gt;/secrets/channel.env; set +a; exec /opt/homebrew/bin/tmux new-session -d -s channel-&lt;agent&gt; claude --dangerously-load-development-channels server:dashi-channel; ...</string>
+</array>
+```
+
+`WorkingDirectory=` (или `WorkingDirectory` в plist) — это и есть CWD процесса. Если опечатаетесь в этом пути — Claude Code не найдёт workspace `CLAUDE.md`, и агент потеряет identity.
+
+Подробнее: [03-installation-linux.md](03-installation-linux.md) для systemd, [03-installation-macos.md](03-installation-macos.md) для launchd.
 
 ---
 

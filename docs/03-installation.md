@@ -1,323 +1,61 @@
 # Установка (production)
 
-Этот документ описывает полную установку плагина под systemd на Linux-сервере для production. Для разработки в одиночку (запуск из терминала вручную) достаточно Quick Start в [README.md](../README.md) — возвращайтесь сюда, когда захотите чтобы агент работал автономно.
+Этот документ — точка входа. Выберите свою операционную систему — каждая имеет свой supervisor (systemd vs launchd), свои пути (`/home/<user>/` vs `/Users/<user>/`), свои conventions.
 
-**Перед чтением:** убедитесь что прочитали [02-where-to-place-plugin.md](02-where-to-place-plugin.md). Без понимания CWD дальнейшие шаги не имеют смысла.
-
----
-
-## Требования
-
-| Компонент | Версия | Зачем |
+| OS | Supervisor | Документ |
 |---|---|---|
-| Linux (Ubuntu 22.04+ / Debian 12+) | — | systemd, tmux |
-| Claude Code | v2.1+ | Channels API (`claude/channel`) |
-| Bun | 1.3.14+ | Runtime плагина |
-| Node-совместимые tools | — | TypeScript checker, MCP SDK |
-| tmux | 3.x | Чтобы Claude Code остался активен после старта systemd (Claude Code требует TTY) |
-| systemd | — | Process supervisor |
-| Service-user | непривилегированный | НЕ запускайте от root |
+| Linux (Ubuntu / Debian / RHEL) | **systemd** | [03-installation-linux.md](03-installation-linux.md) |
+| macOS (Mac mini, MacBook, iMac) | **launchd** | [03-installation-macos.md](03-installation-macos.md) |
 
-Anthropic Max subscription нужна для агента (Claude Code login). Установка плагина её не покрывает — это ваша подписка.
+## В чём принципиальная разница
 
----
+Архитектура плагина одинакова на обоих OS — Bun runtime + Claude Code session + Telegram polling работают идентично. Разница только в **обвязке вокруг**:
 
-## Шаг 1. Service-user и workspace
+| Аспект | Linux | macOS |
+|---|---|---|
+| **Process supervisor** | systemd (`.service` unit) | launchd (`.plist` agent/daemon) |
+| **Команда управления** | `systemctl start/stop/restart` | `launchctl bootstrap/bootout/kickstart` |
+| **Файл сервиса лежит** | `/etc/systemd/system/channel-<agent>.service` | `~/Library/LaunchAgents/com.<you>.channel-<agent>.plist` |
+| **Service user** | Отдельный непривилегированный (`useradd agentctl`) | Запускается под вашим основным GUI user (single-user конвенция macOS) |
+| **Workspace path** | `/home/<user>/.claude-lab/<agent>/.claude/` | `/Users/<user>/.claude-lab/<agent>/.claude/` |
+| **Файл с секретами** | `/etc/dashi-plugin/<agent>/channel.env` (root:agentctl, 640) | `~/.claude-lab/<agent>/secrets/channel.env` (user, 600) |
+| **Передача env в процесс** | `EnvironmentFile=` директива systemd | `EnvironmentVariables` dict в plist **или** wrapper-скрипт `source channel.env && exec ...` |
+| **Логи** | `journalctl -u channel-<agent>` | `~/Library/Logs/dashi-plugin/<agent>.log` (через `StandardOutPath` в plist) |
+| **Auto-start при boot** | `systemctl enable channel-<agent>` | `RunAtLoad=true` в plist + `launchctl bootstrap` |
+| **Установка Bun** | `curl -fsSL https://bun.sh/install | bash` | `brew install oven-sh/bun/bun` **или** тот же curl |
+| **Установка tmux** | `sudo apt install tmux` | `brew install tmux` |
+| **Auto-start при boot после релогина** | Работает без login | Запускается при login GUI user (если plist в `~/Library/LaunchAgents/`). Для запуска до login — `/Library/LaunchDaemons/` (root) |
 
-Создайте непривилегированного пользователя для всех агентов (рекомендуется):
+## Что общее для обоих OS
 
-```bash
-sudo useradd -m -s /bin/bash agentctl
-sudo -u agentctl mkdir -p /home/agentctl/.claude-lab/myagent/.claude
-```
+- Bun 1.3+ и Claude Code v2.1+ — обязательны
+- Workspace структура — `~/.claude-lab/<agent>/.claude/dashi-plugin-claude-code/plugin/`
+- CWD при старте — внутрь `plugin/` (см. [02-where-to-place-plugin.md](02-where-to-place-plugin.md))
+- Welcome-промты Claude Code при первом запуске — те же 2 интерактивных окна, тот же фикс через `~/.claude/settings.json`
+- Telegram bot setup (`@BotFather`) — идентичен
+- Hooks integration (`install-hooks.sh`) — работает на обоих
+- Smoke test через ping бота — одинаков
+- Troubleshooting ([05-troubleshooting.md](05-troubleshooting.md)) — большинство сценариев OS-agnostic
 
-Если уже есть подходящий пользователь — используйте его. Везде ниже подставляйте свои `<service-user>` и `<agent>`.
+## Какой выбрать для production
 
----
+**Linux (VPS / dedicated server):**
+- Если у вас агент должен работать 24/7 без вашего присутствия
+- Если несколько агентов на одной машине под разными service-users
+- Если нужна полная изоляция (cgroups, ProtectSystem, NoNewPrivileges)
+- Hetzner / Timeweb / DigitalOcean / etc.
 
-## Шаг 2. Установка Claude Code и Bun под этим пользователем
+**macOS (Mac mini / iMac):**
+- Если агенты живут рядом с вашим dev-окружением
+- Если используете Anthropic Max через GUI Claude.app login (этот auth scope доступен под вашим user)
+- Если бюджет на отдельный VPS не оправдан
+- Mac mini как «домашний сервер» — типичный сценарий
 
-```bash
-sudo -iu agentctl
-# Bun
-curl -fsSL https://bun.sh/install | bash
-
-# Claude Code — официальный installer
-# (см. актуальную инструкцию https://code.claude.com/docs/en/setup)
-```
-
-Проверка:
-
-```bash
-bun --version    # 1.3.14+
-claude --version # 2.1.x
-```
-
-Залогиньтесь Claude Code в Anthropic Max интерактивно:
-
-```bash
-claude
-# пройдите OAuth, после успеха exit
-```
-
-Login сохраняется в `~/.claude/` под этим пользователем.
+Оба варианта prod-ready. У одного автора могут спокойно сосуществовать несколько агентов на Mac mini + несколько на Linux VPS — пилот Orgrimmar именно так и устроен (Тралл/Артас на Ubuntu VPS, Сильвана/Кельтас/Гаррош/Клод на Mac mini).
 
 ---
 
-## Шаг 3. Клонируйте плагин внутрь workspace
+После выбора OS → возвращайтесь сюда → переходите к specifics:
 
-```bash
-cd /home/agentctl/.claude-lab/myagent/.claude
-git clone https://github.com/qwwiwi/dashi-plugin-claude-code.git
-cd dashi-plugin-claude-code/plugin
-bun install
-bun run typecheck    # должно пройти без ошибок
-bun test             # 425 pass
-```
-
-Если `bun test` падает — НЕ продолжайте. Откройте issue.
-
----
-
-## Шаг 4. Создайте `CLAUDE.md` агента
-
-Минимальный `CLAUDE.md` (`/home/agentctl/.claude-lab/myagent/.claude/CLAUDE.md`):
-
-```markdown
-# MyAgent
-
-## Identity
-Я — MyAgent, AI-помощник <вашего владельца>.
-Язык общения — русский. Стиль: краткость > объяснений.
-
-## Capabilities
-- Отвечаю на сообщения в Telegram
-- Использую инструменты Claude Code (Bash, Read, Write, etc.)
-- Могу обращаться к MCP-серверам если они подключены
-
-## Boundaries
-- Не передаю секреты в чат
-- Не запускаю rm -rf / DROP TABLE без подтверждения
-- В случае ошибки — извещаю владельца, не маскирую
-```
-
-Полный пример с разделённой памятью (`@-include`) — изучите по аналогии существующих агентов в [github.com/qwwiwi/public-gbrain-agentos/tree/main/agent-template](https://github.com/qwwiwi/public-gbrain-agentos/tree/main/agent-template).
-
----
-
-## Шаг 5. Telegram бот и channel.env
-
-В Telegram у [@BotFather](https://t.me/BotFather) создайте нового бота, получите `bot_token`.
-
-Скопируйте example env-файл:
-
-```bash
-sudo mkdir -p /etc/dashi-plugin/myagent
-sudo cp /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code/examples/channel.env.example \
-        /etc/dashi-plugin/myagent/channel.env
-sudo chown root:agentctl /etc/dashi-plugin/myagent/channel.env
-sudo chmod 640 /etc/dashi-plugin/myagent/channel.env
-sudo $EDITOR /etc/dashi-plugin/myagent/channel.env
-```
-
-Заполните минимум:
-
-```bash
-TELEGRAM_BOT_TOKEN=123456789:AAH...
-TELEGRAM_EXPECTED_BOT_ID=123456789
-TELEGRAM_ALLOWED_USER_IDS=164795011    # ваш Telegram user ID
-TELEGRAM_STATE_DIR=/home/agentctl/.claude-lab/shared/state/myagent/telegram
-TELEGRAM_WORKSPACE_ROOT=/home/agentctl/.claude-lab/myagent/.claude
-AGENT_ID=myagent
-```
-
-Узнать свой `user_id` в Telegram — напишите [@userinfobot](https://t.me/userinfobot).
-
-`TELEGRAM_EXPECTED_BOT_ID` — числовая часть до двоеточия в `TELEGRAM_BOT_TOKEN`. Используется plugin'ом для anti-spoof.
-
----
-
-## Шаг 6. systemd unit
-
-Скопируйте example:
-
-```bash
-sudo cp /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code/examples/systemd-unit.service.example \
-        /etc/systemd/system/channel-myagent.service
-sudo $EDITOR /etc/systemd/system/channel-myagent.service
-```
-
-Подставьте свои значения для `User=`, `WorkingDirectory=`, `EnvironmentFile=`:
-
-```ini
-[Unit]
-Description=Dashi Plugin Channel for myagent
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=forking
-User=agentctl
-Group=agentctl
-EnvironmentFile=/etc/dashi-plugin/myagent/channel.env
-Environment=HOME=/home/agentctl
-Environment=PATH=/home/agentctl/.bun/bin:/home/agentctl/.local/bin:/usr/local/bin:/usr/bin:/bin
-WorkingDirectory=/home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code/plugin
-ExecStart=/usr/bin/tmux new-session -d -s channel-myagent \
-  claude --dangerously-load-development-channels server:dashi-channel
-ExecStartPost=/bin/sh -c 'sleep 6 && /usr/bin/tmux send-keys -t channel-myagent Enter'
-ExecStop=/usr/bin/tmux kill-session -t channel-myagent
-Restart=on-failure
-RestartSec=15s
-
-[Install]
-WantedBy=multi-user.target
-```
-
-**КРИТИЧНО:** `WorkingDirectory=` указывает внутрь `plugin/`. Если опечатка — Claude Code не найдёт project CLAUDE.md и агент будет без identity. См. [02-where-to-place-plugin.md](02-where-to-place-plugin.md).
-
-`Type=forking` нужен потому что `tmux new-session -d` форкается и возвращает управление.
-
-`ExecStartPost` посылает `Enter` через 6 секунд — нужно для прохождения интерактивных welcome-промтов Claude Code (см. ниже).
-
-Активируйте:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable channel-myagent
-sudo systemctl start channel-myagent
-sudo systemctl status channel-myagent --no-pager -l
-```
-
-Должен быть `active (running)`. Если падает — `journalctl -u channel-myagent --since "5 min ago"`.
-
----
-
-## Шаг 7. Прохождение welcome-промтов
-
-При **первом** запуске Claude Code задаст 2 интерактивных вопроса:
-
-1. **«Allow external CLAUDE.md file imports?»** — если ваш `CLAUDE.md` использует `@-include`. Ответ: `1` (Yes).
-2. **«--dangerously-load-development-channels»** — предупреждение про dev channels. Ответ: `1` (I am using this for local development).
-
-`ExecStartPost` посылает один `Enter` через 6 секунд — это автоматизирует первый промт. Второй промт требует ещё одного Enter. Откройте tmux и нажмите вручную:
-
-```bash
-sudo -u agentctl tmux attach -t channel-myagent
-# увидите второй промт — нажмите Enter
-# detach: Ctrl-B затем D
-```
-
-После этого плагин стартует и в Telegram должен прийти `getUpdates` response. Напишите боту — должен ответить.
-
-### Persistent welcome approvals (чтобы не нажимать Enter после каждого рестарта)
-
-Welcome-промты показываются **при каждом** запуске Claude Code, включая `systemctl restart`. Это значит, после рестарта сервиса нужен человек с tmux чтобы пройти 2 промта.
-
-**Решение** (требует Claude Code v2.1.140+):
-
-В `~/.claude/settings.json` пользователя `agentctl` добавьте:
-
-```json
-{
-  "hasTrustDialogAccepted": true,
-  "dangerouslyLoadDevelopmentChannelsAccepted": true,
-  "externalImportsAccepted": true
-}
-```
-
-Точные ключи зависят от версии Claude Code — проверьте `~/.claude/settings.json` после первого ручного прохождения, скопируйте появившиеся ключи. После этого `systemctl restart` пройдёт без интерактива.
-
-> **Известный gap:** на момент написания (Claude Code v2.1.143) часть промтов не сохраняется persistent. Workaround: держите `ExecStartPost` который шлёт несколько `Enter` подряд через `sleep`, и тестируйте `systemctl restart` чтобы убедиться.
-
----
-
-## Шаг 8. Smoke test
-
-Напишите боту в Telegram любое сообщение. Должны увидеть:
-
-1. **Реакция 👀** на ваше сообщение (через ~1 сек)
-2. **«печатает...»** в шапке чата
-3. **Реакция ⚙️** когда агент начинает использовать инструменты
-4. **Ответ** агента (текстом или файлом)
-5. **Реакция ✅** на ваше сообщение по завершении
-
-Если ничего не пришло — проверьте:
-
-```bash
-# 1. Сервис активен
-sudo systemctl status channel-myagent
-
-# 2. tmux показывает Claude Code на главном экране (не на welcome-промтах)
-sudo -u agentctl tmux capture-pane -t channel-myagent -p -S -50 | tail -30
-# должны увидеть "Listening for channel messages from: server:dashi-channel"
-
-# 3. Telegram pending updates
-TOKEN=$(grep TELEGRAM_BOT_TOKEN /etc/dashi-plugin/myagent/channel.env | cut -d= -f2-)
-curl -s "https://api.telegram.org/bot${TOKEN}/getUpdates?limit=5&timeout=0" | jq .
-```
-
-Если что-то не так — [05-troubleshooting.md](05-troubleshooting.md).
-
----
-
-## Шаг 9. Hook integration (опционально, для memory/status)
-
-После того как плагин запущен и Claude Code сессия активна, установите hooks чтобы PreToolUse/PostToolUse/Stop/UserPromptSubmit/SessionStart events приходили обратно в плагин — без них Telegram статус будет показывать только начало/конец без промежуточных tool calls.
-
-```bash
-sudo -u agentctl bash /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code/plugin/scripts/install-hooks.sh \
-  --settings /home/agentctl/.claude/settings.json \
-  --chat-id <your-telegram-chat-id> \
-  --webhook-url http://127.0.0.1:8089/hooks/agent \
-  --agent-id myagent
-```
-
-Идемпотентно — повторный запуск не дублирует. Если ваш плагин слушает на другом порте (см. `TELEGRAM_WEBHOOK_PORT` в channel.env), укажите соответствующий `webhook-url`.
-
-После `install-hooks` рестартните сервис: `sudo systemctl restart channel-myagent`.
-
----
-
-## Шаг 10. Memory hooks (опционально)
-
-Для long-term memory pipeline (запись turn'ов в `<workspace>/core/hot/recent.md` + `verbose-YYYY-MM-DD.jsonl`) — раздел [`plugin/README.md` → Memory hooks](../plugin/README.md#memory-hooks-phase-8-config).
-
-Альтернатива: используйте gbrain ([qwwiwi/public-gbrain-agentos](https://github.com/qwwiwi/public-gbrain-agentos)) — там MCP-серверы для memory/recall/swarm.
-
----
-
-## Backup
-
-Перед любым обновлением — снапшот:
-
-```bash
-sudo tar czf /var/backups/myagent-$(date +%Y%m%d-%H%M).tgz \
-  /home/agentctl/.claude-lab/myagent \
-  /etc/dashi-plugin/myagent \
-  /etc/systemd/system/channel-myagent.service
-```
-
-Восстановление: `tar xzf <backup> -C /` + `sudo systemctl daemon-reload` + `systemctl restart`.
-
----
-
-## Update плагина
-
-```bash
-sudo systemctl stop channel-myagent
-cd /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code
-sudo -u agentctl git pull
-cd plugin
-sudo -u agentctl bun install
-sudo -u agentctl bun test
-sudo systemctl start channel-myagent
-```
-
-Если `bun test` падает после `git pull` — откатитесь к предыдущему коммиту (`git reset --hard HEAD~1`) и откройте issue.
-
----
-
-## Готово
-
-Дальше — [05-troubleshooting.md](05-troubleshooting.md) когда что-то сломается, и [04-migration-from-gateway.md](04-migration-from-gateway.md) если переезжаете со старого `claude -p` gateway.
+- [03-installation-linux.md](03-installation-linux.md) — Linux / systemd
+- [03-installation-macos.md](03-installation-macos.md) — macOS / launchd

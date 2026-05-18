@@ -35,6 +35,7 @@
 ```bash
 # 1. Создайте workspace для агента (если ещё нет)
 mkdir -p ~/.claude-lab/myagent/.claude
+mkdir -p ~/.claude-lab/myagent/secrets        # для channel.env (macOS-friendly)
 cd ~/.claude-lab/myagent/.claude
 
 # 2. Склонируйте плагин ВНУТРЬ workspace
@@ -43,16 +44,23 @@ cd dashi-plugin-claude-code/plugin
 bun install
 
 # 3. Скопируйте example config + впишите свой Telegram bot token
-cp ../examples/channel.env.example /etc/dashi-plugin/channel.env
-$EDITOR /etc/dashi-plugin/channel.env
+#    (универсально для Linux + macOS — кладём в свой workspace)
+cp ../examples/channel.env.example ~/.claude-lab/myagent/secrets/channel.env
+chmod 600 ~/.claude-lab/myagent/secrets/channel.env
+$EDITOR ~/.claude-lab/myagent/secrets/channel.env
 
 # 4. Запустите Claude Code из каталога плагина (CWD-критично, см. docs/02)
 cd ~/.claude-lab/myagent/.claude/dashi-plugin-claude-code/plugin
-TELEGRAM_BOT_TOKEN=$(grep TELEGRAM_BOT_TOKEN /etc/dashi-plugin/channel.env | cut -d= -f2-) \
-  claude --dangerously-load-development-channels server:dashi-channel
+set -a; . ~/.claude-lab/myagent/secrets/channel.env; set +a
+claude --dangerously-load-development-channels server:dashi-channel
 ```
 
-При первом запуске Claude Code задаст 2 интерактивных вопроса (allow external imports + dev channels) — это **разово**. После ответа `1` на оба плагин стартует и начнёт слушать вашего бота. Подробности и production setup через systemd — [docs/03-installation.md](docs/03-installation.md).
+При первом запуске Claude Code задаст 2 интерактивных вопроса (allow external imports + dev channels) — это **разово**. После ответа `1` на оба плагин стартует и начнёт слушать вашего бота.
+
+**Production setup** (чтобы агент работал автономно после reboot):
+- **Linux** → [docs/03-installation-linux.md](docs/03-installation-linux.md) (systemd)
+- **macOS / Mac mini** → [docs/03-installation-macos.md](docs/03-installation-macos.md) (launchd)
+- **Сравнение OS** → [docs/03-installation.md](docs/03-installation.md)
 
 ---
 

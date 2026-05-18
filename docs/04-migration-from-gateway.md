@@ -4,6 +4,14 @@
 
 После этой даты Anthropic разделяет billing: `claude -p` (Agent SDK) уходит в отдельный $200/мес pool, отдельный от Max. Любой `claude -p` spawn = расход из SDK pool. Старая gateway-архитектура перестанет быть экономичной.
 
+> **Linux vs macOS:** этот документ написан для Linux/systemd (типичный VPS-кейс — Hetzner/Timeweb/etc). Если ваш старый gateway крутится на **Mac mini под launchd** — последовательность шагов та же, но команды управления другие:
+> - `systemctl stop/start/restart` → `launchctl bootout / bootstrap / kickstart -k`
+> - `journalctl -u <unit>` → `tail ~/Library/Logs/<...>/.log`
+> - `/etc/systemd/system/*.service` → `~/Library/LaunchAgents/*.plist`
+> - `/etc/dashi-plugin/` → `~/.claude-lab/<agent>/secrets/`
+>
+> Полная таблица соответствия — [05-troubleshooting.md → OS-specific команды](05-troubleshooting.md#os-specific-команды-linux-vs-macos). После прочтения этого migration guide → переходите к [03-installation-macos.md](03-installation-macos.md) для launchd-специфики установки нового плагина.
+
 ## Перед стартом
 
 1. **Сделайте полный backup** — gateway процесс, workspace, секреты, systemd/launchd конфиги:

@@ -4,6 +4,26 @@
 
 ---
 
+## OS-specific команды (Linux vs macOS)
+
+Проблемы ниже описаны примерами **для Linux/systemd**. Если вы на macOS — везде где встретите `systemctl` / `journalctl` / `sudo -u <user>`, используйте эквиваленты:
+
+| Действие | Linux (systemd) | macOS (launchd) |
+|---|---|---|
+| Статус сервиса | `systemctl status channel-<agent>` | `launchctl print gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
+| Рестарт | `systemctl restart channel-<agent>` | `launchctl kickstart -k gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
+| Стоп | `systemctl stop channel-<agent>` | `launchctl kill SIGTERM gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
+| Логи stdout/stderr | `journalctl -u channel-<agent> -n 50` | `tail -n 50 ~/Library/Logs/dashi-plugin/channel-<agent>.out.log` и `.err.log` |
+| Tail логов в реалтайме | `journalctl -u channel-<agent> -f` | `tail -f ~/Library/Logs/dashi-plugin/channel-<agent>.err.log` |
+| Tmux attach | `sudo -u <service-user> tmux attach -t channel-<agent>` | `tmux attach -t channel-<agent>` (без sudo, под вашим user) |
+| Список процессов | `ps -ef \| grep -E "bun\|claude\|tmux"` | `ps -ef \| grep -E "bun\|claude\|tmux"` (одинаково) |
+| Открытые порты | `sudo ss -tlnp \| grep <port>` | `sudo lsof -nP -i :<port>` |
+| Конфиг сервиса | `cat /etc/systemd/system/channel-<agent>.service` | `cat ~/Library/LaunchAgents/com.dashi-plugin.channel-<agent>.plist` |
+| Перезагрузить конфиг | `systemctl daemon-reload` | `launchctl bootout ... && launchctl bootstrap ...` |
+| Env-файл | `cat /etc/dashi-plugin/<agent>/channel.env` | `cat ~/.claude-lab/<agent>/secrets/channel.env` |
+
+---
+
 ## Проблема 1. Сервис «active», но Telegram не отвечает
 
 ### Симптом
