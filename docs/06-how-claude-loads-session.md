@@ -86,7 +86,7 @@ External imports:
 
 В нашем случае CWD = `<workspace>/dashi-plugin-claude-code/plugin/`, а `@-include` целит в `<workspace>/core/*` — это «выше по дереву», формально external. Поэтому промт всегда показывается.
 
-Ответ — `1` (разрешить). Persistent fix — см. [03-installation.md → Шаг 7](03-installation.md#persistent-welcome-approvals-чтобы-не-нажимать-enter-после-каждого-рестарта).
+Ответ — `1` (разрешить). Persistent fix — см. [03-installation.md → Persistent welcome approvals](03-installation.md#persistent-welcome-approvals) (точные OS-варианты — [Linux](03-installation-linux.md#persistent-welcome-approvals-чтобы-не-нажимать-enter-после-каждого-рестарта) / [macOS](03-installation-macos.md#persistent-welcome-approvals)).
 
 ## Settings.json hierarchy
 

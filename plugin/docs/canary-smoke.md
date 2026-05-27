@@ -23,7 +23,7 @@ Shortcut: `./scripts/smoke-local` runs all three steps and prints the launch hin
 
 Telegram delivers each update to exactly one long-poll consumer. Before launching the channel plugin, stop any other process consuming this bot's updates so the bot token is free.
 
-> Pre-cutover (Python `gateway.py`) — applicable only if you are migrating from the legacy Python gateway; skip this section if you are installing fresh.
+> ⚠ Pre-cutover (Python gateway.py) — applicable only if you are migrating from the legacy Python gateway plugin. After 2026-06-15 cutover, this section becomes legacy reference only. Skip if installing fresh.
 
 ```bash
 # Confirm any pre-cutover Python canary is up
@@ -84,6 +84,23 @@ For tests 6/7, toggle by exporting `GROQ_API_KEY` before launch or leaving it un
 
 For test 15, only run if the canary launch includes `TELEGRAM_WEBHOOK_PORT` and `TELEGRAM_WEBHOOK_TOKEN`.
 
+### Multichat-era smoke (PR #13, #22, #26)
+
+Rows 16–25 cover features introduced after the initial canary baseline: the multichat router, per-chat tmux session pool, tmux mirror, task mirror, telegram-token redaction, and the HTML-by-default reply format. Each row depends on flags listed in the "Send" column — restart the tmux session after changing env. If the multichat router is not in your build, skip this entire section.
+
+| # | Test | Send | Expected | Verify |
+|---|------|------|----------|--------|
+| 16 | MultichatRouter default-OFF | launch without `MULTICHAT_ENABLED`, send "ping" in DM from `<your-telegram-user-id>` | Legacy single-chat path handles the message; router is bypassed | `tmux capture-pane -t channel-canary-test -p -S -100 \| grep -E 'multichat_router=(off\|skipped)'` returns at least one line; reply arrives as usual |
+| 17 | MultichatRouter enabled (group) | launch with `MULTICHAT_ENABLED=true` and an allowed group id, send "ping" in that group | Router dispatches to per-chat tmux session, response returns via outbox | `tmux ls \| grep channel-multichat-<chat-id>` shows the per-chat session; `ls ~/path/to/your/.claude-lab/shared/channel-runtime/canary/telegram/outbox/` has a fresh entry |
+| 18 | TmuxSessionPool reuse | inside row 17's group, send a second message in the same chat within idle window | Pool finds existing `tmux has-session` and reuses the spawned session — no second spawn | `tmux capture-pane -t channel-canary-test -p -S -200 \| grep 'session_pool=reuse'` appears; total `channel-multichat-*` session count unchanged |
+| 19 | TmuxSessionPool idle-kill | wait longer than `config.session.idle_kill_after_sec` after row 18, then send another message | Idle session is killed and a fresh one spawned; `outbox/dead-letter` and `outbox/mismatched` directories are preserved (not wiped) | `tmux ls \| grep channel-multichat-<chat-id>` shows a new pid; `ls ~/path/to/your/.claude-lab/shared/channel-runtime/canary/telegram/outbox/dead-letter/ ~/path/to/your/.claude-lab/shared/channel-runtime/canary/telegram/outbox/mismatched/` still lists prior entries |
+| 20 | TmuxMirror enabled (DM) | with `TMUX_MIRROR_ENABLED=true`, send "посмотри файлы" in DM from `<your-telegram-user-id>` | Status updates stream and a pane mirror message appears mid-task | `tail -f ~/path/to/your/.claude-lab/shared/channel-runtime/canary/telegram/state/status.json` shows progressing phases; an edited mirror message exists in the chat |
+| 21 | TmuxMirror not enabled (group) | repeat row 20 inside the multichat group | No mirror or status messages — only the final reply | `tail -f ~/path/to/your/.claude-lab/shared/channel-runtime/canary/telegram/logs/permissions.jsonl` shows no mirror writes; the group receives one reply, not a status stream |
+| 22 | TaskMirror update | run a Claude task that uses TodoWrite / Task tools while connected from DM | Mirror message updates in-place as tasks transition states | `tmux capture-pane -t channel-canary-test -p -S -200 \| grep task_mirror=update` shows update events; the existing TG message is edited rather than reposted |
+| 23 | safe-telegram-api redaction | have Claude reply with a string containing a fake Telegram token like `123456:ABC-DEF1234567890abcdefGHI` | Token is replaced with `[REDACTED]` before the message is sent to Telegram | `tail -n 50 ~/path/to/your/.claude-lab/shared/channel-runtime/canary/telegram/logs/outbound.jsonl \| grep -v '[REDACTED]' \| grep -E '[0-9]{6,}:[A-Za-z0-9_-]{30,}'` returns nothing; the chat message contains `[REDACTED]` |
+| 24 | format=html default (PR #22) | trigger any reply whose content includes `**жирный**` markdown | Reply renders as bold in Telegram (HTML mode applied automatically) | Visually confirm bold in the Telegram client; `tmux capture-pane -t channel-canary-test -p -S -200 \| grep 'format=html'` shows the default |
+| 25 | format=text override | ask Claude to reply with `format='text'` and content containing `**stars**` | Stars render literally — no bold, no markdown processing | Visually confirm literal `**stars**` in chat; outbound log shows `format=text` |
+
 ## Inspection commands
 
 ```bash
@@ -102,7 +119,8 @@ cat ~/.claude-lab/shared/channel-runtime/canary/telegram/state/status.json 2>/de
 
 ## Pass criteria
 
-- All 15 rows produce the expected behavior with no plugin crash.
+- Rows 1–15 (baseline) produce the expected behavior with no plugin crash.
+- Rows 16–25 (multichat-era, conditional on PR #13/#22/#26 features being enabled) pass or are explicitly marked N/A.
 - `permissions.jsonl` shows one `allow` entry for test 13 and one `deny` for test 14.
 - Dead-letter queue empty (or contains only deliberate failures).
 - No production bot received traffic during the run (check any production tmux capture for your own deployment).

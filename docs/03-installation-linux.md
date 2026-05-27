@@ -131,12 +131,18 @@ TELEGRAM_EXPECTED_BOT_ID=123456789
 TELEGRAM_ALLOWED_USER_IDS=164795011    # ваш Telegram user ID
 TELEGRAM_STATE_DIR=/home/agentctl/.claude-lab/shared/state/myagent/telegram
 TELEGRAM_WORKSPACE_ROOT=/home/agentctl/.claude-lab/myagent/.claude
+TELEGRAM_WEBHOOK_HOST=127.0.0.1
+TELEGRAM_WEBHOOK_PORT=8089             # default port for hook receiver (Шаг 9)
 AGENT_ID=myagent
 ```
 
 Узнать свой `user_id` в Telegram — напишите [@userinfobot](https://t.me/userinfobot).
 
 `TELEGRAM_EXPECTED_BOT_ID` — числовая часть до двоеточия в `TELEGRAM_BOT_TOKEN`. Используется plugin'ом для anti-spoof.
+
+`TELEGRAM_WEBHOOK_PORT=8089` — порт, на котором плагин слушает Claude Code hooks (PreToolUse/PostToolUse/Stop/UserPromptSubmit/SessionStart). Меняйте только если у вас несколько агентов на одной машине и порт 8089 уже занят — тогда подставьте свободный (например 8090, 8091, …) и не забудьте передать его в `install-hooks.sh --webhook-url` (Шаг 9).
+
+> **Telegram output formatting** (как агент пишет в чат — markdown/HTML, redactor) — см. [03-installation.md → Telegram output formatting](03-installation.md#telegram-output-formatting). OS-agnostic, поведение одинаковое на Linux и macOS.
 
 ---
 
@@ -287,6 +293,29 @@ sudo -u agentctl bash /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-cl
 Для long-term memory pipeline (запись turn'ов в `<workspace>/core/hot/recent.md` + `verbose-YYYY-MM-DD.jsonl`) — раздел [`plugin/README.md` → Memory hooks](../plugin/README.md#memory-hooks-phase-8-config).
 
 Альтернатива: используйте gbrain ([qwwiwi/public-gbrain-agentos](https://github.com/qwwiwi/public-gbrain-agentos)) — там MCP-серверы для memory/recall/swarm.
+
+---
+
+## Логи и state канонические пути
+
+Плагин и Claude Code пишут в три разных места — supervisor stderr/stdout, plugin state dir, tmux pane history. Когда что-то ломается, открывайте в этом порядке:
+
+| Что | Где (Linux systemd) | Команда просмотра |
+|---|---|---|
+| Supervisor stderr/stdout (Claude Code + Bun) | journald, unit `channel-<agent>` | `journalctl -u channel-myagent -n 200 --no-pager` |
+| Supervisor live tail | journald | `journalctl -u channel-myagent -f` |
+| **`bot.pid`** (PID Bun процесса) | `${TELEGRAM_STATE_DIR}/bot.pid` | `cat /home/agentctl/.claude-lab/shared/state/myagent/telegram/bot.pid` |
+| **`access.json`** (multichat allowlist runtime state) | `${TELEGRAM_STATE_DIR}/access.json` | `jq . /home/agentctl/.claude-lab/shared/state/myagent/telegram/access.json` |
+| **`update-offset`** (Telegram getUpdates offset) | `${TELEGRAM_STATE_DIR}/update-offset` | `cat /home/agentctl/.claude-lab/shared/state/myagent/telegram/update-offset` |
+| **`dead-letter/`** (сообщения, которые не удалось доставить) | `${TELEGRAM_STATE_DIR}/dead-letter/` | `ls -la /home/agentctl/.claude-lab/shared/state/myagent/telegram/dead-letter/` |
+| **`permissions.jsonl`** (журнал allowlist-решений) | `${TELEGRAM_STATE_DIR}/logs/permissions.jsonl` | `tail -50 /home/agentctl/.claude-lab/shared/state/myagent/telegram/logs/permissions.jsonl` |
+| Tmux pane history (живой terminal Claude Code) | tmux session `channel-<agent>` | `sudo -u agentctl tmux capture-pane -p -t channel-myagent -S -200` |
+| Tmux attach (интерактивно) | tmux session | `sudo -u agentctl tmux attach -t channel-myagent` (detach Ctrl-B D) |
+| Workspace memory (если memory hooks включены) | `<workspace>/core/hot/recent.md` + `<workspace>/../logs/verbose-YYYY-MM-DD.jsonl` | `tail -100 /home/agentctl/.claude-lab/myagent/.claude/core/hot/recent.md` |
+
+`TELEGRAM_STATE_DIR` определяется в `channel.env` (Шаг 5). Если не задан — плагин падает на дефолт `/tmp/dashi-channel-state/<agent>/`, который **зачищается при reboot** — в production задавайте явно (рекомендуется `<shared>/state/<agent>/telegram/`).
+
+> **Не путайте supervisor stdout и tmux pane:** journald хранит то, что Bun/Claude Code напечатали в stderr/stdout процесса (логи плагина). Tmux pane — это **сам интерактивный terminal Claude Code** с его UI (welcome-промты, спиннеры, ответы модели). Bug в плагине ищите в journald, identity / welcome / context drift — в tmux pane.
 
 ---
 

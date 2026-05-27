@@ -1,13 +1,29 @@
 # Troubleshooting
 
-10 типовых проблем — все взяты из реальных инцидентов. Каждая: **симптом** → **корень** → **фикс** → **как не повторить**.
+11 типовых проблем — все взяты из реальных инцидентов. Каждая: **симптом** → **корень** → **фикс** → **как не повторить**.
 
-**Категории:**
-- Проблемы 1-6 — установка / миграция
-- Проблема 7 — OAuth expired (бот реагирует но не отвечает)
-- Проблема 8 — **Agent self-destruction** (catastrophic, обязательно прочесть)
-- Проблема 9 — Tmux death loop (claude exits → service crash loop)
-- Проблема 10 — Sudo deny rules (что должно блокироваться даже когда sudo allowed)
+> **Прочтите перед использованием.** Документ разделён на две секции:
+> - **Section A — Current (Bun plugin) — problems** — актуальные проблемы текущей версии плагина на Bun + TypeScript. Применимо ко всем установкам.
+> - **Section B — Pre-cutover migration only (Python gateway.py) — applicable until 2026-06-15** — проблемы, специфичные для миграции с legacy Python `gateway.py` на текущий плагин. **Skip if installing fresh after 2026-06-15** — после этой даты старый gateway уходит в отдельный billing pool, новые установки не пользуются им.
+>
+> Если ставите плагин с нуля и legacy gateway у вас никогда не было — читайте только Section A.
+
+**TOC:**
+
+### Section A — Current (Bun plugin)
+- [Проблема 1. Сервис «active», но Telegram не отвечает](#проблема-1-сервис-active-но-telegram-не-отвечает) [current]
+- [Проблема 2. Identity drift — агент отвечает как «default Claude»](#проблема-2-identity-drift--агент-отвечает-как-default-claude) [current]
+- [Проблема 4. Polling vs Webhook — где смотреть проблему](#проблема-4-polling-vs-webhook--где-смотреть-проблему) [current]
+- [Проблема 5. Allowlist отбивает ваше сообщение](#проблема-5-allowlist-отбивает-ваше-сообщение) [current]
+- [Проблема 7. Бот ставит реакции, но не отвечает (OAuth expired)](#проблема-7-бот-ставит-реакции-но-не-отвечает-oauth-expired) [current]
+- [Проблема 8. Agent self-destruction (rm -rf своего OAuth state)](#проблема-8-agent-self-destruction-rm--rf-своего-oauth-state) [current]
+- [Проблема 9. Tmux death loop](#проблема-9-tmux-death-loop-claude-exits--service-в-crash-loop) [current]
+- [Проблема 10. Sudo deny rules: что должно блокироваться ВСЕГДА](#проблема-10-sudo-deny-rules-что-должно-блокироваться-всегда) [current]
+- [Проблема 11. Agent silently stuck in interactive prompt](#проблема-11-agent-silently-stuck-in-interactive-prompt-askuserquestion-vim-less-etc) [current]
+
+### Section B — Pre-cutover migration only (Python gateway.py) — applicable until 2026-06-15
+- [Проблема 3. `getUpdates conflict` — две сессии слушают одного бота](#проблема-3-getupdates-conflict--две-сессии-слушают-одного-бота) [pre-cutover]
+- [Проблема 6. Потеря состояния при миграции](#проблема-6-потеря-состояния-при-миграции) [pre-cutover]
 
 ---
 
@@ -30,6 +46,10 @@
 | Env-файл | `cat /etc/dashi-plugin/<agent>/channel.env` | `cat ~/.claude-lab/<agent>/secrets/channel.env` |
 
 ---
+
+# Section A — Current (Bun plugin) — problems
+
+_Применимо ко всем установкам current Bun + TypeScript плагина. Читайте эту секцию даже если ставите плагин с нуля._
 
 ## Проблема 1. Сервис «active», но Telegram не отвечает
 
@@ -116,53 +136,7 @@ Persistent fix — записать accepts в `~/.claude/settings.json` (см. 
 
 ---
 
-## Проблема 3. `getUpdates conflict` — две сессии слушают одного бота
-
-### Симптом
-
-В логах плагина (`tmux capture-pane` или `journalctl`):
-
-```
-Error: 409 Conflict: terminated by other getUpdates request;
-make sure that only one bot instance is running
-```
-
-Telegram перестаёт отдавать обновления плагину.
-
-### Корень
-
-Telegram Bot API разрешает **только одного** активного `getUpdates` клиента на токен. Если запущено 2 процесса с одним и тем же `TELEGRAM_BOT_TOKEN` — они отбирают сообщения друг у друга, оба ломаются.
-
-Типичные сценарии:
-- Старый `gateway.py` процесс остался жив после миграции (вы запустили новый плагин но не выключили старый)
-- На двух хостах (staging + prod) одновременно запущены сервисы с одним токеном
-- Кто-то локально запустил `bun run start` для отладки, забыл выключить
-
-### Фикс
-
-```bash
-# 1. Найдите все процессы использующие этот токен
-sudo ss -tnp | grep <bot-id>
-ps -ef | grep -E "gateway|channel|claude" | grep -v grep
-
-# 2. Убедитесь что только один процесс должен слушать
-#    Остановите лишние:
-sudo systemctl stop channel-<old>
-# или
-sudo kill <pid-старого-gateway>
-
-# 3. Подождите 30 секунд — Telegram сбросит сторону "другого" клиента
-sleep 30
-
-# 4. Перезапустите ваш единственный процесс
-sudo systemctl restart channel-<agent>
-```
-
-### Как не повторить
-
-В процессе миграции — **сначала** stop старого gateway, **потом** start нового. См. [04-migration-from-gateway.md](04-migration-from-gateway.md) — там пошагово с правильным порядком.
-
-**Урок:** на одного бота — один процесс. Точка. Используйте отдельные тестовые боты (`@BotFather` создаёт их бесплатно) для отладки, не дёргайте production токен.
+> **Проблема 3** перенесена в [Section B → Проблема 3. `getUpdates conflict`](#проблема-3-getupdates-conflict--две-сессии-слушают-одного-бота). Применима только при миграции с legacy Python gateway.py до 2026-06-15.
 
 ---
 
@@ -239,52 +213,7 @@ Default allowlist в коде = `[<your-telegram-user-id>]` (зашитый user
 
 ---
 
-## Проблема 6. Потеря состояния при миграции
-
-### Симптом
-
-После переноса плагина на новое место (или обновления через `git pull` после большого диффа) — бот стартует с нуля: не помнит предыдущие разговоры, `recent.md` пустой, история чата потеряна.
-
-### Корень
-
-`TELEGRAM_STATE_DIR` указывает на путь, который пересоздался / переместился / не примонтировался. Этот каталог хранит:
-- `bot.pid` — PID-файл активного poller
-- `config.json` — runtime config (webhook/memory/status)
-- `inbox/` — голосовые/медиа от пользователя (downloaded files)
-- `logs/permissions.jsonl` — лог permission запросов
-
-Плюс — `<workspace>/core/hot/recent.md` (если memory hooks включены) — там хвост разговора.
-
-При переезде эти файлы должны переехать вместе с плагином, иначе агент стартует с пустой памятью.
-
-### Фикс / как не повторить
-
-**Перед переездом:**
-
-```bash
-# 1. Snapshot всего что нужно сохранить
-sudo systemctl stop channel-<agent>
-sudo tar czf /var/backups/<agent>-pre-migration-$(date +%Y%m%d).tgz \
-  /home/<service-user>/.claude-lab/<agent> \
-  /home/<service-user>/.claude-lab/shared/state/<agent> \
-  /etc/dashi-plugin/<agent> \
-  /etc/systemd/system/channel-<agent>.service
-```
-
-**После переезда:**
-
-```bash
-# 2. Перед стартом — verify state есть на месте
-ls -la $TELEGRAM_STATE_DIR/{bot.pid,config.json,inbox,logs}
-ls -la <workspace>/core/hot/recent.md
-
-# Только если оба есть — start
-sudo systemctl start channel-<agent>
-
-# 3. Smoke: ping бота, проверьте что помнит контекст
-```
-
-**Урок:** state-каталог — отдельная сущность от плагин-кода. При планировании переноса учитывайте оба пути. Никогда не делайте `rm -rf` старого workspace без snapshot.
+> **Проблема 6** перенесена в [Section B → Проблема 6. Потеря состояния при миграции](#проблема-6-потеря-состояния-при-миграции). Применима только при миграции с legacy Python gateway.py до 2026-06-15.
 
 ---
 
@@ -695,6 +624,111 @@ sudo -u <service-user> tmux send-keys -t channel-<agent> Down Down Enter
 ```
 
 Это спасает текущую сессию (контекст не теряется), но фикс через deny-list обязателен на следующий рестарт.
+
+---
+
+# Section B — Pre-cutover migration only (Python gateway.py) — applicable until 2026-06-15
+
+> **Когда читать эту секцию.** Только если у вас уже работает legacy Python `gateway.py` (репо `qwwiwi/jarvis-telegram-gateway` или приватный fork `qwwiwi/gateway-dashis-agents`) и вы мигрируете на текущий Bun-плагин до cutover 2026-06-15. Все остальные читатели — пропустите.
+>
+> После 2026-06-15 Anthropic разделяет billing: `claude -p` (Agent SDK) уходит в отдельный $200/мес pool. Любой `claude -p` spawn = расход из SDK pool. Старая gateway-архитектура перестаёт быть экономичной, и эти проблемы теряют актуальность. См. [04-migration-from-gateway.md](04-migration-from-gateway.md) для пошагового перехода.
+
+## Проблема 3. `getUpdates conflict` — две сессии слушают одного бота
+
+### Симптом
+
+В логах плагина (`tmux capture-pane` или `journalctl`):
+
+```
+Error: 409 Conflict: terminated by other getUpdates request;
+make sure that only one bot instance is running
+```
+
+Telegram перестаёт отдавать обновления плагину.
+
+### Корень
+
+Telegram Bot API разрешает **только одного** активного `getUpdates` клиента на токен. Если запущено 2 процесса с одним и тем же `TELEGRAM_BOT_TOKEN` — они отбирают сообщения друг у друга, оба ломаются.
+
+Типичные сценарии (все pre-cutover):
+- Старый `gateway.py` процесс остался жив после миграции (вы запустили новый плагин но не выключили старый)
+- На двух хостах (staging + prod) одновременно запущены сервисы с одним токеном
+- Кто-то локально запустил `bun run start` для отладки, забыл выключить
+
+### Фикс
+
+```bash
+# 1. Найдите все процессы использующие этот токен
+sudo ss -tnp | grep <bot-id>
+ps -ef | grep -E "gateway|channel|claude" | grep -v grep
+
+# 2. Убедитесь что только один процесс должен слушать
+#    Остановите лишние:
+sudo systemctl stop channel-<old>
+# или
+sudo kill <pid-старого-gateway>
+
+# 3. Подождите 30 секунд — Telegram сбросит сторону "другого" клиента
+sleep 30
+
+# 4. Перезапустите ваш единственный процесс
+sudo systemctl restart channel-<agent>
+```
+
+### Как не повторить
+
+В процессе миграции — **сначала** stop старого gateway, **потом** start нового. См. [04-migration-from-gateway.md](04-migration-from-gateway.md) — там пошагово с правильным порядком.
+
+**Урок:** на одного бота — один процесс. Точка. Используйте отдельные тестовые боты (`@BotFather` создаёт их бесплатно) для отладки, не дёргайте production токен.
+
+---
+
+## Проблема 6. Потеря состояния при миграции
+
+### Симптом
+
+После переноса плагина на новое место (или обновления через `git pull` после большого диффа) — бот стартует с нуля: не помнит предыдущие разговоры, `recent.md` пустой, история чата потеряна.
+
+### Корень
+
+`TELEGRAM_STATE_DIR` указывает на путь, который пересоздался / переместился / не примонтировался. Этот каталог хранит:
+- `bot.pid` — PID-файл активного poller
+- `config.json` — runtime config (webhook/memory/status)
+- `inbox/` — голосовые/медиа от пользователя (downloaded files)
+- `logs/permissions.jsonl` — лог permission запросов
+
+Плюс — `<workspace>/core/hot/recent.md` (если memory hooks включены) — там хвост разговора.
+
+При переезде эти файлы должны переехать вместе с плагином, иначе агент стартует с пустой памятью.
+
+### Фикс / как не повторить
+
+**Перед переездом:**
+
+```bash
+# 1. Snapshot всего что нужно сохранить (archive — НЕ rm)
+sudo systemctl stop channel-<agent>
+sudo tar czf /var/backups/<agent>-pre-migration-$(date +%Y%m%d).tgz \
+  /home/<service-user>/.claude-lab/<agent> \
+  /home/<service-user>/.claude-lab/shared/state/<agent> \
+  /etc/dashi-plugin/<agent> \
+  /etc/systemd/system/channel-<agent>.service
+```
+
+**После переезда:**
+
+```bash
+# 2. Перед стартом — verify state есть на месте
+ls -la $TELEGRAM_STATE_DIR/{bot.pid,config.json,inbox,logs}
+ls -la <workspace>/core/hot/recent.md
+
+# Только если оба есть — start
+sudo systemctl start channel-<agent>
+
+# 3. Smoke: ping бота, проверьте что помнит контекст
+```
+
+**Урок:** state-каталог — отдельная сущность от плагин-кода. При планировании переноса учитывайте оба пути. Архивируйте старый workspace (`tar czf` + `mv .old`) перед любыми деструктивными операциями — см. [04-migration-from-gateway.md → Шаг 7](04-migration-from-gateway.md#шаг-7-архивация-gateway-через-7-14-дней) для безопасного workflow.
 
 ---
 

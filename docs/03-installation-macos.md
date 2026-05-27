@@ -109,6 +109,8 @@ TELEGRAM_ALLOWED_USER_IDS=164795011
 TELEGRAM_ALLOWED_CHAT_IDS=164795011
 TELEGRAM_STATE_DIR=/Users/<you>/.claude-lab/shared/state/myagent/telegram
 TELEGRAM_WORKSPACE_ROOT=/Users/<you>/.claude-lab/myagent/.claude
+TELEGRAM_WEBHOOK_HOST=127.0.0.1
+TELEGRAM_WEBHOOK_PORT=8089             # default port for hook receiver (Шаг 10)
 AGENT_ID=myagent
 ```
 
@@ -116,7 +118,11 @@ AGENT_ID=myagent
 
 `TELEGRAM_EXPECTED_BOT_ID` — числовая часть до `:` в `TELEGRAM_BOT_TOKEN`. Используется для anti-spoof.
 
+`TELEGRAM_WEBHOOK_PORT=8089` — порт, на котором плагин слушает Claude Code hooks (PreToolUse/PostToolUse/Stop/UserPromptSubmit/SessionStart). Меняйте только если у вас несколько агентов на одной машине и порт 8089 уже занят — тогда подставьте свободный (например 8090, 8091, …) и не забудьте передать его в `install-hooks.sh --webhook-url` (Шаг 10).
+
 `chmod 600` — только вы можете читать. Не `640` как в Linux, потому что нет отдельной service-group.
+
+> **Telegram output formatting** (как агент пишет в чат — markdown/HTML, redactor) — см. [03-installation.md → Telegram output formatting](03-installation.md#telegram-output-formatting). OS-agnostic, поведение одинаковое на Linux и macOS.
 
 ---
 
@@ -420,6 +426,31 @@ launchctl kickstart -k gui/$(id -u)/com.dashi-plugin.channel-myagent
 3. **Tailscale + ssh** для удалённого доступа без открытия портов наружу
 4. **Time Machine** на внешний диск — снапшоты `~/.claude-lab/` сохраняются автоматически
 5. **Не используйте FileVault** на головном диске если хотите чтобы агенты стартовали ДО ввода пароля (FileVault блокирует boot до auth)
+
+---
+
+## Логи и state канонические пути
+
+launchd, плагин и Claude Code пишут в три разных места — supervisor stdout/stderr, plugin state dir, tmux pane history. Когда что-то ломается, открывайте в этом порядке:
+
+| Что | Где (macOS launchd) | Команда просмотра |
+|---|---|---|
+| Supervisor stdout (wrapper + Claude Code) | `~/Library/Logs/dashi-plugin/channel-<agent>.out.log` (через `StandardOutPath` в plist) | `tail -200 ~/Library/Logs/dashi-plugin/channel-myagent.out.log` |
+| Supervisor stderr | `~/Library/Logs/dashi-plugin/channel-<agent>.err.log` (через `StandardErrorPath`) | `tail -200 ~/Library/Logs/dashi-plugin/channel-myagent.err.log` |
+| Live tail (оба) | то же | `tail -f ~/Library/Logs/dashi-plugin/channel-myagent.{out,err}.log` |
+| launchd state агента (PID, последний exit, ThrottleInterval) | launchd in-memory | `launchctl print gui/$(id -u)/com.dashi-plugin.channel-myagent` |
+| **`bot.pid`** (PID Bun процесса) | `${TELEGRAM_STATE_DIR}/bot.pid` | `cat ~/.claude-lab/shared/state/myagent/telegram/bot.pid` |
+| **`access.json`** (multichat allowlist runtime state) | `${TELEGRAM_STATE_DIR}/access.json` | `jq . ~/.claude-lab/shared/state/myagent/telegram/access.json` |
+| **`update-offset`** (Telegram getUpdates offset) | `${TELEGRAM_STATE_DIR}/update-offset` | `cat ~/.claude-lab/shared/state/myagent/telegram/update-offset` |
+| **`dead-letter/`** (сообщения, которые не удалось доставить) | `${TELEGRAM_STATE_DIR}/dead-letter/` | `ls -la ~/.claude-lab/shared/state/myagent/telegram/dead-letter/` |
+| **`permissions.jsonl`** (журнал allowlist-решений) | `${TELEGRAM_STATE_DIR}/logs/permissions.jsonl` | `tail -50 ~/.claude-lab/shared/state/myagent/telegram/logs/permissions.jsonl` |
+| Tmux pane history (живой terminal Claude Code) | tmux session `channel-<agent>` | `tmux capture-pane -p -t channel-myagent -S -200` |
+| Tmux attach (интерактивно) | tmux session | `tmux attach -t channel-myagent` (detach Ctrl-B D) |
+| Workspace memory (если memory hooks включены) | `<workspace>/core/hot/recent.md` + `<workspace>/../logs/verbose-YYYY-MM-DD.jsonl` | `tail -100 ~/.claude-lab/myagent/.claude/core/hot/recent.md` |
+
+`TELEGRAM_STATE_DIR` определяется в `channel.env` (Шаг 5). Если не задан — плагин падает на дефолт `/tmp/dashi-channel-state/<agent>/`, который **зачищается при reboot** — в production задавайте явно (рекомендуется `~/.claude-lab/shared/state/<agent>/telegram/`).
+
+> **Не путайте supervisor stdout и tmux pane:** `.out.log` хранит то, что Bun / Claude Code напечатали в stderr/stdout процесса (логи плагина + сообщения wrapper-скрипта `log()`). Tmux pane — это **сам интерактивный terminal Claude Code** с его UI (welcome-промты, спиннеры, ответы модели). Bug в плагине ищите в `.out.log` / `.err.log`, identity / welcome / context drift — в tmux pane.
 
 ---
 
