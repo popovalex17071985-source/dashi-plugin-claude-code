@@ -83,6 +83,17 @@ const LONG_POLL_TIMEOUT_SEC = 25
 const MAX_409_ATTEMPTS = 8
 const MAX_401_ATTEMPTS = 3
 const BACKOFF_CAP_MS = 15_000
+// Reconnect backoff for transient errors (network drops, 5xx, 429 without
+// retry_after). Exponential 1s → 2s → 4s → ... capped at 60s, plus jitter to
+// avoid retry-synchronization across replicas. Reset to attempt=1 on every
+// successful getUpdates round (see loop()).
+const EXPONENTIAL_BACKOFF_BASE_MS = 1_000
+const RECONNECT_BACKOFF_CAP_MS = 60_000
+const RECONNECT_JITTER_MIN_MS = 100
+const RECONNECT_JITTER_MAX_MS = 1_000
+// Hard upper bound on the exponent so `2 ** exp` never overflows even if a
+// pathological stuck-transient run reaches very high attempt counters.
+const RECONNECT_MAX_EXPONENT = 30
 // Cap honour-retry_after at 10 minutes. If Telegram asks for longer the
 // answer is "operator action" rather than "sleep for hours".
 const FLOOD_BACKOFF_CAP_MS = 600_000
@@ -310,22 +321,58 @@ function classifyError(err: unknown): ErrorClass {
   return { kind: 'fatal', message: String(err), retriable: false }
 }
 
+// Exponential reconnect backoff used by the `transient` and (since
+// task #17) `flood`-without-retry_after paths.
+//
+// Sequence for attempt = 1, 2, 3, …: 1s, 2s, 4s, 8s, 16s, 32s, 60s, 60s, …
+// with [100..1000)ms jitter added to each step, hard-capped at
+// RECONNECT_BACKOFF_CAP_MS (inclusive of jitter).
+//
+// `attempt` is 1-based — the loop increments before calling this. We clamp
+// the exponent to RECONNECT_MAX_EXPONENT so that a stuck-transient run with
+// attempt counters running into the thousands never produces `Infinity` or
+// `NaN`. The rng parameter is injectable so unit tests can pin the jitter.
+export function reconnectSleepMs(
+  attempt: number,
+  rng: () => number = Math.random,
+): number {
+  // Coerce attempt at the API boundary: NaN/Infinity/fractional inputs from
+  // a hostile caller (or future drift in the counter type) collapse to a
+  // safe integer in [0, RECONNECT_MAX_EXPONENT].
+  const safeAttempt = Number.isFinite(attempt) ? Math.floor(attempt) : 0
+  const exp = Math.min(Math.max(0, safeAttempt - 1), RECONNECT_MAX_EXPONENT)
+  const base = Math.min(
+    EXPONENTIAL_BACKOFF_BASE_MS * 2 ** exp,
+    RECONNECT_BACKOFF_CAP_MS,
+  )
+  // Clamp the rng roll into [0, 1) so a hostile rng returning negative /
+  // NaN / >= 1 can't push the jitter below RECONNECT_JITTER_MIN_MS or
+  // produce NaN. Math.random's contract is already [0, 1); this is purely
+  // defensive for the exported helper signature.
+  const raw = rng()
+  const roll = Number.isFinite(raw) ? Math.min(Math.max(raw, 0), 0.999_999) : 0
+  const jitterRange = RECONNECT_JITTER_MAX_MS - RECONNECT_JITTER_MIN_MS
+  const jitter = RECONNECT_JITTER_MIN_MS + Math.floor(roll * jitterRange)
+  return Math.min(base + jitter, RECONNECT_BACKOFF_CAP_MS)
+}
+
 // Compute the actual sleep duration for a 429 response. Adds 100..500ms
 // jitter so concurrent retries don't dogpile, caps at FLOOD_BACKOFF_CAP_MS.
 // When `retryAfterSec` is undefined (Telegram omitted the hint), falls back
-// to the existing linear backoff so behaviour is purely additive.
+// to the exponential reconnect backoff (task #17 — was linear cap 15s
+// before, which under-handled real flood-control bursts).
 function floodSleepMs(
   retryAfterSec: number | undefined,
   attempt: number,
   rng: () => number = Math.random,
 ): number {
-  const jitter =
-    FLOOD_JITTER_MIN_MS + Math.floor(rng() * (FLOOD_JITTER_MAX_MS - FLOOD_JITTER_MIN_MS))
   if (retryAfterSec !== undefined) {
+    const jitter =
+      FLOOD_JITTER_MIN_MS + Math.floor(rng() * (FLOOD_JITTER_MAX_MS - FLOOD_JITTER_MIN_MS))
     const base = Math.max(0, retryAfterSec) * 1000
     return Math.min(base + jitter, FLOOD_BACKOFF_CAP_MS)
   }
-  return Math.min(1000 * Math.max(1, attempt), BACKOFF_CAP_MS)
+  return reconnectSleepMs(attempt, rng)
 }
 
 /**
@@ -677,8 +724,10 @@ export class TelegramPoller {
           return
         }
 
-        // Transient network / Telegram 5xx: backoff and retry forever.
-        const delay = Math.min(1000 * attempt, BACKOFF_CAP_MS)
+        // Transient network / Telegram 5xx: exponential reconnect backoff,
+        // retry forever (task #17). Counter resets on any successful round
+        // above, so a single good poll brings us back to the 1s step.
+        const delay = reconnectSleepMs(attempt)
         log.warn('transient poller error, retrying', {
           attempt,
           delay_ms: delay,

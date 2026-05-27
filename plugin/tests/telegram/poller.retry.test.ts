@@ -16,7 +16,7 @@ import type { Update } from 'grammy/types'
 import { getStatePaths, loadConfig, type AppConfig, type StatePaths } from '../../src/config.js'
 import { createLogger } from '../../src/log.js'
 import { ensureStateDirs } from '../../src/state/store.js'
-import { TelegramPoller } from '../../src/telegram/poller.js'
+import { TelegramPoller, reconnectSleepMs } from '../../src/telegram/poller.js'
 
 const FAKE_TOKEN = '123456789:AAH-fake_test_token_with_at_least_thirty_chars'
 
@@ -67,6 +67,48 @@ function flood(retryAfter: number | undefined): GrammyError {
   )
 }
 
+describe('reconnectSleepMs() — exponential backoff helper (task #17)', () => {
+  test('exponential growth at attempts 1..8 with rng=0 (lower jitter bound)', () => {
+    const rng = (): number => 0
+    expect(reconnectSleepMs(1, rng)).toBe(1_100) // 1000 + 100 min jitter
+    expect(reconnectSleepMs(2, rng)).toBe(2_100)
+    expect(reconnectSleepMs(3, rng)).toBe(4_100)
+    expect(reconnectSleepMs(4, rng)).toBe(8_100)
+    expect(reconnectSleepMs(5, rng)).toBe(16_100)
+    expect(reconnectSleepMs(6, rng)).toBe(32_100)
+    // attempt=7 → base 64_000, capped to 60_000 before + jitter then re-capped.
+    expect(reconnectSleepMs(7, rng)).toBe(60_000)
+    expect(reconnectSleepMs(8, rng)).toBe(60_000)
+  })
+
+  test('upper jitter bound saturates at the cap, never exceeds it', () => {
+    const rng = (): number => 0.999
+    // Within range: base + max jitter (999 rounded down)
+    expect(reconnectSleepMs(1, rng)).toBe(1_000 + 999) // 1999
+    expect(reconnectSleepMs(2, rng)).toBe(2_000 + 999) // 2999
+    // Cap path: base reached cap, jitter added then re-capped at 60_000.
+    expect(reconnectSleepMs(10, rng)).toBe(60_000)
+    expect(reconnectSleepMs(100, rng)).toBe(60_000)
+  })
+
+  test('overflow safety: very large attempt values do not produce Infinity/NaN', () => {
+    const rng = (): number => 0
+    const v1 = reconnectSleepMs(1_000, rng)
+    const v2 = reconnectSleepMs(Number.MAX_SAFE_INTEGER, rng)
+    for (const v of [v1, v2]) {
+      expect(Number.isFinite(v)).toBe(true)
+      expect(v).toBeGreaterThan(0)
+      expect(v).toBeLessThanOrEqual(60_000)
+    }
+  })
+
+  test('attempt=0 or negative collapses to the base step (not zero-sleep, not NaN)', () => {
+    const rng = (): number => 0
+    expect(reconnectSleepMs(0, rng)).toBe(1_000 + 100)
+    expect(reconnectSleepMs(-5, rng)).toBe(1_000 + 100)
+  })
+})
+
 describe('TelegramPoller 429 handling (TASK-7 bug B)', () => {
   test('429 with retry_after=10 sleeps ~10s + jitter (100..500ms), then retries', async () => {
     const { bot } = makeBotStub()
@@ -112,7 +154,7 @@ describe('TelegramPoller 429 handling (TASK-7 bug B)', () => {
     expect(delay).toBeLessThan(10_500)
   })
 
-  test('429 without retry_after falls back to linear backoff (no infinite/wrong sleep)', async () => {
+  test('429 without retry_after falls back to exponential reconnect backoff (task #17)', async () => {
     const { bot } = makeBotStub()
     const sleepCalls: number[] = []
     let call = 0
@@ -145,9 +187,12 @@ describe('TelegramPoller 429 handling (TASK-7 bug B)', () => {
     await poller.stop()
     await run
     expect(sleepCalls.length).toBeGreaterThanOrEqual(1)
-    // Fallback: floodCounter starts at 1, so 1000*1 = 1000 ms, < BACKOFF_CAP_MS.
+    // Task #17: floodCounter=1 → reconnectSleepMs(1) = base 1000ms +
+    // [100..1000)ms jitter, capped at 60_000. Was strict `=== 1000` before
+    // the unification with the transient backoff path.
     const delay = sleepCalls[0]!
-    expect(delay).toBe(1000)
+    expect(delay).toBeGreaterThanOrEqual(1_100)
+    expect(delay).toBeLessThan(2_000)
   })
 
   test('429 retry_after caps at 600s even if Telegram asks for more', async () => {
@@ -224,9 +269,110 @@ describe('TelegramPoller 429 handling (TASK-7 bug B)', () => {
     expect(calls).toBeGreaterThanOrEqual(3)
   })
 
+  test('transient errors follow exponential reconnect 1→60s (task #17)', async () => {
+    const { bot } = makeBotStub()
+    const sleepCalls: number[] = []
+    const transientErr = (): Error => {
+      const e = new Error('ETIMEDOUT')
+      ;(e as NodeJS.ErrnoException).code = 'ETIMEDOUT'
+      return e
+    }
+    const poller = new TelegramPoller(
+      {
+        bot,
+        config,
+        statePaths: paths,
+        log: createLogger('test'),
+        onUpdate: async () => undefined,
+      },
+      {
+        getUpdates: async () => {
+          throw transientErr()
+        },
+        sleep: async (ms) => {
+          sleepCalls.push(ms)
+          await new Promise((r) => setTimeout(r, 0))
+        },
+      },
+    )
+    const run = poller.start()
+    // Yield enough times for the loop to throw, sleep, retry, sleep, ...
+    // The Promise-microtask loop without real delay produces many iterations.
+    await new Promise((r) => setTimeout(r, 50))
+    await poller.stop()
+    await run
+
+    expect(sleepCalls.length).toBeGreaterThanOrEqual(6)
+    // Expected base sequence: 1000, 2000, 4000, 8000, 16000, 32000, 60000, 60000, ...
+    // With jitter [100, 1000), each step is in [base+100, base+1000).
+    const expectedBases = [1_000, 2_000, 4_000, 8_000, 16_000, 32_000]
+    for (let i = 0; i < expectedBases.length; i++) {
+      const base = expectedBases[i]!
+      const observed = sleepCalls[i]!
+      expect(observed).toBeGreaterThanOrEqual(base + 100)
+      expect(observed).toBeLessThan(base + 1_000)
+    }
+    // Past the 60s cap: hard-capped at exactly RECONNECT_BACKOFF_CAP_MS
+    // (cap is `Math.min(base + jitter, 60_000)`; once base hits the cap,
+    // adding jitter and re-capping always lands on 60_000 exactly).
+    const capped = sleepCalls.slice(6)
+    for (const ms of capped) {
+      expect(ms).toBe(60_000)
+    }
+  })
+
+  test('transient counter resets after a successful getUpdates round (task #17)', async () => {
+    const { bot } = makeBotStub()
+    const sleepCalls: number[] = []
+    let call = 0
+    const transientErr = (): Error => new Error('ECONNRESET')
+    const poller = new TelegramPoller(
+      {
+        bot,
+        config,
+        statePaths: paths,
+        log: createLogger('test'),
+        onUpdate: async () => undefined,
+      },
+      {
+        getUpdates: async () => {
+          call++
+          // Throw twice, then succeed, then throw again.
+          if (call === 1 || call === 2) throw transientErr()
+          if (call === 3) return []
+          if (call === 4) throw transientErr()
+          await new Promise((r) => setTimeout(r, 5))
+          return []
+        },
+        sleep: async (ms) => {
+          sleepCalls.push(ms)
+          await new Promise((r) => setTimeout(r, 0))
+        },
+      },
+    )
+    const run = poller.start()
+    await new Promise((r) => setTimeout(r, 50))
+    await poller.stop()
+    await run
+
+    // We expect at least three sleeps recorded — two before success, one after.
+    expect(sleepCalls.length).toBeGreaterThanOrEqual(3)
+    const [d1, d2, d3] = sleepCalls
+    // First failure → attempt=1, base 1000 + jitter.
+    expect(d1!).toBeGreaterThanOrEqual(1_100)
+    expect(d1!).toBeLessThan(2_000)
+    // Second failure → attempt=2, base 2000 + jitter.
+    expect(d2!).toBeGreaterThanOrEqual(2_100)
+    expect(d2!).toBeLessThan(3_000)
+    // After the successful round, attempt resets → first failure is back at base 1000.
+    expect(d3!).toBeGreaterThanOrEqual(1_100)
+    expect(d3!).toBeLessThan(2_000)
+  })
+
   test('existing 409 fatal-after-8 still works (regression check)', async () => {
     const { bot } = makeBotStub()
     let calls = 0
+    const sleepCalls: number[] = []
     const poller = new TelegramPoller(
       {
         bot,
@@ -245,7 +391,9 @@ describe('TelegramPoller 429 handling (TASK-7 bug B)', () => {
             {},
           )
         },
-        sleep: async () => undefined,
+        sleep: async (ms) => {
+          sleepCalls.push(ms)
+        },
       },
     )
     let caught: unknown
@@ -256,5 +404,9 @@ describe('TelegramPoller 429 handling (TASK-7 bug B)', () => {
     }
     expect((caught as Error).name).toBe('PollerFatalError')
     expect(calls).toBeGreaterThanOrEqual(8)
+    // Task #17 regression assertion: 409 path stays LINEAR (1000*attempt,
+    // cap 15s) — exponential reconnect must not apply to token-ownership
+    // contention.
+    expect(sleepCalls.slice(0, 7)).toEqual([1_000, 2_000, 3_000, 4_000, 5_000, 6_000, 7_000])
   })
 })
