@@ -107,7 +107,24 @@ bash plugin/scripts/smoke-test-progress.sh --bot-id <expected_bot_id>
 done -- Ns</pre>
 ```
 
-Если сообщение не пришло — смотри в лог плагина (`<state_dir>/logs/server.log`) на предмет `progress reporter ... failed`.
+Если сообщение не пришло — открой supervisor-лог плагина (см. раздел «Логи» ниже) и грепни `progress reporter ... failed` или `[webhook]`.
+
+---
+
+## Логи
+
+Плагин не пишет отдельного файла лога сервера — supervisor stdout/stderr перехватывается systemd или launchd, а runtime-артефакты лежат в `${TELEGRAM_STATE_DIR}`. Канонические пути (синхронизированы с [`docs/03-installation-linux.md`](../../docs/03-installation-linux.md#логи-и-state-канонические-пути) и [`docs/03-installation-macos.md`](../../docs/03-installation-macos.md)):
+
+| Что | Linux (systemd) | macOS (launchd) |
+|---|---|---|
+| **Supervisor stdout/stderr** (то, что плагин и Claude Code напечатали — здесь же лежат события `[webhook]` Progress Reporter / TaskMirror) | `journalctl -u channel-<agent> -f` | `tail -f ~/Library/Logs/dashi-plugin/channel-<agent>.out.log` и `.err.log` |
+| **Tmux pane** (живой UI Claude Code до того, как агент успел ответить — спиннеры, welcome-промты, draft-карточка ProgressReporter) | `tmux capture-pane -p -t channel-<agent>` (под service-user, `sudo -u <agent>`) | `tmux capture-pane -p -t channel-<agent>` |
+| **`permissions.jsonl`** (JSONL аудит каждого permission-решения, ретранслированного через Telegram) | `${TELEGRAM_STATE_DIR}/logs/permissions.jsonl` | то же |
+| **`dead-letter/`** (forensics — payload, который плагин не смог обработать) | `${TELEGRAM_STATE_DIR}/dead-letter/<bucket>/<timestamp>.json` (bucket = `webhook`, `updates`, …) | то же |
+
+`TELEGRAM_STATE_DIR` определяется в `channel.env`. Если не задан — default `/tmp/dashi-channel-state/<agent>/`, зачищается при reboot.
+
+> **Migration note (для тех, кто пришёл от предыдущей версии):** старая редакция этого гайда советовала смотреть файл лога сервера внутри state-каталога (`<state_dir>/logs/…`) — такого файла плагин **никогда не создавал**, ссылка была фантомной. Реальный supervisor-лог живёт в journald (Linux) или `~/Library/Logs/dashi-plugin/` (macOS). Permission-аудит и dead-letter лежат рядом со state в `${TELEGRAM_STATE_DIR}`.
 
 ---
 
@@ -121,6 +138,7 @@ done -- Ns</pre>
 | Сообщение в TG не приходит | `config.progress.enabled = false` | поставь `true` в `<state_dir>/config.json` → `progress: { enabled: true }` |
 | Сообщение приходит, но всегда новое (не редактируется) | session_ttl_ms экспайрил | events отправляются с разрывом > `session_ttl_ms` (default 10m) — это by design |
 | Все события для одного tool сливаются в одну карточку, новая сессия их не сбрасывает | `Stop` hook не доходит до webhook | проверь что Stop hook есть в settings.json с marker `dashi-channel-hook` |
+| Webhook ничего не отвечает, supervisor лог чист | hook реально не отправил запрос (например, `dashi-channel-hook` marker сломан) | `tmux capture-pane -p -t channel-<agent>` покажет вывод post-hook.ts до того, как Claude Code продолжит; параллельно `tail -F ${TELEGRAM_STATE_DIR}/dead-letter/webhook/` — если payload отбракован, он попадёт сюда |
 
 ---
 

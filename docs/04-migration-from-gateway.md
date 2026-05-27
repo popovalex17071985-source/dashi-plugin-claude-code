@@ -177,20 +177,43 @@ sudo systemctl restart channel-<agent>
 
 ---
 
-## Шаг 7. Удаление gateway (через 7-14 дней)
+## Шаг 7. Архивация gateway (через 7-14 дней)
 
-**Не удаляйте сразу.** Дайте плагину 1-2 недели поработать в production. Если за это время не было критичных багов — удалите gateway:
+**Не удаляйте сразу.** Дайте плагину 1-2 недели поработать в production. Если за это время не было критичных багов — архивируйте gateway (move, не delete), чтобы при необходимости откатиться.
+
+### Шаг 7.1. Archive — снимок tarball
 
 ```bash
-# Backup ещё раз перед удалением
+# Final backup перед сдвигом
+tar czf ~/jarvis-telegram-gateway-backup-$(date +%Y%m%d).tgz \
+  ~/jarvis-telegram-gateway
 sudo tar czf /var/backups/gateway-final-$(date +%Y%m%d).tgz \
-  ~/jarvis-telegram-gateway \
   /etc/systemd/system/<gateway-unit>.service
+```
 
-# Удаление
-sudo rm /etc/systemd/system/<gateway-unit>.service
+### Шаг 7.2. Move — отключаем юнит и переименовываем каталог
+
+```bash
+# Disable systemd unit (не удаляем .service файл — переносим в .disabled)
+sudo systemctl disable <gateway-unit>
+sudo mv /etc/systemd/system/<gateway-unit>.service \
+        /etc/systemd/system/<gateway-unit>.service.disabled
 sudo systemctl daemon-reload
-sudo rm -rf ~/jarvis-telegram-gateway
+
+# Move gateway directory (НЕ rm — переименуйте в .old)
+mv ~/jarvis-telegram-gateway ~/jarvis-telegram-gateway.old
+```
+
+Каталог `~/jarvis-telegram-gateway.old` остаётся на диске как rollback-артефакт. При проблеме на плагине: `mv` обратно, `mv` unit-файл обратно, `daemon-reload`, `systemctl start <gateway-unit>` — старый gateway снова работает.
+
+### Шаг 7.3. Очистка (опционально, только после явной верификации стабильности)
+
+**Выполняйте только если** прошёл месяц стабильной работы плагина и вы готовы отказаться от опции быстрого rollback. Можно вообще не выполнять — `.old` каталог занимает мало места и служит страховкой:
+
+```bash
+# Optional cleanup — только если уверены, что rollback не понадобится
+rm -rf ~/jarvis-telegram-gateway.old
+sudo rm /etc/systemd/system/<gateway-unit>.service.disabled
 ```
 
 Старый workspace (если он отдельный от нового) — оставьте ещё на месяц, для подстраховки.
