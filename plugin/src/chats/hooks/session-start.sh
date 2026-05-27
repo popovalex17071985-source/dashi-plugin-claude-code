@@ -20,6 +20,15 @@
 
 set -euo pipefail
 
+# Sentinel: this hook is multichat-specific. If MULTICHAT_STATE_DIR is unset
+# the hook is running outside a per-chat tmux session (e.g. accidentally
+# registered into the master Thrall workspace). Exit cleanly without emitting
+# any additionalContext so the master session is not polluted with a chat
+# persona it never asked for.
+if [[ -z "${MULTICHAT_STATE_DIR:-}" ]]; then
+  exit 0
+fi
+
 if [[ -z "${CHAT_ID:-}" ]]; then
   echo "session-start: CHAT_ID not set, skipping persona injection" >&2
   exit 0

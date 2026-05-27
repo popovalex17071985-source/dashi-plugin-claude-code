@@ -18,7 +18,7 @@ import { Bot } from 'grammy'
 import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync } from 'fs'
 import { execSync } from 'child_process'
 import { homedir } from 'os'
-import { join } from 'path'
+import { isAbsolute, join, resolve as resolvePath } from 'path'
 
 import {
   RuntimeEnvSchema,
@@ -39,11 +39,11 @@ import {
 import { createSafeTelegramApi } from './safety/safe-telegram-api.js'
 import { createRateLimitedTelegramApi } from './safety/rate-limited-telegram-api.js'
 import { redactSecrets } from './safety/redact.js'
-import { StatusManager, shouldStream } from './status/status-manager.js'
+import { StatusManager } from './status/status-manager.js'
 import { ProgressReporter } from './status/progress-reporter.js'
 import { TaskMirror } from './status/task-mirror.js'
-import { TmuxMirror, shouldEnableMirror } from './status/tmux-mirror.js'
-import { loadPolicy, type MultichatPolicy } from './chats/policy-loader.js'
+import { TmuxMirror } from './status/tmux-mirror.js'
+import { loadPolicyFromPath, type MultichatPolicy } from './chats/policy-loader.js'
 import { MultichatRouter } from './router/multichat-router.js'
 import { TmuxSessionPool } from './router/tmux-session-pool.js'
 import { InboundWatcher } from './telegram/watcher.js'
@@ -58,6 +58,7 @@ import {
   type PermissionDeps,
 } from './channel/permissions.js'
 import { TelegramPoller, tokenLock } from './telegram/poller.js'
+import { describePidHolder, readLockHolder } from './telegram/pid-inspect.js'
 import { BOT_COMMANDS } from './commands/oob.js'
 import { startWebhookServer, type WebhookServerHandle } from './webhook/server.js'
 import {
@@ -74,6 +75,10 @@ import {
   type HandlerDeps,
 } from './telegram/handlers.js'
 import { AlbumBuffer } from './telegram/album-buffer.js'
+import {
+  ensureAlbumsDir,
+  recoverPendingAlbums,
+} from './telegram/album-persistence.js'
 import type { BotIdentity } from './prompt/build.js'
 
 const INSTRUCTIONS_TEMPLATE = [
@@ -189,11 +194,29 @@ if (!process.env.TELEGRAM_BOT_TOKEN) {
 
 // Last-resort safety net — without these the process dies silently on any
 // unhandled promise rejection. With them it logs and keeps serving tools.
+//
+// HIGH #11 / TASK-8: we maintain a mutable secret list so the crash
+// handlers can be registered BEFORE the full set of secrets is known
+// (Telegram bot token from env is the only one in scope at this point).
+// Downstream code appends webhook token + Groq key once the runtime
+// env is parsed. `redactToken` (alias of `redactSecrets`) already runs
+// the full pattern-based redactor (Telegram tokens, Bearer, IP, etc.);
+// the exact-substring list catches secrets that have NO public shape
+// (TELEGRAM_WEBHOOK_TOKEN) so an unhandled rejection containing the
+// raw webhook token can't ship verbatim to stderr.
+const crashSecrets: string[] = []
+if (process.env.TELEGRAM_BOT_TOKEN !== undefined) {
+  crashSecrets.push(process.env.TELEGRAM_BOT_TOKEN)
+}
 process.on('unhandledRejection', err => {
-  process.stderr.write(redactToken(`telegram channel: unhandled rejection: ${String(err)}\n`))
+  process.stderr.write(
+    redactToken(`telegram channel: unhandled rejection: ${String(err)}\n`, crashSecrets),
+  )
 })
 process.on('uncaughtException', err => {
-  process.stderr.write(redactToken(`telegram channel: uncaught exception: ${String(err)}\n`))
+  process.stderr.write(
+    redactToken(`telegram channel: uncaught exception: ${String(err)}\n`, crashSecrets),
+  )
 })
 
 // Parse env strictly via Zod so downstream code can rely on the shape.
@@ -231,10 +254,19 @@ migrateLegacyAllowlist(statePaths)
 
 // Secrets we want redacted by exact match in addition to pattern-based
 // redaction (Telegram bot token, Groq key, Bearer/query tokens). The webhook
-// token has no public pattern — feed it in explicitly.
+// token has no public pattern — feed it in explicitly. We also append the
+// same secrets to `crashSecrets` so the unhandledRejection/uncaughtException
+// handlers registered above pick them up retroactively (the closure reads
+// the array on every fire — push extends the live redaction set).
 const logSecrets: string[] = []
-if (env.TELEGRAM_WEBHOOK_TOKEN) logSecrets.push(env.TELEGRAM_WEBHOOK_TOKEN)
-if (env.GROQ_API_KEY) logSecrets.push(env.GROQ_API_KEY)
+if (env.TELEGRAM_WEBHOOK_TOKEN) {
+  logSecrets.push(env.TELEGRAM_WEBHOOK_TOKEN)
+  crashSecrets.push(env.TELEGRAM_WEBHOOK_TOKEN)
+}
+if (env.GROQ_API_KEY) {
+  logSecrets.push(env.GROQ_API_KEY)
+  crashSecrets.push(env.GROQ_API_KEY)
+}
 const log = createLogger('dashi-channel', { secrets: logSecrets })
 
 // Lock down the env file to owner-only after we've read it.
@@ -246,8 +278,9 @@ try {
 
 // ─────────────────────────────────────────────────────────────────────
 // Multichat policy load (Phase 3, 2026-05-23). Default OFF. We load the
-// policy here so StatusManager and TmuxMirror can consult it at
-// construction time (`streamingEnabled`, `enabled` opts) and so server.ts
+// policy here so StatusManager and TmuxMirror can consult it per call
+// (`policy` constructor opt → fail-CLOSED `shouldStreamForChat` /
+// `shouldMirrorTmuxForChat` on every public method) and so server.ts
 // has a single, early failure point if the policy is malformed. Pool
 // and router are instantiated later — they depend on bot.api.
 //
@@ -257,8 +290,18 @@ try {
 //   3. parent of cwd — for the canonical layout
 //      `~/.claude-lab/thrall/.claude/jarvis-channel/plugin`,
 //      this resolves to `~/.claude-lab/thrall/.claude`
-// policy_path defaults to `{workspaceDir}/chats/policy.yaml`.
-// state_dir   defaults to `{workspaceDir}/state/multichat`.
+//
+// Resolution order for the policy file path (FIX-G / M3, Codex review
+// 2026-05-27 #4 — the env var name `_POLICY_PATH` was being treated as
+// a directory hint, so `/etc/edge/my-policy.yaml` silently became
+// `/etc/edge/policy.yaml`):
+//   1. config.multichat.policy_path (which also picks up the
+//      `TELEGRAM_MULTICHAT_POLICY_PATH` env var via config.ts merge)
+//      → EXACT file path. A relative value is resolved against
+//      `multichatWorkspaceDir`.
+//   2. otherwise → `{workspaceDir}/chats/policy.yaml`.
+//
+// state_dir defaults to `{workspaceDir}/state/multichat`.
 //
 // Failure mode: a missing or invalid policy degrades to multichat-OFF
 // (router stays undefined). We log the error but DO NOT crash — the
@@ -272,19 +315,28 @@ if (config.multichat.enabled) {
     config.multichat.workspace_dir
     ?? process.env.CLAUDE_WORKSPACE_DIR
     ?? join(process.cwd(), '..')
-  multichatPolicyPath =
-    config.multichat.policy_path
-    ?? join(multichatWorkspaceDir, 'chats', 'policy.yaml')
+  // FIX-G / M3: treat policy_path as an exact file path. A relative
+  // value (e.g. `chats/staging-policy.yaml`) is resolved against the
+  // workspace dir so existing dev workflows that pass a project-rooted
+  // relative path keep working. An absolute value passes through
+  // untouched.
+  const configuredPolicyPath = config.multichat.policy_path
+  if (configuredPolicyPath !== undefined && configuredPolicyPath !== '') {
+    multichatPolicyPath = isAbsolute(configuredPolicyPath)
+      ? configuredPolicyPath
+      : resolvePath(multichatWorkspaceDir, configuredPolicyPath)
+  } else {
+    multichatPolicyPath = join(multichatWorkspaceDir, 'chats', 'policy.yaml')
+  }
   multichatStateDir =
     config.multichat.state_dir
     ?? join(multichatWorkspaceDir, 'state', 'multichat')
 
   try {
-    // loadPolicy(basePath) reads `{basePath}/policy.yaml`. If the
-    // caller provided a custom policy_path file, derive the basePath
-    // from its parent directory.
-    const policyBaseDir = pathDirname(multichatPolicyPath)
-    multichatPolicy = loadPolicy(policyBaseDir)
+    // FIX-G / M3: loadPolicyFromPath reads the EXACT file. We no
+    // longer derive a parent dir and call loadPolicy(dir) — that
+    // path silently rewrote any custom filename to `policy.yaml`.
+    multichatPolicy = loadPolicyFromPath(multichatPolicyPath)
     log.info('multichat policy loaded', {
       chats_in_policy: Object.keys(multichatPolicy.chats).length,
       policy_path: multichatPolicyPath,
@@ -302,29 +354,38 @@ if (config.multichat.enabled) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Stale poller PID check + token lock. Telegram allows exactly one
-// getUpdates consumer. If a previous session crashed its server.ts
-// grandchild can survive as an orphan and hold the slot forever. Kill
-// any stale holder, then acquire the bot.pid lock for ourselves before
-// starting the poller.
+// Token lock. Telegram allows exactly one getUpdates consumer. We
+// delegate the live/stale liveness decision to `tokenLock.acquire`
+// (see plugin/src/telegram/poller.ts): it overwrites a stale entry in
+// place, but refuses (returns false) when a live foreign PID still
+// holds the lock.
+//
+// SECURITY NOTE (TASK-8 / HIGH #10): we DO NOT send SIGTERM to the
+// holding PID from bootstrap. A stale or tampered bot.pid file under a
+// writable state dir would otherwise let an attacker (or a previous
+// crashed run with a recycled PID) kill an arbitrary process owned by
+// the same user. Instead we read the holder's PID + cmdline (Linux
+// /proc, best-effort) into the refuse-to-start log line and exit
+// non-zero. An operator decides whether the holder is a real running
+// poller or a stale lock — far safer than a blind SIGTERM.
 // ─────────────────────────────────────────────────────────────────────
 
 mkdirSync(statePaths.root, { recursive: true, mode: 0o700 })
-try {
-  const stale = parseInt(readFileSync(statePaths.pid, 'utf8'), 10)
-  if (stale > 1 && stale !== process.pid) {
-    process.kill(stale, 0)
-    log.warn('replacing stale poller', { pid: stale })
-    process.kill(stale, 'SIGTERM')
-  }
-} catch {
-  // No stale pid file or stale process already gone.
-}
 
 if (!tokenLock.acquire(statePaths)) {
+  // Best-effort enrichment: read the PID from the lock file and the
+  // process cmdline from /proc to help the operator identify the
+  // holder. Both calls are pure reads, no side effects, no signals.
+  const holderPid = readLockHolder(statePaths.pid)
+  const description =
+    holderPid !== undefined ? describePidHolder(holderPid) : 'pid=unknown'
   process.stderr.write(
-    `telegram channel: another poller holds bot.pid at ${statePaths.pid}\n` +
-      `  refusing to start a second consumer (Telegram would 409 anyway)\n`,
+    redactToken(
+      `telegram channel: another instance running, ${description} holds bot.pid at ${statePaths.pid}\n` +
+        `  refusing to start a second consumer (Telegram would 409 anyway)\n` +
+        `  if you believe this is a stale lock, stop the holder manually or remove the file\n`,
+      crashSecrets,
+    ),
   )
   process.exit(1)
 }
@@ -377,21 +438,21 @@ const mcp = new Server(
 // message we edit while Claude is composing a reply. The handler opens it
 // on inbound delivery; the reply tool closes it on successful send.
 //
-// Multichat gate: when a policy is loaded, we check whether the warchief's
-// chat (first entry of allowed_chat_ids, which is the canonical 164795011)
-// has streaming enabled. A `streaming: 'off'` chat turns the manager into
-// a no-op shell — final reply still arrives via the router's outbox loop.
-const warchiefChatIdRaw = config.allowed_chat_ids[0]
-const warchiefChatId =
-  warchiefChatIdRaw !== undefined ? String(warchiefChatIdRaw) : '164795011'
-const statusStreamingEnabled = multichatPolicy
-  ? shouldStream(warchiefChatId, multichatPolicy)
-  : true
+// Multichat gate: we pass the loaded policy (or `null` for legacy
+// single-DM mode) and let StatusManager evaluate
+// `shouldStreamForChat(policy, chatId)` per call. Codex review
+// 2026-05-27 (CRITICAL #1 / HIGH #9) found that the previous
+// construction-time `streamingEnabled` boolean was anchored to the
+// warchief's chat id — when warchief DM had `streaming: 'progress'`,
+// every public group was implicitly allowed to stream, even those
+// explicitly configured `streaming: 'off'`. Passing the policy
+// reference keeps each chat isolated to its own entry, and an
+// unlisted chat is fail-closed (no rolling status).
 const statusManager = new StatusManager({
   telegramApi,
   config,
   log,
-  streamingEnabled: statusStreamingEnabled,
+  policy: multichatPolicy ?? null,
 })
 
 // ProgressReporter (2026-05-18) — separate persistent thread showing
@@ -418,12 +479,14 @@ if (config.tmux_mirror.enabled) {
   if (mirrorChatId === '') {
     log.warn('tmux mirror enabled but no allowed_chat_ids configured — skipping')
   } else {
-    // Multichat gate: a `tmux_mirror: false` chat in policy (e.g. the
-    // public group) turns the mirror into a no-op shell — pane content
-    // never reaches Telegram. DM warchief chat keeps the default `true`.
-    const mirrorEnabled = multichatPolicy
-      ? shouldEnableMirror(mirrorChatId, multichatPolicy)
-      : true
+    // Multichat gate: the mirror gates fail-closed against its own
+    // `chatId` via `shouldMirrorTmuxForChat(policy, chatId)` on every
+    // public entry point. A `tmux_mirror: false` chat in policy
+    // (typically a public group) turns the mirror into a no-op
+    // shell — pane content never reaches Telegram. Pre-fix (codex
+    // review 2026-05-27, HIGH #9) we passed a pre-resolved boolean
+    // derived from the warchief's chat id; that fail-open path
+    // leaked pane content into chats absent from policy.
     tmuxMirror = new TmuxMirror({
       api: telegramApi,
       log,
@@ -435,7 +498,7 @@ if (config.tmux_mirror.enabled) {
       mode: config.tmux_mirror.mode,
       maxLines: config.tmux_mirror.max_lines,
       redact: (text) => redactSecrets(text, apiSecrets),
-      enabled: mirrorEnabled,
+      policy: multichatPolicy ?? null,
     })
     void tmuxMirror.start().catch((err: unknown) => {
       log.warn('tmux mirror start failed', {
@@ -757,36 +820,20 @@ function shutdown(): void {
     multichatPool.stopWatchdog()
   }
 
-  // Drain any pending album buffers — fire one final notification per
-  // album so messages already received aren't dropped. We don't await
-  // (shutdown is bounded by the 2s setTimeout below); each call is
-  // best-effort and logs internally.
+  // TASK-4 Bug #2 (2026-05-27): album fragments now persist to
+  // `<state>/albums/<key>/` BEFORE the in-memory buffer accepts them.
+  // The shutdown path therefore does NOT need to fire one final
+  // dispatch — it would race the 2s SIGKILL deadline and historically
+  // emitted with empty chat/sender ids (broken for multichat). Cancel
+  // every in-memory buffer (clear timers, free memory) and trust the
+  // next startup's recoverPendingAlbums pass to replay each pending
+  // dir from disk.
   try {
     const pending = albumBuffer.flushAll()
     for (const album of pending) {
-      const first = album.messages[0]
-      const reply = album.messages.find((m) => m.reply !== undefined)?.reply
-      void sendAlbumNotification(
-        album,
-        {
-          // We didn't capture per-album chatId/senderId in this drain path;
-          // shutdown drain emits with empty ids so the agent at least sees
-          // the album content rather than losing it silently. `user` is a
-          // required field on the router-aware DTO; on the shutdown drain
-          // path no router is wired in deps, so it is never actually read.
-          chatId: '',
-          senderId: '',
-          user: '',
-          mediaGroupId: album.mediaGroupId,
-          kind: 'album_shutdown',
-        },
-        { server: mcp, config, log, bot: botIdentity, telegramApi, statusManager },
-      )
-      log.info('album drained on shutdown', {
+      log.info('album left for recovery on shutdown', {
         media_group_id: album.mediaGroupId,
         album_size: album.messages.length,
-        first_message_id: first?.messageId,
-        had_reply: reply !== undefined,
       })
     }
   } catch (err) {
@@ -910,7 +957,74 @@ void (async () => {
   }
 })()
 
+// FIX-G / M1 (Codex review 2026-05-27 #2): ordered async startup.
+// Previously `recoverPendingAlbums` ran via `void` and `poller.start()`
+// fired immediately after — recovered albums could race fresh inbound
+// updates for the same composite key. We now await recovery BEFORE
+// arming the poller so the race is closed by construction.
+//
+// Failure semantics:
+//   * Album recovery failures are non-fatal (logged, continue) — a
+//     corrupt album dir lives in `<state>/albums/dead-letter/` and
+//     operators can replay manually. Refusing to start the poller
+//     because of one bad album would make a single corrupt fragment
+//     poison the entire channel.
+//   * Poller start failure IS fatal — `shutdown()` runs the same
+//     teardown the SIGTERM path does.
 void (async () => {
+  try {
+    await ensureAlbumsDir(statePaths.root)
+  } catch (err) {
+    log.warn('album state dir setup failed (continuing)', {
+      error: err instanceof Error ? err.message : String(err),
+    })
+  }
+
+  try {
+    const stats = await recoverPendingAlbums<AlbumEntry>({
+      stateDir: statePaths.root,
+      log,
+      flush: async ({ meta, fragments }) => {
+        // Synthesize an in-memory Album from disk fragments and run it
+        // through the same dispatch path live flushes use. The shape
+        // matches AlbumBuffer's Album<TMessage> contract.
+        const albumPayload = {
+          mediaGroupId: meta.mediaGroupId,
+          messages: fragments,
+          firstAt: meta.firstAt,
+          lastAt: meta.firstAt,
+        }
+        await sendAlbumNotification(
+          albumPayload,
+          {
+            chatId: meta.chatId,
+            senderId: meta.senderId,
+            user: meta.user,
+            mediaGroupId: meta.mediaGroupId,
+            kind: meta.kind,
+          },
+          {
+            server: mcp,
+            config,
+            log,
+            bot: botIdentity,
+            telegramApi,
+            statusManager,
+            ...(multichatRouter !== undefined ? { router: multichatRouter } : {}),
+            ...(multichatPolicy !== undefined ? { policy: multichatPolicy } : {}),
+          },
+        )
+      },
+    })
+    log.info('album recovery completed', stats)
+  } catch (err) {
+    log.warn('album recovery failed (continuing)', {
+      error: err instanceof Error ? err.message : String(err),
+    })
+  }
+
+  // Poller starts ONLY after recovery has resolved. The await chain
+  // above is what closes the race in M1.
   try {
     await poller!.start()
   } catch (err) {

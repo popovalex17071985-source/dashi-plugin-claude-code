@@ -29,6 +29,15 @@
 
 set -euo pipefail
 
+# Sentinel: this hook is multichat-specific. If MULTICHAT_STATE_DIR is unset
+# the hook is running outside a per-chat tmux session (e.g. accidentally
+# registered into the master Thrall workspace via a stray settings.json) and
+# applying the strict gate would lock the master session out of every Bash /
+# Edit / Read call. Pass-through silently.
+if [[ -z "${MULTICHAT_STATE_DIR:-}" ]]; then
+  exit 0
+fi
+
 # Fail-safe: CHAT_ID missing -> full deny.
 if [[ -z "${CHAT_ID:-}" ]]; then
   printf '%s\n' '{"decision":"block","reason":"CHAT_ID env var missing (fail-safe deny)"}'

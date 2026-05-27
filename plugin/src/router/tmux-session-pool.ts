@@ -24,28 +24,151 @@
 
 import { spawn, type SpawnOptions } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-import type { MultichatPolicy } from '../chats/policy-loader.ts'
+import type { MultichatPolicy } from '../chats/policy-loader.js'
+
+// Resolve the spawn-chat-shell.sh wrapper relative to THIS module so
+// it works regardless of cwd. The wrapper lives at
+// `plugin/scripts/spawn-chat-shell.sh`; this file is at
+// `plugin/src/router/tmux-session-pool.ts`, so `../../scripts/...`
+// from the module's dir yields the right path in both source and
+// compiled layouts (Bun preserves the relative structure).
+const MODULE_DIR = dirname(fileURLToPath(import.meta.url))
+const DEFAULT_SPAWN_WRAPPER_PATH = resolve(
+  MODULE_DIR,
+  '..',
+  '..',
+  'scripts',
+  'spawn-chat-shell.sh',
+)
 
 // Environment variables that, if present in the plugin's own env, must
 // NEVER be inherited by the spawned `claude` tmux session. Telegram /
 // Groq / gbrain credentials belong to the plugin orchestrator, not to
 // the user-facing claude instance — leaking them gives a compromised
-// session unintended escalation paths. L7 fix (2026-05-23): we log a
-// warning if any of these are set in our env so an operator catches
-// accidental inheritance, and `spawnInternal` explicitly overrides
-// PATH/HOME/USER on the tmux invocation rather than letting tmux pass
-// the full parent env verbatim.
+// session unintended escalation paths.
+//
+// TASK-6 fix (2026-05-27): the previous L7 implementation only WARNED
+// when these were present and still passed the full parent env to
+// tmux. We now build an explicit allowlist (TMUX_CHILD_ENV_ALLOWLIST)
+// and pass ONLY those keys to the tmux session env, plus chat-specific
+// vars via `-e`. The list below is the warn list for human-visible
+// keys we know about; the FORBIDDEN_ENV_REGEX below catches anything
+// matching a credential-shaped suffix even if it's not enumerated.
 const SENSITIVE_ENV_VARS = [
   'TELEGRAM_BOT_TOKEN',
+  'TELEGRAM_WEBHOOK_TOKEN',
   'GROQ_API_KEY',
   'GBRAIN_BEARER',
   'GBRAIN_API_KEY',
   'ANTHROPIC_API_KEY',
   'OPENAI_API_KEY',
 ] as const
+
+// Strict allowlist of env keys forwarded into the per-chat tmux
+// session. Anything NOT on this list is dropped — tmux's new-session
+// receives a sanitized env via the spawning Node child_process AND
+// the per-session env is rebuilt from `-e KEY=VAL` flags so no
+// inherited variable leaks through tmux's global environment table.
+//
+// Rationale for each key:
+//   PATH    — required to locate python3 (hooks) and the claude binary
+//             if it was not pre-resolved by server.ts (H8). Without
+//             PATH the child shell cannot start anything.
+//   HOME    — claude reads ~/.claude/*, ~/.claude-lab/*, ssh keys, etc.
+//             Hooks resolve workspace via ${HOME}/.claude-lab/... when
+//             CLAUDE_WORKSPACE_DIR is unset; HOME is the canonical
+//             fallback root for user data.
+//   USER    — some tools (git, ssh) read $USER instead of getlogin().
+//   LANG / LC_ALL — UTF-8 locale; without these claude / python emit
+//             encoding errors on Cyrillic content.
+//   TERM    — interactive claude renders TUI; without TERM the
+//             readline + spinner code paths fall back to ASCII-only.
+//   SHELL   — claude shells out to $SHELL for Bash tool calls. Falls
+//             back to /bin/sh if missing, but that breaks user's
+//             aliases/PATH munging in their normal shell.
+//   TZ      — claude / date / log timestamps; absence forces UTC which
+//             is fine but TZ is informational, not sensitive.
+//
+// CHAT_ID, MULTICHAT_STATE_DIR, CLAUDE_WORKSPACE_DIR, TMUX_PANE are
+// set explicitly per-session in spawnInternal and are NOT inherited
+// from the parent env — they always come from pool state.
+const TMUX_CHILD_ENV_ALLOWLIST = [
+  'PATH',
+  'HOME',
+  'USER',
+  'LANG',
+  'LC_ALL',
+  'LANGUAGE',
+  'TERM',
+  'SHELL',
+  'TZ',
+  'COLORTERM',
+  'XDG_CONFIG_HOME',
+  'XDG_DATA_HOME',
+  'XDG_CACHE_HOME',
+] as const
+
+// Regex catching credential-shaped env keys. Applied even to allow-
+// listed keys as a defence-in-depth — if someone accidentally adds
+// `PATH_API_KEY` to the allowlist it still gets dropped. Matches:
+//   *_TOKEN, *_API_KEY, *_SECRET, *_PASSWORD, *_PRIVATE_KEY
+//   plus literal TOKEN / API_KEY / SECRET / PASSWORD / PRIVATE_KEY.
+// Also drops every key starting with GBRAIN_, OPENAI_, ANTHROPIC_,
+// TELEGRAM_ — the four namespaces we know contain orchestrator
+// credentials that must never reach user-visible claude sessions.
+const FORBIDDEN_ENV_REGEX =
+  /^(?:GBRAIN_|OPENAI_|ANTHROPIC_|TELEGRAM_).*$|^.*(?:^|_)(?:TOKEN|API_KEY|SECRET|PASSWORD|PRIVATE_KEY)$/
+
+/**
+ * Build the sanitized env passed to a tmux child session.
+ *
+ * Returns:
+ *   - `childEnv`: the env to set on the spawned `tmux` Node process.
+ *     Restricted to the allowlist minus forbidden keys, so even tmux's
+ *     own internal env (which the persistent tmux server keeps in its
+ *     global environment table) cannot carry sensitive values from
+ *     the plugin's process env.
+ *   - `forbiddenSeen`: list of forbidden keys observed in `parentEnv`,
+ *     for the caller to log a warning. Values are never returned —
+ *     only key names.
+ *
+ * This is exported (named export) so the tests in
+ * tests/router/tmux-session-pool.env.test.ts can exercise it without
+ * having to spawn a real tmux process.
+ */
+export function buildSanitizedTmuxEnv(parentEnv: NodeJS.ProcessEnv): {
+  childEnv: Record<string, string>
+  forbiddenSeen: string[]
+} {
+  const childEnv: Record<string, string> = {}
+  const forbiddenSeen: string[] = []
+
+  for (const key of TMUX_CHILD_ENV_ALLOWLIST) {
+    // Defence-in-depth: skip even allowlisted keys if their name
+    // matches the credential regex. Should be impossible by design
+    // but guarantees the regex is the final authority.
+    if (FORBIDDEN_ENV_REGEX.test(key)) continue
+    const val = parentEnv[key]
+    if (val !== undefined && val !== '') {
+      childEnv[key] = val
+    }
+  }
+
+  // Audit pass: enumerate every key in the parent env and record
+  // any forbidden hits (without values). Caller logs these so an
+  // operator can spot a misconfigured systemd unit or sourced .env.
+  for (const key of Object.keys(parentEnv)) {
+    if (FORBIDDEN_ENV_REGEX.test(key) && parentEnv[key] !== undefined && parentEnv[key] !== '') {
+      forbiddenSeen.push(key)
+    }
+  }
+
+  return { childEnv, forbiddenSeen }
+}
 
 // In-memory + persisted view of a live tmux session.
 export type SessionHandle = {
@@ -81,12 +204,19 @@ export interface TmuxSessionPoolOptions {
   // Defaults to `{workspaceDir}/chats` when omitted.
   chatsBasePath?: string
   claudeBinary?: string
-  // Optional wrapper script. When set, tmux runs `{entrypointScript}`
-  // instead of `claude` directly — the wrapper is responsible for
-  // exec'ing claude with any extra env / flags. C1 fix: the wrapper
-  // runs the inbox -> pty injection loop in the background and execs
-  // claude in the foreground.
+  // Optional wrapper script. When set, our spawn-chat-shell.sh wrapper
+  // (which runs `env -i` and re-exports the allowlisted vars) execs
+  // `{entrypointScript}` instead of `claude` directly. The script is
+  // responsible for exec'ing claude with any extra env / flags. C1
+  // fix: the wrapper runs the inbox -> pty injection loop in the
+  // background and execs claude in the foreground.
   entrypointScript?: string
+  // FIX-A B2 (2026-05-27): path to spawn-chat-shell.sh. Defaults to
+  // the in-repo wrapper resolved relative to this module. Tests
+  // override it to point at a captive script that records env vars
+  // so the assertion `tmux global env leak is closed` is exercisable
+  // without spawning a real claude process.
+  spawnWrapperPath?: string
   logger: PoolLogger
 }
 
@@ -114,6 +244,7 @@ export class TmuxSessionPool {
   private readonly chatsBasePath: string
   private readonly claudeBinary: string
   private readonly entrypointScript: string | undefined
+  private readonly spawnWrapperPath: string
   private readonly logger: PoolLogger
   private readonly sessionsFilePath: string
 
@@ -138,21 +269,20 @@ export class TmuxSessionPool {
     this.chatsBasePath = opts.chatsBasePath ?? join(opts.workspaceDir, 'chats')
     this.claudeBinary = opts.claudeBinary ?? 'claude'
     this.entrypointScript = opts.entrypointScript
+    this.spawnWrapperPath = opts.spawnWrapperPath ?? DEFAULT_SPAWN_WRAPPER_PATH
     this.logger = opts.logger
     this.sessionsFilePath = join(this.stateDir, 'sessions.json')
 
-    // L7 audit: tmux inherits the parent process env unless we use
-    // `-e` to override or `env -i` to wipe. Wiping is too aggressive
-    // (claude needs PATH/HOME/USER and the user's normal toolchain),
-    // so spawnInternal pins those three plus the chat-specific vars
-    // and lets everything else inherit. Loud-warn for known-sensitive
-    // vars so an operator notices a misconfigured systemd unit /
-    // shell rc leaking credentials into the multichat sessions.
+    // TASK-6 audit (2026-05-27): warn for known sensitive keys at
+    // construction time so operators see a single boot-time log line
+    // per misconfigured credential. The runtime sanitisation in
+    // spawnInternal will drop these anyway — the warn is purely for
+    // visibility (sysadmin should fix the systemd unit / shell rc).
     for (const varName of SENSITIVE_ENV_VARS) {
       if (process.env[varName] !== undefined && process.env[varName] !== '') {
-        this.logger.warn('pool.sensitive_env_inherited', {
+        this.logger.warn('pool.sensitive_env_present', {
           var: varName,
-          note: 'tmux child will inherit; ensure plugin runs with these masked when not strictly required',
+          note: 'will be stripped from tmux child env; fix orchestrator env to silence this warning',
         })
       }
     }
@@ -163,32 +293,37 @@ export class TmuxSessionPool {
    * Concurrent callers for the same chatId share the same in-flight
    * promise via {@link pendingSpawns}.
    *
-   * H10 fix (2026-05-23): check order is now (1) sync pendingSpawns.get,
-   * (2) sync sessions.get + await isAlive, (3) seed pendingSpawns and
-   * spawn. The pre-fix order had `await isAlive` between the sessions
-   * lookup and the pending lookup — in Node's current single-threaded
-   * model that window can't actually race, but the pattern is brittle:
-   * any future micro-task interleaving (e.g. async aliveness probes
-   * over a socket) would open a duplicate-spawn hole. Checking pending
-   * first is also strictly cheaper — it's a pure Map.get with no I/O.
+   * FIX-E M1 (2026-05-27, Codex router #4): the entire "check existing
+   * + probe isAlive + maybe spawn" path now lives INSIDE a pending
+   * promise installed BEFORE the isAlive await. Without this, callers
+   * A and B can both:
+   *   1. read `pendingSpawns.get` → undefined
+   *   2. read `sessions.get` → same stale handle
+   *   3. await `isAlive(existing)` → false (dead)
+   *   4. fall through to spawnInternal → TWO tmux sessions for one chat.
+   * Step 3 is the race window — any await between the pendingSpawns
+   * check and the pendingSpawns.set lets a second caller slip in. By
+   * resolving the existing-vs-spawn decision inside the pending
+   * promise body, caller B's `pendingSpawns.get` in step 1 returns
+   * the same promise caller A installed and joins it.
+   *
+   * H10 fix (2026-05-23, retained context): pre-H10 the await sat
+   * BETWEEN two Map reads. H10 split the reads but did not close the
+   * underlying stale-handle race. FIX-E M1 supersedes H10 by moving
+   * the await INSIDE the pending entry so the entire decision is
+   * serialised per chat.
    */
   async getOrSpawn(chatId: string): Promise<SessionHandle> {
-    // 1. Synchronous: is a spawn already in flight for this chat?
-    //    If so, join it — no need to probe tmux or seed a new promise.
+    // 1. Synchronous: is a resolve already in flight for this chat?
+    //    Join it — no probe, no second pending entry.
     const pending = this.pendingSpawns.get(chatId)
     if (pending !== undefined) return pending
 
-    // 2. Synchronous lookup + async aliveness probe. We split these
-    //    so the await never sits between two Map reads (H10).
-    const existing = this.sessions.get(chatId)
-    if (existing !== undefined && (await this.isAlive(existing.sessionName))) {
-      return existing
-    }
-
-    // 3. No pending spawn, no alive session — claim the chat by seeding
-    //    pendingSpawns BEFORE awaiting spawnInternal so concurrent
-    //    callers landing here in the same tick share the same promise.
-    const promise = this.spawnInternal(chatId).finally(() => {
+    // 2. Install the pending promise BEFORE any await. The promise
+    //    body runs the existing-handle probe and falls back to spawn.
+    //    Concurrent callers landing here in the same tick get the
+    //    same promise from step 1 and cannot race past the await.
+    const promise = this.resolveOrSpawn(chatId).finally(() => {
       this.pendingSpawns.delete(chatId)
     })
     this.pendingSpawns.set(chatId, promise)
@@ -196,18 +331,62 @@ export class TmuxSessionPool {
   }
 
   /**
+   * Internal worker for {@link getOrSpawn}. Probes any existing
+   * SessionHandle via `tmux has-session`; if alive, returns it
+   * without spawning. Otherwise falls through to {@link spawnInternal}.
+   *
+   * Runs inside the pendingSpawns promise so the `await isAlive`
+   * cannot race with a parallel caller — see the FIX-E M1 comment
+   * on `getOrSpawn` for the failure mode this closes.
+   */
+  private async resolveOrSpawn(chatId: string): Promise<SessionHandle> {
+    const existing = this.sessions.get(chatId)
+    if (existing !== undefined && (await this.isAlive(existing.sessionName))) {
+      return existing
+    }
+    return this.spawnInternal(chatId)
+  }
+
+  /**
    * Kill the tmux session for `chatId` (if any) and remove it from the
    * pool. Safe to call when no session exists.
    *
-   * H7 fix (2026-05-23): after killing the tmux session we recursively
-   * delete `state/chats/{chatId}/inbox` and `state/chats/{chatId}/outbox`.
-   * Before this fix an idle-killed session left behind any half-written
-   * outbox file (e.g. a partial JSON that the previous claude wrote
-   * just before tmux died); on the next respawn the router's outbox
-   * loop would deliver that stale message as if it came from the
-   * freshly-spawned session — confusing the user and burning replies
-   * against the wrong context. handoff.md is preserved on purpose:
-   * it carries cross-session memory and MUST survive idle-kills.
+   * FIX-E M2 (2026-05-27, Codex router #5 + Opus #18): scrub the
+   * volatile queue files ONLY, never the operator-facing quarantine
+   * dirs. The pre-fix code did `rm -rf inbox/` and `rm -rf outbox/`
+   * which destroyed `outbox/dead-letter/` (transient send failures
+   * stashed for re-drive analysis), `outbox/mismatched/` (chat-id
+   * mismatch quarantine carrying audit evidence), and any `albums/`
+   * subtree owned by TASK-4. An idle-kill or operator-triggered kill
+   * would then erase exactly the forensic state we kept for post-
+   * mortem.
+   *
+   * New strategy — remove ONLY:
+   *   * `inbox/*.json`           (pending inbox messages — never sent
+   *                              to claude in this tmux generation,
+   *                              ok to drop on idle-kill since the
+   *                              router will re-deliver on respawn
+   *                              if the original Telegram message is
+   *                              still claimable; for op-kills the
+   *                              user has already moved on)
+   *   * `outbox/*.json`          (root-level pending claims that the
+   *                              tmux side wrote but the router has
+   *                              not yet rename-claimed into
+   *                              processing/)
+   *   * `outbox/processing/*`    (uncommitted claims — the previous
+   *                              tmux generation is dead so we cannot
+   *                              re-attempt confirm/reject for them;
+   *                              log each one as warn before removal
+   *                              so an operator sees what was lost)
+   *
+   * PRESERVE:
+   *   * `outbox/dead-letter/`    (Telegram-send failures — operator
+   *                              must inspect)
+   *   * `outbox/mismatched/`     (chat-id mismatch audit trail —
+   *                              tamper signal, never erase)
+   *   * `albums/`                (TASK-4 territory; if present, leave
+   *                              entirely alone)
+   *   * any other unknown subdirectory (forward-compatible default)
    *
    * The router's outbox poller continues running in parallel; that is
    * fine because pollOutboxOnce treats a missing outbox dir as "no
@@ -228,14 +407,11 @@ export class TmuxSessionPool {
     }
     this.sessions.delete(chatId)
 
-    // H7: scrub per-chat queue directories. force:true treats missing
-    // paths as success, so the second consecutive kill (or a kill on a
-    // chat that never had any inbound traffic) is a no-op.
-    const chatStateDir = join(this.stateDir, 'chats', chatId)
-    try {
-      await rm(join(chatStateDir, 'inbox'), { recursive: true, force: true })
-      await rm(join(chatStateDir, 'outbox'), { recursive: true, force: true })
-    } catch (cleanupErr) {
+    // FIX-E M2: targeted cleanup. We unlink JSON files individually
+    // rather than recursively wiping the parent dir so the quarantine
+    // siblings (dead-letter/, mismatched/) and any albums/ subtree
+    // survive untouched.
+    await this.scrubVolatileQueueState(chatId).catch((cleanupErr: unknown) => {
       this.logger.warn('tmux kill: queue cleanup failed', {
         chatId,
         error:
@@ -243,7 +419,7 @@ export class TmuxSessionPool {
             ? cleanupErr.message
             : String(cleanupErr),
       })
-    }
+    })
 
     await this.atomicSaveSessions().catch((saveErr) => {
       this.logger.error('sessions.json save failed after kill', {
@@ -251,6 +427,82 @@ export class TmuxSessionPool {
         error: saveErr instanceof Error ? saveErr.message : String(saveErr),
       })
     })
+  }
+
+  /**
+   * FIX-E M2 helper: scrub the chat's volatile queue files while
+   * preserving the operator-facing quarantine directories.
+   *
+   * The set of removed paths is:
+   *   * `{chatStateDir}/inbox/*.json`           (and matching `*.tmp`)
+   *   * `{chatStateDir}/outbox/*.json`          (root-level only;
+   *                                             subdirs untouched)
+   *   * `{chatStateDir}/outbox/processing/*`    (each file logged
+   *                                             warn before unlink)
+   *
+   * Anything else — `outbox/dead-letter/`, `outbox/mismatched/`,
+   * `albums/`, unknown future subdirs — is explicitly NOT touched.
+   * The function is best-effort: individual unlink failures are
+   * swallowed (a missing file from a concurrent dispatch is benign)
+   * but a readdir failure on a parent dir is propagated so the
+   * caller can log it under one wrapped warn line.
+   */
+  private async scrubVolatileQueueState(chatId: string): Promise<void> {
+    const chatStateDir = join(this.stateDir, 'chats', chatId)
+    const inboxDir = join(chatStateDir, 'inbox')
+    const outboxDir = join(chatStateDir, 'outbox')
+    const processingDir = join(outboxDir, 'processing')
+
+    // 1. Inbox: drop committed `.json` + in-flight `.tmp` files.
+    //    Use try/catch around readdir so a missing dir is a no-op.
+    try {
+      const entries = await readdir(inboxDir)
+      for (const name of entries) {
+        if (!name.endsWith('.json') && !name.endsWith('.tmp')) continue
+        await rm(join(inboxDir, name), { force: true }).catch(() => {})
+      }
+    } catch {
+      // Inbox dir missing — first-ever kill or already scrubbed.
+    }
+
+    // 2. Outbox ROOT-LEVEL only: `.json` files awaiting rename-claim.
+    //    Subdirectories (processing/, dead-letter/, mismatched/) MUST
+    //    survive — they are handled in dedicated branches below.
+    try {
+      const entries = await readdir(outboxDir, { withFileTypes: true })
+      for (const entry of entries) {
+        if (!entry.isFile()) continue
+        if (!entry.name.endsWith('.json')) continue
+        await rm(join(outboxDir, entry.name), { force: true }).catch(
+          () => {},
+        )
+      }
+    } catch {
+      // Outbox dir missing — no work to do.
+    }
+
+    // 3. Processing: each file represents a claim the previous tmux
+    //    generation owned but cannot complete (we just killed the
+    //    session). Log warn before unlink so an operator sees the
+    //    lost claims in their journal — they would otherwise linger
+    //    in processing/ forever and trip the next sweep audit.
+    try {
+      const entries = await readdir(processingDir)
+      for (const name of entries) {
+        this.logger.warn(
+          'tmux kill: dropping uncommitted outbox claim (session died before confirm/reject)',
+          {
+            chatId,
+            file: name,
+          },
+        )
+        await rm(join(processingDir, name), { force: true }).catch(() => {})
+      }
+    } catch {
+      // Processing dir missing — no in-flight claims, nothing to log.
+    }
+
+    // dead-letter/, mismatched/, albums/ deliberately untouched.
   }
 
   /** True iff `tmux has-session -t {sessionName}` exits 0. */
@@ -414,22 +666,41 @@ export class TmuxSessionPool {
     // SessionStart hook reads persona / policy via it — those files
     // live one level up at `{workspaceDir}/chats/{CHAT_ID}/...`.
     //
-    // TMUX_PANE: tmux auto-populates this inside each pane, but we
-    // pass it through explicitly so the entrypoint wrapper's
-    // background watcher (which runs in a subshell) is guaranteed
-    // to see it. Defence in depth — covers shells / wrappers that
-    // strip non-whitelisted env on inherit.
+    // TASK-6 env-filter (2026-05-27, FIX-A B2): the previous design
+    // relied on tmux `-e KEY=VAL` overlays alone. That is INSUFFICIENT:
+    // tmux's persistent server keeps a global environment table seeded
+    // from its first client connection and propagates ANY var from
+    // that table into every new shell — `-e` only overlays the
+    // enumerated keys on top, it does NOT clear unmentioned vars
+    // already in the global table.
     //
-    // L7 env-filter (2026-05-23): we pin PATH, HOME, USER explicitly
-    // alongside the chat-specific vars. tmux still inherits the rest
-    // of the parent env, but the explicit pins ensure that even if
-    // the plugin runs under a stripped-env wrapper (systemd
-    // Environment= directives, restrictive shells) the spawned
-    // claude session still has the basics it needs to start.
-    // `env -i` would be more rigorous but tmux + shell startup
-    // breaks under a truly empty env in unpredictable ways; opt for
-    // explicit-override + sensitive-var audit (constructor warn).
-    const args = [
+    // The real fix is `env -i` at the moment the child shell starts:
+    // wipe ALL inherited env, then re-export only the allowlisted
+    // keys we explicitly want. We do this via the
+    // `scripts/spawn-chat-shell.sh` wrapper (always used, never
+    // bypassed — overrides this.entrypointScript when the caller
+    // provided a script of their own, that script is invoked by our
+    // wrapper after env -i).
+    //
+    // tmux is still given the per-session env via `-e KEY=VAL` so
+    // wrapper-side `${CHAT_ID}` etc. are populated when the script
+    // runs. The wrapper then transitively re-exports them through
+    // `env -i` to the final `claude` exec.
+    const { childEnv, forbiddenSeen } = buildSanitizedTmuxEnv(process.env)
+    if (forbiddenSeen.length > 0) {
+      // Log without values — key names only. Sorted for stable test
+      // assertions and human-readable log output.
+      this.logger.warn('pool.forbidden_env_dropped', {
+        chatId,
+        keys: [...forbiddenSeen].sort(),
+        note: 'forbidden credential-shaped keys present in parent env; stripped from tmux child',
+      })
+    }
+
+    // Per-session env passed via `-e KEY=VAL`. Order:
+    //   1. Chat-specific vars (always-set, never inherited).
+    //   2. Allowlisted vars from sanitized childEnv (PATH, HOME, ...).
+    const args: string[] = [
       'new-session',
       '-d',
       '-s',
@@ -440,24 +711,36 @@ export class TmuxSessionPool {
       `MULTICHAT_STATE_DIR=${this.stateDir}`,
       '-e',
       `CLAUDE_WORKSPACE_DIR=${this.workspaceDir}`,
-      '-e',
-      `PATH=${process.env.PATH ?? '/usr/local/bin:/usr/bin:/bin'}`,
-      '-e',
-      `HOME=${process.env.HOME ?? ''}`,
-      '-e',
-      `USER=${process.env.USER ?? ''}`,
-      '-e',
-      'TMUX_PANE',
+    ]
+    for (const [key, val] of Object.entries(childEnv)) {
+      args.push('-e', `${key}=${val}`)
+    }
+    // PATH baseline if the parent didn't have one (extremely unlikely
+    // but keeps the session bootstrappable under systemd Environment=).
+    if (childEnv.PATH === undefined) {
+      args.push('-e', 'PATH=/usr/local/bin:/usr/bin:/bin')
+    }
+    // FIX-A B3 (2026-05-27): removed the bare `-e TMUX_PANE` arg pair
+    // that lived here before. tmux's `-e` syntax requires `KEY=value`
+    // — passing a bare key either errors out or eats the next token
+    // as the value (silently breaking `-c`). tmux auto-populates
+    // TMUX_PANE inside the pane regardless, so no defence-in-depth
+    // case justifies the broken arg.
+    //
+    // FIX-A B2: hardwire the spawn-chat-shell.sh wrapper so the
+    // child shell starts under `env -i` and cannot inherit tmux
+    // server global-env leaks. The wrapper takes the claude binary
+    // (or the operator's entrypointScript override) as its first
+    // positional argument and execs it after the env wipe.
+    args.push(
       '-c',
       this.chatsBasePath,
-      // Run wrapper if provided, else claude directly. The wrapper is
-      // expected to perform the inbox -> pty injection (C1 fix) and
-      // finally `exec claude`.
+      this.spawnWrapperPath,
       this.entrypointScript ?? this.claudeBinary,
-    ]
+    )
 
     try {
-      await runTmux(args)
+      await runTmux(args, childEnv)
     } catch (err) {
       this.logger.error('tmux new-session failed', {
         chatId,
@@ -512,10 +795,31 @@ function buildSessionName(chatId: string): string {
   return `multichat-${chatId}`
 }
 
-function runTmux(args: readonly string[]): Promise<void> {
+/**
+ * Spawn `tmux` with the given args.
+ *
+ * When `childEnv` is omitted (the default for housekeeping calls like
+ * `has-session` / `kill-session`), tmux inherits the parent env — these
+ * calls only talk to the existing tmux server and never start a new
+ * user-visible shell, so inheritance is safe.
+ *
+ * When `childEnv` is provided (used by `spawnInternal` for
+ * `new-session`), tmux is given a sanitized env. This is the
+ * load-bearing path for chat isolation: tmux's persistent server
+ * keeps a global environment table seeded from its first client
+ * connection, so the new-session client must NOT carry sensitive
+ * vars even though `-e` flags also rebuild the per-session env.
+ * Two layers of defence — process env AND `-e` flags — close the
+ * gap regardless of tmux server lifecycle ordering.
+ */
+function runTmux(
+  args: readonly string[],
+  childEnv?: Record<string, string>,
+): Promise<void> {
   return new Promise((resolve, reject) => {
     const opts: SpawnOptions = {
       stdio: ['ignore', 'pipe', 'pipe'],
+      ...(childEnv !== undefined ? { env: childEnv } : {}),
     }
     const child = spawn('tmux', args as string[], opts)
     let stderrBuf = ''

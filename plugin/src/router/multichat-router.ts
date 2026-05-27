@@ -31,13 +31,15 @@ import { join } from 'node:path'
 import type { TelegramApi } from '../channel/tools.js'
 import type { Logger } from '../log.js'
 import {
-  getChatPolicy,
+  assertValidChatId,
+  getChatPolicyOrDeny,
   type MultichatPolicy,
 } from '../chats/policy-loader.js'
 import {
   confirmOutboxClaim,
   ensureChatStateDirs,
   pollOutboxOnce,
+  quarantineMismatchedClaim,
   rejectOutboxClaim,
   writeToInbox,
   type InboundMessage,
@@ -94,6 +96,36 @@ export class MultichatRouter {
   // chatId -> outbox loop handle. Presence in the map means polling is
   // active; absence means we are not draining this chat's outbox yet.
   private readonly outboxLoops = new Map<string, OutboxLoopHandle>()
+  // TASK-5 bug 3 (2026-05-27): per-chat in-flight drain guard. The
+  // outbox tick is a `setInterval(200ms)`; if a Telegram send is slow
+  // (rate-limit backoff, network stall), the next tick would otherwise
+  // re-enter drainOutbox and reorder/duplicate sends. The set is keyed
+  // by chatId — an entry means "a drain pass is currently running for
+  // this chat, skip the next tick". We use a Set rather than a counter
+  // because re-entrancy is binary here: either we are draining or we
+  // are not. The set is per-chat (not global) so drains in different
+  // chats still run concurrently.
+  private readonly draining = new Set<string>()
+  // FIX-E M3 (2026-05-27, Codex router #6): per-chat dispatch mutex.
+  // The map value is the tail of a promise chain — each runDispatch()
+  // call appends its work onto the chain so the queue-depth check +
+  // writeToInbox pair runs atomically per chat. Without this two
+  // concurrent dispatch() calls can both readdir() → see 0 pending →
+  // both writeToInbox(), violating max_queue_depth=1 with two files.
+  //
+  // The chain is per-chat, not global, so dispatch() to different
+  // chats stays parallel — total throughput is unchanged. Entries
+  // self-clean: a chain whose tail resolves and is still the live
+  // map value is removed in finally(), so an idle chat does not
+  // hold a Map entry forever.
+  //
+  // We use a separate map from `draining` because the two cover
+  // different sides of the queue: `draining` serialises the OUTBOX
+  // (tmux → Telegram), `dispatchLocks` serialises the INBOX
+  // (Telegram → tmux). Conflating them would force outbound sends
+  // to wait on inbound writes for the same chat — unnecessary
+  // latency.
+  private readonly dispatchLocks = new Map<string, Promise<void>>()
   private started = false
 
   constructor(deps: RouterDeps) {
@@ -143,6 +175,12 @@ export class MultichatRouter {
       this.stopOutboxLoop(chatId)
     }
     this.pool.stopWatchdog()
+    // FIX-E M3: clear any lingering dispatch chain heads. The values
+    // are promise chains — Node will GC them once their owning
+    // callers release; clearing the Map only prevents stale
+    // references from holding onto memory across stop()/start()
+    // cycles in tests.
+    this.dispatchLocks.clear()
 
     this.logger.info('multichat router stopped')
   }
@@ -162,65 +200,84 @@ export class MultichatRouter {
   /**
    * Route an inbound message into the per-chat tmux session.
    *
-   * Flow (in order — H5 spawn-order fix 2026-05-23):
-   *   1. Defence-in-depth allowlist check (handlers.ts already gated,
-   *      but a buggy caller must not bypass policy). AND-logic for
-   *      groups (C2): require both chat AND chat-policy presence;
-   *      for DMs, require user in allowlist.users.
-   *   2. Ensure the per-chat inbox/outbox directories exist.
-   *   3. Atomically write the inbound JSON to the inbox.
-   *   4. Spawn-or-attach the chat's tmux session — the entrypoint
+   * Flow (in order — H5 spawn-order fix 2026-05-23, TASK-5 bug 1
+   * unified gate 2026-05-27):
+   *   1. Validate chat_id shape (defence in depth, TASK-5 bug 4).
+   *   2. Unified policy gate — BOTH user_id in allowlist.users AND
+   *      a non-null `getChatPolicyOrDeny(policy, chat_id)` must pass.
+   *      Resolved BEFORE any filesystem mutation so a chat that the
+   *      pool will refuse to spawn does not accumulate inbox files
+   *      and dirs on disk (TASK-5 bug 1 — HIGH #7 in Codex review).
+   *   3. Ensure the per-chat inbox/outbox directories exist.
+   *   4. Atomically write the inbound JSON to the inbox.
+   *   5. Spawn-or-attach the chat's tmux session — the entrypoint
    *      watcher drains the inbox on first poll, so the inbox must
    *      already contain this message before the wrapper starts.
-   *   5. Update lastMessageAt so the watchdog does not idle-kill.
-   *   6. Arm the outbox poller if it is not already running.
+   *   6. Update lastMessageAt so the watchdog does not idle-kill.
+   *   7. Arm the outbox poller if it is not already running.
    */
   async dispatch(input: InboundMessage): Promise<void> {
-    // 1. Defence in depth — handlers.ts already authorized at the
-    //    gate, but a buggy caller (or future refactor) must not be
-    //    able to inject traffic for an unconfigured chat / user.
-    //
-    //    AND-logic, separated by chat kind (C2 fix):
-    //      * DM (chat_id == user_id in Telegram private chats):
-    //        require user_id in allowlist.users. ChatPolicy may
-    //        still be missing — pool.spawnInternal performs the
-    //        final policy-presence check before tmux spawn (C3).
-    //      * Group/supergroup (chat_id != user_id, typically
-    //        negative): require BOTH chat_id in allowlist.chats AND
-    //        a corresponding entry in policy.chats. Missing either
-    //        is a silent drop with a warn log — gate.ts should have
-    //        already filtered these, but defence in depth.
-    //
-    //    Note on isPrivate detection: Telegram private chats have
-    //    chat.id == user.id (both positive). Groups have negative
-    //    chat.id that never matches user.id. This shortcut avoids
-    //    threading chatType through the InboundMessage DTO.
-    const chatAllowed = this.policy.allowlist.chats.includes(input.chat_id)
-    const userAllowed = this.policy.allowlist.users.includes(input.user_id)
-    const chatPolicy = getChatPolicy(this.policy, input.chat_id)
-    const isPrivate = input.chat_id === input.user_id
-
-    if (isPrivate) {
-      if (!userAllowed) {
-        this.logger.warn('router.dispatch.dm_unauthorized', {
-          chat_id: input.chat_id,
-          user_id: input.user_id,
-        })
-        return
-      }
-    } else {
-      if (!chatAllowed || chatPolicy === null) {
-        this.logger.warn('router.dispatch.group_unauthorized', {
-          chat_id: input.chat_id,
-          user_id: input.user_id,
-          chat_in_allowlist: chatAllowed,
-          has_chat_policy: chatPolicy !== null,
-        })
-        return
-      }
+    // 1. Chat-id shape gate (TASK-5 bug 4). Reject anything that
+    //    does not match `/^-?\d+$/` BEFORE the value reaches
+    //    path.join, tmux session names, or policy.chats[…] lookup.
+    //    A throw here means a buggy/hostile caller fed us a path
+    //    traversal payload or non-string — drop the message,
+    //    structured log, do NOT crash the poller above us.
+    try {
+      assertValidChatId(input.chat_id)
+    } catch (err) {
+      this.logger.warn('router.dispatch.invalid_chat_id', {
+        chat_id: typeof input.chat_id === 'string'
+          ? input.chat_id.slice(0, 64)
+          : String(input.chat_id),
+        user_id: input.user_id,
+        error: err instanceof Error ? err.message : String(err),
+      })
+      return
     }
 
-    // 2. Ensure dirs FIRST (H5). The pool's entrypoint wrapper drains
+    // 2. Unified policy gate (TASK-5 bug 1, supersedes the prior
+    //    DM/group split). The previous split allowed a DM in
+    //    `allowlist.users` to flow through ensureChatStateDirs +
+    //    writeToInbox even when `policy.chats[chat_id]` was missing —
+    //    pool.spawnInternal would then refuse to spawn (C3) and the
+    //    message would sit in the inbox forever. The fix:
+    //
+    //      * BOTH `allowlist.users` includes user_id, AND
+    //      * `getChatPolicyOrDeny(policy, chat_id)` returns non-null.
+    //
+    //    Resolution happens here, before any FS mutation. Any deny
+    //    path returns a single structured warn log with both signals
+    //    so an operator can diagnose which clause tripped.
+    //
+    //    Note: `getChatPolicyOrDeny` accepts `policy: MultichatPolicy
+    //    | null`. The router only constructs itself with a loaded
+    //    policy (server.ts gates on `multichatPolicy !== undefined`),
+    //    so the null branch is unreachable here — but using the
+    //    multichat-aware helper keeps a single source of truth for
+    //    "is this chat configured?" across router, status-manager,
+    //    tmux-mirror, persona-manager. Legacy single-DM mode never
+    //    runs through this router.
+    const userAllowed = this.policy.allowlist.users.includes(input.user_id)
+    const chatPolicy = getChatPolicyOrDeny(this.policy, input.chat_id)
+    const chatAllowed = this.policy.allowlist.chats.includes(input.chat_id)
+
+    if (chatPolicy === null || !userAllowed) {
+      this.logger.warn('router.dispatch.denied', {
+        chat_id: input.chat_id,
+        user_id: input.user_id,
+        user_in_allowlist: userAllowed,
+        has_chat_policy: chatPolicy !== null,
+        chat_in_allowlist: chatAllowed,
+        // isPrivate stays informational — the gate no longer branches
+        // on it, but the field helps operators understand which kind
+        // of traffic was refused (TG private vs group/supergroup).
+        is_private: input.chat_id === input.user_id,
+      })
+      return
+    }
+
+    // 3. Ensure dirs FIRST (H5). The pool's entrypoint wrapper drains
     //    the inbox on its initial pass — if we spawn before the inbox
     //    exists, the wrapper logs and exits its initial drain on an
     //    empty dir, then waits for inotify which would race against
@@ -235,7 +292,7 @@ export class MultichatRouter {
       return
     }
 
-    // 2b. M10 fix (2026-05-23): enforce `policy.chats[*].max_queue_depth`.
+    // 3b. M10 fix (2026-05-23): enforce `policy.chats[*].max_queue_depth`.
     //     If the inbox is already at or above the cap, drop the
     //     oldest pending message(s) before writing the new one. Default
     //     cap is 1 (matches policy-loader's Zod default and PLAN.md §7
@@ -255,59 +312,75 @@ export class MultichatRouter {
     //     `chatPolicy` was already looked up above for the gate check;
     //     reuse it. For DMs without a per-chat policy entry, fall back
     //     to the same default (1) so the global guarantee holds.
+    //
+    //     FIX-E M3 (2026-05-27, Codex router #6): the queue-depth
+    //     check + writeToInbox pair runs INSIDE `runDispatch(chatId,
+    //     ...)` so two concurrent dispatch() calls for the same chat
+    //     serialise. Without serialisation both could readdir() → see
+    //     0 pending → both writeToInbox(), violating the cap with
+    //     two files. The mutex is per-chat — dispatch() to other
+    //     chats stays parallel. `writeToInbox`'s return value is
+    //     intentionally discarded: callers only care about success
+    //     vs failure (boolean), not the file path.
     const maxDepth = chatPolicy?.max_queue_depth ?? 1
     const inboxDir = join(this.stateDir, 'chats', input.chat_id, 'inbox')
-    try {
-      const inboxEntries = await readdir(inboxDir).catch(() => [])
-      // Only .json files count toward the queue depth — `.tmp` writers
-      // are mid-rename and will appear as committed files in the next
-      // poll, but they are not yet "pending" from the watcher's POV.
-      const pending = inboxEntries
-        .filter((name) => name.endsWith('.json') && !name.endsWith('.tmp'))
-        .sort() // timestamp-prefixed → oldest first
-      while (pending.length >= maxDepth) {
-        const oldest = pending.shift()
-        if (oldest === undefined) break
-        const oldestPath = join(inboxDir, oldest)
-        await unlink(oldestPath).catch((unlinkErr: unknown) => {
-          this.logger.warn('router.dispatch.queue_overflow.drop_failed', {
-            chat_id: input.chat_id,
-            file: oldest,
-            error:
-              unlinkErr instanceof Error
-                ? unlinkErr.message
-                : String(unlinkErr),
+    const writeOk = await this.runDispatch(input.chat_id, async () => {
+      try {
+        const inboxEntries = await readdir(inboxDir).catch(() => [])
+        // Only .json files count toward the queue depth — `.tmp`
+        // writers are mid-rename and will appear as committed files
+        // in the next poll, but they are not yet "pending" from the
+        // watcher's POV.
+        const pending = inboxEntries
+          .filter((name) => name.endsWith('.json') && !name.endsWith('.tmp'))
+          .sort() // timestamp-prefixed → oldest first
+        while (pending.length >= maxDepth) {
+          const oldest = pending.shift()
+          if (oldest === undefined) break
+          const oldestPath = join(inboxDir, oldest)
+          await unlink(oldestPath).catch((unlinkErr: unknown) => {
+            this.logger.warn('router.dispatch.queue_overflow.drop_failed', {
+              chat_id: input.chat_id,
+              file: oldest,
+              error:
+                unlinkErr instanceof Error
+                  ? unlinkErr.message
+                  : String(unlinkErr),
+            })
           })
-        })
-        this.logger.warn('router.dispatch.queue_overflow.dropped_oldest', {
+          this.logger.warn('router.dispatch.queue_overflow.dropped_oldest', {
+            chat_id: input.chat_id,
+            dropped: oldest,
+            max_depth: maxDepth,
+          })
+        }
+      } catch (err) {
+        // Cap enforcement is best-effort — a readdir failure must not
+        // block delivery of the fresh inbound. Continue to writeToInbox.
+        this.logger.warn('router.dispatch.queue_overflow.check_failed', {
           chat_id: input.chat_id,
-          dropped: oldest,
-          max_depth: maxDepth,
+          error: err instanceof Error ? err.message : String(err),
         })
       }
-    } catch (err) {
-      // Cap enforcement is best-effort — a readdir failure must not
-      // block delivery of the fresh inbound. Continue to writeToInbox.
-      this.logger.warn('router.dispatch.queue_overflow.check_failed', {
-        chat_id: input.chat_id,
-        error: err instanceof Error ? err.message : String(err),
-      })
-    }
 
-    // 3. Atomic inbox write BEFORE spawn (H5). The .tmp + rename
-    //    pattern means a partial JSON is never visible to the
-    //    watcher, even if it polls between our write and rename.
-    try {
-      await writeToInbox(input.chat_id, input, this.stateDir)
-    } catch (err) {
-      this.logger.error('router.dispatch.inbox_write_failed', {
-        chat_id: input.chat_id,
-        error: err instanceof Error ? err.message : String(err),
-      })
-      return
-    }
+      // 4. Atomic inbox write BEFORE spawn (H5). The .tmp + rename
+      //    pattern means a partial JSON is never visible to the
+      //    watcher, even if it polls between our write and rename.
+      try {
+        await writeToInbox(input.chat_id, input, this.stateDir)
+      } catch (err) {
+        this.logger.error('router.dispatch.inbox_write_failed', {
+          chat_id: input.chat_id,
+          error: err instanceof Error ? err.message : String(err),
+        })
+        return false
+      }
+      return true
+    })
 
-    // 4. Spawn-or-attach AFTER the inbox is populated (H5). The pool
+    if (!writeOk) return
+
+    // 5. Spawn-or-attach AFTER the inbox is populated (H5). The pool
     //    serialises concurrent callers for the same chat via its
     //    pendingSpawns mutex, so a burst of inbound messages cannot
     //    race into duplicate tmux sessions. spawnInternal also
@@ -322,10 +395,10 @@ export class MultichatRouter {
       return
     }
 
-    // 5. Mark activity for the idle-kill watchdog.
+    // 6. Mark activity for the idle-kill watchdog.
     this.pool.touch(input.chat_id)
 
-    // 6. Arm outbox poll if missing. Idempotent.
+    // 7. Arm outbox poll if missing. Idempotent.
     this.startOutboxLoop(input.chat_id)
 
     this.logger.debug?.('router.dispatch.ok', {
@@ -334,24 +407,132 @@ export class MultichatRouter {
     })
   }
 
+  /**
+   * FIX-E M3 helper (2026-05-27, Codex router #6): per-chat dispatch
+   * mutex. Chains `work` onto the tail promise stored at
+   * `dispatchLocks.get(chatId)` and returns the new tail's value.
+   * Two parallel callers for the same chat get serialised — caller B
+   * sees caller A's promise as the prior tail and awaits it before
+   * running its own `work()`.
+   *
+   * Failure semantics: `work()` is wrapped so a throw becomes a
+   * `return false` from the caller-visible boolean. The chain itself
+   * stays resolved (never rejected) so a failed dispatch does NOT
+   * poison subsequent calls — the per-chat lock keeps flowing.
+   *
+   * Self-cleanup: when the tail resolves AND `dispatchLocks.get(chatId)`
+   * still points at this exact promise (i.e. no further caller has
+   * appended), delete the entry. This stops idle chats from holding
+   * Map entries forever after their burst is done.
+   *
+   * Note on perf: the mutex adds at most one `await` (the prior tail)
+   * to the dispatch fast path. Under normal load — one inbound at a
+   * time per chat — the prior tail has already resolved and the
+   * extra await collapses to a microtask. Burst load (multiple
+   * Telegram messages in the same tick for one chat) is bounded by
+   * the Telegram inbound rate (~30 msg/s per bot) and is exactly
+   * the case where serialisation is required to preserve the
+   * queue-depth cap.
+   */
+  private async runDispatch<T>(
+    chatId: string,
+    work: () => Promise<T>,
+  ): Promise<T> {
+    const prior = this.dispatchLocks.get(chatId) ?? Promise.resolve()
+    // Chain: wait for prior to settle (success OR failure — we don't
+    // want a prior throw to dominoes through), then run work().
+    let result!: T
+    let workError: unknown = null
+    const next = prior.then(
+      async () => {
+        try {
+          result = await work()
+        } catch (err) {
+          // Capture the error so we can re-throw to the caller AFTER
+          // releasing the lock — but keep the chain resolved so the
+          // next call is not poisoned.
+          workError = err
+        }
+      },
+      // prior rejected (shouldn't happen — we swallow inside work
+      // wrapper — but defence-in-depth): swallow so the chain stays
+      // alive.
+      () => undefined,
+    )
+    this.dispatchLocks.set(chatId, next)
+    try {
+      await next
+      if (workError !== null) {
+        throw workError
+      }
+      return result
+    } finally {
+      // Self-cleanup: only drop the entry if we are still the tail.
+      // A caller that appended after us has already replaced the
+      // value with their own next; leaving it alone keeps the chain
+      // intact.
+      if (this.dispatchLocks.get(chatId) === next) {
+        this.dispatchLocks.delete(chatId)
+      }
+    }
+  }
+
   // ───── outbox loop internals ─────
 
   /**
    * Begin polling the chat's outbox. No-op when a loop is already
-   * armed for this chat.
+   * armed for this chat. The chatId is validated up front; an invalid
+   * id is logged and silently skipped (the chat was already denied at
+   * dispatch, so a poll loop here is a programmer error in start()).
    */
   private startOutboxLoop(chatId: string): void {
+    // TASK-5 bug 4 (2026-05-27): assertValidChatId at the outbox-loop
+    // entry point. start() iterates `policy.allowlist.chats`, which
+    // a future malformed policy.yaml could populate with bad ids.
+    // Failing here drops the chat from polling without crashing
+    // unrelated loops.
+    try {
+      assertValidChatId(chatId)
+    } catch (err) {
+      this.logger.warn('router.outbox.invalid_chat_id', {
+        chat_id: typeof chatId === 'string' ? chatId.slice(0, 64) : String(chatId),
+        error: err instanceof Error ? err.message : String(err),
+      })
+      return
+    }
     if (this.outboxLoops.has(chatId)) return
     const interval = setInterval(() => {
-      this.drainOutbox(chatId).catch((err: unknown) => {
-        // drainOutbox catches its own errors; this is belt-and-braces
-        // so an unforeseen throw cannot crash the interval callback
-        // and silently stop polling.
-        this.logger.warn('router.outbox.uncaught', {
+      // TASK-5 bug 3 (2026-05-27): per-chat in-flight guard. If the
+      // previous tick is still running drainOutbox (slow sendMessage
+      // due to Telegram rate-limit backoff, slow disk, etc.), the
+      // next tick must be a no-op — otherwise two concurrent drain
+      // passes could race rename() on the same processing file and
+      // duplicate or reorder sends. The guard is binary per chat;
+      // drains in different chats remain independent.
+      if (this.draining.has(chatId)) {
+        this.logger.debug?.('router.outbox.tick_skipped_inflight', {
           chat_id: chatId,
-          error: err instanceof Error ? err.message : String(err),
         })
-      })
+        return
+      }
+      this.draining.add(chatId)
+      this.drainOutbox(chatId)
+        .catch((err: unknown) => {
+          // drainOutbox catches its own errors; this is belt-and-braces
+          // so an unforeseen throw cannot crash the interval callback
+          // and silently stop polling.
+          this.logger.warn('router.outbox.uncaught', {
+            chat_id: chatId,
+            error: err instanceof Error ? err.message : String(err),
+          })
+        })
+        .finally(() => {
+          // Always release the guard so a faulty drainOutbox call
+          // does not wedge the chat into a perpetual "in-flight"
+          // state — better to risk one reorder than to freeze the
+          // chat's outbox forever.
+          this.draining.delete(chatId)
+        })
     }, DEFAULT_OUTBOX_POLL_INTERVAL_MS)
     // Do not keep the event loop alive solely for an outbox poller —
     // server.ts owns shutdown via stop().
@@ -368,6 +549,10 @@ export class MultichatRouter {
     if (handle === undefined) return
     clearInterval(handle.interval)
     this.outboxLoops.delete(chatId)
+    // TASK-5 bug 3 (2026-05-27): release any lingering in-flight
+    // guard on teardown — keeps the Set tidy for re-arm scenarios
+    // (test fixtures repeatedly start/stop the router).
+    this.draining.delete(chatId)
     this.logger.debug?.('router.outbox.stopped', { chat_id: chatId })
   }
 
@@ -408,12 +593,52 @@ export class MultichatRouter {
    * stringified Telegram message_id — convert via parseInt with NaN
    * guard so a bogus payload becomes a dead-letter rather than a
    * loop-killing throw.
+   *
+   * TASK-5 bug 2 (2026-05-27): before any Telegram send we assert
+   * `claim.message.chat_id === chatId` (the outbox directory that
+   * owned the file). A mismatch means the tmux session writing into
+   * this directory emitted a payload addressed to a DIFFERENT chat —
+   * either a buggy persona, a stale conversation context, or an
+   * attempted cross-chat exfil. We never send the message; we
+   * quarantine the file into `outbox/mismatched/` with both
+   * expected/actual chat ids in a sidecar, and emit a structured log
+   * line carrying `outbox_chat_mismatch=true` so an operator can
+   * grep for it.
    */
   private async deliverClaim(
     chatId: string,
     claim: OutboxClaim,
   ): Promise<void> {
     const message = claim.message
+    // TASK-5 bug 2 (2026-05-27): chat-id consistency check. The
+    // claim file lives under `outbox/processing/` of `chatId`'s
+    // directory, but the payload carries its own `chat_id`. The two
+    // MUST match — otherwise a session running in chat A could
+    // deliver content under chat B's identity (misrouting,
+    // potential PII leak, or a vector for prompt-injection-induced
+    // exfil). Quarantine; do NOT send.
+    if (message.chat_id !== chatId) {
+      this.logger.error('router.outbox.chat_mismatch', {
+        chat_id: chatId,
+        actual_chat_id: message.chat_id,
+        original: claim.originalName,
+        outbox_chat_mismatch: true,
+      })
+      await quarantineMismatchedClaim(claim, {
+        expectedChatId: chatId,
+        actualChatId: message.chat_id,
+      }).catch((quarErr: unknown) => {
+        this.logger.error('router.outbox.quarantine_failed', {
+          chat_id: chatId,
+          actual_chat_id: message.chat_id,
+          original: claim.originalName,
+          error:
+            quarErr instanceof Error ? quarErr.message : String(quarErr),
+        })
+      })
+      return
+    }
+
     const opts: { reply_to_message_id?: number; parse_mode?: 'HTML' | 'MarkdownV2' } = {}
     if (message.reply_to !== undefined) {
       const parsed = Number.parseInt(message.reply_to, 10)
@@ -426,6 +651,26 @@ export class MultichatRouter {
         })
       }
     }
+    // FIX-F (2026-05-27, Opus router #14): map OutboxMessage.format to
+    // the Telegram parse_mode. The Zod schema in inbox-bridge.ts
+    // populates `format` with the default 'html' when the writer omits
+    // it, so this branch always sees a concrete value. Pre-fix, the
+    // router never set parse_mode and `<b>bold</b>` / `**bold**` payloads
+    // were delivered as literal text — regressing PR #22 which made
+    // 'html' the default for the channel reply tool.
+    //
+    // We deliberately do NOT call markdownToTelegramHtml here: the
+    // outbox writer (the tmux-side reply tool) owns text shape — the
+    // router is a thin transport. A writer that wants markdown→HTML
+    // conversion must do it before the outbox file lands; this mirrors
+    // how the in-process channel reply tool calls markdownToTelegramHtml
+    // before pushing to sendMessage.
+    if (message.format === 'html') {
+      opts.parse_mode = 'HTML'
+    } else if (message.format === 'markdown') {
+      opts.parse_mode = 'MarkdownV2'
+    }
+    // format === 'text' → omit parse_mode entirely.
     try {
       await this.telegramApi.sendMessage(chatId, message.text, opts)
     } catch (err) {

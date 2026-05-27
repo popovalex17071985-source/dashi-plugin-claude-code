@@ -38,6 +38,9 @@ import {
   writeFile,
 } from 'node:fs/promises'
 import { basename, join } from 'node:path'
+import { z } from 'zod'
+
+import { assertValidChatId } from '../chats/policy-loader.js'
 
 // M11 (2026-05-23): per-chat state directories and the JSON files
 // inside them carry user prompts and bot replies (potentially with
@@ -68,17 +71,54 @@ export type InboundMessage = {
 // Outbound DTO — what the tmux session emits back to the plugin.
 // `reply_to` is a Telegram message_id (as string) when the reply
 // should be a quote-reply; omitted otherwise.
-export type OutboxMessage = {
-  text: string
-  chat_id: string
-  reply_to?: string
-  timestamp: string
-}
+//
+// FIX-F (2026-05-27, Opus router #14): `format` controls how the
+// router maps the payload to a Telegram `parse_mode` at send time.
+//   * 'html'      → parse_mode='HTML'      (matches PR #22 default —
+//                   the tmux session is expected to write Telegram-
+//                   subset HTML; plain text is safe because Telegram
+//                   tolerates `<`/`>`/`&` in non-tag positions)
+//   * 'markdown'  → parse_mode='MarkdownV2'(caller escapes per Telegram
+//                   MarkdownV2 rules — same contract as the channel
+//                   reply tool's 'markdownv2' format)
+//   * 'text'      → parse_mode omitted    (literal text, no markup)
+// Default 'html' matches PR #22's channel reply tool default so a
+// tmux-side writer that omits the field gets HTML rendering — i.e. a
+// `<b>bold</b>` payload now renders bold instead of literal text.
+//
+// Caveat: a legacy writer who emits raw markdown like `**bold**` AND
+// omits `format` will now be parsed as HTML — Telegram will render
+// the `**` as literal asterisks (not bold). Writers MUST set
+// `format: 'markdown'` explicitly to get MarkdownV2 rendering, or
+// `format: 'text'` to bypass markup entirely. We accept this risk
+// because the only known in-tree writer path is the channel reply
+// tool itself (PR #22), which uses 'html' by default and converts
+// markdown→HTML before shipping.
+export const OutboxMessageFormatSchema = z
+  .enum(['html', 'markdown', 'text'])
+  .default('html')
+export type OutboxMessageFormat = z.infer<typeof OutboxMessageFormatSchema>
+
+export const OutboxMessageSchema = z.object({
+  text: z.string().min(1),
+  chat_id: z.string().min(1),
+  reply_to: z.string().optional(),
+  timestamp: z.string().min(1),
+  format: OutboxMessageFormatSchema,
+})
+export type OutboxMessage = z.infer<typeof OutboxMessageSchema>
 
 const INBOX_SUBDIR = 'inbox'
 const OUTBOX_SUBDIR = 'outbox'
 const OUTBOX_PROCESSING_SUBDIR = 'processing'
 const OUTBOX_DEAD_LETTER_SUBDIR = 'dead-letter'
+// TASK-5 bug 2 (2026-05-27): subdirectory for outbox claims whose
+// `claim.message.chat_id` did not match the owning chat directory.
+// Kept separate from `dead-letter/` (transient send failures) so an
+// operator can distinguish "Telegram refused this message" from
+// "tmux session wrote into the wrong chat's outbox". The latter is
+// a tampering / bug signal that must NEVER auto-redrive.
+const OUTBOX_MISMATCHED_SUBDIR = 'mismatched'
 
 function chatStateRoot(chatId: string, stateDir: string): string {
   return join(stateDir, 'chats', chatId)
@@ -141,6 +181,12 @@ export async function ensureChatStateDirs(
   chatId: string,
   stateDir: string,
 ): Promise<void> {
+  // TASK-5 bug 4 (2026-05-27): centralized chatId validation. A chatId
+  // that does not match `/^-?\d+$/` would otherwise reach `path.join`
+  // and could traverse outside `{stateDir}/chats/` (e.g. `../`) or
+  // poison tmux session names. Fail loud — the dispatch boundary
+  // catches the throw and converts it to a log + drop.
+  assertValidChatId(chatId)
   const root = chatStateRoot(chatId, stateDir)
   // M11: tighten perms on every mkdir. `recursive: true` will create
   // missing parents but only applies `mode` to the LEAF directory in
@@ -192,6 +238,11 @@ export async function writeToInbox(
   message: InboundMessage,
   stateDir: string,
 ): Promise<string> {
+  // TASK-5 bug 4 (2026-05-27): validate chatId before it reaches
+  // `path.join`. Defence in depth — `ensureChatStateDirs` should have
+  // already caught a malformed id, but writeToInbox may be invoked
+  // directly by tests / future callers.
+  assertValidChatId(chatId)
   const inboxDir = join(chatStateRoot(chatId, stateDir), INBOX_SUBDIR)
   const filename = buildFilename()
   const finalPath = join(inboxDir, filename)
@@ -242,6 +293,11 @@ export async function pollOutboxOnce(
   chatId: string,
   stateDir: string,
 ): Promise<OutboxClaim[]> {
+  // TASK-5 bug 4 (2026-05-27): validate chatId. The outbox loop in
+  // multichat-router runs on a setInterval where a buggy caller could
+  // accidentally pass a non-string or a tampered id; assertion here
+  // is the last line of defence before `path.join` builds an FS path.
+  assertValidChatId(chatId)
   const outboxDir = outboxRoot(chatId, stateDir)
   const processingDir = outboxProcessingDir(chatId, stateDir)
   const deadLetterDir = outboxDeadLetterDir(chatId, stateDir)
@@ -278,7 +334,16 @@ export async function pollOutboxOnce(
     let parsed: OutboxMessage
     try {
       const raw = await readFile(processingPath, 'utf8')
-      parsed = JSON.parse(raw) as OutboxMessage
+      // FIX-F (2026-05-27, Opus router #14): Zod parse instead of an
+      // unchecked `as OutboxMessage` cast. Two payoffs:
+      //   1. A malformed file (missing chat_id, wrong types) lands in
+      //      dead-letter with a precise schema error instead of crashing
+      //      downstream sendMessage on `undefined.chat_id`.
+      //   2. The `format` field gets the `.default('html')` applied so
+      //      every tuple downstream sees a populated format and we never
+      //      branch on `format === undefined`.
+      const json = JSON.parse(raw) as unknown
+      parsed = OutboxMessageSchema.parse(json)
     } catch (err) {
       // Corrupt or unreadable JSON — dead-letter immediately so the
       // poller never sees this file again. We carry the reason as a
@@ -310,6 +375,63 @@ export async function pollOutboxOnce(
  */
 export async function confirmOutboxClaim(claim: OutboxClaim): Promise<void> {
   await unlink(claim.processingPath).catch(() => {})
+}
+
+/**
+ * TASK-5 bug 2 (2026-05-27): quarantine a claim whose embedded
+ * `claim.message.chat_id` did not match the chat directory that owned
+ * the file. Moves the processing file to `outbox/mismatched/` with a
+ * `.mismatch.json` sidecar that records both the expected (directory)
+ * chat id and the actual (payload) chat id. NEVER auto-redrives —
+ * an operator must inspect because mismatched claims indicate either
+ * a buggy tmux session, a directory-traversal attempt, or memory
+ * corruption.
+ *
+ * Falls back to `unlink` if the dead-letter sibling lookup fails so
+ * the file does not stick in `processing/` and block the poll loop.
+ *
+ * @param claim the claim returned by {@link pollOutboxOnce}
+ * @param mismatch metadata describing the chat id discrepancy
+ */
+export async function quarantineMismatchedClaim(
+  claim: OutboxClaim,
+  mismatch: { expectedChatId: string; actualChatId: string },
+): Promise<void> {
+  // Compute the chat-local outbox root via the well-known relative
+  // layout: processing/ and mismatched/ are siblings under outbox/.
+  const mismatchedDir = join(
+    claim.processingPath,
+    '..',
+    '..',
+    OUTBOX_MISMATCHED_SUBDIR,
+  )
+  try {
+    await mkdir(mismatchedDir, { recursive: true, mode: STATE_DIR_MODE })
+    const ts = Date.now()
+    const target = join(mismatchedDir, `${ts}-${claim.originalName}`)
+    await rename(claim.processingPath, target)
+    await chmod(target, STATE_FILE_MODE).catch(() => {})
+
+    const sidecarPath = `${target}.mismatch.json`
+    const sidecarTmp = `${sidecarPath}.tmp`
+    const meta = {
+      reason: 'outbox_chat_mismatch',
+      expectedChatId: mismatch.expectedChatId,
+      actualChatId: mismatch.actualChatId,
+      quarantinedAt: new Date().toISOString(),
+    }
+    await writeFile(sidecarTmp, JSON.stringify(meta), {
+      encoding: 'utf8',
+      mode: STATE_FILE_MODE,
+    }).catch(() => {})
+    await chmod(sidecarTmp, STATE_FILE_MODE).catch(() => {})
+    await rename(sidecarTmp, sidecarPath).catch(() => {
+      return unlink(sidecarTmp).catch(() => {})
+    })
+  } catch {
+    // Last resort — unlink so the file does not block the poll loop.
+    await unlink(claim.processingPath).catch(() => {})
+  }
 }
 
 /**
