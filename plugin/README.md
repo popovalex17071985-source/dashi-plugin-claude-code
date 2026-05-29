@@ -139,11 +139,11 @@ Env overrides: `TELEGRAM_MULTICHAT_ENABLED`, `TELEGRAM_MULTICHAT_POLICY_PATH`, `
 ```yaml
 version: 1
 allowlist:
-  chats: ["164795011", "-1003784643974"]   # chat_id строкой — отрицательные group id обязаны быть в кавычках
-  users: ["164795011"]                       # кто вообще может писать
-mention_allowlist: ["164795011"]             # кто может звать через @mention в группах
+  chats: ["123456789", "-1001234567890"]   # chat_id строкой — отрицательные group id обязаны быть в кавычках
+  users: ["123456789"]                       # кто вообще может писать
+mention_allowlist: ["123456789"]             # кто может звать через @mention в группах
 chats:
-  "164795011":
+  "123456789":
     mode: private                             # private | public — выбирает поверхности (TmuxMirror, edit_message_progress)
     streaming: progress                       # progress | off
     tmux_mirror: true                         # включить TmuxMirror в этом чате
