@@ -26,6 +26,7 @@ import { writeDeadLetter } from '../state/store.js'
 import {
   AskUserQuestionAnswerSchema,
   AskUserQuestionRequestSchema,
+  FallbackReplyRouteRequestSchema,
   ReactRouteRequestSchema,
   WebhookPayloadSchema,
   type AskUserQuestionAnswer,
@@ -54,6 +55,10 @@ const ASK_BODY_LIMIT_BYTES = 64 * 1024
 // Read-receipt bodies are tiny ({chat_id, message_id, emoji}); 4 KB is
 // generous and keeps the route cheap to abuse-proof.
 const REACT_BODY_LIMIT_BYTES = 4 * 1024
+// Fallback-reply bodies carry one text up to Telegram's 4096-char cap plus a
+// short chat_id; 16 KB covers a worst-case multibyte (UTF-8) 4096-char text
+// with JSON overhead while still cheap to abuse-proof. 2026-06-03.
+const FALLBACK_REPLY_BODY_LIMIT_BYTES = 16 * 1024
 const DEFAULT_AGENT_ID = 'dashi-channel'
 
 // Margin added on top of the configured AskUserQuestion timeout to set
@@ -170,6 +175,16 @@ export interface WebhookDeps {
   // plugin". Optional so tests/legacy paths can omit; when absent the route
   // answers 503 and the hook degrades to a no-op (no read receipt, no crash).
   reactToMessage?: (chatId: string, messageId: number, emoji: string) => Promise<void>
+  // 2026-06-03: DM fallback-reply capability. The warchief's DM session
+  // normally answers through the `mcp__dashi-channel__reply` MCP tool. When a
+  // turn ends WITHOUT having sent such a reply, the fallback-reply Stop hook
+  // posts the turn's final assistant text to POST /hooks/fallback-reply and we
+  // send it via this capability — a fire-and-forget plain-text Telegram
+  // message so the warchief still sees the answer. Wired through the same
+  // safe-wrapped, rate-limited telegramApi as every other outbound send.
+  // Optional so tests/legacy paths can omit; when absent the route answers 503
+  // and the hook degrades to a no-op (no fallback, no crash).
+  sendMessage?: (chatId: string, text: string) => Promise<void>
 }
 
 export interface WebhookServerHandle {
@@ -333,6 +348,15 @@ async function handleRequest(
   // bearer + chat allowlist, then sets 👀 via deps.reactToMessage.
   if (method === 'POST' && path === '/hooks/react') {
     await handleReact(req, res, deps, webhookToken)
+    return
+  }
+
+  // 2026-06-03 (feature/dm-fallback-reply-hook): DM fallback-reply route.
+  // Wired before /hooks/agent so the more-specific path takes priority.
+  // Loopback + bearer + chat allowlist, then sends the turn's final assistant
+  // text via deps.sendMessage when the DM turn ended without an MCP reply().
+  if (method === 'POST' && path === '/hooks/fallback-reply') {
+    await handleFallbackReply(req, res, deps, webhookToken)
     return
   }
 
@@ -793,6 +817,64 @@ async function handleReact(
   }
 
   reply(res, 200, { status: 'reacted' })
+}
+
+// 2026-06-03 (feature/dm-fallback-reply-hook): POST /hooks/fallback-reply —
+// forward the DM turn's final assistant text to the warchief's Telegram when
+// the turn ended WITHOUT an MCP reply()/edit_message() call. Auth: loopback
+// origin + bearer (same fence as the react route). Defence in depth: chatId
+// must be in the allowlist, so a leaked token still can't make the bot post
+// into an arbitrary chat. Modeled on handleReact.
+async function handleFallbackReply(
+  req: IncomingMessage,
+  res: ServerResponse,
+  deps: WebhookDeps,
+  webhookToken: string | undefined,
+): Promise<void> {
+  const { config, log, sendMessage } = deps
+
+  if (!authGate(req, res, webhookToken)) return
+
+  // Feature wiring gate: when no send capability was injected we answer 503
+  // (not 404) so an operator can tell "wired but disabled" from "wrong route",
+  // and the hook degrades to a no-op without retry storms.
+  if (!sendMessage) {
+    reply(res, 503, { status: 'fallback_reply_unavailable' })
+    return
+  }
+
+  const parsed = await readJsonBody(
+    req,
+    res,
+    log,
+    FALLBACK_REPLY_BODY_LIMIT_BYTES,
+    FallbackReplyRouteRequestSchema,
+    'fallback-reply',
+  )
+  if (!parsed.ok) return
+  const payload = parsed.value
+
+  if (!chatIdAllowed(config, payload.chat_id)) {
+    log.warn('fallback-reply chatId not in allowlist', { chat_id: payload.chat_id })
+    reply(res, 403, { error: 'chatId not in allowlist' })
+    return
+  }
+
+  try {
+    await sendMessage(payload.chat_id, payload.text)
+  } catch (err) {
+    // A failed send must never wedge the hook. We log and answer 200 so the
+    // hook records the turn as handled and moves on rather than retry-storming
+    // a send that keeps failing (e.g. transient 429 / 5xx after retries).
+    log.warn('fallback-reply sendMessage failed', {
+      chat_id: payload.chat_id,
+      error: err instanceof Error ? redactToken(err.message) : String(err),
+    })
+    reply(res, 200, { status: 'send_failed' })
+    return
+  }
+
+  reply(res, 200, { status: 'sent' })
 }
 
 async function handleAskRequest(
