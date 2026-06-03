@@ -865,9 +865,11 @@ async function handleFallbackReply(
   try {
     await sendMessage(payload.chat_id, payload.text)
   } catch (err) {
-    // A failed send must never wedge the hook. We log and answer 200 so the
-    // hook records the turn as handled and moves on rather than retry-storming
-    // a send that keeps failing (e.g. transient 429 / 5xx after retries).
+    // A failed send must never wedge the hook. We log and answer 200 (not 5xx)
+    // with an explicit {status:'send_failed'} so the hook can distinguish a
+    // real delivery from a failure: it records dedup ONLY on {status:'sent'},
+    // so a send that keeps failing is re-attempted on the next Stop fire
+    // instead of being silently marked delivered.
     log.warn('fallback-reply sendMessage failed', {
       chat_id: payload.chat_id,
       error: err instanceof Error ? redactToken(err.message) : String(err),
