@@ -173,6 +173,12 @@ export const AppConfigSchema = z.object({
   tmux_mirror: z.object({
     enabled: z.boolean().default(false),
     pane_target: z.string().default(''),
+    // tmux socket name (`tmux -L <name>`). Empty = default socket. Needed
+    // when the channel unit runs its session on a dedicated socket (two
+    // Type=forking channel units on one host race at boot on the default
+    // socket) — capture-pane must address the same socket or it finds
+    // nothing (Arthas migration, 2026-06-05).
+    socket_name: z.string().default(''),
     poll_interval_ms: z.number().int().min(500).default(5000),
     line_count: z.number().int().min(5).max(500).default(50),
     // Segments to drop from the rendered mirror. Default hides the boot

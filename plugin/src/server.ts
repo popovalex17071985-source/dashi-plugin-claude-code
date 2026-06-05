@@ -498,6 +498,7 @@ if (config.tmux_mirror.enabled) {
       log,
       chatId: mirrorChatId,
       paneTarget: target,
+      socketName: config.tmux_mirror.socket_name,
       pollIntervalMs: config.tmux_mirror.poll_interval_ms,
       lineCount: config.tmux_mirror.line_count,
       hideSegments: config.tmux_mirror.hide_segments,

@@ -140,6 +140,50 @@ describe('TmuxMirror — lifecycle', () => {
     await mirror.stop()
   })
 
+  test('socketName prepends -L to every capture-pane exec; empty omits it', async () => {
+    const calls: string[][] = []
+    const recordingExec: TmuxExec = async (args) => {
+      calls.push([...args])
+      return ok('pane content')
+    }
+    const withSocket = new TmuxMirror({
+      api: makeStubApi().api,
+      log: stubLog,
+      chatId: '100',
+      paneTarget: 'channel-arthas:0.0',
+      socketName: 'channel-arthas',
+      pollIntervalMs: 1000,
+      lineCount: 50,
+      exec: recordingExec,
+    })
+    await withSocket.start()
+    await withSocket.onPoll()
+    await withSocket.stop()
+    expect(calls.length).toBeGreaterThan(0)
+    for (const args of calls.filter((a) => a.includes('capture-pane'))) {
+      expect(args.slice(0, 2)).toEqual(['-L', 'channel-arthas'])
+    }
+
+    calls.length = 0
+    const noSocket = new TmuxMirror({
+      api: makeStubApi().api,
+      log: stubLog,
+      chatId: '100',
+      paneTarget: 'channel-thrall:0.0',
+      pollIntervalMs: 1000,
+      lineCount: 50,
+      exec: recordingExec,
+    })
+    await noSocket.start()
+    await noSocket.onPoll()
+    await noSocket.stop()
+    expect(calls.length).toBeGreaterThan(0)
+    for (const args of calls) {
+      expect(args[0]).toBe('capture-pane')
+      expect(args).not.toContain('-L')
+    }
+  })
+
   test('changed pane content triggers editMessageText', async () => {
     const stub = makeStubApi()
     const exec = makeExec([ok('one'), ok('two'), ok('three')])

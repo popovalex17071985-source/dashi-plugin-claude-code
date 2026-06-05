@@ -88,6 +88,10 @@ export interface TmuxMirrorOptions {
   chatId: string
   // tmux target spec, e.g. `channel-thrall:0.0` (session:window.pane).
   paneTarget: string
+  // Optional tmux socket name (`tmux -L <name>`). Empty/omitted = default
+  // socket. Channel units on a dedicated socket (boot-race isolation)
+  // need every capture-pane addressed to that socket.
+  socketName?: string
   // Polling cadence. Tests usually drive `onPoll()` directly and pass a
   // long interval so the interval never fires within the test window.
   pollIntervalMs: number
@@ -249,6 +253,7 @@ export class TmuxMirror {
   private readonly log: Logger
   private readonly chatId: string
   private readonly paneTarget: string
+  private readonly socketName: string
   private readonly pollIntervalMs: number
   private readonly lineCount: number
   private readonly exec: TmuxExec
@@ -289,6 +294,7 @@ export class TmuxMirror {
     this.log = opts.log
     this.chatId = opts.chatId
     this.paneTarget = opts.paneTarget
+    this.socketName = opts.socketName ?? ''
     this.pollIntervalMs = opts.pollIntervalMs
     this.lineCount = opts.lineCount
     this.exec = opts.exec ?? defaultTmuxExec
@@ -572,7 +578,10 @@ export class TmuxMirror {
     this.inFlight = true
     try {
       this.lastPollAt = this.now()
+      // Socket flag must precede the tmux command word.
+      const socketArgs = this.socketName ? ['-L', this.socketName] : []
       const result = await this.exec([
+        ...socketArgs,
         'capture-pane',
         '-p',
         '-t',
