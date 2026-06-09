@@ -34,9 +34,10 @@ describe('stdout rendering', () => {
 })
 
 describe('decideLocal', () => {
-  test('non-PreToolUse → passthrough (empty stdout)', () => {
+  test('non-PreToolUse event → deny (hook is PreToolUse-exclusive; fail-closed)', () => {
     const d = decideLocal({ envelope: { hook_event_name: 'PostToolUse' }, policy: ALLOW_POLICY, scope: 'main' })
-    expect(d).toEqual({ action: 'emit', stdout: '' })
+    expect(d.action).toBe('emit')
+    expect(JSON.parse(d.stdout!).hookSpecificOutput.permissionDecision).toBe('deny')
   })
   test('safe Read → emit allow', () => {
     const d = decideLocal({
@@ -168,14 +169,6 @@ describe('decideLocal fail-closed (Codex Critical #1 / high)', () => {
     })
     expect(d.action).toBe('emit')
     expect(JSON.parse(d.stdout!).hookSpecificOutput.permissionDecision).toBe('deny')
-  })
-  test('a genuine non-PreToolUse event still passes through (empty stdout)', () => {
-    const d = decideLocal({
-      envelope: { hook_event_name: 'PostToolUse', tool_name: 'Bash' },
-      policy: ALLOW_POLICY,
-      scope: 'main',
-    })
-    expect(d).toEqual({ action: 'emit', stdout: '' })
   })
 })
 

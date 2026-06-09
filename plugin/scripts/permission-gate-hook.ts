@@ -16,7 +16,9 @@
 //      DENY (fail-closed — there is no terminal UI to fall back to).
 //
 // Hard invariants (mirror ask-user-question-hook.ts):
-//   * Exit code 0 on every path — the decision travels via stdout JSON.
+//   * The decision travels via stdout JSON. Exit code is 0 on normal paths;
+//     failClosed() additionally sets exit 2 (a second deny signal Claude Code
+//     honors even if the stdout JSON is unparseable).
 //   * Bearer token never written to stdout/stderr.
 //   * Off-loopback webhook URL → refuse to ship the token; fail-closed deny
 //     for confirm-tier calls (we cannot get a verdict safely).
@@ -235,16 +237,16 @@ export function decideLocal(args: {
 }): LocalDecision {
   const { envelope, policy, scope } = args
   const event = envelope.hook_event_name
-  // The hook is registered for PreToolUse ONLY. A well-formed envelope for some
-  // OTHER known event (defensive — if an operator also wires it elsewhere) is a
-  // genuine passthrough. But a MISSING or non-string event is a malformed
-  // PreToolUse and must fail closed to deny (Codex Critical: a JSON object with
-  // no hook_event_name used to passthrough → the tool ran).
-  if (typeof event !== 'string' || event.length === 0) {
-    return { action: 'emit', stdout: renderDeny('malformed hook envelope: missing hook_event_name; fail-closed') }
-  }
+  // This hook is installed for PreToolUse ONLY (install-hooks wires the gate
+  // marker exclusively on PreToolUse; the notification mirror is a separate
+  // hook). So ANY envelope whose event is not exactly "PreToolUse" — missing,
+  // non-string, or a spoofed/mislabeled value like "PostToolUse" — is either
+  // malformed or a misconfiguration, and under bypassPermissions must fail
+  // closed to deny rather than passthrough (Codex round-2 Critical). A deny on
+  // a genuine non-PreToolUse event (if ever misconfigured) is harmless — those
+  // events have no permission decision to honor.
   if (event !== 'PreToolUse') {
-    return { action: 'emit', stdout: '' }
+    return { action: 'emit', stdout: renderDeny('non-PreToolUse or malformed hook envelope; fail-closed') }
   }
   const verdict = classifyToolCall({
     toolName: envelope.tool_name,

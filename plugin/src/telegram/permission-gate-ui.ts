@@ -138,21 +138,18 @@ export function createPermissionGateUi(deps: PermissionGateUiDeps): PermissionGa
 
     const pendingBefore = relay.getPending(parsed.requestId)
 
-    // Message-id binding (Codex high): only resolve when the tapped keyboard
-    // belongs to THIS pending request's message. A short id can be reused once
-    // its 60s tombstone expires; without this, a stale Allow button left on an
-    // old (e.g. timed-out) card could resolve a later request that reused the
-    // id. When the context carries no message id we fall through (older grammy
-    // paths) — the auth + idempotency guards still apply.
-    if (
-      pendingBefore
-      && ctx.callbackQuery.messageId !== undefined
-      && pendingBefore.telegramMessageId !== undefined
-      && ctx.callbackQuery.messageId !== pendingBefore.telegramMessageId
-    ) {
-      log.warn('permission_gate tap message-id mismatch (stale keyboard)', { request_id: parsed.requestId })
-      await ctx.answerCallbackQuery({ text: 'Запрос уже закрыт' }).catch(() => {})
-      return true
+    // Message-id binding (Codex high + round-2): once a request has a keyboard
+    // message id, a tap MUST carry the SAME message id. A 5-char short id can
+    // be reused after its 60s tombstone expires; a stale Allow button left on
+    // an old card must not resolve a later id-reusing request. We REQUIRE the
+    // id (Telegram always sends message.message_id on inline-keyboard taps) —
+    // a tap with a missing or mismatched id is rejected, never falls through.
+    if (pendingBefore && pendingBefore.telegramMessageId !== undefined) {
+      if (ctx.callbackQuery.messageId !== pendingBefore.telegramMessageId) {
+        log.warn('permission_gate tap message-id mismatch/absent (stale keyboard)', { request_id: parsed.requestId })
+        await ctx.answerCallbackQuery({ text: 'Запрос уже закрыт' }).catch(() => {})
+        return true
+      }
     }
 
     const status = relay.answer(parsed.requestId, parsed.behavior)

@@ -108,7 +108,7 @@ describe('permission-gate UI', () => {
     const ui = createPermissionGateUi({ config, log, telegramApi: api, relay })
     let toast: string | undefined
     const handled = await ui.handlePgateCallback({
-      callbackQuery: { data: 'pgate:allow:abcde' },
+      callbackQuery: { data: 'pgate:allow:abcde', messageId: 5 },
       from: { id: 164795011 },
       answerCallbackQuery: async (arg) => { toast = arg?.text },
     })
@@ -150,12 +150,24 @@ describe('permission-gate UI', () => {
     const ui = createPermissionGateUi({ config, log, telegramApi: api, relay })
     let toast: string | undefined
     await ui.handlePgateCallback({
-      callbackQuery: { data: 'pgate:allow:abcde' },
+      callbackQuery: { data: 'pgate:allow:abcde', messageId: 5 },
       from: { id: 999 },
       answerCallbackQuery: async (arg) => { toast = arg?.text },
     })
     expect(answered).toHaveLength(0)
     expect(toast).toBe('Не авторизован')
+  })
+
+  test('tap with NO message-id is rejected when the request has a keyboard (required, not fallthrough)', async () => {
+    const { api } = makeTelegramApi()
+    const { relay, answered } = makeFakeRelay({ telegramMessageId: 5 })
+    const ui = createPermissionGateUi({ config, log, telegramApi: api, relay })
+    await ui.handlePgateCallback({
+      callbackQuery: { data: 'pgate:allow:abcde' }, // no messageId
+      from: { id: 164795011 },
+      answerCallbackQuery: async () => {},
+    })
+    expect(answered).toHaveLength(0)
   })
 
   test('foreign callback data is not consumed', async () => {
