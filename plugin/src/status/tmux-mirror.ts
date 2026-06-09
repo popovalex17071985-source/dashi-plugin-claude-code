@@ -196,7 +196,7 @@ function stripAnsi(text: string): string {
 const GLYPH_MAP: ReadonlyArray<readonly [RegExp, string]> = [
   [/⏺/g, '●'], // ⏺ -> ● (BLACK CIRCLE renders as text)
   [/⚠/g, '(!)'], // ⚠ -> (!)
-  [/[︎️]/g, ''], // variation selectors
+  [/[\uFE0E\uFE0F]/g, ''], // variation selectors (invisible — keep as escapes)
 ]
 
 function sanitizeTerminalGlyphs(text: string): string {
@@ -342,7 +342,7 @@ export class TmuxMirror {
       const errMsg = `tmux unavailable: ${this.lastError.slice(0, 200)}`
       return renderBody('(no output)', errMsg, this.maxBodyChars)
     }
-    const cleaned = sanitizeTerminalGlyphs(stripAnsi(result.stdout))
+    const cleaned = stripAnsi(result.stdout)
     // Drop banner / warning / footer / input-box BEFORE redaction — the
     // filter's anchors look at the raw textual structure (box corners,
     // specific phrases, U+2500 separators) and must not be perturbed by
@@ -354,6 +354,10 @@ export class TmuxMirror {
     let filtered = needsFilter
       ? filterPane(cleaned, { hide: this.hideSegments, mode: this.mode })
       : cleaned
+    // Glyph sanitization runs AFTER the structural pane filter (its anchors
+    // read the raw pane layout) and BEFORE redaction/rendering, so no
+    // emoji-presentation glyph survives into the Telegram message.
+    filtered = sanitizeTerminalGlyphs(filtered)
     // Line cap runs AFTER the segment filter so the warchief's iPhone
     // sees a tidy ~14-line tail of the post-filter content, not a
     // 14-line slice of raw tmux output that includes hidden segments.

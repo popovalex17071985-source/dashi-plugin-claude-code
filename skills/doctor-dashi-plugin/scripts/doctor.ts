@@ -508,6 +508,11 @@ export function checkAllowlist(envText: string, userId?: string, chatId?: string
  * «working/running» Telegram windows next to the tmux mirror — the owner saw
  * duplicate windows. Defaults are all-off now; this check catches explicit
  * double-enables so the bug cannot quietly return.
+ *
+ * Scope: validates <TELEGRAM_STATE_DIR>/config.json ONLY. That is the single
+ * layer able to enable these surfaces — the env schema has no
+ * status/progress enable switches (TELEGRAM_WEBHOOK_* set host/port only),
+ * and since 2026-06-09 the schema defaults are all-off.
  */
 export function checkProgressSurfaces(stateConfig: unknown): Check {
   const id = 'progress-surfaces'
