@@ -97,6 +97,27 @@ export const PermissionPolicySchema = z
     confirm: PolicyRulesSchema.optional(),
     allow: PolicyRulesSchema.optional(),
     scopes: z.record(z.string(), PolicyScopeSchema).optional(),
+    // Operator downgrade of SPECIFIC built-in confirm rules (owner autonomy
+    // policy 2026-06-09: cards only for what cannot be automated, e.g. sudo).
+    // Entries must name exact BUILTIN_CONFIRM_BASH rules — a typo fails
+    // validation loudly instead of silently disabling nothing.
+    confirm_overrides: z
+      .object({
+        builtin_rules: z
+          .array(z.string())
+          .superRefine((rules, ctx) => {
+            for (const r of rules) {
+              if (!BUILTIN_CONFIRM_BASH.includes(r)) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `unknown built-in confirm rule: ${JSON.stringify(r)} (must be one of: ${BUILTIN_CONFIRM_BASH.join(', ')})`,
+                })
+              }
+            }
+          }),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
 
@@ -116,6 +137,14 @@ export interface PermissionPolicy {
   readonly allow?: PolicyRules
   /** Per-scope (per-chat / "main") overrides, unioned with the globals. */
   readonly scopes?: Readonly<Record<string, PolicyScope>>
+  /**
+   * Built-in confirm rules the operator explicitly downgrades to the normal
+   * policy flow (confirm -> allow -> default). Deny tiers and the
+   * pipe-to-interpreter evasion confirm are NEVER overridable. A compound
+   * command matching an overridden AND a non-overridden built-in rule still
+   * confirms.
+   */
+  readonly confirm_overrides?: { readonly builtin_rules?: readonly string[] }
 }
 
 // Tools that cannot mutate state or exfiltrate data. Under default_tier
@@ -488,6 +517,17 @@ function matchBashRules(rules: readonly string[] | undefined, commandLower: stri
   return undefined
 }
 
+/** All rules from the list that match — used by the built-in confirm tier so
+ * an operator override of one rule cannot mask a sibling hit (e.g.
+ * `git push; kill 1234` overriding only `git push` must still confirm). */
+function matchAllBashRules(rules: readonly string[], commandLower: string): string[] {
+  const hits: string[] = []
+  for (const rule of rules) {
+    if (bashMatch(rule, commandLower)) hits.push(rule)
+  }
+  return hits
+}
+
 /** Merge global + scope rules for one tier (scope rules are additive). */
 function mergeRules(global: PolicyRules | undefined, scope: PolicyRules | undefined): PolicyRules {
   return {
@@ -641,12 +681,16 @@ export function classifyToolCall(input: ClassifyInput): PermissionVerdict {
     return { tier: 'deny', reason: `policy deny (${denyHit})`, matchedRule: `deny:${denyHit}` }
   }
 
-  // 4. Built-in confirm bash — UNCONDITIONAL (no operator-allow short-circuit).
-  // Substring list + spacing-tolerant interpreter/exfil evasion detection.
+  // 4. Built-in confirm bash — no operator-ALLOW short-circuit (Codex
+  // Critical #3); the only relaxation is the explicit, validated
+  // confirm_overrides list, and a command matching ANY non-overridden rule
+  // still confirms. The evasion detector below is never overridable.
   if (commandLower !== undefined) {
-    const hit = matchBashRules(BUILTIN_CONFIRM_BASH, commandLower)
-    if (hit) {
-      return { tier: 'confirm', reason: `risky command needs confirmation: ${hit}`, matchedRule: `builtin:confirm_bash:${hit}` }
+    const overridden = policy.confirm_overrides?.builtin_rules ?? []
+    const hits = matchAllBashRules(BUILTIN_CONFIRM_BASH, commandLower)
+    const standing = hits.filter((h) => !overridden.includes(h))
+    if (standing.length > 0) {
+      return { tier: 'confirm', reason: `risky command needs confirmation: ${standing[0]}`, matchedRule: `builtin:confirm_bash:${standing[0]}` }
     }
     if (bashConfirmEvasion(commandLower)) {
       return { tier: 'confirm', reason: 'pipe-to-interpreter download needs confirmation', matchedRule: 'builtin:confirm_bash:pipe-interpreter' }
