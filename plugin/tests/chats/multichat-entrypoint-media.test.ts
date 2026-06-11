@@ -208,3 +208,46 @@ describe('prompt_fingerprint — speaker-line preference', () => {
     expect(res.stdout.startsWith('обычный текст')).toBe(true)
   })
 })
+
+describe('build_prompt — whitespace-only reply_context (Codex finding 2)', () => {
+  test('reply_context of spaces with no other payload → exit 3', () => {
+    const f = writeInboxJson('msg.json', {
+      text: '',
+      user: 'u',
+      reply_context: '   ',
+    })
+    const res = runHelpers(`rc=0; build_prompt '${f}' || rc=$?; echo "rc=$rc" >&2`)
+    expect(res.stdout).toBe('')
+    expect(res.stderr).toContain('rc=3')
+  })
+})
+
+describe('prompt_fingerprint — reply-context steal (Codex finding 1)', () => {
+  test('quoted [from @old] inside reply_context does not steal the fingerprint', () => {
+    const prompt = [
+      '<untrusted_metadata type="telegram_reply">',
+      '[from @old_user] цитата прошлого сообщения достаточно длинная',
+      '</untrusted_metadata>',
+      '',
+      VOICE_DESCRIPTOR,
+      '',
+      '[from @dashieshiev] Проверь воркшоп немедленно',
+    ].join('\n')
+    const res = runHelpers(
+      `prompt_fingerprint "$(printf '%s' '${prompt.replace(/'/g, "'\\''")}')"`,
+    )
+    expect(res.code).toBe(0)
+    expect(res.stdout.startsWith('[from @dashieshiev]')).toBe(true)
+  })
+
+  test('bare short speaker line falls back to unique descriptor head', () => {
+    // Caption-less voice note: "[from @u]" is identical across messages —
+    // the descriptor head (carrying file_id) must win instead.
+    const prompt = `${VOICE_DESCRIPTOR}\n\n[from @u]`
+    const res = runHelpers(
+      `prompt_fingerprint "$(printf '%s' '${prompt.replace(/'/g, "'\\''")}')"`,
+    )
+    expect(res.code).toBe(0)
+    expect(res.stdout.startsWith('<media kind="voice" file_id="abc"')).toBe(true)
+  })
+})

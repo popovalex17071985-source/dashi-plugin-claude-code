@@ -108,20 +108,35 @@ prompt_fingerprint() {
   printf '%s' "$1" | python3 -c '
 import sys
 lines = [l.strip() for l in sys.stdin.read().splitlines()]
-# Prefer the stable speaker line over whatever happens to come first: a
-# leading <media .../> descriptor can be very long (voice transcript
-# attribute) and tmux may wrap it differently than our 60-char slice,
-# producing a false "not submitted". The [from @user] line is short and
-# always rendered verbatim.
-for line in lines:
-    if line.startswith("[from @") and len(line) >= 4:
-        sys.stdout.write(line[:60])
-        break
+# Selection order (build_prompt renders reply_context -> descriptors ->
+# speaker line -> media paths):
+#   1. The LAST "[from @" line, if long enough to be distinctive. Last,
+#      not first: reply_context precedes the current message and a
+#      quoted body may itself contain a "[from @old]" line — picking it
+#      would verify the wrong text (false submit confirmation).
+#   2. A "<media " descriptor line. Its head carries the per-message
+#      file_id, so a caption-less voice note (bare attribution shorter
+#      than the threshold — identical across every voice note from the
+#      same user) still gets a unique fingerprint. The first 60 chars
+#      sit on one visual pane row even after tmux wraps the long tail.
+#   3. The bare speaker line, then any line >= 4 chars (legacy fallback).
+speaker = next(
+    (l for l in reversed(lines) if l.startswith("[from @") and len(l) >= 4),
+    None,
+)
+if speaker is not None and len(speaker) >= 20:
+    sys.stdout.write(speaker[:60])
 else:
-    for line in lines:
-        if len(line) >= 4:
-            sys.stdout.write(line[:60])
-            break
+    descriptor = next((l for l in lines if l.startswith("<media ")), None)
+    if descriptor is not None:
+        sys.stdout.write(descriptor[:60])
+    elif speaker is not None:
+        sys.stdout.write(speaker[:60])
+    else:
+        for line in lines:
+            if len(line) >= 4:
+                sys.stdout.write(line[:60])
+                break
 ' || true
 }
 
@@ -222,7 +237,11 @@ text = d.get('text', '') or ''
 user = d.get('user', '') or ''
 
 reply_context = d.get('reply_context')
-if not (isinstance(reply_context, str) and reply_context):
+if isinstance(reply_context, str):
+    # strip() so whitespace-only context cannot defeat the skip-empty
+    # contract below (Codex review, 2026-06-11).
+    reply_context = reply_context.strip() or None
+else:
     reply_context = None
 
 raw_descriptors = d.get('media_descriptors') or []
@@ -248,9 +267,10 @@ parts = []
 if reply_context is not None:
     parts.append(reply_context)
 
-# Media descriptors go ABOVE the speaker line — parity with the DM
-# path's buildChannelContent (media first, then text). The speaker
-# attribution stays adjacent to the text it labels.
+# Media descriptors go ABOVE the speaker line, matching the DM path
+# (buildChannelContent renders media before text). Note the residual
+# divergence: DM puts reply metadata LAST, this path renders
+# reply_context FIRST (pre-existing ordering, kept as-is).
 parts.extend(descriptors)
 
 if user:

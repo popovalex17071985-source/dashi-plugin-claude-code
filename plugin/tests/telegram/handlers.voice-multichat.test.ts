@@ -254,3 +254,33 @@ describe('renderMediaDescriptor — single-line invariant', () => {
     expect(rendered.endsWith('/>')).toBe(true)
   })
 })
+
+// Integration slice (Codex finding 3): the field must survive the real
+// inbox write — the bash watcher reads the JSON file, not the TS object.
+import { writeToInbox, ensureChatStateDirs } from '../../src/router/inbox-bridge.js'
+import { readFileSync } from 'fs'
+
+describe('writeToInbox persists media_descriptors to the JSON file', () => {
+  test('round-trip: descriptor string lands in the on-disk JSON', async () => {
+    const stateDir = mkdtempSync(join(tmpdir(), 'dashi-inbox-rt-'))
+    const chatId = '-1003784643974'
+    await ensureChatStateDirs(chatId, stateDir)
+    const descriptor =
+      '<media kind="voice" file_id="f1" transcript="привет" transcription_status="ok" />'
+    const path = await writeToInbox(
+      chatId,
+      {
+        text: '',
+        chat_id: chatId,
+        user_id: '164795011',
+        user: 'dashieshiev',
+        timestamp: new Date().toISOString(),
+        media_descriptors: [descriptor],
+      },
+      stateDir,
+    )
+    const onDisk = JSON.parse(readFileSync(path, 'utf8'))
+    expect(onDisk.media_descriptors).toEqual([descriptor])
+    rmSync(stateDir, { recursive: true, force: true })
+  })
+})
