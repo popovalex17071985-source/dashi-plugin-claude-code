@@ -70,10 +70,14 @@ export function renderContext(text: string): string {
 if (import.meta.main) {
   // We do not even need to read stdin: the reminder is independent of the
   // prompt body, and reading it would only risk echoing private content.
+  // Set exitCode and let the process terminate naturally — calling
+  // process.exit() right after an async stdout write can truncate the
+  // payload before the stream flushes (Codex review). The payload is one
+  // short line, but natural termination is the safe pattern.
   try {
     process.stdout.write(renderContext(reminderForChat(process.env.CHAT_ID)))
   } catch {
     // Never gate the turn on a reminder failure.
   }
-  process.exit(0)
+  process.exitCode = 0
 }
