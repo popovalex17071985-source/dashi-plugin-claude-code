@@ -1,0 +1,210 @@
+import { describe, expect, test } from 'bun:test'
+
+import {
+  buildKeysKeyboard,
+  handleKkeyCallback,
+  parseKkeyCallback,
+  KEYS_PANEL_HEADER,
+  KKEY_PREFIX,
+  type KkeyCallbackContext,
+  type KkeyCallbackDeps,
+} from '../../src/telegram/keys-panel-ui.js'
+import type { KeysExec, TmuxKeysTarget } from '../../src/commands/keys.js'
+import type { Logger } from '../../src/log.js'
+
+function makeLogger(): Logger {
+  return { debug: () => {}, info: () => {}, warn: () => {}, error: () => {} }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// parseKkeyCallback
+// ─────────────────────────────────────────────────────────────────────
+
+describe('parseKkeyCallback', () => {
+  test('accepts each whitelisted literal token', () => {
+    for (const t of ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'y', 'n']) {
+      expect(parseKkeyCallback(`${KKEY_PREFIX}${t}`)).toBe(t)
+    }
+  })
+
+  test('accepts each whitelisted named token', () => {
+    for (const t of ['enter', 'esc', 'escape', 'tab', 'space', 'up', 'down', 'left', 'right']) {
+      expect(parseKkeyCallback(`${KKEY_PREFIX}${t}`)).toBe(t)
+    }
+  })
+
+  test('rejects a non-whitelisted token (kkey:rm)', () => {
+    expect(parseKkeyCallback('kkey:rm')).toBeNull()
+  })
+
+  test('rejects an empty token (kkey:)', () => {
+    expect(parseKkeyCallback('kkey:')).toBeNull()
+  })
+
+  test('rejects a multi-token / sequence payload (kkey:1;2)', () => {
+    expect(parseKkeyCallback('kkey:1;2')).toBeNull()
+    expect(parseKkeyCallback('kkey:1 enter')).toBeNull()
+    expect(parseKkeyCallback('kkey:1,2')).toBeNull()
+  })
+
+  test('rejects non-kkey callback data', () => {
+    expect(parseKkeyCallback('pgate:allow:abcde')).toBeNull()
+    expect(parseKkeyCallback('ask:foo')).toBeNull()
+    expect(parseKkeyCallback('perm:allow')).toBeNull()
+    expect(parseKkeyCallback('1')).toBeNull()
+  })
+
+  test('rejects an empty string', () => {
+    expect(parseKkeyCallback('')).toBeNull()
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────
+// buildKeysKeyboard
+// ─────────────────────────────────────────────────────────────────────
+
+describe('buildKeysKeyboard', () => {
+  test('produces 3 rows with the expected callback_data values', () => {
+    const kb = buildKeysKeyboard()
+    expect(kb.inline_keyboard.length).toBe(3)
+
+    const cb = (row: number) => kb.inline_keyboard[row]!.map((b) => b.callback_data)
+    expect(cb(0)).toEqual(['kkey:1', 'kkey:2', 'kkey:3', 'kkey:4', 'kkey:5'])
+    expect(cb(1)).toEqual(['kkey:y', 'kkey:n', 'kkey:enter', 'kkey:esc'])
+    expect(cb(2)).toEqual(['kkey:up', 'kkey:down', 'kkey:left', 'kkey:right'])
+  })
+
+  test('every callback_data parses back to a whitelisted token', () => {
+    const kb = buildKeysKeyboard()
+    for (const row of kb.inline_keyboard) {
+      for (const btn of row) {
+        expect(btn.callback_data).toBeDefined()
+        expect(parseKkeyCallback(btn.callback_data!)).not.toBeNull()
+      }
+    }
+  })
+
+  test('header is HTML and explains the keypad in Russian', () => {
+    expect(KEYS_PANEL_HEADER).toContain('Управление сессией')
+    expect(KEYS_PANEL_HEADER).toContain('<b>')
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────
+// handleKkeyCallback — AUTH gate (the critical security test) + dispatch.
+// ─────────────────────────────────────────────────────────────────────
+
+const ALLOWED_ID = 164795011
+const NON_ALLOWED_ID = 999999
+
+function makeCtx(data: string, fromId: number): {
+  ctx: KkeyCallbackContext
+  toasts: string[]
+} {
+  const toasts: string[] = []
+  const ctx: KkeyCallbackContext = {
+    callbackQuery: { data },
+    from: { id: fromId },
+    answerCallbackQuery: async (arg) => {
+      toasts.push(arg.text)
+    },
+  }
+  return { ctx, toasts }
+}
+
+// `noPane: true` builds deps WITHOUT a resolvable pane (the key is omitted,
+// not set to undefined — exactOptionalPropertyTypes rejects explicit
+// undefined). Other overrides merge on top.
+function makeDeps(
+  overrides: Partial<KkeyCallbackDeps> & { noPane?: boolean } = {},
+): {
+  deps: KkeyCallbackDeps
+  calls: string[][]
+} {
+  const calls: string[][] = []
+  const exec: KeysExec = async (args) => {
+    calls.push([...args])
+    return { exitCode: 0, stderr: '' }
+  }
+  const target: TmuxKeysTarget = { paneTarget: '%1', socketPath: '/tmp/s' }
+  const { noPane, ...rest } = overrides
+  const deps: KkeyCallbackDeps = {
+    allowedUserIds: [ALLOWED_ID],
+    log: makeLogger(),
+    exec,
+    ...(noPane ? {} : { tmuxKeysTarget: target }),
+    ...rest,
+  }
+  return { deps, calls }
+}
+
+describe('handleKkeyCallback — auth gate', () => {
+  test('NON-allowed user: toasts «не авторизовано» and NEVER sends a keystroke', async () => {
+    const { ctx, toasts } = makeCtx('kkey:2', NON_ALLOWED_ID)
+    const { deps, calls } = makeDeps()
+    const consumed = await handleKkeyCallback(ctx, deps)
+    expect(consumed).toBe(true)
+    // The critical assertion: the exec/sendKeys mock got ZERO calls.
+    expect(calls.length).toBe(0)
+    expect(toasts).toEqual(['не авторизовано'])
+  })
+
+  test('ALLOWED user: sendKeys called once with the parsed token', async () => {
+    const { ctx, toasts } = makeCtx('kkey:2', ALLOWED_ID)
+    const { deps, calls } = makeDeps()
+    const consumed = await handleKkeyCallback(ctx, deps)
+    expect(consumed).toBe(true)
+    // Exactly one send-keys invocation, carrying the literal token «2».
+    expect(calls).toEqual([['-S', '/tmp/s', 'send-keys', '-t', '%1', '-l', '2']])
+    expect(toasts).toEqual(['нажато: 2'])
+  })
+
+  test('ALLOWED user, named token (enter): sent without -l', async () => {
+    const { ctx, toasts } = makeCtx('kkey:enter', ALLOWED_ID)
+    const { deps, calls } = makeDeps()
+    await handleKkeyCallback(ctx, deps)
+    expect(calls).toEqual([['-S', '/tmp/s', 'send-keys', '-t', '%1', 'Enter']])
+    expect(toasts).toEqual(['нажато: enter'])
+  })
+
+  test('non-whitelisted token: toasts «неизвестная клавиша», no keystroke', async () => {
+    const { ctx, toasts } = makeCtx('kkey:rm', ALLOWED_ID)
+    const { deps, calls } = makeDeps()
+    await handleKkeyCallback(ctx, deps)
+    expect(calls.length).toBe(0)
+    expect(toasts).toEqual(['неизвестная клавиша'])
+  })
+
+  test('no resolvable pane: toasts «pane недоступен», no keystroke', async () => {
+    const { ctx, toasts } = makeCtx('kkey:2', ALLOWED_ID)
+    // Omit tmuxKeysTarget entirely.
+    const { deps, calls } = makeDeps({ noPane: true })
+    await handleKkeyCallback(ctx, deps)
+    expect(calls.length).toBe(0)
+    expect(toasts).toEqual(['pane недоступен'])
+  })
+
+  test('tmux failure: toasts an error, never throws', async () => {
+    const { ctx, toasts } = makeCtx('kkey:2', ALLOWED_ID)
+    const calls: string[][] = []
+    const failingExec: KeysExec = async (args) => {
+      calls.push([...args])
+      return { exitCode: 1, stderr: 'no such pane' }
+    }
+    const { deps } = makeDeps({ exec: failingExec })
+    const consumed = await handleKkeyCallback(ctx, deps)
+    expect(consumed).toBe(true)
+    expect(calls.length).toBe(1)
+    expect(toasts[0]).toContain('ошибка')
+    expect(toasts[0]).toContain('no such pane')
+  })
+
+  test('auth check runs BEFORE pane check (non-allowed + no pane → не авторизовано)', async () => {
+    const { ctx, toasts } = makeCtx('kkey:2', NON_ALLOWED_ID)
+    const { deps, calls } = makeDeps({ noPane: true })
+    await handleKkeyCallback(ctx, deps)
+    expect(calls.length).toBe(0)
+    // A non-allowed user must not even learn whether a pane exists.
+    expect(toasts).toEqual(['не авторизовано'])
+  })
+})

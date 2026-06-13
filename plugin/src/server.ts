@@ -68,6 +68,7 @@ import { createPermissionGateUi } from './telegram/permission-gate-ui.js'
 import { TelegramPoller, tokenLock } from './telegram/poller.js'
 import { describePidHolder, readLockHolder } from './telegram/pid-inspect.js'
 import { BOT_COMMANDS } from './commands/oob.js'
+import { handleKkeyCallback } from './telegram/keys-panel-ui.js'
 import { startWebhookServer, type WebhookServerHandle } from './webhook/server.js'
 import {
   handleInboundAudio,
@@ -675,6 +676,38 @@ bot.on('callback_query:data', async ctx => {
       })
     } catch (err) {
       log.error('pgate callback_query handler threw', {
+        error: err instanceof Error ? err.message : String(err),
+      })
+    }
+    return
+  }
+  // /keys keypad (kkey:*) — one-tap keystroke injection into the agent pane.
+  // Dispatched on its own prefix so it never collides with pgate:/ask:/perm:.
+  // Auth is fail-closed against config.allowed_user_ids — the SAME allowlist
+  // that guards the sibling `/key` OOB text command (handlers.ts OOB gate).
+  // We use allowed_user_ids (not the permission_gate set) because these
+  // buttons ARE /key: a tap injects one whitelisted keystroke, identical to
+  // typing `/key <token>`, so the authorization surface must match /key's.
+  // The handler never mutates the keyboard message — the warchief taps it
+  // repeatedly across a multi-step dialog.
+  if (data.startsWith('kkey:')) {
+    try {
+      await handleKkeyCallback(
+        {
+          callbackQuery: { data },
+          from: { id: ctx.from.id },
+          answerCallbackQuery: async arg => {
+            await ctx.answerCallbackQuery(arg)
+          },
+        },
+        {
+          allowedUserIds: config.allowed_user_ids,
+          log,
+          ...(tmuxKeysTarget !== undefined ? { tmuxKeysTarget } : {}),
+        },
+      )
+    } catch (err) {
+      log.error('kkey callback_query handler threw', {
         error: err instanceof Error ? err.message : String(err),
       })
     }

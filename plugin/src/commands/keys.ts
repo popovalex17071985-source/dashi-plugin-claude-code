@@ -26,10 +26,13 @@ const execFileAsync = promisify(execFile)
 
 // Literal characters are sent with `send-keys -l` (no name lookup);
 // named keys are sent without -l so tmux resolves Enter/Escape/arrows.
-const LITERAL_TOKENS = new Set([
+// Exported so the /keys inline-button panel (telegram/keys-panel-ui.ts)
+// derives its accepted token set from THIS list — a single whitelist
+// shared by the `/key` text command and the tap keypad.
+export const LITERAL_TOKENS = new Set([
   '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'y', 'n',
 ])
-const NAMED_TOKENS: Record<string, string> = {
+export const NAMED_TOKENS: Record<string, string> = {
   enter: 'Enter',
   esc: 'Escape',
   escape: 'Escape',
