@@ -246,7 +246,7 @@ describe('ProgressReporter', () => {
     expect(sends.length).toBe(1)
     expect(edits.length).toBe(0)
     expect(sends[0]!.chatId).toBe('164795011')
-    expect(sends[0]!.text).toContain('running')
+    expect(sends[0]!.text).toContain('команда echo hi')
   })
 
   test('rapid subsequent events within throttle window collapse into one edit', async () => {

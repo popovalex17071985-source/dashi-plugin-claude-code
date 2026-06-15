@@ -85,17 +85,23 @@ describe('maskSecrets', () => {
 })
 
 describe('summarizeToolInput', () => {
-  test('Read returns last two path segments', () => {
-    expect(summarizeToolInput('Read', { file_path: '/a/b/c/server.ts' })).toBe('c/server.ts')
+  test('Read returns last three path segments', () => {
+    expect(summarizeToolInput('Read', { file_path: '/a/b/c/server.ts' })).toBe('b/c/server.ts')
   })
 
   test('Read accepts `path` fallback and normalizes backslashes', () => {
-    expect(summarizeToolInput('Read', { path: 'src\\\\foo\\\\bar.ts' })).toBe('foo/bar.ts')
+    expect(summarizeToolInput('Read', { path: 'src\\\\foo\\\\bar.ts' })).toBe('src/foo/bar.ts')
   })
 
-  test('Bash truncates to 40', () => {
-    const long = 'a'.repeat(80)
-    expect(summarizeToolInput('Bash', { command: long }).length).toBeLessThanOrEqual(40)
+  test('Bash truncates to 70', () => {
+    const long = 'a'.repeat(120)
+    expect(summarizeToolInput('Bash', { command: long }).length).toBeLessThanOrEqual(70)
+  })
+
+  test('Bash prefers description over command', () => {
+    expect(
+      summarizeToolInput('Bash', { command: 'tar xzf backup.tgz', description: 'Restore from backup' }),
+    ).toBe('Restore from backup')
   })
 
   test('Grep wraps pattern in quotes (raw, render escapes)', () => {
@@ -214,8 +220,8 @@ describe('renderActivityBlock', () => {
       phase: 'reasoning',
     }
     const out = renderActivityBlock(snap, baseStart)
-    expect(out).toContain('working -- 0s')
-    expect(out).toContain('reasoning...')
+    expect(out).toContain('работаю -- 0 сек')
+    expect(out).toContain('думаю...')
     expect(out.startsWith('<pre>')).toBe(true)
     expect(out.endsWith('</pre>')).toBe(true)
   })
@@ -231,7 +237,7 @@ describe('renderActivityBlock', () => {
       phase: 'tool',
     }
     const out = renderActivityBlock(snap, baseStart + 12_000)
-    expect(out).toContain('working -- 12s')
+    expect(out).toContain('работаю -- 12 сек')
     expect(out).toContain('▸ read a.ts')
     expect(out).toContain('▸ bash bun test')
   })
@@ -252,9 +258,9 @@ describe('renderActivityBlock', () => {
       phase: 'tool',
     }
     const out = renderActivityBlock(snap, baseStart + 25_000)
-    expect(out).toContain('working -- 25s')
+    expect(out).toContain('работаю -- 25 сек')
     // Header carries the running total; the older "+N earlier" line is gone.
-    expect(out).toContain('steps (8 total):')
+    expect(out).toContain('шаги (всего 8):')
     expect(out).not.toContain('earlier')
     expect(out).toContain('▸ bash eight')
     // Only the last window (5) renders; older calls are implied by the total.
@@ -285,12 +291,16 @@ describe('renderActivityBlock', () => {
 })
 
 describe('buildActivityDetail', () => {
-  test('lowercases tool name + summary', () => {
-    expect(buildActivityDetail('Bash', { command: 'bun test' })).toBe('bash bun test')
+  test('Russian verb prefix + summary', () => {
+    expect(buildActivityDetail('Bash', { command: 'bun test' })).toBe('команда bun test')
   })
 
-  test('omits summary if empty', () => {
-    expect(buildActivityDetail('Read', {})).toBe('read')
+  test('omits summary if empty (verb only)', () => {
+    expect(buildActivityDetail('Read', {})).toBe('читаю')
+  })
+
+  test('unknown tool falls back to lowercase name', () => {
+    expect(buildActivityDetail('Hypothetical', {})).toBe('hypothetical')
   })
 })
 
@@ -312,74 +322,79 @@ describe('secret-path leak after summarization (regression)', () => {
   })
 })
 
-describe('humanized lines wired into render (M1)', () => {
-  // Wiring test — renderer must surface humanizeTool output on lines that
-  // carry a `humanized` HTML string, and fall back to the plain detail
-  // path for tools that don't have a richer label (TodoWrite, unknown).
+describe('verbose card renders Russian detail, not English humanized (regression)', () => {
+  // The operator-preferred card (gateway.py:2410) surfaces the Russian
+  // `detail` («команда …», «подзадача …»), NOT the English `humanizeTool`
+  // string. An early plugin port had wired humanized as the primary surface;
+  // this block guards against that regression. `buildHumanizedActivityLine`
+  // still exists (status-manager builds it) but the card must ignore it.
 
-  test('Bash humanized line emits `running: <code>cmd</code>` inside <pre>', () => {
-    const humanized = buildHumanizedActivityLine('Bash', { command: 'bun test' })
-    expect(humanized).toBe('running: <code>bun test</code>')
+  test('Bash renders Russian detail; English humanized is ignored', () => {
+    const detail = buildActivityDetail('Bash', { command: 'bun test' })
+    expect(detail).toBe('команда bun test')
     const snap: ActivitySnapshot = {
       startedAtMs: 0,
-      calls: [{ toolName: 'Bash', detail: 'bash bun test', humanized }],
+      // humanized still carries the English string — render must not use it.
+      calls: [{ toolName: 'Bash', detail, humanized: 'running: <code>bun test</code>' }],
       phase: 'tool',
     }
     const out = renderActivityBlock(snap, 0)
-    expect(out).toContain('▸ running: <code>bun test</code>')
-    // Plain detail string is no longer the primary surface.
-    expect(out).not.toContain('▸ bash bun test')
+    expect(out).toContain('▸ команда bun test')
+    expect(out).not.toContain('running:')
   })
 
-  test('Agent humanized line uses SUBAGENT_LABELS map', () => {
-    const humanized = buildHumanizedActivityLine('Agent', { subagent_type: 'researcher' })
-    expect(humanized).toBe('<b>searching and verifying sources</b>')
+  test('Agent renders «подзадача <type>»', () => {
+    const detail = buildActivityDetail('Agent', { subagent_type: 'researcher' })
+    expect(detail).toBe('подзадача researcher')
     const snap: ActivitySnapshot = {
       startedAtMs: 0,
-      calls: [{ toolName: 'Agent', detail: 'agent researcher', humanized }],
+      calls: [{ toolName: 'Agent', detail, humanized: '<b>searching and verifying sources</b>' }],
       phase: 'tool',
     }
     const out = renderActivityBlock(snap, 0)
-    expect(out).toContain('▸ <b>searching and verifying sources</b>')
+    expect(out).toContain('▸ подзадача researcher')
+    expect(out).not.toContain('searching and verifying')
   })
 
-  test('TodoWrite returns null → falls back to plain detail with single escape', () => {
-    const humanized = buildHumanizedActivityLine('TodoWrite', { todos: [] })
-    expect(humanized).toBeNull()
+  test('TodoWrite renders «план»', () => {
+    const detail = buildActivityDetail('TodoWrite', { todos: [] })
+    expect(detail).toBe('план')
     const snap: ActivitySnapshot = {
       startedAtMs: 0,
-      calls: [{ toolName: 'TodoWrite', detail: 'todowrite', humanized }],
+      calls: [{ toolName: 'TodoWrite', detail }],
       phase: 'tool',
     }
     const out = renderActivityBlock(snap, 0)
-    expect(out).toContain('▸ todowrite')
+    expect(out).toContain('▸ план')
   })
 
-  test('Unknown tool returns null → falls back to plain detail', () => {
-    const humanized = buildHumanizedActivityLine('Hypothetical', { a: 1 })
-    expect(humanized).toBeNull()
+  test('Unknown tool falls back to lowercase name in detail', () => {
+    const detail = buildActivityDetail('Hypothetical', { a: 1 })
     const snap: ActivitySnapshot = {
       startedAtMs: 0,
-      calls: [{ toolName: 'Hypothetical', detail: 'hypothetical a=1', humanized }],
+      calls: [{ toolName: 'Hypothetical', detail }],
       phase: 'tool',
     }
     const out = renderActivityBlock(snap, 0)
     expect(out).toContain('▸ hypothetical a=1')
   })
 
-  test('humanized line still masks long tokens after the fact', () => {
-    // buildHumanizedActivityLine applies mask at construction. Render
-    // re-masks defensively — verify a token added to humanized later still
-    // gets eaten by the render pass.
+  test('detail line still masks long tokens at the render boundary', () => {
     const tok = `abcd${'x'.repeat(20)}wxyz`
     const snap: ActivitySnapshot = {
       startedAtMs: 0,
-      calls: [{ toolName: 'Bash', detail: '', humanized: `running: <code>${tok}</code>` }],
+      calls: [{ toolName: 'Bash', detail: `команда echo ${tok}` }],
       phase: 'tool',
     }
     const out = renderActivityBlock(snap, 0)
     expect(out).not.toContain(tok)
     expect(out).toContain('abcd***wxyz')
+  })
+
+  test('buildHumanizedActivityLine still returns the English label (kept for status-manager)', () => {
+    expect(buildHumanizedActivityLine('Bash', { command: 'bun test' })).toBe(
+      'running: <code>bun test</code>',
+    )
   })
 })
 
@@ -401,16 +416,16 @@ describe('renderActivityBlock 4096-char cap (M2)', () => {
     expect(out.length).toBeLessThanOrEqual(4096)
     // Truncation marker absent for short outputs — only present when we cut.
     // 50 × 60+ = 3000+; with rolling window of 5 we only render 5 → no
-    // truncation in practice. Force a real overflow with humanized payload.
-    // Use punctuation-broken filler so the generic long-token mask (which
-    // chews ≥24-char `[A-Za-z0-9_-]` runs) doesn't collapse it.
+    // truncation in practice. Force a real overflow with a long `detail`
+    // payload (the card's surface). Use punctuation-broken filler so the
+    // generic long-token mask (which chews ≥24-char `[A-Za-z0-9_-]` runs)
+    // doesn't collapse it.
     const filler = ('AB. '.repeat(400)).slice(0, 1500)
     const snap2: ActivitySnapshot = {
       startedAtMs: 0,
       calls: Array.from({ length: 5 }, (_, i) => ({
         toolName: 'Bash',
-        detail: 'b',
-        humanized: `running: <code>${filler}-${i}</code>`,
+        detail: `команда ${filler}-${i}`,
       })),
       phase: 'tool',
     }

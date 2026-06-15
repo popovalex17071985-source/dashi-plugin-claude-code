@@ -478,9 +478,9 @@ describe('StatusManager.recordActivityByChatId', () => {
     const edits = api.calls.filter((c) => c.kind === 'edit')
     const last = edits[edits.length - 1]!
     expect(last.text).toContain('<pre>')
-    expect(last.text).toContain('working --')
-    // Humanized line: Bash non-curl/git/read → `running: <code>cmd</code>`
-    expect(last.text).toContain('running: <code>bun test</code>')
+    expect(last.text).toContain('работаю --')
+    // Verbose card surfaces the Russian detail: «команда <cmd>».
+    expect(last.text).toContain('команда bun test')
   })
 
   test('SessionStart with no active status opens one without reply_to', async () => {
@@ -526,8 +526,8 @@ describe('StatusManager.recordActivityByChatId', () => {
     const afterAgent = api.calls.filter((c) => c.kind === 'edit').length
     expect(afterAgent).toBeGreaterThan(beforeAgent)
     const last = api.calls.filter((c) => c.kind === 'edit').pop()!
-    // Humanized Agent line uses SUBAGENT_LABELS map for `researcher`.
-    expect(last.text).toContain('<b>searching and verifying sources</b>')
+    // Verbose card surfaces the Russian detail: «подзадача <type>».
+    expect(last.text).toContain('подзадача researcher')
   })
 
   test('Non-Agent PreToolUse within 5s is recorded but not re-rendered', async () => {
@@ -561,9 +561,9 @@ describe('StatusManager.recordActivityByChatId', () => {
       toolUseId: 'u2',
     })
     const lastEdit = api.calls.filter((c) => c.kind === 'edit').pop()!
-    // Humanized: Bash non-curl/git/read → `running: <code>two</code>`
-    expect(lastEdit.text).toContain('running: <code>two</code>')
-    expect(lastEdit.text).toContain('reasoning...')
+    // Verbose card surfaces the Russian detail: «команда <cmd>».
+    expect(lastEdit.text).toContain('команда two')
+    expect(lastEdit.text).toContain('думаю...')
   })
 
   test('UserPromptSubmit flips phase to reasoning and renders', async () => {
@@ -577,7 +577,7 @@ describe('StatusManager.recordActivityByChatId', () => {
     })
     await mgr.recordActivityByChatId('164795011', { kind: 'reasoning' })
     const last = api.calls.filter((c) => c.kind === 'edit').pop()!
-    expect(last.text).toContain('reasoning...')
+    expect(last.text).toContain('думаю...')
   })
 
   test('mid-render does not leak raw prompt text through ActivityEvent', async () => {
@@ -588,7 +588,7 @@ describe('StatusManager.recordActivityByChatId', () => {
     await mgr.recordActivityByChatId('164795011', { kind: 'reasoning' })
     const everything = api.calls.map((c) => c.text ?? '').join('\n')
     expect(everything).not.toContain('prompt')
-    expect(everything).toContain('working --')
+    expect(everything).toContain('работаю --')
   })
 
   test('Buffer enforces ACTIVITY_MAX_BUFFER (10) — older shifted out', async () => {
@@ -613,7 +613,7 @@ describe('StatusManager.recordActivityByChatId', () => {
     expect(last.text).toContain('subagent-11')
     expect(last.text).toContain('subagent-10')
     // Renderer header carries the buffered total (10 retained, 5 shown).
-    expect(last.text).toContain('steps (10 total):')
+    expect(last.text).toContain('шаги (всего 10):')
   })
 
   test('Visibility failure during lazy-open is swallowed', async () => {
@@ -699,7 +699,7 @@ describe('StatusManager.recordActivityByChatId', () => {
     const last = api.calls.filter((c) => c.kind === 'edit').pop()!
     // Buffer kept the last 10 (cmd-02..cmd-11). Renderer window is 5 →
     // show cmd-07..cmd-11 under a `steps (10 total):` header (no +N line).
-    expect(last.text).toContain('steps (10 total):')
+    expect(last.text).toContain('шаги (всего 10):')
     expect(last.text).toContain('cmd-11')
     expect(last.text).toContain('cmd-07')
     // cmd-00 and cmd-01 evicted; cmd-02..cmd-06 in the +5 collapse.

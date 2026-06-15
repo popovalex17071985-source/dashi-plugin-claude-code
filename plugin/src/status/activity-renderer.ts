@@ -22,6 +22,25 @@ const SUBAGENT_LABELS: Record<string, string> = {
   'claude-code-guide': 'checking docs',
 }
 
+// gateway.py:2113-2126 — RU_TOOL_VERBS. The verbose activity card the operator
+// prefers prefixes each step with a Russian verb («читаю config/...» rather
+// than «read config/...»). This is the `detail` path used by renderActivityBlock
+// — the screenshotted card. Tools absent from the map fall back to the
+// lowercase tool name (e.g. an unknown MCP tool).
+const RU_TOOL_VERBS: Record<string, string> = {
+  Read: 'читаю',
+  Write: 'пишу файл',
+  Edit: 'правлю',
+  MultiEdit: 'правлю',
+  Bash: 'команда',
+  Grep: 'ищу в коде',
+  Glob: 'ищу файлы',
+  WebFetch: 'качаю',
+  WebSearch: 'ищу в вебе',
+  Agent: 'подзадача',
+  TodoWrite: 'план',
+}
+
 // Tool input is always an opaque record from Claude; helpers read explicit
 // keys only. We never embed the entire object.
 type ToolInput = Record<string, unknown>
@@ -31,12 +50,16 @@ function strField(input: ToolInput, key: string): string {
   return typeof v === 'string' ? v : ''
 }
 
-function lastTwoSegments(rawPath: string): string {
+// gateway.py:2150 — the verbose card shows the last THREE path segments
+// (`rsplit("/", 3)`), e.g. `…/memory/MEMORY.md`, so the operator can tell
+// which subtree a file lives in, not just its basename. Empty segments
+// (doubled slashes) are dropped before taking the tail.
+function lastThreeSegments(rawPath: string): string {
   if (!rawPath) return ''
   const normalized = rawPath.replace(/\\/g, '/')
   const parts = normalized.split('/').filter((p) => p.length > 0)
   if (parts.length >= 2) {
-    return parts.slice(-2).join('/')
+    return parts.slice(-3).join('/')
   }
   // Match gateway.py:1512 fall-through: when rsplit yields < 2 parts, use
   // the raw normalized path.
@@ -92,11 +115,14 @@ export function summarizeToolInput(toolName: string, toolInput: ToolInput): stri
     case 'Edit':
     case 'MultiEdit': {
       const fp = strField(toolInput, 'file_path') || strField(toolInput, 'path')
-      s = lastTwoSegments(fp)
+      s = lastThreeSegments(fp)
       break
     }
     case 'Bash': {
-      s = strField(toolInput, 'command').slice(0, 40)
+      // gateway.py:2154 — prefer the human-written `description` (e.g. «Restore
+      // clean settings.json from backup») over the raw command, so the card
+      // reads as intent, not shell. Falls back to the command when absent.
+      s = strField(toolInput, 'description') || strField(toolInput, 'command')
       break
     }
     case 'Grep':
@@ -124,6 +150,12 @@ export function summarizeToolInput(toolName: string, toolInput: ToolInput): stri
       s = strField(toolInput, 'query').slice(0, 40)
       break
     }
+    case 'TodoWrite': {
+      // The verbose card shows just the verb («план») — the todo payload is
+      // a structured array, not a useful one-line summary.
+      s = ''
+      break
+    }
     default: {
       // Unknown tools — produce a safe, bounded summary. Never embed the raw
       // object via JSON.stringify because nested objects can be huge.
@@ -148,7 +180,9 @@ export function summarizeToolInput(toolName: string, toolInput: ToolInput): stri
     }
   }
 
-  return s.slice(0, 40)
+  // gateway.py:2176 capped summaries at 70 chars (was 40 in the early port) —
+  // the verbose card has room for a fuller path / Bash description.
+  return s.slice(0, 70)
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -270,11 +304,14 @@ export function renderActivityBlock(
   nowMs: number,
 ): string {
   const elapsedSec = Math.max(0, Math.floor((nowMs - snapshot.startedAtMs) / 1000))
-  const lines: string[] = [escapeHtml(`working -- ${elapsedSec}s`)]
+  // gateway.py:2384 — Russian header «работаю -- N сек». The operator-preferred
+  // verbose card is fully localized; the early plugin port had switched it to
+  // English («working -- Ns») which read as a regression.
+  const lines: string[] = [escapeHtml(`работаю -- ${elapsedSec} сек`)]
 
   if (snapshot.phase === 'reasoning') {
     lines.push('')
-    lines.push(escapeHtml('reasoning...'))
+    lines.push(escapeHtml('думаю...'))
   }
 
   if (snapshot.calls.length > 0) {
@@ -282,23 +319,16 @@ export function renderActivityBlock(
     const total = snapshot.calls.length
     const window = Math.min(ACTIVITY_WINDOW, total)
     const recent = snapshot.calls.slice(total - window)
-    // gateway.py:_render_activity — header carries the running total ("steps
-    // (N total):"); the last `window` calls follow. The total count is what
-    // replaces the older "+N earlier" collapse line. Restored 2026-06-14
-    // (operator-preferred verbose card).
-    lines.push(escapeHtml(`steps (${total} total):`))
+    // gateway.py:2408 — header carries the running total («шаги (всего N):»);
+    // the last `window` calls follow. The total count replaces the older
+    // "+N earlier" collapse line.
+    lines.push(escapeHtml(`шаги (всего ${total}):`))
     for (const call of recent) {
-      if (call.humanized) {
-        // Humanized string is already HTML-safe: inner identifiers were
-        // escaped at construction (see humanizeTool), inline tags are
-        // intentional. Re-mask defensively against any post-store mutation.
-        lines.push(`▸ ${maskSecretsPreserveTags(call.humanized)}`)
-      } else {
-        // Plain detail — single escape at render boundary so a Grep pattern
-        // like `"recordActivity"` lands as `&quot;recordActivity&quot;` once,
-        // not twice (review §1).
-        lines.push(escapeHtml(`▸ ${maskSecrets(call.detail)}`))
-      }
+      // gateway.py:2410-2411 — the verbose card renders the Russian `detail`
+      // («команда …», «пишу файл …», «правлю …»), NOT the English humanized
+      // string. Single escape at the render boundary so a Grep pattern like
+      // `"recordActivity"` lands as `&quot;…&quot;` once, not twice (review §1).
+      lines.push(escapeHtml(`  ▸ ${maskSecrets(call.detail)}`))
     }
   }
 
@@ -314,19 +344,6 @@ export function renderActivityBlock(
 }
 
 /**
- * Re-mask a humanized HTML line without disturbing the inline tags. The
- * masking rules only touch IPs, secret paths, long tokens, Telegram bot
- * tokens, and Supabase hosts — none of those overlap with the `<code>`/`<b>`
- * tag bodies emitted by humanizeTool (we already mask path/cmd content
- * before wrapping). So a plain pass is safe; this is kept as a separate
- * function for clarity and to localize future changes if a mask rule ever
- * threatens an HTML tag.
- */
-function maskSecretsPreserveTags(html: string): string {
-  return maskSecrets(html)
-}
-
-/**
  * Combine summarizeToolInput with the lowercase tool name to produce the
  * detail string stored on `ActivityCall.detail`. Masking happens here —
  * AFTER path summarization (which can collapse `/abs/.../secrets/foo.key`
@@ -336,8 +353,11 @@ function maskSecretsPreserveTags(html: string): string {
  */
 export function buildActivityDetail(toolName: string, toolInput: ToolInput): string {
   const summary = summarizeToolInput(toolName, toolInput)
-  const lower = toolName.toLowerCase()
-  const detail = summary ? `${lower} ${summary}` : lower
+  // gateway.py:2502-2504 — `{verb} {detail}` where verb is the Russian
+  // RU_TOOL_VERBS entry («команда», «пишу файл», «правлю»…). Unknown tools
+  // fall back to the lowercase tool name so nothing renders blank.
+  const verb = RU_TOOL_VERBS[toolName] ?? toolName.toLowerCase()
+  const detail = summary ? `${verb} ${summary}` : verb
   return maskSecrets(detail)
 }
 
