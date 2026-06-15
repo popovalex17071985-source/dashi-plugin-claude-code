@@ -70,6 +70,7 @@ import { describePidHolder, readLockHolder } from './telegram/pid-inspect.js'
 import { BOT_COMMANDS } from './commands/oob.js'
 import { handleKkeyCallback } from './telegram/keys-panel-ui.js'
 import { handleCcmdCallback } from './telegram/cc-panel-ui.js'
+import { isActionCallback, handleActionCallback } from './telegram/action-buttons.js'
 import { startWebhookServer, type WebhookServerHandle } from './webhook/server.js'
 import {
   handleInboundAudio,
@@ -657,6 +658,14 @@ const permissionGateUi = createPermissionGateUi({
 // vs isPermissionApprover); the silent-ack on unknown payloads at the
 // bottom of each handler keeps a foreign callback from leaving a spinner
 // in the chat.
+// Marquiz / orders outcome-button business logic lives in a Jarvis-side Python
+// CLI (reuses orders_handled_log.append_manual). Paths are overridable for
+// tests / non-default layouts; defaults point at this workspace's bin/.
+const ACTION_PYTHON_BIN = process.env.JARVIS_ACTION_PYTHON ?? '/usr/bin/python3'
+const ACTION_CALLBACK_SCRIPT =
+  process.env.JARVIS_ACTION_CALLBACK_SCRIPT ??
+  '/home/edgelab/.claude-lab/jarvis/bin/handle-action-callback.py'
+
 bot.on('callback_query:data', async ctx => {
   const data = ctx.callbackQuery.data ?? ''
   // Permission gate (pgate:*) — interactive Allow/Deny. Dispatched first so
@@ -780,6 +789,34 @@ bot.on('callback_query:data', async ctx => {
         error: err instanceof Error ? err.message : String(err),
       })
     }
+    return
+  }
+  // Marquiz / InSales-orders outcome buttons (mqz:* / ord:*). Re-homed from
+  // the killed gateway (see action-buttons.ts). Dispatched before the headless
+  // perm:* fallthrough so these prefixes never reach the permission flow.
+  if (isActionCallback(data)) {
+    const messageId = ctx.callbackQuery.message?.message_id
+    await handleActionCallback(
+      {
+        data,
+        chatId: ctx.callbackQuery.message?.chat?.id,
+        messageId,
+        from: {
+          ...(ctx.from?.id !== undefined ? { id: ctx.from.id } : {}),
+          ...(ctx.from?.first_name !== undefined ? { first_name: ctx.from.first_name } : {}),
+          ...(ctx.from?.last_name !== undefined ? { last_name: ctx.from.last_name } : {}),
+          ...(ctx.from?.username !== undefined ? { username: ctx.from.username } : {}),
+        },
+        editReplyMarkup: async keyboard => {
+          await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: keyboard } })
+        },
+        answerCallbackQuery: async (text, showAlert) => {
+          if (text) await ctx.answerCallbackQuery({ text, show_alert: showAlert ?? false })
+          else await ctx.answerCallbackQuery()
+        },
+      },
+      { pythonBin: ACTION_PYTHON_BIN, scriptPath: ACTION_CALLBACK_SCRIPT, log },
+    )
     return
   }
   const adapted: CallbackQueryLike = {
