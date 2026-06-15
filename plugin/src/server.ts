@@ -42,7 +42,7 @@ import { redactSecrets } from './safety/redact.js'
 import { StatusManager } from './status/status-manager.js'
 import { ProgressReporter } from './status/progress-reporter.js'
 import { TaskMirror } from './status/task-mirror.js'
-import { TmuxMirror } from './status/tmux-mirror.js'
+import { TmuxMirror, defaultTmuxExec } from './status/tmux-mirror.js'
 import { loadPolicyFromPath, type MultichatPolicy } from './chats/policy-loader.js'
 import { MultichatRouter } from './router/multichat-router.js'
 import { TmuxSessionPool } from './router/tmux-session-pool.js'
@@ -743,6 +743,11 @@ bot.on('callback_query:data', async ctx => {
   // Never mutates the keyboard message — the warchief taps it repeatedly.
   if (data.startsWith('ccmd:')) {
     try {
+      // Chat the forwarded slash-command output goes to: the chat the tap
+      // came from (fall back to the user's DM id). Same convention as the
+      // ask: flow above.
+      const ccmdChatId =
+        ctx.chat?.id !== undefined ? String(ctx.chat.id) : String(ctx.from?.id ?? '')
       await handleCcmdCallback(
         {
           callbackQuery: { data },
@@ -755,6 +760,17 @@ bot.on('callback_query:data', async ctx => {
           allowedUserIds: config.allowed_user_ids,
           log,
           ...(tmuxKeysTarget !== undefined ? { tmuxKeysTarget } : {}),
+          // Output forwarding: capture the pane after the command renders and
+          // send it back as a new message. Reuses the production tmux driver
+          // and the safe Telegram sendMessage (HTML parse mode for <pre>).
+          // The handler only forwards for forwardOutput=true commands and is
+          // best-effort (a capture failure leaves the toast untouched).
+          captureExec: defaultTmuxExec,
+          sendMessage: (chatId, htmlText) =>
+            telegramApi
+              .sendMessage(chatId, htmlText, { parse_mode: 'HTML' })
+              .then(() => undefined),
+          ...(ccmdChatId !== '' ? { chatId: ccmdChatId } : {}),
         },
       )
     } catch (err) {

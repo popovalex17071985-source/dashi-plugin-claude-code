@@ -184,7 +184,11 @@ const ANSI_RE =
 // eslint-disable-next-line no-control-regex
 const CTRL_RE = /[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g
 
-function stripAnsi(text: string): string {
+// Exported so other pane consumers (e.g. the /cc panel's slash-command output
+// forwarder) reuse the SAME cleaning passes instead of duplicating the ANSI /
+// control / box-drawing regexes — single source of truth for "raw pane bytes →
+// clean text".
+export function stripAnsi(text: string): string {
   return text.replace(ANSI_RE, '').replace(CTRL_RE, '')
 }
 
@@ -205,6 +209,92 @@ function sanitizeTerminalGlyphs(text: string): string {
   return out
 }
 
+// Box-drawing / decoration glyphs Claude Code draws around its panels
+// (input box, separators, table frames). They carry no information once the
+// pane is flattened to plain text and only add visual noise to a forwarded
+// `<pre>` block, so we drop them. Kept separate from `sanitizeTerminalGlyphs`
+// (which the rolling mirror uses, where the box frame is part of the
+// at-a-glance layout) — only the one-shot output forwarder strips frames.
+const BOX_DRAWING_RE = /[─-╿]/g
+
+// ── Reusable one-shot pane capture for the /cc panel ──────────────────
+// The rolling TmuxMirror is stateful (interval, message_id, hash dedup). The
+// /cc output forwarder instead wants a single "snapshot the pane right now,
+// give me clean text" primitive that reuses the mirror's ANSI/control/glyph
+// cleaning. These types/functions are that primitive.
+
+// Test seam — same shape as the mirror's `TmuxExec`. The default wrapper is
+// reused; callers in server.ts inject the production driver.
+export type CapturePaneExec = TmuxExec
+
+export interface CapturePaneTarget {
+  paneTarget: string
+  // `-L <name>` socket (plugin config) — mutually exclusive with socketPath.
+  socketName?: string
+  // `-S /abs/path` socket (resolved from the plugin's own $TMUX env).
+  socketPath?: string
+}
+
+export interface CaptureCleanOptions {
+  // -S argument to capture-pane: N most recent lines. Default 200 — enough
+  // to hold a /context or /cost panel without dragging in old scrollback.
+  lineCount?: number
+  // Strip box-drawing frames (input box / separators / tables). Default true
+  // for the forwarder; the rolling mirror keeps them via its own path.
+  stripBoxDrawing?: boolean
+}
+
+export interface CaptureCleanResult {
+  ok: boolean
+  // Cleaned, trimmed pane text (empty string when the capture failed).
+  text: string
+  // Present only on failure (non-zero exit / exec throw classified here).
+  error?: string
+}
+
+// Capture the pane ONCE and return cleaned plain text. Reuses `stripAnsi`
+// (ANSI/control) + `sanitizeTerminalGlyphs` (emoji-glyph swap) so the cleaning
+// rules never drift from the rolling mirror. Optionally drops box-drawing
+// frames. Never throws — a failed capture returns `{ ok: false, ... }` so the
+// caller can fall back to a toast.
+export async function captureCleanPane(
+  target: CapturePaneTarget,
+  exec: CapturePaneExec = defaultTmuxExec,
+  opts: CaptureCleanOptions = {},
+): Promise<CaptureCleanResult> {
+  const lineCount = opts.lineCount ?? 200
+  const stripBox = opts.stripBoxDrawing ?? true
+  const socketArgs = target.socketPath
+    ? ['-S', target.socketPath]
+    : target.socketName
+      ? ['-L', target.socketName]
+      : []
+  let result: TmuxExecResult
+  try {
+    result = await exec([
+      ...socketArgs,
+      'capture-pane',
+      '-p',
+      '-t',
+      target.paneTarget,
+      '-S',
+      `-${lineCount}`,
+    ])
+  } catch (err) {
+    return { ok: false, text: '', error: err instanceof Error ? err.message : String(err) }
+  }
+  if (result.exitCode !== 0) {
+    return {
+      ok: false,
+      text: '',
+      error: result.stderr.trim() || `tmux exited ${result.exitCode}`,
+    }
+  }
+  let cleaned = sanitizeTerminalGlyphs(stripAnsi(result.stdout))
+  if (stripBox) cleaned = cleaned.replace(BOX_DRAWING_RE, '')
+  return { ok: true, text: cleaned }
+}
+
 function htmlEscape(text: string): string {
   return text
     .replace(/&/g, '&amp;')
@@ -220,7 +310,10 @@ function hash(text: string): string {
 // non-zero exit so the caller can render the failure state instead of
 // crashing the polling loop.
 const execFileAsync = promisify(execFile)
-async function defaultTmuxExec(args: readonly string[]): Promise<TmuxExecResult> {
+// Exported so wiring code (server.ts) can hand the SAME production tmux driver
+// to the one-shot `captureCleanPane` forwarder without re-implementing the
+// child-process plumbing.
+export async function defaultTmuxExec(args: readonly string[]): Promise<TmuxExecResult> {
   try {
     const { stdout, stderr } = await execFileAsync('tmux', args as string[], {
       maxBuffer: 4 * 1024 * 1024,
