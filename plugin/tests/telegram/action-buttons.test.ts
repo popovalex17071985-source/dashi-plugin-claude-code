@@ -30,10 +30,10 @@ afterAll(() => rmSync(dir, { recursive: true, force: true }))
 
 function makeCtx(data: string): {
   ctx: ActionCallbackContext
-  answers: Array<{ text?: string; alert?: boolean }>
+  answers: Array<{ text?: string | undefined; alert?: boolean | undefined }>
   edits: InlineButton[][][]
 } {
-  const answers: Array<{ text?: string; alert?: boolean }> = []
+  const answers: Array<{ text?: string | undefined; alert?: boolean | undefined }> = []
   const edits: InlineButton[][][] = []
   const ctx: ActionCallbackContext = {
     data,
