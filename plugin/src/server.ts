@@ -663,6 +663,10 @@ const permissionGateUi = createPermissionGateUi({
 // CLI (reuses orders_handled_log.append_manual). Paths are overridable for
 // tests / non-default layouts; defaults point at this workspace's bin/.
 const ACTION_PYTHON_BIN = process.env.JARVIS_ACTION_PYTHON ?? '/usr/bin/python3'
+// reviews-action.py needs playwright (2gis posting) — use the venv that has it.
+const REVIEW_PYTHON_BIN =
+  process.env.JARVIS_REVIEW_PYTHON ??
+  '/home/edgelab/.claude-lab/jarvis/venv-reviews/bin/python'
 const ACTION_CALLBACK_SCRIPT =
   process.env.JARVIS_ACTION_CALLBACK_SCRIPT ??
   '/home/edgelab/.claude-lab/jarvis/bin/handle-action-callback.py'
@@ -827,7 +831,7 @@ bot.on('callback_query:data', async ctx => {
           else await ctx.answerCallbackQuery()
         },
       },
-      { pythonBin: ACTION_PYTHON_BIN, scriptPath: REVIEW_ACTION_SCRIPT, log },
+      { pythonBin: REVIEW_PYTHON_BIN, scriptPath: REVIEW_ACTION_SCRIPT, log },
     )
     return
   }
@@ -1085,7 +1089,7 @@ bot.on('message:text', async ctx => {
       replyToMessageId: ctx.message.reply_to_message?.message_id,
       sendReply: async text => { await ctx.reply(text) },
     },
-    { pythonBin: ACTION_PYTHON_BIN, scriptPath: REVIEW_ACTION_SCRIPT, log },
+    { pythonBin: REVIEW_PYTHON_BIN, scriptPath: REVIEW_ACTION_SCRIPT, log },
   ).catch(() => false)
   if (consumed) return
   return handleInboundText(ctx, handlerDeps)
