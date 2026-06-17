@@ -71,6 +71,7 @@ import { BOT_COMMANDS } from './commands/oob.js'
 import { handleKkeyCallback } from './telegram/keys-panel-ui.js'
 import { handleCcmdCallback } from './telegram/cc-panel-ui.js'
 import { isActionCallback, handleActionCallback } from './telegram/action-buttons.js'
+import { isReviewCallback, handleReviewCallback, tryHandleReviewReply } from './telegram/review-buttons.js'
 import { startWebhookServer, type WebhookServerHandle } from './webhook/server.js'
 import {
   handleInboundAudio,
@@ -665,6 +666,9 @@ const ACTION_PYTHON_BIN = process.env.JARVIS_ACTION_PYTHON ?? '/usr/bin/python3'
 const ACTION_CALLBACK_SCRIPT =
   process.env.JARVIS_ACTION_CALLBACK_SCRIPT ??
   '/home/edgelab/.claude-lab/jarvis/bin/handle-action-callback.py'
+const REVIEW_ACTION_SCRIPT =
+  process.env.JARVIS_REVIEW_ACTION_SCRIPT ??
+  '/home/edgelab/.claude-lab/jarvis/bin/reviews-action.py'
 
 bot.on('callback_query:data', async ctx => {
   const data = ctx.callbackQuery.data ?? ''
@@ -805,6 +809,26 @@ bot.on('callback_query:data', async ctx => {
         error: err instanceof Error ? err.message : String(err),
       })
     }
+    return
+  }
+  // Review-reply buttons (rev:*) — publish / regenerate a draft answer.
+  if (isReviewCallback(data)) {
+    await handleReviewCallback(
+      {
+        data,
+        editReplyMarkup: async kb => {
+          await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: kb } })
+        },
+        editMessageText: async (text, kb) => {
+          await ctx.editMessageText(text, { reply_markup: { inline_keyboard: kb } })
+        },
+        answerCallbackQuery: async (text, showAlert) => {
+          if (text) await ctx.answerCallbackQuery({ text, show_alert: showAlert ?? false })
+          else await ctx.answerCallbackQuery()
+        },
+      },
+      { pythonBin: ACTION_PYTHON_BIN, scriptPath: REVIEW_ACTION_SCRIPT, log },
+    )
     return
   }
   // Marquiz / InSales-orders outcome buttons (mqz:* / ord:*). Re-homed from
@@ -1052,7 +1076,20 @@ const handlerDeps: HandlerDeps = {
   askUserQuestionUi,
 }
 
-bot.on('message:text', ctx => handleInboundText(ctx, handlerDeps))
+bot.on('message:text', async ctx => {
+  // Edit-by-reply: a reply to a review approval card publishes that text.
+  // Falls through to the normal inbound-text path for any other message.
+  const consumed = await tryHandleReviewReply(
+    {
+      text: ctx.message.text ?? '',
+      replyToMessageId: ctx.message.reply_to_message?.message_id,
+      sendReply: async text => { await ctx.reply(text) },
+    },
+    { pythonBin: ACTION_PYTHON_BIN, scriptPath: REVIEW_ACTION_SCRIPT, log },
+  ).catch(() => false)
+  if (consumed) return
+  return handleInboundText(ctx, handlerDeps)
+})
 bot.on('message:photo', ctx => handleInboundPhoto(ctx, handlerDeps))
 bot.on('message:document', ctx => handleInboundDocument(ctx, handlerDeps))
 bot.on('message:voice', ctx => handleInboundVoice(ctx, handlerDeps))
