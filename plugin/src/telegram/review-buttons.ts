@@ -37,7 +37,9 @@ export function isReviewCallback(data: string): boolean {
 
 async function runCli(opts: ReviewActionOpts, args: string[]): Promise<ReviewCliResult> {
   const { stdout } = await execFileAsync(opts.pythonBin, [opts.scriptPath, ...args], {
-    timeout: 30_000,
+    // Publishing drives a headless browser (Yandex/2GIS cabinet) — 30s wasn't enough
+    // on this 2-core VPS, the CLI got SIGKILLed mid-post and the card hung "Загрузка".
+    timeout: 90_000,
     maxBuffer: 1 << 20,
   })
   return JSON.parse(stdout.trim()) as ReviewCliResult
@@ -68,18 +70,25 @@ export async function handleReviewCallback(ctx: ReviewCallbackContext, opts: Rev
     await ctx.answerCallbackQuery()
     return
   }
+  // Ack the tap immediately. Telegram invalidates an unanswered callback within
+  // seconds, so if we wait for the (slow, browser-driven) publish before answering,
+  // the button stays stuck on "Загрузка". Clear the spinner now, then edit the card
+  // to reflect the real outcome once the CLI returns.
+  await ctx.answerCallbackQuery(cliAction === 'ok' ? '⏳ Публикую…' : undefined)
   try {
     const res = await runCli(opts, ['--action', cliAction, '--source', src, '--id', id])
     if (cliAction === 'regen' && res.ok && res.card_text) {
       await ctx.editMessageText(res.card_text, LIVE_KEYBOARD(src, id))
     } else if (res.ok) {
       await ctx.editReplyMarkup([[{ text: res.label, callback_data: 'rev:locked' }]])
+    } else {
+      // Publish failed — keep the buttons so она can retry, don't leave it ambiguous.
+      await ctx.editReplyMarkup(LIVE_KEYBOARD(src, id))
     }
-    await ctx.answerCallbackQuery(res.toast || (res.ok ? 'Готово' : 'Ошибка'), !res.ok)
     opts.log.info('review callback handled', { action, src, ok: res.ok, error: res.error })
   } catch (err) {
     opts.log.warn('review callback failed', { data: ctx.data, error: err instanceof Error ? err.message : String(err) })
-    try { await ctx.answerCallbackQuery('Ошибка обновления', true) } catch { /* ignore */ }
+    try { await ctx.editReplyMarkup(LIVE_KEYBOARD(src, id)) } catch { /* ignore */ }
   }
 }
 
