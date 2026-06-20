@@ -1150,15 +1150,60 @@ export async function handleInboundText(ctx: Context, deps: HandlerDeps): Promis
 }
 
 // ─────────────────────────────────────────────────────────────────────
+// Media handler factory. Every media handler shares one skeleton:
+//   maybeTriggerWatcher → maybeBumpMirror → [tryRouteToAlbumBuffer] →
+//   gateAndNotify
+// The only per-kind variation is captured by `MediaHandlerSpec`:
+//   - kind:        the descriptor `kind` string (also the gate/log label)
+//   - buildText:   primary text fn. Most kinds forward the caption via
+//                  `textWithEntities`; video_note/sticker carry no caption
+//                  (always ''), matching the pre-refactor handlers.
+//   - albumRouting: whether this kind participates in media-group buffering.
+//                  photo/document/audio/video do; voice/video_note/sticker
+//                  do NOT (they never carry media_group_id in practice and
+//                  the pre-refactor handlers skipped the album path).
+//   - buildDescriptor: closure that turns a ctx into MediaDescriptor[].
+//                  This is where the only real logic differs (photo
+//                  downloads, voice transcribes, the rest are pure
+//                  metadata). The factory passes ctx/deps in so each
+//                  spec stays a thin data-shaped builder.
+// Behaviour is byte-for-byte identical to the previous explicit handlers;
+// this is copy-paste removal, not a logic change.
+// ─────────────────────────────────────────────────────────────────────
+
+interface MediaHandlerSpec {
+  kind: string
+  /** Primary text builder. `withCaption` ⇒ textWithEntities; otherwise ''. */
+  withCaption: boolean
+  /** Whether to route media-group fragments through the album buffer. */
+  albumRouting: boolean
+  buildDescriptor: (ctx: Context, deps: HandlerDeps) => Promise<MediaDescriptor[]>
+}
+
+function createMediaHandler(
+  spec: MediaHandlerSpec,
+): (ctx: Context, deps: HandlerDeps) => Promise<void> {
+  return async (ctx: Context, deps: HandlerDeps): Promise<void> => {
+    // PR-A3: same watcher hook as text. Media handlers must surface
+    // «Тралл занят» too — otherwise a busy-session photo/voice silently waits.
+    maybeTriggerWatcher(ctx, deps)
+    maybeBumpMirror(ctx, deps)
+    const build = (): Promise<MediaDescriptor[]> => spec.buildDescriptor(ctx, deps)
+    const buildText = (): string => (spec.withCaption ? textWithEntities(ctx.message) : '')
+    if (spec.albumRouting && (await tryRouteToAlbumBuffer(ctx, deps, build, spec.kind))) return
+    await gateAndNotify(ctx, deps, buildText, build, spec.kind)
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
 // Photo — picks largest size, downloads to inbox after the gate allows.
 // ─────────────────────────────────────────────────────────────────────
 
-export async function handleInboundPhoto(ctx: Context, deps: HandlerDeps): Promise<void> {
-  // PR-A3: same watcher hook as text. Media handlers must surface
-  // «Тралл занят» too — otherwise a busy-session photo/voice silently waits.
-  maybeTriggerWatcher(ctx, deps)
-  maybeBumpMirror(ctx, deps)
-  const buildPhoto = async (): Promise<MediaDescriptor[]> => {
+export const handleInboundPhoto = createMediaHandler({
+  kind: 'photo',
+  withCaption: true,
+  albumRouting: true,
+  buildDescriptor: async (ctx, deps) => {
     const sizes = ctx.message?.photo
     if (!sizes || sizes.length === 0) return []
     // Telegram photo array is sorted ascending by resolution — pick last.
@@ -1182,20 +1227,19 @@ export async function handleInboundPhoto(ctx: Context, deps: HandlerDeps): Promi
       ...(largest.file_size !== undefined ? { size: largest.file_size } : {}),
     }
     return [md]
-  }
-  if (await tryRouteToAlbumBuffer(ctx, deps, buildPhoto, 'photo')) return
-  await gateAndNotify(ctx, deps, () => textWithEntities(ctx.message), buildPhoto, 'photo')
-}
+  },
+})
 
 // ─────────────────────────────────────────────────────────────────────
 // Document — pure metadata, no download. Claude triggers download via the
 // download_attachment tool when needed.
 // ─────────────────────────────────────────────────────────────────────
 
-export async function handleInboundDocument(ctx: Context, deps: HandlerDeps): Promise<void> {
-  maybeTriggerWatcher(ctx, deps)
-  maybeBumpMirror(ctx, deps)
-  const buildDoc = async (): Promise<MediaDescriptor[]> => {
+export const handleInboundDocument = createMediaHandler({
+  kind: 'document',
+  withCaption: true,
+  albumRouting: true,
+  buildDescriptor: async (ctx) => {
     const doc = ctx.message?.document
     if (!doc) return []
     const md: MediaDescriptor = {
@@ -1206,72 +1250,67 @@ export async function handleInboundDocument(ctx: Context, deps: HandlerDeps): Pr
       ...(doc.file_size !== undefined ? { size: doc.file_size } : {}),
     }
     return [md]
-  }
-  if (await tryRouteToAlbumBuffer(ctx, deps, buildDoc, 'document')) return
-  await gateAndNotify(ctx, deps, () => textWithEntities(ctx.message), buildDoc, 'document')
-}
+  },
+})
 
 // ─────────────────────────────────────────────────────────────────────
 // Voice — calls Groq Whisper if GROQ_API_KEY is set. Transcript folds into
-// the descriptor; failure does not crash.
+// the descriptor; failure does not crash. No album routing (voice messages
+// never carry media_group_id).
 // ─────────────────────────────────────────────────────────────────────
 
-export async function handleInboundVoice(ctx: Context, deps: HandlerDeps): Promise<void> {
-  maybeTriggerWatcher(ctx, deps)
-  maybeBumpMirror(ctx, deps)
-  await gateAndNotify(
-    ctx,
-    deps,
-    () => textWithEntities(ctx.message),
-    async () => {
-      const voice = ctx.message?.voice
-      if (!voice) return []
+export const handleInboundVoice = createMediaHandler({
+  kind: 'voice',
+  withCaption: true,
+  albumRouting: false,
+  buildDescriptor: async (ctx, deps) => {
+    const voice = ctx.message?.voice
+    if (!voice) return []
 
-      const transcription = await maybeTranscribeVoice(
-        {
-          fileId: voice.file_id,
-          ...(voice.duration !== undefined ? { durationSec: voice.duration } : {}),
-          ...(voice.file_size !== undefined ? { size: voice.file_size } : {}),
-          ...(voice.mime_type !== undefined ? { mime: voice.mime_type } : {}),
-          downloadFile: (fileId: string) =>
-            deps.telegramApi.downloadFile(fileId, deps.statePaths.inbox),
-        },
-        deps.config,
-        deps.env,
-      )
-
-      if (transcription.status === 'failed' || transcription.status === 'skipped') {
-        deps.log.warn('voice transcription failed', {
-          status: transcription.status,
-          error: transcription.errorMessage,
-        })
-      }
-
-      const md: MediaDescriptor = {
-        kind: 'voice',
+    const transcription = await maybeTranscribeVoice(
+      {
         fileId: voice.file_id,
-        ...(voice.mime_type !== undefined ? { mime: voice.mime_type } : {}),
-        ...(voice.file_size !== undefined ? { size: voice.file_size } : {}),
         ...(voice.duration !== undefined ? { durationSec: voice.duration } : {}),
-        ...(transcription.transcript !== undefined
-          ? { transcript: transcription.transcript }
-          : {}),
-        transcriptionStatus: transcription.status,
-      }
-      return [md]
-    },
-    'voice',
-  )
-}
+        ...(voice.file_size !== undefined ? { size: voice.file_size } : {}),
+        ...(voice.mime_type !== undefined ? { mime: voice.mime_type } : {}),
+        downloadFile: (fileId: string) =>
+          deps.telegramApi.downloadFile(fileId, deps.statePaths.inbox),
+      },
+      deps.config,
+      deps.env,
+    )
+
+    if (transcription.status === 'failed' || transcription.status === 'skipped') {
+      deps.log.warn('voice transcription failed', {
+        status: transcription.status,
+        error: transcription.errorMessage,
+      })
+    }
+
+    const md: MediaDescriptor = {
+      kind: 'voice',
+      fileId: voice.file_id,
+      ...(voice.mime_type !== undefined ? { mime: voice.mime_type } : {}),
+      ...(voice.file_size !== undefined ? { size: voice.file_size } : {}),
+      ...(voice.duration !== undefined ? { durationSec: voice.duration } : {}),
+      ...(transcription.transcript !== undefined
+        ? { transcript: transcription.transcript }
+        : {}),
+      transcriptionStatus: transcription.status,
+    }
+    return [md]
+  },
+})
 
 // ─────────────────────────────────────────────────────────────────────
 // Audio — metadata only (title/performer for songs).
 // ─────────────────────────────────────────────────────────────────────
 
-export async function handleInboundAudio(ctx: Context, deps: HandlerDeps): Promise<void> {
-  maybeTriggerWatcher(ctx, deps)
-  maybeBumpMirror(ctx, deps)
-  const buildAudio = async (): Promise<MediaDescriptor[]> => {
+export const handleInboundAudio = createMediaHandler({
+  kind: 'audio',
+  withCaption: true,
+  albumRouting: true,
+  buildDescriptor: async (ctx) => {
     const audio = ctx.message?.audio
     if (!audio) return []
     const md: MediaDescriptor = {
@@ -1285,19 +1324,18 @@ export async function handleInboundAudio(ctx: Context, deps: HandlerDeps): Promi
       ...(audio.duration !== undefined ? { durationSec: audio.duration } : {}),
     }
     return [md]
-  }
-  if (await tryRouteToAlbumBuffer(ctx, deps, buildAudio, 'audio')) return
-  await gateAndNotify(ctx, deps, () => textWithEntities(ctx.message), buildAudio, 'audio')
-}
+  },
+})
 
 // ─────────────────────────────────────────────────────────────────────
 // Video — metadata only.
 // ─────────────────────────────────────────────────────────────────────
 
-export async function handleInboundVideo(ctx: Context, deps: HandlerDeps): Promise<void> {
-  maybeTriggerWatcher(ctx, deps)
-  maybeBumpMirror(ctx, deps)
-  const buildVideo = async (): Promise<MediaDescriptor[]> => {
+export const handleInboundVideo = createMediaHandler({
+  kind: 'video',
+  withCaption: true,
+  albumRouting: true,
+  buildDescriptor: async (ctx) => {
     const video = ctx.message?.video
     if (!video) return []
     const md: MediaDescriptor = {
@@ -1311,61 +1349,49 @@ export async function handleInboundVideo(ctx: Context, deps: HandlerDeps): Promi
       ...(video.height !== undefined ? { height: video.height } : {}),
     }
     return [md]
-  }
-  if (await tryRouteToAlbumBuffer(ctx, deps, buildVideo, 'video')) return
-  await gateAndNotify(ctx, deps, () => textWithEntities(ctx.message), buildVideo, 'video')
-}
+  },
+})
 
 // ─────────────────────────────────────────────────────────────────────
 // Video note — round selfie videos. Always square, no name/mime in the
-// Telegram object (only length+duration+thumb).
+// Telegram object (only length+duration+thumb). No caption, no album.
 // ─────────────────────────────────────────────────────────────────────
 
-export async function handleInboundVideoNote(ctx: Context, deps: HandlerDeps): Promise<void> {
-  maybeTriggerWatcher(ctx, deps)
-  maybeBumpMirror(ctx, deps)
-  await gateAndNotify(
-    ctx,
-    deps,
-    () => '',
-    async () => {
-      const note = ctx.message?.video_note
-      if (!note) return []
-      const md: MediaDescriptor = {
-        kind: 'video_note',
-        fileId: note.file_id,
-        ...(note.file_size !== undefined ? { size: note.file_size } : {}),
-        ...(note.duration !== undefined ? { durationSec: note.duration } : {}),
-      }
-      return [md]
-    },
-    'video_note',
-  )
-}
+export const handleInboundVideoNote = createMediaHandler({
+  kind: 'video_note',
+  withCaption: false,
+  albumRouting: false,
+  buildDescriptor: async (ctx) => {
+    const note = ctx.message?.video_note
+    if (!note) return []
+    const md: MediaDescriptor = {
+      kind: 'video_note',
+      fileId: note.file_id,
+      ...(note.file_size !== undefined ? { size: note.file_size } : {}),
+      ...(note.duration !== undefined ? { durationSec: note.duration } : {}),
+    }
+    return [md]
+  },
+})
 
 // ─────────────────────────────────────────────────────────────────────
-// Sticker — emoji + optional set name.
+// Sticker — emoji + optional set name. No caption, no album.
 // ─────────────────────────────────────────────────────────────────────
 
-export async function handleInboundSticker(ctx: Context, deps: HandlerDeps): Promise<void> {
-  maybeTriggerWatcher(ctx, deps)
-  maybeBumpMirror(ctx, deps)
-  await gateAndNotify(
-    ctx,
-    deps,
-    () => '',
-    async () => {
-      const sticker = ctx.message?.sticker
-      if (!sticker) return []
-      const md: MediaDescriptor = {
-        kind: 'sticker',
-        fileId: sticker.file_id,
-        ...(sticker.emoji !== undefined ? { emoji: sticker.emoji } : {}),
-        ...(sticker.set_name !== undefined ? { setName: sticker.set_name } : {}),
-        ...(sticker.file_size !== undefined ? { size: sticker.file_size } : {}),
-      }
-      return [md]
-    },
-    'sticker',
-  )
-}
+export const handleInboundSticker = createMediaHandler({
+  kind: 'sticker',
+  withCaption: false,
+  albumRouting: false,
+  buildDescriptor: async (ctx) => {
+    const sticker = ctx.message?.sticker
+    if (!sticker) return []
+    const md: MediaDescriptor = {
+      kind: 'sticker',
+      fileId: sticker.file_id,
+      ...(sticker.emoji !== undefined ? { emoji: sticker.emoji } : {}),
+      ...(sticker.set_name !== undefined ? { setName: sticker.set_name } : {}),
+      ...(sticker.file_size !== undefined ? { size: sticker.file_size } : {}),
+    }
+    return [md]
+  },
+})
