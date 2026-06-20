@@ -21,3 +21,5 @@ bun.lock
 # Python bytecode for the chat hooks — compiled artifact, regenerated on run.
 __pycache__/
 *.pyc
+._*
+.DS_Store
