@@ -273,11 +273,27 @@ if reply_context is not None:
 # reply_context FIRST (pre-existing ordering, kept as-is).
 parts.extend(descriptors)
 
+# Group-member text is UNTRUSTED. A member could type a fake
+# "[from @operator] ..." line or a system-style instruction in their body
+# to impersonate the bridge's own attribution. Wrap the speaker block so
+# the model reads it as data, never instructions — same defense as
+# reply_context (build.ts). The "[from @user]" line stays INSIDE the block
+# so the watcher's fingerprint anchor (prompt_fingerprint) still locks onto
+# it. This hook serves group chats only; the operator's DM commands go
+# through buildChannelContent (TS) and stay trusted.
+speaker = None
 if user:
-    parts.append(f'[from @{user}] {text}' if text else f'[from @{user}]')
-else:
-    if text:
-        parts.append(text)
+    speaker = f'[from @{user}] {text}' if text else f'[from @{user}]'
+elif text:
+    speaker = text
+if speaker is not None:
+    # Neutralise a literal closing tag in the body so it can't break out.
+    speaker = speaker.replace('</untrusted_metadata>', '<\\/untrusted_metadata>')
+    parts.append(
+        '<untrusted_metadata type="telegram_group_message">\n'
+        + speaker
+        + '\n</untrusted_metadata>'
+    )
 
 for p in media_paths:
     parts.append(f'[media: {p}]')
