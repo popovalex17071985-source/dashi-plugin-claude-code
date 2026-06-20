@@ -24,6 +24,7 @@
 //   - /reset and /new without `force` return a short reply asking for the
 //     flag, no channel notification.
 
+import { readFileSync } from 'node:fs'
 import type { AppConfig } from '../config.js'
 import type { Logger } from '../log.js'
 import type { TelegramApi, InlineKeyboardLike } from '../channel/tools.js'
@@ -188,45 +189,82 @@ export interface BotCommandSpec {
   command: string
   description: string
 }
-// ponytail: only the commands worth a tap-menu slot live here. /status, /new
-// (dup of /reset), /mirror, /keys (no perm gates under --skip-permissions) still
-// parse if typed — they're just off the autocomplete list.
+// ponytail: only the commands worth a tap-menu slot live here. /new (dup of
+// /reset), /mirror, /keys (no perm gates under --skip-permissions) still parse
+// if typed — they're just off the autocomplete list.
 export const BOT_COMMANDS: ReadonlyArray<BotCommandSpec> = [
   { command: 'help', description: 'справка по командам' },
+  { command: 'status', description: 'память и размер контекста' },
   { command: 'stop', description: 'попросить Claude остановиться' },
   { command: 'reset', description: 'сбросить сессию (нужен force)' },
   { command: 'cc', description: 'панель команд Claude Code (тап) или /cc <команда>' },
 ]
 
+// ponytail: Jarvis-specific paths hardcoded — this is Jarvis's own fork, not
+// the generic upstream plugin. If reused elsewhere, lift to config/env.
+const JARVIS_CORE = '/home/edgelab/.claude-lab/jarvis/.claude/core'
+const CTX_WINDOW = 400_000 // CLAUDE_CODE_AUTO_COMPACT_WINDOW
+
+function kb(bytes: number): string {
+  return bytes < 1024 ? `${bytes} Б` : `${(bytes / 1024).toFixed(1)} КБ`
+}
+
+// Last usage.jsonl row ≈ what was sent to the model that turn:
+// input + cache_read + cache_creation ≈ current context fill.
+function contextFill(): number | undefined {
+  try {
+    const raw = readFileSync(`${JARVIS_CORE}/usage.jsonl`, 'utf8').trimEnd()
+    const last = raw.slice(raw.lastIndexOf('\n') + 1)
+    const r = JSON.parse(last) as { input?: number; cache_read?: number; cache_creation?: number }
+    return (r.input ?? 0) + (r.cache_read ?? 0) + (r.cache_creation ?? 0)
+  } catch {
+    return undefined
+  }
+}
+
+function fileStat(path: string): { bytes: number; entries: number } | undefined {
+  try {
+    const txt = readFileSync(path, 'utf8')
+    return { bytes: Buffer.byteLength(txt, 'utf8'), entries: (txt.match(/^### /gm) ?? []).length }
+  } catch {
+    return undefined
+  }
+}
+
 function statusText(ctx: OobContext): string {
-  const lines: string[] = ['<b>статус</b>']
-  if (ctx.botId !== undefined) {
-    lines.push(`bot_id: <code>${escapeHtml(String(ctx.botId))}</code>`)
-  }
-  if (ctx.stateDir) {
-    lines.push(`state_dir: <code>${escapeHtml(ctx.stateDir)}</code>`)
-  }
-  lines.push(`allowed_user: <code>${escapeHtml(ctx.senderId)}</code>`)
+  const lines: string[] = ['<b>память + контекст</b>']
 
-  if (ctx.pollerStatus) {
-    const ps = ctx.pollerStatus()
-    const off = ps.offset === undefined ? '—' : String(ps.offset)
-    lines.push(`update_offset: <code>${escapeHtml(off)}</code>`)
-    if (ps.lastError) {
-      lines.push(`poller_error: <code>${escapeHtml(ps.lastError)}</code>`)
-    }
+  const fill = contextFill()
+  if (fill !== undefined) {
+    const pct = Math.round((fill / CTX_WINDOW) * 100)
+    const flag = pct >= 80 ? ' ⚠️' : ''
+    lines.push(`контекст: ~${Math.round(fill / 1000)}k / ${CTX_WINDOW / 1000}k (${pct}%)${flag}`)
   }
 
-  if (ctx.statusManager) {
-    const active = ctx.statusManager.isActive(ctx.chatId) ? 'active' : 'idle'
-    lines.push(`status_manager: <code>${active}</code>`)
-  }
+  const recent = fileStat(`${JARVIS_CORE}/hot/recent.md`)
+  if (recent) lines.push(`recent.md: ${recent.entries} записей, ${kb(recent.bytes)}`)
+  const handoff = fileStat(`${JARVIS_CORE}/hot/handoff.md`)
+  if (handoff) lines.push(`handoff.md: ${kb(handoff.bytes)} (последние 5)`)
+  const mem = fileStat(`${JARVIS_CORE}/MEMORY.md`)
+  if (mem) lines.push(`MEMORY.md: ${kb(mem.bytes)}`)
 
+  lines.push('')
+  lines.push('<code>/reset force</code> — сбросить окно (handoff сохранится сам)')
+
+  // compact diag tail — webhook/poller health in one glance
+  const diag: string[] = []
   if (ctx.webhookStatus) {
     const ws = ctx.webhookStatus()
-    const w = ws.enabled ? `on:${ws.port}` : 'off'
-    lines.push(`webhook: <code>${w}</code>`)
+    diag.push(`webhook ${ws.enabled ? `on:${ws.port}` : 'off'}`)
   }
+  if (ctx.pollerStatus) {
+    const ps = ctx.pollerStatus()
+    if (ps.lastError) diag.push(`poller_err: ${escapeHtml(ps.lastError)}`)
+  }
+  if (ctx.statusManager) {
+    diag.push(`status ${ctx.statusManager.isActive(ctx.chatId) ? 'active' : 'idle'}`)
+  }
+  if (diag.length) lines.push(`<i>${diag.join(' · ')}</i>`)
 
   return lines.join('\n')
 }
