@@ -347,6 +347,29 @@ function healthBody(config: AppConfig): Record<string, unknown> {
 // Main handler
 // ─────────────────────────────────────────────────────────────────────
 
+type RouteHandler = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  deps: WebhookDeps,
+  webhookToken: string | undefined,
+) => Promise<void>
+
+// path → handler dispatch for the specialised POST relay routes. Kept as a
+// plain map (not a richer spec table) on purpose: these four routes diverge
+// in feature-gate position (before vs after body read), disabled-path code
+// (200 pass_through vs 503), chatId allowlist vs custom user-id authz, and
+// per-route socket timeouts — a shared template would need a flag per
+// difference and read worse than the standalone handlers. The handlers are
+// hoisted function declarations, so referencing them here before their
+// textual definition is safe.
+const SPECIAL_ROUTES: ReadonlyMap<string, RouteHandler> = new Map<string, RouteHandler>([
+  ['/hooks/ask-user-question/request', handleAskRequest],
+  ['/hooks/ask-user-question/answer', handleAskAnswer],
+  ['/hooks/react', handleReact],
+  ['/hooks/fallback-reply', handleFallbackReply],
+  ['/hooks/permission/request', handlePermissionRequest],
+])
+
 async function handleRequest(
   req: IncomingMessage,
   res: ServerResponse,
@@ -375,42 +398,19 @@ async function handleRequest(
     return
   }
 
-  // PRX-1 TASK-3 (2026-05-27): AskUserQuestion HTTP relay routes. Wired
-  // BEFORE /hooks/agent so the more-specific paths take priority. Both
-  // routes require loopback origin + bearer auth + the route handler
-  // owns its own body-read / Zod-validate flow (different payload shape
-  // than the /hooks/agent envelope).
-  if (method === 'POST' && path === '/hooks/ask-user-question/request') {
-    await handleAskRequest(req, res, deps, webhookToken)
-    return
-  }
-  if (method === 'POST' && path === '/hooks/ask-user-question/answer') {
-    await handleAskAnswer(req, res, deps, webhookToken)
-    return
-  }
-
-  // fix/eyes-on-read (2026-05-28): read-receipt route. Wired before
-  // /hooks/agent so the more-specific path takes priority. Loopback +
-  // bearer + chat allowlist, then sets 👀 via deps.reactToMessage.
-  if (method === 'POST' && path === '/hooks/react') {
-    await handleReact(req, res, deps, webhookToken)
-    return
-  }
-
-  // 2026-06-03 (feature/dm-fallback-reply-hook): DM fallback-reply route.
-  // Wired before /hooks/agent so the more-specific path takes priority.
-  // Loopback + bearer + chat allowlist, then sends the turn's final assistant
-  // text via deps.sendMessage when the DM turn ended without an MCP reply().
-  if (method === 'POST' && path === '/hooks/fallback-reply') {
-    await handleFallbackReply(req, res, deps, webhookToken)
-    return
-  }
-
-  // Permission gate (2026-06-09): interactive confirm relay. Wired before
-  // /hooks/agent so the more-specific path takes priority. Loopback + bearer,
-  // feature gate (config.permission_gate.enabled), then submit + long-wait.
-  if (method === 'POST' && path === '/hooks/permission/request') {
-    await handlePermissionRequest(req, res, deps, webhookToken)
+  // Specialised relay routes (ask-user-question, react, fallback-reply,
+  // permission). All are POST and wired BEFORE /hooks/agent so the more-
+  // specific paths take priority. Each handler owns its own auth fence,
+  // feature gate, body-read / Zod-validate flow and per-route socket
+  // timeout — the differences are too large to template (see SPECIAL_ROUTES
+  // comment), so this map only does path→handler dispatch.
+  const handler = SPECIAL_ROUTES.get(path)
+  if (handler !== undefined) {
+    if (method !== 'POST') {
+      reply(res, 404, { error: 'not found' })
+      return
+    }
+    await handler(req, res, deps, webhookToken)
     return
   }
 
@@ -813,6 +813,59 @@ function authGate(
   return true
 }
 
+// Shared skeleton for the two chat-scoped fire-and-forget routes (react +
+// fallback-reply). Both follow the IDENTICAL fence in the IDENTICAL order —
+//   authGate → feature-wiring 503 → readJsonBody (per-route cap+schema) →
+//   chatId allowlist → handler.
+// The only per-route differences are data (cap, schema, 503 body, label) and
+// the handler's own success/failure response bodies, so those live in the
+// spec passed in. Centralising the fence keeps the security ordering (auth
+// before body-read, allowlist before side effect) in one audited place.
+//
+// `cap`     — per-route body byte cap.
+// `schema`  — Zod schema; must produce a payload carrying `chat_id`.
+// `unwired` — true when the feature capability is absent → 503 + `unwiredBody`.
+// `handler` — runs only after auth + wiring + body + allowlist all pass; owns
+//             its own reply() (success and any caught-failure path).
+async function chatScopedRoute<T extends { chat_id: string }>(
+  req: IncomingMessage,
+  res: ServerResponse,
+  deps: WebhookDeps,
+  webhookToken: string | undefined,
+  spec: {
+    cap: number
+    schema: z.ZodType<T>
+    routeLabel: string
+    unwired: boolean
+    unwiredBody: Record<string, unknown>
+    handler: (payload: T) => Promise<void>
+  },
+): Promise<void> {
+  const { config, log } = deps
+
+  if (!authGate(req, res, webhookToken)) return
+
+  // Feature wiring gate: when the capability was not injected we answer 503
+  // (not 404) so an operator can tell "wired but disabled" from "wrong route",
+  // and the hook degrades to a no-op without retry storms.
+  if (spec.unwired) {
+    reply(res, 503, spec.unwiredBody)
+    return
+  }
+
+  const parsed = await readJsonBody(req, res, log, spec.cap, spec.schema, spec.routeLabel)
+  if (!parsed.ok) return
+  const payload = parsed.value
+
+  if (!chatIdAllowed(config, payload.chat_id)) {
+    log.warn(`${spec.routeLabel} chatId not in allowlist`, { chat_id: payload.chat_id })
+    reply(res, 403, { error: 'chatId not in allowlist' })
+    return
+  }
+
+  await spec.handler(payload)
+}
+
 // fix/eyes-on-read (2026-05-28): POST /hooks/react — set the 👀 read
 // receipt on an inbound message the agent has actually read in a turn.
 // Auth: loopback origin + bearer (same fence as the AskUserQuestion
@@ -824,53 +877,33 @@ async function handleReact(
   deps: WebhookDeps,
   webhookToken: string | undefined,
 ): Promise<void> {
-  const { config, log, reactToMessage } = deps
-
-  if (!authGate(req, res, webhookToken)) return
-
-  // Feature wiring gate: when no reaction capability was injected we answer
-  // 503 (not 404) so an operator can tell "wired but disabled" from "wrong
-  // route", and the hook degrades to a no-op without retry storms.
-  if (!reactToMessage) {
-    reply(res, 503, { status: 'reactions_unavailable' })
-    return
-  }
-
-  const parsed = await readJsonBody(
-    req,
-    res,
-    log,
-    REACT_BODY_LIMIT_BYTES,
-    ReactRouteRequestSchema,
-    'react',
-  )
-  if (!parsed.ok) return
-  const payload = parsed.value
-  const emoji = payload.emoji ?? '👀'
-
-  if (!chatIdAllowed(config, payload.chat_id)) {
-    log.warn('react chatId not in allowlist', { chat_id: payload.chat_id })
-    reply(res, 403, { error: 'chatId not in allowlist' })
-    return
-  }
-
-  try {
-    await reactToMessage(payload.chat_id, payload.message_id, emoji)
-  } catch (err) {
-    // A failed reaction must never wedge the hook. Telegram returns 400 for
-    // reactions on messages too old to react to (and 429 under burst); we
-    // log and answer 200 so the hook records the message as handled and
-    // moves on rather than retrying forever.
-    log.warn('react setMessageReaction failed', {
-      chat_id: payload.chat_id,
-      message_id: payload.message_id,
-      error: err instanceof Error ? redactToken(err.message) : String(err),
-    })
-    reply(res, 200, { status: 'react_failed' })
-    return
-  }
-
-  reply(res, 200, { status: 'reacted' })
+  const { log, reactToMessage } = deps
+  await chatScopedRoute(req, res, deps, webhookToken, {
+    cap: REACT_BODY_LIMIT_BYTES,
+    schema: ReactRouteRequestSchema,
+    routeLabel: 'react',
+    unwired: !reactToMessage,
+    unwiredBody: { status: 'reactions_unavailable' },
+    handler: async (payload) => {
+      const emoji = payload.emoji ?? '👀'
+      try {
+        await reactToMessage!(payload.chat_id, payload.message_id, emoji)
+      } catch (err) {
+        // A failed reaction must never wedge the hook. Telegram returns 400 for
+        // reactions on messages too old to react to (and 429 under burst); we
+        // log and answer 200 so the hook records the message as handled and
+        // moves on rather than retrying forever.
+        log.warn('react setMessageReaction failed', {
+          chat_id: payload.chat_id,
+          message_id: payload.message_id,
+          error: err instanceof Error ? redactToken(err.message) : String(err),
+        })
+        reply(res, 200, { status: 'react_failed' })
+        return
+      }
+      reply(res, 200, { status: 'reacted' })
+    },
+  })
 }
 
 // 2026-06-03 (feature/dm-fallback-reply-hook): POST /hooks/fallback-reply —
@@ -885,52 +918,32 @@ async function handleFallbackReply(
   deps: WebhookDeps,
   webhookToken: string | undefined,
 ): Promise<void> {
-  const { config, log, sendMessage } = deps
-
-  if (!authGate(req, res, webhookToken)) return
-
-  // Feature wiring gate: when no send capability was injected we answer 503
-  // (not 404) so an operator can tell "wired but disabled" from "wrong route",
-  // and the hook degrades to a no-op without retry storms.
-  if (!sendMessage) {
-    reply(res, 503, { status: 'fallback_reply_unavailable' })
-    return
-  }
-
-  const parsed = await readJsonBody(
-    req,
-    res,
-    log,
-    FALLBACK_REPLY_BODY_LIMIT_BYTES,
-    FallbackReplyRouteRequestSchema,
-    'fallback-reply',
-  )
-  if (!parsed.ok) return
-  const payload = parsed.value
-
-  if (!chatIdAllowed(config, payload.chat_id)) {
-    log.warn('fallback-reply chatId not in allowlist', { chat_id: payload.chat_id })
-    reply(res, 403, { error: 'chatId not in allowlist' })
-    return
-  }
-
-  try {
-    await sendMessage(payload.chat_id, payload.text)
-  } catch (err) {
-    // A failed send must never wedge the hook. We log and answer 200 (not 5xx)
-    // with an explicit {status:'send_failed'} so the hook can distinguish a
-    // real delivery from a failure: it records dedup ONLY on {status:'sent'},
-    // so a send that keeps failing is re-attempted on the next Stop fire
-    // instead of being silently marked delivered.
-    log.warn('fallback-reply sendMessage failed', {
-      chat_id: payload.chat_id,
-      error: err instanceof Error ? redactToken(err.message) : String(err),
-    })
-    reply(res, 200, { status: 'send_failed' })
-    return
-  }
-
-  reply(res, 200, { status: 'sent' })
+  const { log, sendMessage } = deps
+  await chatScopedRoute(req, res, deps, webhookToken, {
+    cap: FALLBACK_REPLY_BODY_LIMIT_BYTES,
+    schema: FallbackReplyRouteRequestSchema,
+    routeLabel: 'fallback-reply',
+    unwired: !sendMessage,
+    unwiredBody: { status: 'fallback_reply_unavailable' },
+    handler: async (payload) => {
+      try {
+        await sendMessage!(payload.chat_id, payload.text)
+      } catch (err) {
+        // A failed send must never wedge the hook. We log and answer 200 (not 5xx)
+        // with an explicit {status:'send_failed'} so the hook can distinguish a
+        // real delivery from a failure: it records dedup ONLY on {status:'sent'},
+        // so a send that keeps failing is re-attempted on the next Stop fire
+        // instead of being silently marked delivered.
+        log.warn('fallback-reply sendMessage failed', {
+          chat_id: payload.chat_id,
+          error: err instanceof Error ? redactToken(err.message) : String(err),
+        })
+        reply(res, 200, { status: 'send_failed' })
+        return
+      }
+      reply(res, 200, { status: 'sent' })
+    },
+  })
 }
 
 // 2026-06-09: POST /hooks/permission/request — interactive permission confirm.
