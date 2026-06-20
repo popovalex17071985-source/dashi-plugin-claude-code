@@ -27,6 +27,11 @@ import type { TaskMirrorEvent } from '../hooks/claude-events.js'
 import type { TodoItem } from '../schemas.js'
 import type { TelegramApiForProgress } from './telegram-api.js'
 import { escapeHtml } from '../format/html.js'
+import {
+  PerChatMessageQueue,
+  type BaseChatEntry,
+  type QueueConfigSlice,
+} from './per-chat-message-queue.js'
 
 // Telegram editMessageText cap (4096 chars). Default render budget below it
 // — the spec asks for ~3500-char headroom (see plan §3 file 4).
@@ -40,9 +45,6 @@ const ICONS = {
   completed: '☑',
 } as const
 
-// HTML used as parse_mode for both send and edit — same as ProgressReporter.
-const HTML_OPTS = { parse_mode: 'HTML' as const }
-
 export interface TaskMirrorDeps {
   telegramApi: TelegramApiForProgress
   config: AppConfig
@@ -52,14 +54,9 @@ export interface TaskMirrorDeps {
   clearTimer?: (handle: NodeJS.Timeout) => void
 }
 
-// Per-chat lifecycle entry. Field-for-field parallel to ChatProgressEntry,
-// only `calls[]` is replaced with `todos[]` (latest snapshot, not a window).
-interface ChatTaskEntry {
-  chatId: string
-  messageId?: number
-  startedAtMs: number
-  // Updated on every recordEvent. Used by TTL eviction in getOrCreate.
-  lastActivityMs: number
+// Per-chat lifecycle entry. Extends the shared queue entry with the two
+// TaskMirror-specific render sources.
+interface ChatTaskEntry extends BaseChatEntry {
   // Latest TodoWrite snapshot from Claude. Replaced wholesale on each event
   // — TodoWrite is itself the full list, so we never merge incrementally.
   todos: ReadonlyArray<TodoItem>
@@ -69,20 +66,6 @@ interface ChatTaskEntry {
   // after every mutation so `scheduleFlush` keeps using the existing renderer.
   // Insertion-order Map keeps the visual ordering stable across renders.
   taskMap: Map<string, TodoItem>
-  // Last text we actually sent / edited. Idempotency gate.
-  lastRenderedText?: string
-  // Timestamp of the last successful send or edit. Used for throttle.
-  lastEditAtMs: number
-  // Newest snapshot text waiting to be published. Multiple events overwrite
-  // so only the freshest view ever lands on Telegram.
-  desiredText?: string
-  // Single-slot scheduler: non-null while a Telegram op is in flight.
-  flushPromise: Promise<void> | null
-  // Single-slot throttle timer. Non-null while waiting for the throttle
-  // window to elapse before publishing.
-  pendingTimer: NodeJS.Timeout | null
-  // True once todo_session_stop has been processed. Idempotency guard.
-  stopped: boolean
 }
 
 // Extract the harness-assigned task id from a TaskCreate PostToolUse
@@ -95,23 +78,19 @@ function parseCreatedTaskId(toolResult: unknown): string | null {
   return match ? (match[1] ?? null) : null
 }
 
-export class TaskMirror {
-  private readonly telegramApi: TelegramApiForProgress
+export class TaskMirror extends PerChatMessageQueue<ChatTaskEntry> {
   private readonly config: AppConfig
-  private readonly log: Logger
-  private readonly now: () => number
-  private readonly setTimer: (cb: () => void, ms: number) => NodeJS.Timeout
-  private readonly clearTimer: (handle: NodeJS.Timeout) => void
-  private readonly chats: Map<string, ChatTaskEntry>
+  protected readonly logPrefix = 'task mirror'
 
   constructor(deps: TaskMirrorDeps) {
-    this.telegramApi = deps.telegramApi
+    super({
+      telegramApi: deps.telegramApi,
+      log: deps.log,
+      now: deps.now ?? (() => Date.now()),
+      setTimer: deps.setTimer ?? ((cb, ms) => setTimeout(cb, ms)),
+      clearTimer: deps.clearTimer ?? ((h) => clearTimeout(h)),
+    })
     this.config = deps.config
-    this.log = deps.log
-    this.now = deps.now ?? (() => Date.now())
-    this.setTimer = deps.setTimer ?? ((cb, ms) => setTimeout(cb, ms))
-    this.clearTimer = deps.clearTimer ?? ((h) => clearTimeout(h))
-    this.chats = new Map()
   }
 
   /**
@@ -238,185 +217,22 @@ export class TaskMirror {
     entry.taskMap.set(id, next)
   }
 
-  /**
-   * Test-only drain — same contract as ProgressReporter._idleForTests.
-   */
-  async _idleForTests(chatId: string): Promise<void> {
-    for (let i = 0; i < 16; i++) {
-      const entry = this.chats.get(chatId)
-      if (!entry || entry.flushPromise === null) return
-      try {
-        await entry.flushPromise
-      } catch {
-        /* already logged */
-      }
-    }
-  }
-
   // ─────────────────────────────────────────────────────────────────────
-  // Internals
+  // Subclass hooks
   // ─────────────────────────────────────────────────────────────────────
 
-  private getOrCreate(chatId: string): ChatTaskEntry {
-    const existing = this.chats.get(chatId)
-    if (existing) {
-      const idle = this.now() - existing.lastActivityMs
-      if (idle > this.config.task_mirror.session_ttl_ms) {
-        this.log.debug('task mirror entry TTL expired, starting fresh thread', {
-          chat_id: chatId,
-          idle_ms: idle,
-        })
-        this.chats.delete(chatId)
-      } else {
-        return existing
-      }
-    }
-    const entry: ChatTaskEntry = {
-      chatId,
-      startedAtMs: this.now(),
-      lastActivityMs: this.now(),
-      todos: [],
-      taskMap: new Map(),
-      lastEditAtMs: 0,
-      flushPromise: null,
-      pendingTimer: null,
-      stopped: false,
-    }
-    this.chats.set(chatId, entry)
-    return entry
+  protected getConfigSlice(): QueueConfigSlice {
+    return this.config.task_mirror
   }
 
-  /**
-   * Render the current snapshot and schedule a flush. Idempotent — if a
-   * flush is already in flight or a timer is armed, just update
-   * `desiredText` and return.
-   */
-  private scheduleFlush(entry: ChatTaskEntry): void {
-    if (entry.stopped) return
-    const text = this.safeRender(entry.todos)
-    if (!text || text === entry.lastRenderedText) return
-    entry.desiredText = text
-
-    if (entry.flushPromise !== null || entry.pendingTimer !== null) return
-
-    const isFirstSend = entry.messageId === undefined
-    const elapsed = this.now() - entry.lastEditAtMs
-    const wait = isFirstSend
-      ? 0
-      : Math.max(0, this.config.task_mirror.edit_throttle_ms - elapsed)
-
-    if (wait > 0) {
-      entry.pendingTimer = this.setTimer(() => {
-        entry.pendingTimer = null
-        this.startFlush(entry)
-      }, wait)
-    } else {
-      this.startFlush(entry)
-    }
+  protected createEntryState(
+    _chatId: string,
+  ): { todos: ReadonlyArray<TodoItem>; taskMap: Map<string, TodoItem> } {
+    return { todos: [], taskMap: new Map() }
   }
 
-  private startFlush(entry: ChatTaskEntry): void {
-    if (entry.stopped) return
-    if (entry.flushPromise !== null) return
-    const text = entry.desiredText
-    if (text === undefined || text === entry.lastRenderedText) return
-    delete entry.desiredText
-
-    entry.flushPromise = this.executeFlush(entry, text).finally(() => {
-      entry.flushPromise = null
-      if (
-        !entry.stopped &&
-        entry.desiredText !== undefined &&
-        entry.desiredText !== entry.lastRenderedText
-      ) {
-        this.scheduleFlush(entry)
-      }
-    })
-  }
-
-  private async executeFlush(entry: ChatTaskEntry, text: string): Promise<void> {
-    if (entry.messageId === undefined) {
-      try {
-        const sent = await this.telegramApi.sendMessage(entry.chatId, text, HTML_OPTS)
-        if (!entry.stopped) {
-          entry.messageId = sent.message_id
-          entry.lastRenderedText = text
-          entry.lastEditAtMs = this.now()
-        } else {
-          this.log.warn('task mirror send completed after stop (orphan)', {
-            chat_id: entry.chatId,
-            message_id: sent.message_id,
-          })
-        }
-      } catch (err) {
-        this.log.warn('task mirror sendMessage failed (ignored)', {
-          chat_id: entry.chatId,
-          error: err instanceof Error ? err.message : String(err),
-        })
-      }
-      return
-    }
-    try {
-      await this.telegramApi.editMessageText(entry.chatId, entry.messageId, text, HTML_OPTS)
-      if (!entry.stopped) {
-        entry.lastRenderedText = text
-        entry.lastEditAtMs = this.now()
-      }
-    } catch (err) {
-      this.log.warn('task mirror editMessageText failed (ignored)', {
-        chat_id: entry.chatId,
-        message_id: entry.messageId,
-        error: err instanceof Error ? err.message : String(err),
-      })
-    }
-  }
-
-  /**
-   * Eviction handler — mirrors ProgressReporter.handleStop. Cancels timers,
-   * awaits any in-flight flush, posts a final edit (if a message exists)
-   * with the latest snapshot AND a «сессия завершена» marker line, then
-   * deletes the entry.
-   *
-   * Why the marker: without it, if the last TodoWrite snapshot was already
-   * rendered the idempotency gate (`text === lastRenderedText`) skips the
-   * final edit — the warchief never sees a visual «session ended» signal.
-   * Appending a non-empty marker line guarantees the final text differs.
-   */
-  private async handleStop(chatId: string): Promise<void> {
-    const entry = this.chats.get(chatId)
-    if (!entry || entry.stopped) return
-    entry.stopped = true
-
-    if (entry.pendingTimer !== null) {
-      this.clearTimer(entry.pendingTimer)
-      entry.pendingTimer = null
-    }
-
-    if (entry.flushPromise !== null) {
-      try {
-        await entry.flushPromise
-      } catch {
-        /* already logged */
-      }
-    }
-
-    if (entry.messageId !== undefined) {
-      const text = this.renderFinal(entry)
-      if (text && text !== entry.lastRenderedText) {
-        try {
-          await this.telegramApi.editMessageText(entry.chatId, entry.messageId, text, HTML_OPTS)
-          entry.lastRenderedText = text
-        } catch (err) {
-          this.log.warn('task mirror final edit failed (ignored)', {
-            chat_id: entry.chatId,
-            message_id: entry.messageId,
-            error: err instanceof Error ? err.message : String(err),
-          })
-        }
-      }
-    }
-
-    this.chats.delete(chatId)
+  protected renderEntry(entry: ChatTaskEntry): string {
+    return this.safeRender(entry.todos)
   }
 
   /**
@@ -427,7 +243,7 @@ export class TaskMirror {
    * snapshot already pushes against the cap, the marker still fits inside
    * the safety margin renderTodoList reserves.
    */
-  private renderFinal(entry: ChatTaskEntry): string {
+  protected renderFinalEntry(entry: ChatTaskEntry): string {
     const block = this.safeRender(entry.todos)
     if (!block) return ''
     return `${block}\n<i>сессия завершена</i>`
