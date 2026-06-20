@@ -25,6 +25,7 @@ import {
 } from '../../src/status/task-mirror.js'
 import type { TelegramApiForProgress } from '../../src/status/telegram-api.js'
 import type { AppConfig } from '../../src/config.js'
+import { makeConfig as makeSharedConfig } from '../helpers/config.js'
 import type { TaskMirrorEvent } from '../../src/hooks/claude-events.js'
 import type { TodoItem } from '../../src/schemas.js'
 import { createLogger } from '../../src/log.js'
@@ -33,48 +34,13 @@ const silentLog = createLogger('test', {
   stream: { write: () => true } as unknown as NodeJS.WritableStream,
 })
 
+// `overrides` patch the nested `task_mirror` block (enabled / session_ttl_ms
+// / collapse_completed_after).
 function makeConfig(overrides: Partial<AppConfig['task_mirror']> = {}): AppConfig {
+  const base = makeSharedConfig()
   return {
-    bot_id: 8507713167,
-    dm_only: true,
-    allowed_user_ids: [164795011],
-    allowed_chat_ids: [164795011],
-    status: { enabled: true, interval_ms: 700, ttl_ms: 300_000, delete_on_complete: true, suppress_typing_bubble: false },
-    album: { flush_ms: 2000 },
-    voice: { provider: 'groq', language: 'ru', model: 'whisper-large-v3-turbo' },
-    webhook: { enabled: false, host: '127.0.0.1', port: 0 },
-    permission_relay: { enabled: true, allowed_user_ids: [164795011], bash_only_proof: true },
-    commands: { help: true, status: true, stop: true, reset: true, new: true },
-    memory: {
-      enabled: false,
-      source_tag: 'tg',
-      max_hot_bytes: 20480,
-      trim_keep_lines: 600,
-      buffer_ttl_ms: 5 * 60 * 1000,
-      buffer_max_entries: 100,
-    },
-    progress: {
-      enabled: true,
-      edit_throttle_ms: 3000,
-      recent_buffer: 10,
-      session_ttl_ms: 10 * 60 * 1000,
-    },
-    task_mirror: {
-      enabled: true,
-      edit_throttle_ms: 3000,
-      session_ttl_ms: 10 * 60 * 1000,
-      collapse_completed_after: 5,
-      ...overrides,
-    },
-    watcher: {
-      enabled: true,
-      debounce_ms: 10_000,
-      busy_threshold_ms: 30_000,
-    },
-    tmux_mirror: { enabled: false, pane_target: '', socket_name: '', poll_interval_ms: 5000, line_count: 50, hide_segments: ['boot_banner', 'inbound_warning', 'footer_hints', 'input_box'], mode: 'latest_inbound_only', max_lines: 14 },
-    multichat: { enabled: false },
-    ask_user_question: { enabled: false, timeout_ms: 300_000, max_preview_chars: 1000 },
-    permission_gate: { enabled: false, timeout_ms: 120_000 },
+    ...base,
+    task_mirror: { ...base.task_mirror, ...overrides },
   }
 }
 

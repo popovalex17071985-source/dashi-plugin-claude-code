@@ -33,6 +33,7 @@ import {
   type MultichatPolicy,
 } from '../../src/chats/policy-loader.js'
 import type { AppConfig, StatePaths } from '../../src/config.js'
+import { makeConfig as makeSharedConfig } from '../helpers/config.js'
 import { createLogger } from '../../src/log.js'
 import type { TelegramApi } from '../../src/channel/tools.js'
 import type { BotIdentity } from '../../src/prompt/build.js'
@@ -47,51 +48,19 @@ const silentLog = createLogger('test', {
 const WARCHIEF_USER_ID = 164795011
 const ALLOWED_GROUP_CHAT_ID = -1003784643974
 
+// Addressing suite runs with the status bubble OFF and the permission relay
+// DISABLED (it exercises gate/addressing, not the relay) — local defaults
+// over the shared fixture. WARCHIEF_USER_ID matches the canonical allowlist.
 function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+  const base = makeSharedConfig()
   return {
-    bot_id: 8507713167,
-    dm_only: true,
+    ...base,
     allowed_user_ids: [WARCHIEF_USER_ID],
     allowed_chat_ids: [WARCHIEF_USER_ID],
-    status: {
-      enabled: false,
-      interval_ms: 700,
-      ttl_ms: 300_000,
-      delete_on_complete: true,
-      suppress_typing_bubble: false,
-    },
-    album: { flush_ms: 2000 },
-    voice: { provider: 'groq', language: 'ru', model: 'whisper-large-v3-turbo' },
-    webhook: { enabled: false, host: '127.0.0.1', port: 0 },
+    status: { ...base.status, enabled: false },
     permission_relay: { enabled: false, allowed_user_ids: [], bash_only_proof: true },
-    commands: { help: true, status: true, stop: true, reset: true, new: true },
-    memory: {
-      enabled: false,
-      source_tag: 'tg',
-      max_hot_bytes: 20480,
-      trim_keep_lines: 600,
-      buffer_ttl_ms: 5 * 60 * 1000,
-      buffer_max_entries: 100,
-    },
-    progress: {
-      enabled: true,
-      edit_throttle_ms: 3000,
-      recent_buffer: 10,
-      session_ttl_ms: 600000,
-    },
-    task_mirror: {
-      enabled: true,
-      edit_throttle_ms: 3000,
-      session_ttl_ms: 600000,
-      collapse_completed_after: 5,
-    },
-    watcher: {
-      enabled: true,
-      debounce_ms: 10_000,
-      busy_threshold_ms: 30_000,
-    },
     ...overrides,
-  } as unknown as AppConfig
+  }
 }
 
 function makeStatePaths(): StatePaths {

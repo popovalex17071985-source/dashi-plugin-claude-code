@@ -17,11 +17,7 @@ import {
   type KeysExec,
   type TmuxKeysTarget,
 } from '../../src/commands/keys.js'
-import type { Logger } from '../../src/log.js'
-
-function makeLogger(): Logger {
-  return { debug: () => {}, info: () => {}, warn: () => {}, error: () => {} }
-}
+import { makeLogger } from '../helpers/config.js'
 
 // ─────────────────────────────────────────────────────────────────────
 // parseKkeyCallback

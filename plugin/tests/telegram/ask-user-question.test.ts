@@ -22,6 +22,7 @@ import {
 } from '../../src/telegram/ask-user-question.js'
 import { createAskUserQuestionRelay } from '../../src/channel/ask-user-question.js'
 import type { AppConfig } from '../../src/config.js'
+import { makeConfig } from '../helpers/config.js'
 import type { Logger } from '../../src/log.js'
 import type {
   ChatAction,
@@ -96,40 +97,28 @@ function fakeTelegram(state: FakeTelegramSends, opts?: { editThrows?: boolean })
   }
 }
 
+// This UI suite enables the AskUserQuestion relay and turns every other
+// surface (status/progress/task_mirror/watcher) OFF; only the relay knobs
+// and permission allowlist vary. Built over the shared fixture.
 function mkConfig(overrides: { allowedUserIds?: number[]; maxPreview?: number; timeoutMs?: number } = {}): AppConfig {
-  // Build a minimal AppConfig that exercises only the surfaces this UI
-  // touches. We cast through unknown so we don't have to populate every
-  // unrelated config slice (memory/multichat/etc.) — the UI never reads
-  // them, and the test would otherwise drift every time another module
-  // adds a config block.
+  const base = makeConfig()
   return {
-    bot_id: 8507713167,
-    dm_only: true,
-    allowed_user_ids: [164795011],
-    allowed_chat_ids: [164795011],
-    status: { enabled: false, interval_ms: 700, ttl_ms: 300_000, delete_on_complete: true, suppress_typing_bubble: false },
-    album: { flush_ms: 2000 },
-    voice: { provider: 'groq', language: 'ru', model: 'whisper-large-v3-turbo' },
-    webhook: { enabled: false, host: '127.0.0.1', port: 0 },
-    permission_relay: { enabled: true, allowed_user_ids: overrides.allowedUserIds ?? [164795011], bash_only_proof: true },
-    commands: { help: true, status: true, stop: true, reset: true, new: true },
-    memory: {
-      enabled: false,
-      source_tag: 'tg',
-      max_hot_bytes: 20480,
-      trim_keep_lines: 600,
-      buffer_ttl_ms: 5 * 60 * 1000,
-      buffer_max_entries: 100,
+    ...base,
+    status: { ...base.status, enabled: false },
+    permission_relay: {
+      enabled: true,
+      allowed_user_ids: overrides.allowedUserIds ?? [164795011],
+      bash_only_proof: true,
     },
-    progress: { enabled: false, edit_throttle_ms: 3000, recent_buffer: 10, session_ttl_ms: 600000 },
-    task_mirror: { enabled: false, edit_throttle_ms: 3000, session_ttl_ms: 600000, collapse_completed_after: 5 },
-    watcher: { enabled: false, debounce_ms: 10000, busy_threshold_ms: 30000 },
+    progress: { ...base.progress, enabled: false },
+    task_mirror: { ...base.task_mirror, enabled: false },
+    watcher: { ...base.watcher, enabled: false },
     ask_user_question: {
       enabled: true,
       timeout_ms: overrides.timeoutMs ?? 300_000,
       max_preview_chars: overrides.maxPreview ?? 1000,
     },
-  } as unknown as AppConfig
+  }
 }
 
 interface UiHarness {
