@@ -188,14 +188,13 @@ export interface BotCommandSpec {
   command: string
   description: string
 }
+// ponytail: only the commands worth a tap-menu slot live here. /status, /new
+// (dup of /reset), /mirror, /keys (no perm gates under --skip-permissions) still
+// parse if typed — they're just off the autocomplete list.
 export const BOT_COMMANDS: ReadonlyArray<BotCommandSpec> = [
   { command: 'help', description: 'справка по командам' },
-  { command: 'status', description: 'снимок плагина и сессии' },
   { command: 'stop', description: 'попросить Claude остановиться' },
   { command: 'reset', description: 'сбросить сессию (нужен force)' },
-  { command: 'new', description: 'начать новую сессию (нужен force)' },
-  { command: 'mirror', description: 'зеркало терминала: on | off | status' },
-  { command: 'keys', description: 'панель кнопок для подтверждений (нажатия в сессию)' },
   { command: 'cc', description: 'панель команд Claude Code (тап) или /cc <команда>' },
 ]
 
