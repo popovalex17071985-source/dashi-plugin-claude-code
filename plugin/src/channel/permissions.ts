@@ -335,18 +335,3 @@ export interface CallbackQueryBot {
     handler: (ctx: CallbackQueryLike) => Promise<void>,
   ): void
 }
-
-export function registerPermissionCallback(
-  bot: CallbackQueryBot,
-  deps: { config: AppConfig; hooks: PermissionRelayHooks; pending: Map<string, PendingPermission>; log: Logger },
-): void {
-  bot.on('callback_query:data', async (ctx: CallbackQueryLike) => {
-    try {
-      await handlePermissionCallback(ctx, deps)
-    } catch (err) {
-      deps.log.error('callback_query handler threw', {
-        error: err instanceof Error ? err.message : String(err),
-      })
-    }
-  })
-}

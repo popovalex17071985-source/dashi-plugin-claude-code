@@ -153,26 +153,6 @@ export function loadPolicyFromPath(absolutePath: string): MultichatPolicy {
   return MultichatPolicySchema.parse(parsed)
 }
 
-/**
- * Look up a chat's policy by stringified chat id.
- *
- * Returns `null` when the chat is not declared in policy.yaml — the
- * caller must treat this as "chat not configured" (typically a hard
- * drop in the gate). Group chat ids are negative, so always pass the
- * id as a string (e.g. `"-1003784643974"`).
- *
- * @param policy loaded multichat policy
- * @param chatId stringified Telegram chat id
- * @returns the chat's policy, or `null` if not configured
- */
-export function getChatPolicy(
-  policy: MultichatPolicy,
-  chatId: string,
-): ChatPolicy | null {
-  const entry = policy.chats[chatId]
-  return entry ?? null
-}
-
 // ──────────────────────────────────────────────────────────────────────
 // Shared chat-policy primitives (Codex review 2026-05-27, TASK-1)
 //
