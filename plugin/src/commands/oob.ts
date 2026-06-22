@@ -209,14 +209,19 @@ function kb(bytes: number): string {
   return bytes < 1024 ? `${bytes} Б` : `${(bytes / 1024).toFixed(1)} КБ`
 }
 
-// Last usage.jsonl row ≈ what was sent to the model that turn:
-// input + cache_read + cache_creation ≈ current context fill.
+// usage.jsonl aggregates input/cache_read/cache_creation across ALL sub-requests
+// of a turn (num_turns of them). The per-request window size — the actual context
+// fill — is that sum divided back by num_turns; otherwise a 38-tool-call turn
+// reports ~38× the real fill.
 function contextFill(): number | undefined {
   try {
     const raw = readFileSync(`${JARVIS_CORE}/usage.jsonl`, 'utf8').trimEnd()
     const last = raw.slice(raw.lastIndexOf('\n') + 1)
-    const r = JSON.parse(last) as { input?: number; cache_read?: number; cache_creation?: number }
-    return (r.input ?? 0) + (r.cache_read ?? 0) + (r.cache_creation ?? 0)
+    const r = JSON.parse(last) as {
+      input?: number; cache_read?: number; cache_creation?: number; num_turns?: number
+    }
+    const turns = Math.max(r.num_turns ?? 1, 1)
+    return Math.round(((r.input ?? 0) + (r.cache_read ?? 0) + (r.cache_creation ?? 0)) / turns)
   } catch {
     return undefined
   }
