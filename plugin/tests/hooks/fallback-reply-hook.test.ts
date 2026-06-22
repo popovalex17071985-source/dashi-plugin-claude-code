@@ -17,6 +17,8 @@ import {
   isUserPrompt,
   resolveFallbackConfig,
   resolveStatePath,
+  lastChatPath,
+  readLastChat,
   dedupeToken,
   truncateForTelegram,
   loadDedupState,
@@ -294,6 +296,26 @@ describe('resolveStatePath (per-session)', () => {
   })
   test('undefined when no base dir', () => {
     expect(resolveStatePath({}, 's1')).toBeUndefined()
+  })
+})
+
+describe('lastChatPath / readLastChat (background-turn fallback)', () => {
+  test('resolves only from TELEGRAM_STATE_DIR, never multichat', () => {
+    expect(lastChatPath({ TELEGRAM_STATE_DIR: '/d' })).toBe('/d/fallback-reply/last-chat')
+    // group session (no DM state dir) → disabled, so a stale id can't misroute
+    expect(lastChatPath({ MULTICHAT_STATE_DIR: '/g' })).toBeUndefined()
+    expect(lastChatPath({})).toBeUndefined()
+  })
+
+  test('readLastChat: trims, empty/missing → undefined', () => {
+    expect(readLastChat('/p', () => '140141496\n')).toBe('140141496')
+    expect(readLastChat('/p', () => '   ')).toBeUndefined()
+    expect(readLastChat(undefined)).toBeUndefined()
+    expect(
+      readLastChat('/p', () => {
+        throw new Error('ENOENT')
+      }),
+    ).toBeUndefined()
   })
 })
 

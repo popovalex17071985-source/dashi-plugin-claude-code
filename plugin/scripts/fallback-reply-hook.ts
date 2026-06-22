@@ -400,6 +400,44 @@ export function resolveStatePath(
 }
 
 /**
+ * DM-scoped "last seen Telegram chat_id" path. Resolvable ONLY from
+ * TELEGRAM_STATE_DIR (the single-peer DM session) — never MULTICHAT_STATE_DIR,
+ * so a group session can't reuse a stale chat_id and misroute. Lets a turn
+ * triggered by a background task-notification (whose boundary prompt carries no
+ * <channel chat_id=…> envelope) still reach the user instead of dropping silent.
+ */
+export function lastChatPath(
+  env: Readonly<Record<string, string | undefined>>,
+): string | undefined {
+  const base = env.TELEGRAM_STATE_DIR
+  if (!base) return undefined
+  return join(base, 'fallback-reply', 'last-chat')
+}
+
+export function readLastChat(
+  path: string | undefined,
+  readFile: (p: string) => string = (p) => readFileSync(p, 'utf8'),
+): string | undefined {
+  if (!path) return undefined
+  try {
+    const v = readFile(path).trim()
+    return v.length > 0 ? v : undefined
+  } catch {
+    return undefined
+  }
+}
+
+function persistLastChat(path: string | undefined, chatId: string): void {
+  if (!path) return
+  try {
+    mkdirSync(dirname(path), { recursive: true })
+    writeFileSync(path, chatId, { mode: 0o600 })
+  } catch {
+    /* best-effort: a stale/absent last-chat only loses the fallback, never sends wrong */
+  }
+}
+
+/**
  * Per-turn dedup token. When the transcript line carries a `uuid` it uniquely
  * identifies the turn → use it alone. Without a uuid (legacy transcripts) the
  * assistant text alone is NOT a turn discriminator: two DIFFERENT turns in the
@@ -629,12 +667,17 @@ async function main(): Promise<void> {
     }
   }
 
+  // Remember the chat_id from any Telegram-anchored turn so background-triggered
+  // turns (task-notification boundary, no envelope) can still reach the user.
+  const lastPath = lastChatPath(env)
+  if (turn.chatId !== undefined) persistLastChat(lastPath, turn.chatId)
+
   if (turn.replied) return
   const text = turn.text
   if (text === undefined || text.trim().length === 0) return
-  // No telegram chat_id in the turn → not answering a Telegram message, OR no
-  // turn boundary found. Either way we have no trusted destination → silent.
-  const chatId = turn.chatId
+  // chat_id from the turn boundary, else the last DM chat_id we saw. Only when
+  // both are absent (e.g. a group session with no prior anchor) do we go silent.
+  const chatId = turn.chatId ?? readLastChat(lastPath)
   if (chatId === undefined) return
 
   const config = resolveFallbackConfig(env)
