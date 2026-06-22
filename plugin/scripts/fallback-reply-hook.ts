@@ -594,7 +594,7 @@ async function main(): Promise<void> {
   // We re-read a few times before concluding the turn had no text. A genuinely
   // text-less turn (pure tool / pure thinking) just exhausts the budget. Knobs
   // are upper-clamped so an oversized value cannot hang the synchronous hook.
-  const attempts = envInt(env, 'FALLBACK_REPLY_RETRY_ATTEMPTS', 4, 1, 50)
+  const attempts = envInt(env, 'FALLBACK_REPLY_RETRY_ATTEMPTS', 8, 1, 50)
   const delayMs = envInt(env, 'FALLBACK_REPLY_RETRY_DELAY_MS', 120, 0, 2000)
 
   let turn: TurnResult = { replied: false }
@@ -603,7 +603,7 @@ async function main(): Promise<void> {
   // budget is exhausted we stop sleeping but still run the remaining read
   // attempts back-to-back, so a transcript that lands late is still picked up
   // without hanging the synchronous Stop hook.
-  const SLEEP_BUDGET_MS = 3000
+  const SLEEP_BUDGET_MS = 6000
   let sleptMs = 0
   for (let attempt = 0; attempt < attempts; attempt++) {
     let transcript = ''
