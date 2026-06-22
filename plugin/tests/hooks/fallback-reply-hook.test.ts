@@ -518,4 +518,35 @@ describe('hook E2E dedup persistence (FIX 1)', () => {
       await route.close()
     }
   })
+
+  // Lost-final regression: a turn with an interim narrative line, then tool
+  // calls, then the FINAL text. The hook must forward the FINAL — never the
+  // earlier interim line that breaking on first-non-empty used to grab.
+  test('interim + tools + final → forwards the FINAL text, not the interim', async () => {
+    dir = mkdtempSync(join(tmpdir(), 'fr-e2e-'))
+    const statePath = join(dir, 'state.json')
+    const transcriptPath = join(dir, 'transcript.jsonl')
+    writeFileSync(
+      transcriptPath,
+      [
+        line('user', TG_PROMPT('164795011', 11)),
+        line('assistant', [{ type: 'text', text: 'interim: пишу скрипт:' }], 'u-interim'),
+        line('assistant', [{ type: 'tool_use', name: 'Write', input: {} }], 'u-tool'),
+        line('user', [{ type: 'tool_result', content: 'ok' }]),
+        line('assistant', [{ type: 'text', text: 'Готово. Таблица собрана.' }], 'u-final'),
+      ].join('\n') + '\n',
+      'utf8',
+    )
+
+    const route = await startStubRoute(() => ({ status: 200, json: { status: 'sent' } }))
+    try {
+      const r = await runHook(route.port, statePath, transcriptPath)
+      expect(r.code).toBe(0)
+      expect(route.received.length).toBe(1)
+      expect(route.received[0]).toEqual({ chat_id: '164795011', text: 'Готово. Таблица собрана.' })
+      expect(loadDedupState(statePath)?.dedupe_token).toBe('u-final')
+    } finally {
+      await route.close()
+    }
+  })
 })

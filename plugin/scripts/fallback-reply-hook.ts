@@ -626,23 +626,29 @@ async function main(): Promise<void> {
   const fileVars = loadChannelEnvFile(process.env)
   const env: Record<string, string | undefined> = { ...fileVars, ...process.env }
 
-  // Bounded retry on empty extraction. Same race as stop-to-outbox.py: a reply
-  // produced with extended thinking emits a [thinking] line first and the
-  // [text] line a beat later; a Stop hook reading between them sees no text.
-  // We re-read a few times before concluding the turn had no text. A genuinely
-  // text-less turn (pure tool / pure thinking) just exhausts the budget. Knobs
-  // are upper-clamped so an oversized value cannot hang the synchronous hook.
+  // Bounded retry. Two races, same fix — re-read until the latest assistant
+  // text STABILISES (unchanged across two reads), not just until it is non-empty:
+  //   1. extended-thinking: [thinking] flushes first, [text] a beat later → an
+  //      early read sees no text (stop-to-outbox.py's original case).
+  //   2. lost-final (2026-06-22): a turn emits an interim narrative line, then
+  //      tool calls, then the FINAL text. A Stop hook that reads after the
+  //      interim flushed but before the final flushed grabs the STALE interim,
+  //      forwards it, writes dedup — and the final, landing a beat later, gets
+  //      no second Stop → silently lost. Breaking on first-non-empty caused this.
+  // A genuinely text-less turn (pure tool / pure thinking) just exhausts the
+  // budget. Knobs are upper-clamped so an oversized value cannot hang the hook.
   const attempts = envInt(env, 'FALLBACK_REPLY_RETRY_ATTEMPTS', 8, 1, 50)
   const delayMs = envInt(env, 'FALLBACK_REPLY_RETRY_DELAY_MS', 120, 0, 2000)
 
   let turn: TurnResult = { replied: false }
-  // FIX 3: cap the CUMULATIVE sleep at a hard 3s ceiling regardless of the
+  // FIX 3: cap the CUMULATIVE sleep at a hard ceiling regardless of the
   // attempts×delay knob product (up to 50×2000 = 100s otherwise). Once the
   // budget is exhausted we stop sleeping but still run the remaining read
   // attempts back-to-back, so a transcript that lands late is still picked up
   // without hanging the synchronous Stop hook.
   const SLEEP_BUDGET_MS = 6000
   let sleptMs = 0
+  let prevText: string | undefined
   for (let attempt = 0; attempt < attempts; attempt++) {
     let transcript = ''
     try {
@@ -650,7 +656,7 @@ async function main(): Promise<void> {
     } catch {
       // FIX 4: a transient read/write race must NOT abort the whole retry
       // loop. Skip to the next attempt; only give up after all attempts are
-      // exhausted with no text (bounded by the FIX 3 sleep budget).
+      // exhausted (bounded by the FIX 3 sleep budget).
       if (attempt < attempts - 1 && delayMs > 0 && sleptMs < SLEEP_BUDGET_MS) {
         await sleep(delayMs)
         sleptMs += delayMs
@@ -660,7 +666,11 @@ async function main(): Promise<void> {
     turn = analyzeCurrentTurn(transcript)
     // A reply already reached the warchief this turn → never fall back.
     if (turn.replied) return
-    if (turn.text !== undefined && turn.text.trim().length > 0) break
+    const cur = turn.text?.trim() ?? ''
+    // Settled: non-empty and identical to the previous read → the final text has
+    // landed and is no longer changing. Forward THAT, not an earlier interim.
+    if (cur.length > 0 && cur === prevText) break
+    if (cur.length > 0) prevText = cur
     if (attempt < attempts - 1 && delayMs > 0 && sleptMs < SLEEP_BUDGET_MS) {
       await sleep(delayMs)
       sleptMs += delayMs
