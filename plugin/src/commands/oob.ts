@@ -204,6 +204,9 @@ export const BOT_COMMANDS: ReadonlyArray<BotCommandSpec> = [
 // the generic upstream plugin. If reused elsewhere, lift to config/env.
 const JARVIS_CORE = '/home/edgelab/.claude-lab/jarvis/.claude/core'
 const CTX_WINDOW = 400_000 // CLAUDE_CODE_AUTO_COMPACT_WINDOW
+// OpenViking auto-memory index — the MEMORY.md actually injected into context.
+const MEM_INDEX =
+  '/home/edgelab/.claude/projects/-home-edgelab--claude-lab-jarvis--claude-dashi-plugin-claude-code/memory/MEMORY.md'
 
 function kb(bytes: number): string {
   return bytes < 1024 ? `${bytes} Б` : `${(bytes / 1024).toFixed(1)} КБ`
@@ -251,8 +254,11 @@ function statusText(ctx: OobContext): string {
   if (recent) lines.push(`recent.md: ${recent.entries} записей, ${kb(recent.bytes)}`)
   const handoff = fileStat(`${JARVIS_CORE}/hot/handoff.md`)
   if (handoff) lines.push(`handoff.md: ${kb(handoff.bytes)} (последние 5)`)
-  const mem = fileStat(`${JARVIS_CORE}/MEMORY.md`)
-  if (mem) lines.push(`MEMORY.md: ${kb(mem.bytes)}`)
+  // The MEMORY.md actually auto-loaded into every session's context is the
+  // OpenViking index, not core/MEMORY.md (which is the cold-memory pointer and
+  // is NOT in context). Show the in-context one — that's the size that matters.
+  const mem = fileStat(MEM_INDEX)
+  if (mem) lines.push(`MEMORY.md (в контексте): ${kb(mem.bytes)}`)
 
   lines.push('')
   lines.push('<code>/reset force</code> — сбросить окно (handoff сохранится сам)')
