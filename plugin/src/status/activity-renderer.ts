@@ -340,7 +340,9 @@ export function renderActivityBlock(
     const head = lastNl > 0 ? truncated.slice(0, lastNl) : truncated
     body = `${head}\n…+truncated`
   }
-  return `<pre>${body}</pre>`
+  // ponytail: force Telegram's "Shell" syntax highlighting so the card is
+  // always colored, not only when the last 5 steps happen to contain shell.
+  return `<pre><code class="language-shell">${body}</code></pre>`
 }
 
 /**
