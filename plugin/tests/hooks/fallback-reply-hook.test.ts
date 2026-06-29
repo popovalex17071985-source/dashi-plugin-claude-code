@@ -175,6 +175,38 @@ describe('analyzeCurrentTurn', () => {
     expect(analyzeCurrentTurn(transcript).text).toBe('second (final)')
   })
 
+  test('textIsTrailing=true for a plain trailing final text', () => {
+    const transcript = [
+      line('user', TG_PROMPT('1', 51)),
+      line('assistant', [{ type: 'text', text: 'final answer' }], 'uF'),
+    ].join('\n')
+    expect(analyzeCurrentTurn(transcript).textIsTrailing).toBe(true)
+  })
+
+  test('textIsTrailing=false when a tool cycle follows the text (interim, grill-me bug)', () => {
+    // The disk state at the moment the real final has NOT flushed yet: the most
+    // recent text is an interim, followed by a tool_use + its tool_result. The
+    // settle loop must NOT treat this stable interim as the final.
+    const transcript = [
+      line('user', TG_PROMPT('1', 52)),
+      line('assistant', [{ type: 'text', text: 'Читаю SKILL.md…' }], 'uInterim'),
+      line('assistant', [{ type: 'tool_use', name: 'WebFetch', input: {} }], 'uTool'),
+      line('user', [{ type: 'tool_result', content: 'page body' }]),
+    ].join('\n')
+    const r = analyzeCurrentTurn(transcript)
+    expect(r.text).toBe('Читаю SKILL.md…')
+    expect(r.textIsTrailing).toBe(false)
+  })
+
+  test('textIsTrailing=false when a bare tool_use follows the text', () => {
+    const transcript = [
+      line('user', TG_PROMPT('1', 53)),
+      line('assistant', [{ type: 'text', text: 'interim' }], 'uI'),
+      line('assistant', [{ type: 'tool_use', name: 'Bash', input: {} }], 'uB'),
+    ].join('\n')
+    expect(analyzeCurrentTurn(transcript).textIsTrailing).toBe(false)
+  })
+
   test('empty transcript → no text, not replied, no chatId', () => {
     const r = analyzeCurrentTurn('')
     expect(r.text).toBeUndefined()

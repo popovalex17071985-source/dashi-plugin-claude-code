@@ -125,6 +125,11 @@ export interface TurnResult {
   // to distinguish two different turns that have no `uuid` but identical
   // assistant text. Undefined when no boundary prompt text was found.
   readonly promptText?: string | undefined
+  // True only when the captured `text` is the turn's TRAILING content — i.e. no
+  // tool_use/tool_result block appears after it in the turn. A stable interim
+  // followed by a tool cycle (the model is mid-turn, final not yet flushed) is
+  // NOT trailing, and must not be forwarded as if it were the final answer.
+  readonly textIsTrailing: boolean
 }
 
 /**
@@ -173,6 +178,16 @@ function contentCallsReplyTool(content: unknown): boolean {
     if (b.type === 'tool_use' && typeof b.name === 'string' && REPLY_TOOL_NAMES.has(b.name)) {
       return true
     }
+  }
+  return false
+}
+
+/** True when a content array contains any tool_use block (assistant tool call). */
+function contentHasToolUse(content: unknown): boolean {
+  if (!Array.isArray(content)) return false
+  for (const block of content) {
+    if (block === null || typeof block !== 'object') continue
+    if ((block as Record<string, unknown>).type === 'tool_use') return true
   }
   return false
 }
@@ -247,6 +262,10 @@ export function analyzeCurrentTurn(transcript: string): TurnResult {
   let text: string | undefined
   let uuid: string | undefined
   let replied = false
+  // Walking backward, any tool activity we meet BEFORE the most-recent text was
+  // emitted AFTER that text chronologically → the text is a mid-turn interim,
+  // not the trailing final. Tracked only until `text` is captured.
+  let sawToolAfter = false
   for (let i = lines.length - 1; i >= 0; i--) {
     let obj: unknown
     try {
@@ -272,8 +291,11 @@ export function analyzeCurrentTurn(transcript: string): TurnResult {
         const promptText = userPromptText(content)
         const chatId =
           promptText !== undefined ? extractLeadingTelegramChatId(promptText) : undefined
-        return { text, uuid, replied, chatId, promptText }
+        return { text, uuid, replied, chatId, promptText, textIsTrailing: text !== undefined && !sawToolAfter }
       }
+      // tool_result echo (not a genuine prompt) → tool activity. If it sits
+      // after the most-recent text, that text is a non-trailing interim.
+      if (text === undefined) sawToolAfter = true
       continue
     }
 
@@ -285,13 +307,16 @@ export function analyzeCurrentTurn(transcript: string): TurnResult {
         text = t
         const u = line.uuid
         uuid = typeof u === 'string' && u.length > 0 ? u : undefined
+      } else if (contentHasToolUse(content)) {
+        // tool-only assistant message after the (later-found) text.
+        sawToolAfter = true
       }
     }
   }
   // Reached the top without a genuine user prompt: no turn boundary found, so
   // we cannot confirm a Telegram chat_id → no fallback. Still report replied
   // (harmless) but leave chatId/promptText undefined.
-  return { text, uuid, replied, chatId: undefined, promptText: undefined }
+  return { text, uuid, replied, chatId: undefined, promptText: undefined, textIsTrailing: text !== undefined && !sawToolAfter }
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -640,7 +665,7 @@ async function main(): Promise<void> {
   const attempts = envInt(env, 'FALLBACK_REPLY_RETRY_ATTEMPTS', 8, 1, 50)
   const delayMs = envInt(env, 'FALLBACK_REPLY_RETRY_DELAY_MS', 120, 0, 2000)
 
-  let turn: TurnResult = { replied: false }
+  let turn: TurnResult = { replied: false, textIsTrailing: false }
   // FIX 3: cap the CUMULATIVE sleep at a hard ceiling regardless of the
   // attempts×delay knob product (up to 50×2000 = 100s otherwise). Once the
   // budget is exhausted we stop sleeping but still run the remaining read
@@ -667,9 +692,11 @@ async function main(): Promise<void> {
     // A reply already reached the warchief this turn → never fall back.
     if (turn.replied) return
     const cur = turn.text?.trim() ?? ''
-    // Settled: non-empty and identical to the previous read → the final text has
-    // landed and is no longer changing. Forward THAT, not an earlier interim.
-    if (cur.length > 0 && cur === prevText) break
+    // Settled: non-empty, identical to the previous read, AND trailing (no tool
+    // cycle after it). A stable interim that is followed by tool_use/tool_result
+    // means the model is mid-turn and the real final has not flushed yet — keep
+    // retrying within the budget rather than forwarding the interim as final.
+    if (cur.length > 0 && cur === prevText && turn.textIsTrailing) break
     if (cur.length > 0) prevText = cur
     if (attempt < attempts - 1 && delayMs > 0 && sleptMs < SLEEP_BUDGET_MS) {
       await sleep(delayMs)
