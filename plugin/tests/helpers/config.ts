@@ -74,6 +74,10 @@ export function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     multichat: { enabled: false },
     ask_user_question: { enabled: false, timeout_ms: 300_000, max_preview_chars: 1000 },
     permission_gate: { enabled: false, timeout_ms: 120_000 },
+    // ponytail: temporary — richMessages is required by AppConfig until the
+    // Rich Messages revert (step 5 of the 2026-07-04 upstream merge) drops
+    // the field from config.ts. Remove this line together with that revert.
+    richMessages: { enabled: false, perChatOptOut: [] },
     ...overrides,
   }
 }

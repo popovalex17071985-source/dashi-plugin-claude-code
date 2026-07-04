@@ -28,12 +28,18 @@ import {
   StatusArgsSchema,
 } from '../schemas.js'
 import { assertAllowedChat } from '../telegram/gate.js'
+import type { GuestQueryRegistry } from '../telegram/guest-queries.js'
 import {
   isTelegramHtmlParseError,
   markdownToTelegramHtml,
 } from '../format/html.js'
 import { splitMessage } from '../format/chunk.js'
 import { assertSendableFile, isPhotoExtension } from '../security/paths.js'
+import {
+  buildRichMessagePayload,
+  contentFitsRichLimits,
+} from '../format/rich.js'
+import type { RichLatch } from '../safety/rich-latch.js'
 
 // ─────────────────────────────────────────────────────────────────────
 // MCP request/response types we touch. We narrow rather than import deep
@@ -101,6 +107,18 @@ export interface SendDocumentOpts {
   caption?: string
 }
 
+// Options for the rich-message send. Threading only for M1; M3/M4 extend.
+export interface SendRichMessageOpts {
+  reply_to_message_id?: number
+}
+
+// Result of a rich send. Either Telegram accepted it (we got a message_id)
+// or the layered wrapper decided to fall back to the HTML path. `fallback`
+// is the signal the reply tool reads to decide whether to also run the HTML
+// chunk path — exactly one of the two ships, so a message is never lost or
+// duplicated.
+export type SendRichMessageResult = { message_id: number } | { fallback: true }
+
 export interface DownloadResult {
   path: string
   mime?: string
@@ -120,8 +138,24 @@ export type ChatAction =
   | 'record_video_note'
   | 'upload_video_note'
 
+// Options for the one-shot guest answer (Guest Mode, Bot API 10.0).
+export interface AnswerGuestQueryOpts {
+  parse_mode?: 'MarkdownV2' | 'HTML'
+}
+
 export interface TelegramApi {
   sendMessage(chatId: string, text: string, opts: SendMessageOpts): Promise<{ message_id: number }>
+  // Telegram Bot API 10.1 Rich Messages: ship RAW markdown that Telegram
+  // renders server-side (tables/math/headings/task-lists/<details>/footnotes,
+  // up to 32768 bytes). The result is either a message_id (sent) or
+  // { fallback: true } (caller must use the HTML path instead). Implemented
+  // via grammY's raw escape hatch; redaction runs in the safe wrapper BEFORE
+  // the raw send — never call this from outside the layered chain.
+  sendRichMessage(
+    chatId: string,
+    rawMarkdown: string,
+    opts: SendRichMessageOpts,
+  ): Promise<SendRichMessageResult>
   editMessageText(chatId: string, messageId: number, text: string, opts: EditOpts): Promise<void>
   setMessageReaction(chatId: string, messageId: number, emoji: string): Promise<void>
   sendChatAction(chatId: string, action: ChatAction): Promise<void>
@@ -129,7 +163,25 @@ export interface TelegramApi {
   sendPhoto(chatId: string, filePath: string, opts: SendDocumentOpts): Promise<{ message_id: number }>
   downloadFile(fileId: string, destDir: string): Promise<DownloadResult>
   deleteMessage(chatId: string, messageId: number): Promise<void>
+  // Guest Mode: answer a guest @-mention exactly once. Telegram's contract
+  // takes an InlineQueryResult; we constrain the surface to a text article
+  // — the only shape the reply tool emits — so stubs stay trivial.
+  answerGuestQuery(guestQueryId: string, text: string, opts: AnswerGuestQueryOpts): Promise<void>
 }
+
+// grammY ^1.21.0 has no typed `sendRichMessage` on its RawApi (the method is
+// newer than the bundled types). We reach it through the raw escape hatch
+// `bot.api.raw`, narrowed to a typed function rather than `any`: the body is
+// the RichMessageBody buildRichMessagePayload produces, and the response is
+// the small shape we read message_id from (defensively — Telegram nests it
+// under `result`, grammY usually unwraps to the top level).
+interface RawSendRichResponse {
+  message_id?: number
+  result?: { message_id?: number }
+}
+type RawSendRichMessageFn = (
+  body: Record<string, unknown>,
+) => Promise<RawSendRichResponse>
 
 // Thin wrapper around grammY bot.api. Keeps the rest of the system free of
 // grammy-specific quirks (reply_parameters vs reply_to_message_id, etc).
@@ -148,6 +200,29 @@ export function createTelegramApi(bot: Bot, token: string): TelegramApi {
       }
       const sent = await bot.api.sendMessage(chatId, text, other)
       return { message_id: sent.message_id }
+    },
+    async sendRichMessage(chatId, rawMarkdown, opts) {
+      // Build the raw-api body (chat_id + markdown + reply_parameters) and
+      // dispatch through grammY's untyped raw escape hatch. The safe wrapper
+      // already redacted `rawMarkdown`; this layer only transports it.
+      const body = buildRichMessagePayload(rawMarkdown, {
+        chat_id: chatId,
+        ...(opts.reply_to_message_id !== undefined
+          ? { reply_to_message_id: opts.reply_to_message_id }
+          : {}),
+      })
+      // `bot.api.raw` is typed to known methods only; cast through unknown to
+      // a typed function for the (still-untyped-in-grammY) sendRichMessage.
+      const rawApi = bot.api.raw as unknown as Record<string, unknown>
+      const sendRich = rawApi.sendRichMessage as RawSendRichMessageFn
+      const res = await sendRich(body as unknown as Record<string, unknown>)
+      // Parse message_id defensively: top-level (grammY-unwrapped) first,
+      // then nested under `result` (raw Bot API envelope).
+      const messageId = res.message_id ?? res.result?.message_id
+      if (typeof messageId !== 'number') {
+        throw new Error('sendRichMessage returned no message_id')
+      }
+      return { message_id: messageId }
     },
     async editMessageText(chatId, messageId, text, opts) {
       const other: Record<string, unknown> = {}
@@ -199,6 +274,20 @@ export function createTelegramApi(bot: Bot, token: string): TelegramApi {
       writeFileSync(path, buf)
       return { path, size: buf.length }
     },
+    async answerGuestQuery(guestQueryId, text, opts) {
+      // answerGuestQuery takes an InlineQueryResult; a text answer is an
+      // article with InputTextMessageContent. `id` is scoped to the query
+      // (one result per answer), so a constant is fine.
+      await bot.api.answerGuestQuery(guestQueryId, {
+        type: 'article',
+        id: 'answer',
+        title: 'Ответ',
+        input_message_content: {
+          message_text: text,
+          ...(opts.parse_mode !== undefined ? { parse_mode: opts.parse_mode } : {}),
+        },
+      })
+    },
   }
 }
 
@@ -211,12 +300,17 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
   {
     name: 'reply',
     description:
-      'Reply on Telegram. Pass chat_id from the inbound message. Optionally pass reply_to (message_id) for threading, and files (absolute paths) to attach images or documents.',
+      'Reply on Telegram. Pass chat_id from the inbound message. Optionally pass reply_to (message_id) for threading, and files (absolute paths) to attach images or documents. GUEST MODE: when the inbound <channel> meta carries guest_query_id (guest="1"), pass that guest_query_id here too — the answer is delivered into the foreign chat via answerGuestQuery. Guest answers are ONE-SHOT (exactly one reply, no attachments, no reply_to, single message ≤4096 chars — be concise).',
     inputSchema: {
       type: 'object',
       properties: {
         chat_id: { type: 'string' },
         text: { type: 'string' },
+        guest_query_id: {
+          type: 'string',
+          description:
+            'Guest Mode only: the guest_query_id from the inbound <channel> meta. When set, the reply goes through answerGuestQuery (one-shot) instead of sendMessage.',
+        },
         reply_to: {
           type: 'string',
           description: 'Message ID to thread under. Use message_id from the inbound <channel> block.',
@@ -229,10 +323,10 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
         },
         format: {
           type: 'string',
-          enum: ['text', 'markdownv2', 'html'],
+          enum: ['text', 'markdownv2', 'html', 'rich'],
           default: 'html',
           description:
-            "Rendering mode. Default: 'html' — markdown (**bold**, *italic*, `code`, ```fenced```, [text](url), tables, # headings) is auto-converted to Telegram's HTML subset and auto-chunked at 4000 chars. Plain `<`, `>`, `&` in regular text are safe — they get auto-escaped before sending. On parse error the chunk re-sends as plain text so the reply still ships. Use 'text' only to bypass markdown conversion entirely (e.g. sending pre-built Telegram entity strings verbatim). 'markdownv2' passes raw — caller escapes per Telegram rules.",
+            "Rendering mode. Default: 'html' — markdown (**bold**, *italic*, `code`, ```fenced```, [text](url), tables, # headings) is auto-converted to Telegram's HTML subset and auto-chunked at 4000 chars. Plain `<`, `>`, `&` in regular text are safe — they get auto-escaped before sending. On parse error the chunk re-sends as plain text so the reply still ships. Use 'text' only to bypass markdown conversion entirely (e.g. sending pre-built Telegram entity strings verbatim). 'markdownv2' passes raw — caller escapes per Telegram rules. 'rich' is never required: DM replies auto-upgrade to Telegram's native markdown rendering when available; the explicit value just forces the same gate.",
         },
       },
       required: ['chat_id', 'text'],
@@ -329,6 +423,25 @@ export interface ToolDeps {
   // H4 fix (2026-05-23): when multichat is enabled, the policy is the
   // authoritative outbound allowlist. Omitted in legacy DM-only mode.
   policy?: MultichatPolicy
+  // Guest Mode (2026-07-04): pending one-shot guest queries. Authorization
+  // for a guest reply is registry membership — only allowlisted callers'
+  // queries are ever registered (handleGuestMessage gates first), so the
+  // chat allowlist is deliberately NOT consulted on this path.
+  guestQueries?: GuestQueryRegistry
+  // M1 rich messages (2026-06-14): session-scoped capability latch shared
+  // with the safe-telegram-api wrapper. The reply handler reads
+  // `sendDisabled` to skip rich attempts cheaply once a capability error has
+  // latched it off. Optional so existing test fixtures that omit it keep the
+  // legacy HTML-only behaviour (rich is then never attempted).
+  richLatch?: RichLatch
+}
+
+// DM detection: a Telegram DM chat.id equals the user's id and is positive.
+// Groups/supergroups/channels are negative. M1 ships rich messages to DMs
+// only (groups are M4). Non-numeric / NaN ids fail closed (not a DM).
+export function isDmChat(chatId: string): boolean {
+  const n = Number(chatId)
+  return Number.isFinite(n) && n > 0
 }
 
 function toolError(name: string, message: string): CallToolResult {
@@ -353,6 +466,113 @@ export async function callTool(req: CallToolRequest, deps: ToolDeps): Promise<Ca
         const parsed = ReplyArgsSchema.safeParse(rawArgs)
         if (!parsed.success) return toolError(name, zodErrorMessage(parsed.error))
         const args = parsed.data
+
+        // Guest Mode path (2026-07-04). Authorization = registry membership
+        // (only allowlisted callers' queries get registered), NOT the chat
+        // allowlist — the originating chat is one the bot is not a member
+        // of, so assertAllowedChat would always (correctly) refuse it.
+        if (args.guest_query_id !== undefined) {
+          if (deps.guestQueries === undefined) {
+            return toolError(name, 'guest replies unavailable — guest_mode is not enabled in config')
+          }
+          if ((args.files ?? []).length > 0) {
+            return toolError(name, 'guest replies cannot carry attachments — answerGuestQuery is text-only')
+          }
+          if (args.reply_to !== undefined) {
+            return toolError(name, 'guest replies do not support reply_to — the answer always lands in-place')
+          }
+
+          // Render BEFORE claiming (Fable #4): a renderer throw after
+          // claim() would strand the one-shot entry inflight until TTL.
+          // Hard-cap at ONE Telegram message: there is no second
+          // answerGuestQuery, so chunking cannot apply — ship chunk[0] and
+          // flag the truncation in the tool result so the agent knows.
+          // 'rich' degrades to the HTML rendering here: answerGuestQuery has
+          // no rich_message payload, and raw markdown in a public foreign
+          // chat reads worse than our rendered HTML subset.
+          const guestFormat = args.format === 'rich' ? 'html' : args.format
+          const body =
+            guestFormat === 'html' ? markdownToTelegramHtml(args.text) : args.text
+          const chunks = splitMessage(body)
+          const single = chunks[0]
+          if (single === undefined) {
+            return toolError(name, 'guest reply rendered to an empty message — nothing to send')
+          }
+          const truncated = chunks.length > 1
+          // Plain-text fallback body: the PRE-render text (Fable #3) — a
+          // parse failure means our markup was bad, and raw <b> tag soup in
+          // a public foreign chat reads worse than unrendered markdown.
+          const plainBody = splitMessage(args.text)[0] ?? single
+          const guestOpts: AnswerGuestQueryOpts =
+            guestFormat === 'html'
+              ? { parse_mode: 'HTML' }
+              : guestFormat === 'markdownv2'
+                ? { parse_mode: 'MarkdownV2' }
+                : {}
+
+          const claim = deps.guestQueries.claim(args.guest_query_id)
+          if (claim.kind !== 'ok') {
+            return toolError(
+              name,
+              `guest query ${claim.kind} — guest answers are one-shot and expire after 15 minutes`,
+            )
+          }
+          // Cheap LLM-mixup guard (Fable #5): with two pending guest
+          // queries in different foreign chats, a swapped (chat_id,
+          // guest_query_id) pair would deliver chat A's answer into chat B
+          // — both public. The registry knows the true origin; refuse loud.
+          if (
+            claim.entry.callerChatId !== undefined &&
+            claim.entry.callerChatId !== args.chat_id
+          ) {
+            deps.guestQueries.release(args.guest_query_id)
+            return toolError(
+              name,
+              `guest query ${args.guest_query_id} originated in chat ${claim.entry.callerChatId}, not ${args.chat_id} — pass the chat_id from the SAME inbound <channel> meta`,
+            )
+          }
+
+          try {
+            await telegramApi.answerGuestQuery(args.guest_query_id, single, guestOpts)
+          } catch (err) {
+            // Entity-parse failures are format-agnostic (Fable #2):
+            // Telegram raises the same «can't parse entities» family for
+            // HTML and MarkdownV2 bodies — and a chunked MarkdownV2 body
+            // can be INVALID by construction (splitMessage balances only
+            // HTML tags), so without this retry a long markdownv2 guest
+            // reply would burn the query's TTL on identical failures.
+            // A failed call does not consume the query on Telegram's side.
+            if (guestOpts.parse_mode !== undefined && isTelegramHtmlParseError(err)) {
+              log.warn('guest answer entity parse failed, retrying as plain text', {
+                format: args.format,
+                error: err instanceof Error ? err.message : String(err),
+              })
+              try {
+                await telegramApi.answerGuestQuery(args.guest_query_id, plainBody, {})
+              } catch (err2) {
+                deps.guestQueries.release(args.guest_query_id)
+                return toolError(name, err2 instanceof Error ? err2.message : String(err2))
+              }
+            } else {
+              deps.guestQueries.release(args.guest_query_id)
+              return toolError(name, err instanceof Error ? err.message : String(err))
+            }
+          }
+
+          // Send succeeded — freeze the entry as answered so a repeat
+          // reply reads 'consumed' and cap-eviction may reclaim the slot.
+          deps.guestQueries.confirm(args.guest_query_id)
+
+          return {
+            content: [{
+              type: 'text',
+              text: truncated
+                ? 'guest answer sent (TRUNCATED to one message — guest replies are one-shot; keep them short)'
+                : 'guest answer sent',
+            }],
+          }
+        }
+
         try {
           assertAllowedChat(args.chat_id, config, deps.policy)
         } catch (err) {
@@ -377,7 +597,46 @@ export async function callTool(req: CallToolRequest, deps: ToolDeps): Promise<Ca
 
         const sentIds: number[] = []
 
-        if (args.format === 'html') {
+        // ── M1 Rich Messages (Bot API 10.1) ─────────────────────────────
+        // Attempt a single RAW-markdown rich send when ALL conditions hold.
+        // On success we push the id and SKIP the HTML/text+chunk path. On a
+        // transparent `{ fallback: true }` we fall through to the existing
+        // HTML path UNCHANGED — exactly one path ships, so the reply is
+        // never lost or duplicated. A `transient` error re-throws from the
+        // safe wrapper (caught by the outer try) so we never silently
+        // swallow then resend.
+        const richLatch = deps.richLatch
+        const richEligible =
+          config.richMessages.enabled &&
+          args.format !== 'text' &&
+          args.format !== 'markdownv2' &&
+          richLatch !== undefined &&
+          !richLatch.sendDisabled &&
+          !config.richMessages.perChatOptOut.includes(args.chat_id) &&
+          files.length === 0 &&
+          contentFitsRichLimits(args.text) &&
+          isDmChat(args.chat_id)
+
+        let richSent = false
+        if (richEligible) {
+          const richOpts: SendRichMessageOpts = {}
+          if (replyToId !== undefined) richOpts.reply_to_message_id = replyToId
+          const res = await telegramApi.sendRichMessage(args.chat_id, args.text, richOpts)
+          if ('message_id' in res) {
+            sentIds.push(res.message_id)
+            richSent = true
+          }
+          // else res.fallback === true → fall through to the HTML path below.
+        }
+
+        if (richSent) {
+          // Rich shipped the whole body — nothing else to send for text.
+          // (Attachments are impossible here: richEligible required
+          // files.length === 0.)
+        } else if (args.format === 'html' || args.format === 'rich') {
+          // HTML path (also the fallback for 'rich'): when rich was skipped
+          // (disabled / non-DM / oversize / opted-out / has files) or fell
+          // back transparently, render markdown → validated Telegram HTML.
           // Convert markdown → Telegram HTML, then chunk at 4000 chars so we
           // never exceed Telegram's 4096 sendMessage cap. reply_to applies
           // only to the first chunk so a long answer doesn't quote-spam the

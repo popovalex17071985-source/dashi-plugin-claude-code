@@ -128,6 +128,7 @@ function makeTelegramApi(): TelegramApi {
   }
   return {
     sendMessage: noop as unknown as TelegramApi['sendMessage'],
+    sendRichMessage: noop as unknown as TelegramApi['sendRichMessage'],
     editMessageText: noop as unknown as TelegramApi['editMessageText'],
     setMessageReaction: async () => undefined,
     sendChatAction: async () => undefined,
@@ -135,6 +136,7 @@ function makeTelegramApi(): TelegramApi {
     sendPhoto: noop as unknown as TelegramApi['sendPhoto'],
     downloadFile: noop as unknown as TelegramApi['downloadFile'],
     deleteMessage: noop as unknown as TelegramApi['deleteMessage'],
+    answerGuestQuery: noop as unknown as TelegramApi['answerGuestQuery'],
   }
 }
 

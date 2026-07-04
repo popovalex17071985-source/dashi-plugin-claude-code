@@ -6,6 +6,7 @@ import { join } from 'path'
 import {
   callTool,
   listTools,
+  type AnswerGuestQueryOpts,
   type CallToolRequest,
   type DownloadResult,
   type EditOpts,
@@ -24,6 +25,9 @@ const silentLog = createLogger('test', { stream: { write: () => true } as unknow
 function makeStubApi(overrides: Partial<TelegramApi> = {}): TelegramApi {
   return {
     sendMessage: async (_chatId: string, _text: string, _opts: SendMessageOpts) => ({ message_id: 1 }),
+    // Default rich stub reports fallback so legacy reply tests (richMessages
+    // disabled in makeConfig) never accidentally exercise the rich path.
+    sendRichMessage: async () => ({ fallback: true as const }),
     editMessageText: async (_chatId: string, _messageId: number, _text: string, _opts: EditOpts) => {
       /* noop */
     },
@@ -40,6 +44,9 @@ function makeStubApi(overrides: Partial<TelegramApi> = {}): TelegramApi {
       size: 0,
     }),
     deleteMessage: async (_chatId: string, _messageId: number) => {
+      /* noop */
+    },
+    answerGuestQuery: async (_guestQueryId: string, _text: string, _opts: AnswerGuestQueryOpts) => {
       /* noop */
     },
     ...overrides,
@@ -333,6 +340,28 @@ describe('callTool', () => {
       deps,
     )
     expect(result.isError).toBeUndefined()
+    rmSync(deps.statePaths.root, { recursive: true, force: true })
+  })
+
+  test('reply format=rich accepts new enum value (falls back to HTML when richMessages disabled)', async () => {
+    // Schema regression: 'rich' must be a legal format value (M1). With the
+    // default makeConfig (richMessages.enabled=false) no rich send is
+    // attempted — the body renders via the validated HTML path, parse_mode=HTML.
+    const captured: Array<{ text: string; opts: SendMessageOpts }> = []
+    const api = makeStubApi({
+      sendMessage: async (_chatId, text, opts) => {
+        captured.push({ text, opts })
+        return { message_id: 700 + captured.length }
+      },
+    })
+    const deps = makeDeps({ telegramApi: api })
+    const result = await callTool(
+      callReq('reply', { chat_id: '164795011', text: '# Title', format: 'rich' }),
+      deps,
+    )
+    expect(result.isError).toBeUndefined()
+    expect(captured).toHaveLength(1)
+    expect(captured[0]?.opts.parse_mode).toBe('HTML')
     rmSync(deps.statePaths.root, { recursive: true, force: true })
   })
 

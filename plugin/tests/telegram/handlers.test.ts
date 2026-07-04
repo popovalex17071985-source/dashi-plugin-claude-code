@@ -128,6 +128,7 @@ function makeTelegramApi(): {
   }
   const api: TelegramApi = {
     sendMessage: noop as unknown as TelegramApi['sendMessage'],
+    sendRichMessage: noop as unknown as TelegramApi['sendRichMessage'],
     editMessageText: noop as unknown as TelegramApi['editMessageText'],
     setMessageReaction: async (chatId, messageId, emoji): Promise<void> => {
       reactions.push({ chatId, messageId, emoji })
@@ -139,6 +140,7 @@ function makeTelegramApi(): {
     sendPhoto: noop as unknown as TelegramApi['sendPhoto'],
     downloadFile: noop as unknown as TelegramApi['downloadFile'],
     deleteMessage: noop as unknown as TelegramApi['deleteMessage'],
+    answerGuestQuery: noop as unknown as TelegramApi['answerGuestQuery'],
   }
   return { api, reactions }
 }
