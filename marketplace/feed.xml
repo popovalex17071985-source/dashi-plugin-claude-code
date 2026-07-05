@@ -44,7 +44,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>426971203</Id>
@@ -1459,7 +1459,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <Akb>90</Akb></Ad>
 
       <Ad>
         <Id>453766229</Id>
@@ -1506,7 +1506,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>490852539</Id>
@@ -1556,7 +1556,7 @@
         <Akb>81</Akb>
         <ScreenFlaws>Много мелких царапин</ScreenFlaws>
         <CaseFlaws>Царапины</CaseFlaws>
-      <GoodsSubType>Смарт-часы</GoodsSubType></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><GoodsSubType>Смарт-часы</GoodsSubType></Ad>
 
       <Ad>
         <Id>490943030</Id>
@@ -1603,7 +1603,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <Akb>90</Akb></Ad>
 
       <Ad>
         <Id>492976627</Id>
@@ -1650,7 +1650,7 @@
         <SimSlot>Нет</SimSlot>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <Akb>90</Akb></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>492976910</Id>
@@ -2257,7 +2257,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Вмятины или сколы</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1494883073</Id>
@@ -2353,7 +2353,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1615196817</Id>
@@ -2388,7 +2388,7 @@
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1635768033</Id>
@@ -2435,7 +2435,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1635778217</Id>
@@ -2482,7 +2482,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1640346097</Id>
@@ -2528,7 +2528,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1640640105</Id>
@@ -4309,7 +4309,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1645727185</Id>
@@ -4630,7 +4630,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1646051529</Id>
@@ -4676,7 +4676,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1646054993</Id>
@@ -4723,7 +4723,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1646591545</Id>
@@ -4856,7 +4856,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1646875313</Id>
@@ -4890,7 +4890,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1650144321</Id>
@@ -4939,7 +4939,7 @@
         <Akb>82</Akb>
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Царапины</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1650941753</Id>
@@ -4974,7 +4974,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1650945297</Id>
@@ -5009,7 +5009,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1650948193</Id>
@@ -5043,7 +5043,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1650982665</Id>
@@ -5091,7 +5091,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Потёртости</KBCondition>
-      </Ad>
+      <Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1658522689</Id>
@@ -5139,7 +5139,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1658523953</Id>
@@ -5186,7 +5186,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1658526385</Id>
@@ -5232,7 +5232,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1689814889</Id>
@@ -5280,7 +5280,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1730301473</Id>
@@ -5326,7 +5326,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1730351489</Id>
@@ -5373,7 +5373,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1752492929</Id>
@@ -5421,7 +5421,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1752517689</Id>
@@ -5469,7 +5469,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1762510609</Id>
@@ -5504,7 +5504,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1762511873</Id>
@@ -5539,7 +5539,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1777115129</Id>
@@ -5585,7 +5585,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1805386401</Id>
@@ -5634,7 +5634,7 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1805387273</Id>
@@ -5683,7 +5683,7 @@
         <Akb>85</Akb>
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1805387785</Id>
@@ -5719,7 +5719,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1805447305</Id>
@@ -5756,7 +5756,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1816301785</Id>
@@ -5805,7 +5805,7 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1816306961</Id>
@@ -5854,7 +5854,7 @@
         <Akb>88</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1816375305</Id>
@@ -5903,7 +5903,7 @@
         <Akb>89</Akb>
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1816833897</Id>
@@ -5949,7 +5949,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1816839529</Id>
@@ -5995,7 +5995,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1816967233</Id>
@@ -6042,7 +6042,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1817277049</Id>
@@ -6130,7 +6130,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1820539881</Id>
@@ -6179,7 +6179,7 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1821171169</Id>
@@ -6225,7 +6225,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1821358969</Id>
@@ -6274,7 +6274,7 @@
         <Akb>89</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1822231401</Id>
@@ -6320,7 +6320,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1822231777</Id>
@@ -6367,7 +6367,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1822232825</Id>
@@ -6413,7 +6413,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1827159825</Id>
@@ -6459,7 +6459,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1831829129</Id>
@@ -6506,7 +6506,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1832845489</Id>
@@ -6552,7 +6552,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1832940497</Id>
@@ -6598,7 +6598,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1833107553</Id>
@@ -6646,7 +6646,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Потёртости</KBCondition>
-      </Ad>
+      <Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1833140257</Id>
@@ -6692,7 +6692,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1833158553</Id>
@@ -6738,7 +6738,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1833172361</Id>
@@ -6784,7 +6784,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836474113</Id>
@@ -6830,7 +6830,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836815489</Id>
@@ -6878,7 +6878,7 @@
         <Akb>86</Akb>
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Царапины</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1836839593</Id>
@@ -6925,7 +6925,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836847817</Id>
@@ -6972,7 +6972,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836853865</Id>
@@ -7019,7 +7019,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836857889</Id>
@@ -7066,7 +7066,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836884577</Id>
@@ -7113,7 +7113,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836890713</Id>
@@ -7159,7 +7159,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836924937</Id>
@@ -7205,7 +7205,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836951585</Id>
@@ -7252,7 +7252,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836993081</Id>
@@ -7299,7 +7299,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1836995889</Id>
@@ -7347,7 +7347,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1837007129</Id>
@@ -7382,7 +7382,7 @@
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1838209481</Id>
@@ -7428,7 +7428,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1842357529</Id>
@@ -7464,7 +7464,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1842371137</Id>
@@ -7511,7 +7511,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1842467209</Id>
@@ -7657,7 +7657,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1847194457</Id>
@@ -7703,7 +7703,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1847237033</Id>
@@ -7750,7 +7750,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1847276241</Id>
@@ -7798,7 +7798,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1847286785</Id>
@@ -7848,7 +7848,7 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1847300593</Id>
@@ -7897,7 +7897,7 @@
         <Akb>85</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1847315385</Id>
@@ -7995,7 +7995,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1847351793</Id>
@@ -8029,7 +8029,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1850052065</Id>
@@ -8067,7 +8067,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1850131785</Id>
@@ -8114,7 +8114,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1850197553</Id>
@@ -8162,7 +8162,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1854046281</Id>
@@ -8209,7 +8209,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859688865</Id>
@@ -8256,7 +8256,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859692993</Id>
@@ -8304,7 +8304,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859693433</Id>
@@ -8353,7 +8353,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859697753</Id>
@@ -8399,7 +8399,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859701297</Id>
@@ -8446,7 +8446,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859703289</Id>
@@ -8494,7 +8494,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859705249</Id>
@@ -8541,7 +8541,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859709745</Id>
@@ -8588,7 +8588,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859734489</Id>
@@ -8634,7 +8634,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859739073</Id>
@@ -8681,7 +8681,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859746849</Id>
@@ -8718,7 +8718,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1859857097</Id>
@@ -8765,7 +8765,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1868769177</Id>
@@ -8960,7 +8960,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Крупные царапины</CaseCondition>
         <KBCondition>Потёртости</KBCondition>
-      </Ad>
+      <Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1868814529</Id>
@@ -9047,7 +9047,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      </Ad>
+      <Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1868990273</Id>
@@ -9093,7 +9093,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1869009505</Id>
@@ -9140,7 +9140,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1869010473</Id>
@@ -9187,7 +9187,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1869012817</Id>
@@ -9234,7 +9234,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1869034489</Id>
@@ -9280,7 +9280,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1869077385</Id>
@@ -9326,7 +9326,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      </Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1869094241</Id>
@@ -9372,5 +9372,5 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 </Ads>
