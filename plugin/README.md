@@ -256,7 +256,7 @@ Local pre-flight (детерминистично, без сети):
 
 Запускает `bun install`, `bun run typecheck`, `bun test tests/`. Exit non-zero на первой ошибке.
 
-Live smoke против `@testmyfirsttmuxbot` (15-row matrix, operator-driven): см. [`docs/canary-smoke.md`](docs/canary-smoke.md). Покрывает text, HTML chunking, reply anti-spoof, photo/document/voice/album, OOB (`/status`, `/help`, `/stop`, `/reset`, `/mirror`), permission relay (allow/deny), webhook путь. Включает rollback procedure на Python canary.
+Live smoke против `@testmyfirsttmuxbot` (15-row matrix, operator-driven): см. [`docs/canary-smoke.md`](docs/canary-smoke.md). Покрывает text, HTML chunking, reply anti-spoof, photo/document/voice/album, OOB (`/status`, `/help`, `/stop`, `/mirror`), permission relay (allow/deny), webhook путь. Включает rollback procedure на Python canary.
 
 End-to-end Progress Reporter (после установки хуков):
 

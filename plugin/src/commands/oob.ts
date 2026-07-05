@@ -350,9 +350,6 @@ async function statusText(ctx: OobContext): Promise<string> {
     lines.push(`uptime: <code>${escapeHtml(formatUptime(ctx.uptimeSeconds))}</code>`)
   }
 
-  lines.push('')
-  lines.push('<code>/reset force</code> — сбросить окно (handoff сохранится сам)')
-
   return lines.join('\n')
 }
 
