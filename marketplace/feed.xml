@@ -1650,7 +1650,7 @@
         <SimSlot>Нет</SimSlot>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework></Ad>
+      <Akb>90</Akb></Ad>
 
       <Ad>
         <Id>492976910</Id>
@@ -7511,55 +7511,6 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      </Ad>
-
-      <Ad>
-        <Id>1842459137</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad Pro 11&quot; 2024 M4 256Gb Space Black WiFi бу</Title>
-        <Description><![CDATA[<p>Apple iPad Pro 11" 2024 M4 256Gb Space Black WiFi бу</p>
-<p>✅Комплект: устройство + кабель<br>✅Гарантия от магазина: 180 дней<br>✅Отличное внешнее состояние</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. d7qnr</p>]]></Description>
-        <Price>52990</Price>
-        
-        <Model>iPad Pro 11 (5-го поколения) (2024)</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/8185/3073859577/IMG_0608.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/9/3073859593/IMG_0609.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/25/3073859609/IMG_0610.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/57/3073859641/IMG_0611.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/97/3073859681/IMG_0612.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/121/3073859705/IMG_0613.jpg"/>
-        </Images>
-        <MemorySize>256</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <RamSize>8</RamSize>
-        <Model>iPad Pro 11 (5-го поколения) (2024)</Model>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Нет</SimSlot>
-        <Devicework>Включается</Devicework>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <Akb>96</Akb>
       </Ad>
 
       <Ad>
