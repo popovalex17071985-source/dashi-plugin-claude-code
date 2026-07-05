@@ -2388,7 +2388,7 @@
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1635768033</Id>
@@ -4856,7 +4856,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1646875313</Id>
@@ -4890,7 +4890,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1650144321</Id>
@@ -4939,7 +4939,7 @@
         <Akb>82</Akb>
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Царапины</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1650941753</Id>
@@ -4974,7 +4974,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1650945297</Id>
@@ -5009,7 +5009,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1650948193</Id>
@@ -5043,7 +5043,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1650982665</Id>
@@ -5504,7 +5504,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1762511873</Id>
@@ -5539,7 +5539,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1777115129</Id>
@@ -5634,7 +5634,7 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1805387273</Id>
@@ -5683,7 +5683,7 @@
         <Akb>85</Akb>
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1805387785</Id>
@@ -5719,7 +5719,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1805447305</Id>
@@ -5756,7 +5756,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1816301785</Id>
@@ -5805,7 +5805,7 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1816306961</Id>
@@ -5854,7 +5854,7 @@
         <Akb>88</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1816375305</Id>
@@ -5903,7 +5903,7 @@
         <Akb>89</Akb>
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1816833897</Id>
@@ -6130,7 +6130,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1820539881</Id>
@@ -6179,7 +6179,7 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1821171169</Id>
@@ -6274,7 +6274,7 @@
         <Akb>89</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1822231401</Id>
@@ -6878,7 +6878,7 @@
         <Akb>86</Akb>
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Царапины</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1836839593</Id>
@@ -7382,7 +7382,7 @@
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1838209481</Id>
@@ -7464,7 +7464,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1842371137</Id>
@@ -7848,7 +7848,7 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1847300593</Id>
@@ -7897,7 +7897,7 @@
         <Akb>85</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1847315385</Id>
@@ -8029,7 +8029,7 @@
         <GoodsType>Стилусы</GoodsType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1850052065</Id>
@@ -8067,7 +8067,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1850131785</Id>
@@ -8718,7 +8718,7 @@
         <Category>Аудио и видео</Category>
         <GoodsType>Наушники</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1859857097</Id>
@@ -8960,7 +8960,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Крупные царапины</CaseCondition>
         <KBCondition>Потёртости</KBCondition>
-      <Akb>89</Akb></Ad>
+      </Ad>
 
       <Ad>
         <Id>1868814529</Id>
@@ -9047,7 +9047,7 @@
         <Category>Товары для компьютера</Category>
         <GoodsType>Клавиатуры и мыши</GoodsType>
         <Condition>Б/у</Condition>
-      <Devicework>Включается</Devicework></Ad>
+      </Ad>
 
       <Ad>
         <Id>1868990273</Id>
