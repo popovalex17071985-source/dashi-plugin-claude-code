@@ -28,6 +28,7 @@ import {
   StatusArgsSchema,
 } from '../schemas.js'
 import { assertAllowedChat } from '../telegram/gate.js'
+import { teeCockpit } from './cockpit-tee.js'
 import type { GuestQueryRegistry } from '../telegram/guest-queries.js'
 import {
   isTelegramHtmlParseError,
@@ -157,6 +158,7 @@ export function createTelegramApi(bot: Bot, token: string): TelegramApi {
         other.reply_markup = opts.reply_markup
       }
       const sent = await bot.api.sendMessage(chatId, text, other)
+      teeCockpit(chatId, 'out', text)
       return { message_id: sent.message_id }
     },
     async editMessageText(chatId, messageId, text, opts) {
