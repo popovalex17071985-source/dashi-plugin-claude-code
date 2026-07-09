@@ -120,7 +120,7 @@
         <Model>iPhone 15</Model>
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <MemorySize>128 ГБ</MemorySize></Ad>
 
       <Ad>
         <Id>426999248</Id>
@@ -169,7 +169,7 @@
         <Model>iPhone 15</Model>
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <MemorySize>256 ГБ</MemorySize></Ad>
 
       <Ad>
         <Id>426999306</Id>
@@ -217,7 +217,7 @@
         <GoodsType>iPhone</GoodsType>
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
+      <MemorySize>512 ГБ</MemorySize></Ad>
 
       <Ad>
         <Id>427184705</Id>
@@ -295,7 +295,7 @@
         <Category>Телефоны</Category>
         <GoodsType>iPhone</GoodsType>
         <Condition>новое</Condition>
-        <MemorySize>256</MemorySize>
+        <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
 
@@ -444,7 +444,7 @@
         <Category>Телефоны</Category>
         <GoodsType>iPhone</GoodsType>
         <Condition>новое</Condition>
-        <MemorySize>128</MemorySize>
+        <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
 
@@ -4977,6 +4977,41 @@
       </Ad>
 
       <Ad>
+        <Id>1650945297</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Наушники</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Аудио и видео</Category>
+        <Title>Apple AirPods 2 бу</Title>
+        <Description><![CDATA[<p>Apple AirPods 2 бу</p>
+<p>✅Комплект: устройство + коробка</p>
+<p>✅Гарантия 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
+<p>Арт. NLX2Y</p>]]></Description>
+        <Price>6990</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/4593/2550854129/IMG_3956.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4585/2550854121/IMG_3955.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4601/2550854137/IMG_3957.jpg"/>
+        </Images>
+        <Category>Аудио и видео</Category>
+        <GoodsType>Наушники</GoodsType>
+        <Condition>Б/у</Condition>
+      </Ad>
+
+      <Ad>
         <Id>1650948193</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -8757,7 +8792,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/5009/3149263761/IMG_4277.jpg"/>
           <Image url="https://static.insales-cdn.com/images/products/1/5017/3149263769/IMG_4278.jpg"/>
         </Images>
-        <MemorySize>256 ГБ</MemorySize>
+        <MemorySize>512 ГБ</MemorySize>
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
@@ -9097,7 +9132,7 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>81</Akb></Ad>
 
       <Ad>
-        <Id>1650945297</Id>
+        <Id>1854044017</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
         <ListingFee>Package</ListingFee>
@@ -9106,28 +9141,181 @@
         <ManagerName>Тимофей</ManagerName>
         <ContactPhone>+73422140020</ContactPhone>
         <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Наушники</GoodsType>
+        <GoodsType>iPhone</GoodsType>
         <AdType>Товар приобретен на продажу</AdType>
-        <Category>Аудио и видео</Category>
-        <Title>Apple AirPods 2 бу</Title>
-        <Description><![CDATA[<p>Apple AirPods 2 бу</p>
-<p>✅Комплект: устройство + коробка</p>
-<p>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. NLX2Y</p>]]></Description>
-        <Price>6990</Price>
+        <Category>Телефоны</Category>
+        <Title>iPhone XR 64Gb Black бу</Title>
+        <Description><![CDATA[<p>iPhone XR 64Gb Black бу</p>
+<p>✅Отличное состояние, минимальные следы эксплуатации, технически исправен<br>✅Комплект: коробка + устройство + зарядка<br>✅Аккумулятор 100%🔋Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 66536</p>]]></Description>
+        <Price>8700</Price>
         
-        
+        <Model>iPhone XR</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4593/2550854129/IMG_3956.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4585/2550854121/IMG_3955.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4601/2550854137/IMG_3957.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3521/3163188673/IMG_1845.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3529/3163188681/IMG_1846.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3537/3163188689/IMG_1847.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3545/3163188697/IMG_1848.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3553/3163188705/IMG_1849.JPG"/>
         </Images>
-        <Category>Аудио и видео</Category>
-        <GoodsType>Наушники</GoodsType>
-        <Condition>Б/у</Condition>
-      </Ad>
+        <MemorySize>64 ГБ</MemorySize>
+        <Color>черный</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        <GoodsType>iPhone</GoodsType>
+        <RamSize>3 ГБ</RamSize>
+        <Model>iPhone XR</Model>
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
+        <Id>1874199177</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 12 128Gb Black бу</Title>
+        <Description><![CDATA[<p>iPhone 12 128Gb Black бу</p>
+<p>✅Отличное внешнее состояние, есть следы эксплуатации по корпусу, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 83%🔋<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 63245</p>]]></Description>
+        <Price>16990</Price>
+        
+        <Model>iPhone 12</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/6249/3163191401/IMG_1855.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6257/3163191409/IMG_1856.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6265/3163191417/IMG_1857.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6281/3163191433/IMG_1858.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6289/3163191441/IMG_1860.JPG"/>
+        </Images>
+        <MemorySize>128 ГБ</MemorySize>
+        <Color>черный</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        <GoodsType>iPhone</GoodsType>
+        <RamSize>4 ГБ</RamSize>
+        <Model>iPhone 12</Model>
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb></Ad>
+
+      <Ad>
+        <Id>1874199297</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 8 Plus 64Gb Red бу</Title>
+        <Description><![CDATA[<p>iPhone 8 Plus 64Gb Gold бу</p>
+<p>✅Отличное состояние, общие следы эксплуатации, потертости на рамке корпуса, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 100%🔋Заменен в нашем СЦ                                                                                   ✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 54677</p>]]></Description>
+        <Price>7990</Price>
+        
+        <Model>iPhone 8 Plus</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/5241/3163190393/IMG_1840.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/5249/3163190401/IMG_1841.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/5257/3163190409/IMG_1842.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/5273/3163190425/IMG_1843.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/5281/3163190433/IMG_1844.JPG"/>
+        </Images>
+        <MemorySize>64 ГБ</MemorySize>
+        <Color>красный</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        <GoodsType>iPhone</GoodsType>
+        <RamSize>3 ГБ</RamSize>
+        <Model>iPhone 8 Plus</Model>
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
+        <Id>1874200401</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Мобильные телефоны</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 7 32gb Rose Gold бу</Title>
+        <Description><![CDATA[<p>iPhone 7 32gb Rose Gold бу</p>
+<p>✅Отличное внешнее состояние, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 100%🔋Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 42792</p>]]></Description>
+        <Price>5990</Price>
+        
+        <Model>iPhone 7</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/4281/3163189433/IMG_1835.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4297/3163189449/IMG_1836.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4305/3163189457/IMG_1837.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4321/3163189473/IMG_1838.JPG"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4329/3163189481/IMG_1839.JPG"/>
+        </Images>
+        <MemorySize>32 ГБ</MemorySize>
+        <Color>розовый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        <GoodsType>Мобильные телефоны</GoodsType>
+        <RamSize>3 ГБ</RamSize>
+        <Model>iPhone 7</Model>
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 </Ads>
