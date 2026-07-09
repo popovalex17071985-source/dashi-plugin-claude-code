@@ -4977,41 +4977,6 @@
       </Ad>
 
       <Ad>
-        <Id>1650945297</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Наушники</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Аудио и видео</Category>
-        <Title>Apple AirPods 2 бу</Title>
-        <Description><![CDATA[<p>Apple AirPods 2 бу</p>
-<p>✅Комплект: устройство + коробка</p>
-<p>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. NLX2Y</p>]]></Description>
-        <Price>6990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4593/2550854129/IMG_3956.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4585/2550854121/IMG_3955.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4601/2550854137/IMG_3957.jpg"/>
-        </Images>
-        <Category>Аудио и видео</Category>
-        <GoodsType>Наушники</GoodsType>
-        <Condition>Б/у</Condition>
-      </Ad>
-
-      <Ad>
         <Id>1650948193</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -9130,4 +9095,39 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>81</Akb></Ad>
+
+      <Ad>
+        <Id>1650945297</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Наушники</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Аудио и видео</Category>
+        <Title>Apple AirPods 2 бу</Title>
+        <Description><![CDATA[<p>Apple AirPods 2 бу</p>
+<p>✅Комплект: устройство + коробка</p>
+<p>✅Гарантия 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
+<p>Арт. NLX2Y</p>]]></Description>
+        <Price>6990</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/4593/2550854129/IMG_3956.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4585/2550854121/IMG_3955.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4601/2550854137/IMG_3957.jpg"/>
+        </Images>
+        <Category>Аудио и видео</Category>
+        <GoodsType>Наушники</GoodsType>
+        <Condition>Б/у</Condition>
+      </Ad>
 </Ads>
