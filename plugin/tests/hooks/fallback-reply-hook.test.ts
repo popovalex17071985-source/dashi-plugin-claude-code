@@ -24,6 +24,9 @@ import {
   loadDedupState,
   alreadyForwarded,
   loadChannelEnvFile,
+  containsToolCallSyntax,
+  stripToolCallSyntax,
+  sanitizeForForward,
   type DedupState,
 } from '../../scripts/fallback-reply-hook.js'
 
@@ -580,5 +583,98 @@ describe('hook E2E dedup persistence (FIX 1)', () => {
     } finally {
       await route.close()
     }
+  })
+
+  // BUG 1 (2026-07-10): a turn that DID deliver via mcp reply must NOT be
+  // forwarded again. The reply tool_use is the last assistant action (text
+  // emitted first) — the turn-walk must still see it and stay silent.
+  test('reply called this turn → hook is SILENT (no forward)', async () => {
+    dir = mkdtempSync(join(tmpdir(), 'fr-e2e-'))
+    const statePath = join(dir, 'state.json')
+    const transcriptPath = join(dir, 'transcript.jsonl')
+    writeFileSync(
+      transcriptPath,
+      [
+        line('user', TG_PROMPT('164795011', 12)),
+        line('assistant', [{ type: 'text', text: 'Готово.' }], 'u-txt'),
+        line('assistant', [{ type: 'tool_use', name: 'mcp__dashi-channel__reply', input: {} }], 'u-reply'),
+        line('user', [{ type: 'tool_result', content: 'ok' }]),
+      ].join('\n') + '\n',
+      'utf8',
+    )
+
+    const route = await startStubRoute(() => ({ status: 200, json: { status: 'sent' } }))
+    try {
+      const r = await runHook(route.port, statePath, transcriptPath)
+      expect(r.code).toBe(0)
+      // reply already reached the user → the fallback must post NOTHING.
+      expect(route.received.length).toBe(0)
+    } finally {
+      await route.close()
+    }
+  })
+
+  // BUG 2 (2026-07-10): a malformed tool call leaks raw `<invoke …>` syntax into
+  // the assistant TEXT. With no reply this turn, the fallback would fire — but it
+  // must SUPPRESS the leaked machinery rather than post the XML to the user.
+  test('leaked <invoke> tool-call text → suppressed (no forward)', async () => {
+    dir = mkdtempSync(join(tmpdir(), 'fr-e2e-'))
+    const statePath = join(dir, 'state.json')
+    const transcriptPath = join(dir, 'transcript.jsonl')
+    const leaked =
+      'court<invoke name="mcp__dashi-channel__reply">\n' +
+      '<parameter name="chat_id">164795011</parameter>\n' +
+      '<parameter name="text">hi</parameter>\n' +
+      '</invoke>'
+    writeFileSync(
+      transcriptPath,
+      [
+        line('user', TG_PROMPT('164795011', 13)),
+        line('assistant', [{ type: 'text', text: leaked }], 'u-leak'),
+      ].join('\n') + '\n',
+      'utf8',
+    )
+
+    const route = await startStubRoute(() => ({ status: 200, json: { status: 'sent' } }))
+    try {
+      const r = await runHook(route.port, statePath, transcriptPath)
+      expect(r.code).toBe(0)
+      expect(route.received.length).toBe(0)
+    } finally {
+      await route.close()
+    }
+  })
+})
+
+describe('sanitizeForForward (BUG 2 — tool-call syntax leak)', () => {
+  test('normal prose passes through untouched', () => {
+    expect(sanitizeForForward('Готово. Таблица собрана.')).toBe('Готово. Таблица собрана.')
+    expect(containsToolCallSyntax('just text')).toBe(false)
+  })
+
+  test('detects and strips a well-formed invoke block', () => {
+    const leaked =
+      'court<invoke name="mcp__dashi-channel__reply">' +
+      '<parameter name="chat_id">140141496</parameter>' +
+      '<parameter name="text">hi</parameter></invoke>'
+    expect(containsToolCallSyntax(leaked)).toBe(true)
+    // Only the stray "court" prefix survives → too thin → suppressed.
+    expect(sanitizeForForward(leaked)).toBeUndefined()
+    expect(stripToolCallSyntax(leaked)).toBe('court')
+  })
+
+  test('substantial prose around a leaked tag survives (stripped)', () => {
+    const t =
+      'Вот итог по обороту за день, всё сходится с GinCore и таблицей.\n' +
+      '<parameter name="text">noise</parameter>'
+    const out = sanitizeForForward(t)
+    expect(out).toBeDefined()
+    expect(out).not.toContain('<parameter')
+    expect(out).toContain('Вот итог по обороту')
+  })
+
+  test('empty residue after stripping → undefined', () => {
+    const only = '<invoke name="a"><parameter name="b">c</parameter></invoke>'
+    expect(sanitizeForForward(only)).toBeUndefined()
   })
 })

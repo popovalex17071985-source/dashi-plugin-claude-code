@@ -87,8 +87,53 @@ _CHAT_ID_RE = re.compile(r"-?\d+")
 # the path) plus a newline-free capture keep a marker on one line.
 _FILE_MARKER_RE = re.compile(r"\[\[file:[ \t]*([^\]\n]+?)[ \t]*\]\]")
 
+# BUG 2 (2026-07-10) — leaked tool-call machinery. A MALFORMED tool call (e.g. a
+# stray token glued before the block: ``court<invoke name="...">…</invoke>``) is
+# not parsed as a tool_use — the raw XML lands in the assistant's TEXT block and
+# would be relayed to the group verbatim. We strip those blocks/tags; when only
+# junk/emptiness survives, the message WAS the broken call → nothing is sent.
+# Same filter as the DM ``sanitizeForForward`` in scripts/fallback-reply-hook.ts.
+_TOOL_CALL_SYNTAX_RE = re.compile(
+    r"<\/?(?:antml:)?(?:function_calls|invoke|parameter)\b", re.IGNORECASE
+)
+_TOOL_CALL_BLOCK_RES = (
+    re.compile(
+        r"<(?:antml:)?function_calls\b[\s\S]*?</(?:antml:)?function_calls>",
+        re.IGNORECASE,
+    ),
+    re.compile(r"<(?:antml:)?invoke\b[\s\S]*?</(?:antml:)?invoke>", re.IGNORECASE),
+    re.compile(r"<(?:antml:)?parameter\b[\s\S]*?</(?:antml:)?parameter>", re.IGNORECASE),
+)
+_TOOL_CALL_TAG_RE = re.compile(
+    r"<\/?(?:antml:)?(?:function_calls|invoke|parameter)\b[^>]*>", re.IGNORECASE
+)
+# Below this many non-whitespace chars, a message that CONTAINED tool-call syntax
+# is treated as pure machinery + a stray fragment, not a real answer → dropped.
+_MIN_SANITIZED_PROSE = 8
+
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 logger = logging.getLogger("stop-to-outbox")
+
+
+def _sanitize_tool_call_syntax(text: str) -> str | None:
+    """Strip leaked tool-call XML; return None when only junk/empty remains.
+
+    Normal prose (no tool-call tags) is returned unchanged. Text that carried
+    ``<invoke …>`` / ``<parameter …>`` machinery is stripped of whole blocks and
+    stray tags; if the surviving prose is too thin to be a real answer, returns
+    ``None`` so the caller relays NOTHING instead of the raw syntax.
+    """
+    if not _TOOL_CALL_SYNTAX_RE.search(text):
+        return text
+    out = text
+    for rx in _TOOL_CALL_BLOCK_RES:
+        out = rx.sub(" ", out)
+    out = _TOOL_CALL_TAG_RE.sub(" ", out)
+    out = re.sub(r"[ \t]+\n", "\n", out)
+    out = re.sub(r"\n{3,}", "\n\n", out).strip()
+    if len(re.sub(r"\s+", "", out)) < _MIN_SANITIZED_PROSE:
+        return None
+    return out
 
 
 def read_last_assistant_text(transcript_path: Path) -> tuple[str, str | None] | None:
@@ -401,6 +446,13 @@ def main() -> int:
     attach_files = [m.strip() for m in _FILE_MARKER_RE.findall(assistant_text) if m.strip()]
     if attach_files:
         assistant_text = _FILE_MARKER_RE.sub("", assistant_text).strip()
+
+    # BUG 2 — drop leaked tool-call machinery. A malformed tool call spills its
+    # `<invoke …>` / `<parameter …>` XML into the visible text; strip it. When
+    # only junk survives, blank the text (a file-only reply still sends its
+    # attachments; the "nothing to deliver" guard below drops a text-only leak).
+    sanitized = _sanitize_tool_call_syntax(assistant_text)
+    assistant_text = sanitized if sanitized is not None else ""
 
     # Nothing to deliver: neither visible text nor any attachment.
     if not assistant_text.strip() and not attach_files:

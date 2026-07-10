@@ -101,6 +101,59 @@ export function truncateForTelegram(text: string): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────
+// BUG 2 — strip leaked tool-call machinery from a forwarded final text.
+//
+// When a tool call is MALFORMED (e.g. a stray token glued before the block,
+// `court<invoke name="...">…</invoke>`), the harness does NOT parse it as a
+// tool_use — the raw XML lands in the assistant's TEXT block. The fallback
+// forward would then post that machinery (`<invoke …>`, `<parameter …>`,
+// `</invoke>`) verbatim to the warchief. We remove those blocks/tags; when only
+// junk or emptiness survives, the message WAS the broken call → forward nothing.
+// ─────────────────────────────────────────────────────────────────────
+
+// Fast presence probe: any opener/closer of a tool-call tag, namespaced
+// (`antml:`) or bare. Used to leave normal prose completely untouched.
+const TOOL_CALL_SYNTAX_RE = /<\/?(?:antml:)?(?:function_calls|invoke|parameter)\b/i
+
+/** True when the text carries any tool-call XML tag (well-formed or stray). */
+export function containsToolCallSyntax(text: string): boolean {
+  return TOOL_CALL_SYNTAX_RE.test(text)
+}
+
+// Below this many non-whitespace chars, a message that CONTAINED tool-call
+// syntax is treated as pure machinery + a stray fragment (the "court" prefix),
+// not a real answer → suppressed rather than forwarded.
+const MIN_SANITIZED_PROSE = 8
+
+/** Remove tool-call blocks and stray tags; collapse leftover whitespace. */
+export function stripToolCallSyntax(text: string): string {
+  let out = text
+  // Whole well-formed blocks first (non-greedy), namespaced or bare.
+  out = out.replace(/<(?:antml:)?function_calls\b[\s\S]*?<\/(?:antml:)?function_calls>/gi, ' ')
+  out = out.replace(/<(?:antml:)?invoke\b[\s\S]*?<\/(?:antml:)?invoke>/gi, ' ')
+  out = out.replace(/<(?:antml:)?parameter\b[\s\S]*?<\/(?:antml:)?parameter>/gi, ' ')
+  // Residual stray tags (unbalanced leak): drop the tag tokens themselves.
+  out = out.replace(/<\/?(?:antml:)?(?:function_calls|invoke|parameter)\b[^>]*>/gi, ' ')
+  return out
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+/**
+ * Decide the text to forward. Normal prose passes through untouched. Text that
+ * contained tool-call syntax is stripped; if the surviving prose is too thin to
+ * be a real answer, returns undefined → the caller forwards NOTHING (never leaks
+ * `<invoke …>` machinery, never posts a stray "court" fragment).
+ */
+export function sanitizeForForward(text: string): string | undefined {
+  if (!containsToolCallSyntax(text)) return text
+  const cleaned = stripToolCallSyntax(text)
+  if (cleaned.replace(/\s+/g, '').length < MIN_SANITIZED_PROSE) return undefined
+  return cleaned
+}
+
+// ─────────────────────────────────────────────────────────────────────
 // Transcript turn-walk. Ported from stop-to-outbox.py's
 // read_last_assistant_text + _is_user_prompt: walk the CURRENT TURN backward,
 // stopping at the last genuine user prompt, collecting the most recent
@@ -704,13 +757,40 @@ async function main(): Promise<void> {
     }
   }
 
+  // BUG 1 — final anti-duplicate guard. The retry loop can BREAK on a stable,
+  // TRAILING interim text a beat BEFORE the turn's reply tool_use line is
+  // durably flushed to the transcript: the model emits the final text and then
+  // delivers it via `mcp__dashi-channel__reply` as its last action. At that
+  // instant `replied` reads false (the reply block hasn't landed yet) and the
+  // hook would forward a duplicate of what reply already sent. The turn-walk
+  // itself is correct on a COMPLETE transcript — the miss is purely a flush
+  // race — so we take ONE more fresh read (after a short settle) and abort if
+  // the reply signal is now present. A genuinely reply-less turn just
+  // re-confirms `replied === false` here and proceeds to forward as before.
+  try {
+    const settle = Math.min(delayMs || 120, Math.max(0, SLEEP_BUDGET_MS - sleptMs))
+    if (settle > 0) await sleep(settle)
+    const finalTurn = analyzeCurrentTurn(tailReadTranscript(transcriptPath))
+    if (finalTurn.replied) return
+    // Prefer the freshest turn view (text/uuid/chatId) when it still carries
+    // final text; otherwise keep the last good `turn` from the loop.
+    if (finalTurn.text !== undefined && finalTurn.text.trim().length > 0) turn = finalTurn
+  } catch {
+    /* a transient re-read failure must not gate delivery — keep last `turn` */
+  }
+
   // Remember the chat_id from any Telegram-anchored turn so background-triggered
   // turns (task-notification boundary, no envelope) can still reach the user.
   const lastPath = lastChatPath(env)
   if (turn.chatId !== undefined) persistLastChat(lastPath, turn.chatId)
 
   if (turn.replied) return
-  const text = turn.text
+  const rawText = turn.text
+  if (rawText === undefined || rawText.trim().length === 0) return
+  // BUG 2 — never forward leaked tool-call machinery. Strip `<invoke …>` /
+  // `<parameter …>` blocks from a malformed-tool-call text; if only junk/empty
+  // survives, stay silent instead of posting the raw syntax to the warchief.
+  const text = sanitizeForForward(rawText)
   if (text === undefined || text.trim().length === 0) return
   // chat_id from the turn boundary, else the last DM chat_id we saw. Only when
   // both are absent (e.g. a group session with no prior anchor) do we go silent.

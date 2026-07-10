@@ -744,3 +744,42 @@ describe('attachment markers ([[file: …]])', () => {
     expect(msg.text).toBe('Здравствуй, вождь.')
   })
 })
+
+describe('stop-to-outbox.py — BUG 2 leaked tool-call syntax', () => {
+  test('leaked <invoke>/<parameter> machinery → nothing written', () => {
+    const leaked =
+      'court<invoke name="mcp__dashi-channel__reply">\n' +
+      '<parameter name="chat_id">164795011</parameter>\n' +
+      '<parameter name="text">hi</parameter>\n' +
+      '</invoke>'
+    const transcript = writeTranscript([
+      userLine('вопрос'),
+      assistantLine([{ type: 'text', text: leaked }]),
+    ])
+    const r = run(
+      { CHAT_ID, MULTICHAT_STATE_DIR: stateDir },
+      { transcript_path: transcript, session_id: 's-leak' },
+    )
+    expect(r.code).toBe(0)
+    // Only the stray "court" prefix survives → junk → nothing delivered.
+    expect(listOutboxJson().length).toBe(0)
+  })
+
+  test('prose with a stray tag → stripped, still delivered', () => {
+    const t = 'Оборот за день сходится с GinCore.<parameter name="x">n</parameter>'
+    const transcript = writeTranscript([
+      userLine('вопрос'),
+      assistantLine([{ type: 'text', text: t }]),
+    ])
+    const r = run(
+      { CHAT_ID, MULTICHAT_STATE_DIR: stateDir },
+      { transcript_path: transcript, session_id: 's-prose' },
+    )
+    expect(r.code).toBe(0)
+    const files = listOutboxJson()
+    expect(files.length).toBe(1)
+    const text = readOutboxPayload(files[0]!).text as string
+    expect(text).not.toContain('<parameter')
+    expect(text).toContain('Оборот за день сходится')
+  })
+})
