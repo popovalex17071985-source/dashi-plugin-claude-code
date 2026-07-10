@@ -5053,8 +5053,8 @@
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
         <KBLayout>Нет кириллицы</KBLayout>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
+        <ScreenCondition>Мелкие царапины</ScreenCondition>
+        <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Потёртости</KBCondition>
       </Ad>
 
@@ -5277,7 +5277,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/5777/2658850449/IMG_5663.jpg"/>
         </Images>
         <MemorySize>128</MemorySize>
-        <Color>серебристый</Color>
+        <Color>Серебряный</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
         <GoodsType>Планшеты</GoodsType>
@@ -5290,7 +5290,7 @@
         <SimSlot>Есть</SimSlot>
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
-      </Ad>
+      <Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1730301473</Id>
@@ -6514,7 +6514,7 @@
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
         <KBLayout>Есть кириллица</KBLayout>
-        <ScreenCondition>Без дефектов</ScreenCondition>
+        <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Потёртости</KBCondition>
       </Ad>
@@ -9176,7 +9176,7 @@
         </Images>
         <Category>Настольные компьютеры</Category>
         <GoodsType>Моноблоки</GoodsType>
-      </Ad>
+      <Condition>Б/у</Condition></Ad>
 
       <Ad>
         <Id>1874129113</Id>
