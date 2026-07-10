@@ -14,7 +14,6 @@
 
 import type { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import type { Logger } from '../log.js'
-import { teeCockpit } from './cockpit-tee.js'
 
 export type ChannelEvent = {
   content: string
@@ -68,9 +67,6 @@ export async function sendChannelNotification(
         meta: event.meta,
       },
     })
-    // Mirror inbound into the cockpit transcript (no-op unless it's the
-    // cockpit DM). Belt-and-suspenders after a successful notify.
-    if (event.meta.chat_id) teeCockpit(event.meta.chat_id, 'in', event.content)
     return true
   } catch (err) {
     log.error('channel notification failed', {
