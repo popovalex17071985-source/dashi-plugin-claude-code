@@ -7774,40 +7774,6 @@
       </Ad>
 
       <Ad>
-        <Id>1847351793</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Стилусы</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple Pencil 2 бу</Title>
-        <Description><![CDATA[<p>Apple Pencil 2 бу</p>
-<p>✅Отличное состояние, полностью исправен<br>✅Гарантия от магазина 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. zjkm9</p>]]></Description>
-        <Price>6490</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/553/3148874281/IMG_1678.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/561/3148874289/IMG_1676.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/569/3148874297/IMG_1677.jpg"/>
-        </Images>
-        <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Стилусы</GoodsType>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
-
-      <Ad>
         <Id>1850052065</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -10225,4 +10191,38 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>81</Akb></Ad>
+
+      <Ad>
+        <Id>1847351793</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Стилусы</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Планшеты и электронные книги</Category>
+        <Title>Apple Pencil 2 бу</Title>
+        <Description><![CDATA[<p>Apple Pencil 2 бу</p>
+<p>✅Отличное состояние, полностью исправен<br>✅Гарантия от магазина 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. zjkm9</p>]]></Description>
+        <Price>6490</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/561/3148874289/IMG_1676.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/553/3148874281/IMG_1678.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/569/3148874297/IMG_1677.jpg"/>
+        </Images>
+        <Category>Планшеты и электронные книги</Category>
+        <GoodsType>Стилусы</GoodsType>
+        <Condition>Б/у</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+      </Ad>
 </Ads>
