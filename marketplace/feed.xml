@@ -2160,7 +2160,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2973121</Revalidate></Ad>
+      <Revalidate>2973127</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2630,7 +2630,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973121</Revalidate></Ad>
+      <Revalidate>2973127</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2783,7 +2783,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973121</Revalidate></Ad>
+      <Revalidate>2973127</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2936,7 +2936,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973121</Revalidate></Ad>
+      <Revalidate>2973127</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3548,7 +3548,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973121</Revalidate></Ad>
+      <Revalidate>2973127</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3650,7 +3650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973121</Revalidate></Ad>
+      <Revalidate>2973127</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3956,7 +3956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973121</Revalidate></Ad>
+      <Revalidate>2973127</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4109,7 +4109,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973121</Revalidate></Ad>
+      <Revalidate>2973127</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -9274,53 +9274,6 @@
       <ScreenCondition>Мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
-        <Id>1874198145</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 14 Pro Max 128Gb Deep Purple бу</Title>
-        <Description><![CDATA[<p>iPhone 14 Pro Max 128Gb Deep Purple бу</p>
-<p>✅Отличное состояние, мелкие царапинки на дисплее, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 85%🔋 <br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 68848</p>]]></Description>
-        <Price>37990</Price>
-        
-        <Model>iPhone 14 Pro Max</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6305/3165632673/IMG_2011.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6321/3165632689/IMG_2012.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6329/3165632697/IMG_2013.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6337/3165632705/IMG_2014.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6345/3165632713/IMG_2015.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>фиолетовый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
-        <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14 Pro Max</Model>
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>85</Akb></Ad>
-
-      <Ad>
         <Id>1874198817</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -9741,54 +9694,6 @@
         <StrapType>Силикон</StrapType>
         <DeviceWork>Включается</DeviceWork>
         <Akb>100</Akb>
-        <ScreenFlaws>Без дефектов</ScreenFlaws>
-        <CaseFlaws>Без дефектов</CaseFlaws>
-      <GoodsSubType>Смарт-часы</GoodsSubType></Ad>
-
-      <Ad>
-        <Id>1874680105</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>Apple Watch Series 8 41mm Starlight бу</Title>
-        <Description><![CDATA[<p>Apple Watch Series 8 41mm Starlight бу</p>
-<p>✅Отличное состояние, технически исправны <br>✅Комплект: часы + коробка + зарядка<br>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. xxvq6</p>]]></Description>
-        <Price>11990</Price>
-        
-        <Model>Apple Watch 8</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2321/3165628689/IMG_1983.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2329/3165628697/IMG_1984.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2337/3165628705/IMG_1985.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2345/3165628713/IMG_1986.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2361/3165628729/IMG_1987.jpg"/>
-        </Images>
-        <Color>Бежевый</Color>
-        <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch 8</Model>
-        <ProductType>Смарт-часы или браслет</ProductType>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Brand>Apple</Brand>
-        <ProductSubType>смарт-часы</ProductSubType>
-        <Gender>унисекс</Gender>
-        <StrapType>Полиуретановый</StrapType>
-        <DeviceWork>Включается</DeviceWork>
-        <Akb>83</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
       <GoodsSubType>Смарт-часы</GoodsSubType></Ad>
