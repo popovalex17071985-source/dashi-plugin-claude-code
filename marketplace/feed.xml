@@ -2160,7 +2160,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2973361</Revalidate></Ad>
+      <Revalidate>2973367</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2630,7 +2630,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973361</Revalidate></Ad>
+      <Revalidate>2973367</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2783,7 +2783,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973361</Revalidate></Ad>
+      <Revalidate>2973367</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2936,7 +2936,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973361</Revalidate></Ad>
+      <Revalidate>2973367</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3548,7 +3548,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973361</Revalidate></Ad>
+      <Revalidate>2973367</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3650,7 +3650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973361</Revalidate></Ad>
+      <Revalidate>2973367</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3956,7 +3956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973361</Revalidate></Ad>
+      <Revalidate>2973367</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4109,7 +4109,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973361</Revalidate></Ad>
+      <Revalidate>2973367</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -4727,55 +4727,6 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <Akb>93</Akb>
-      </Ad>
-
-      <Ad>
-        <Id>1646615345</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad Pro 11&quot; 2021 M1 256Gb Space gray WiFi + LTE бу</Title>
-        <Description><![CDATA[<p>Apple iPad Pro 11" 2021 M1 256Gb Space gray WiFi + LTE бу</p>
-<p>✅Комплект: коробка + устройство <br>✅Гарантия от магазина: 180 дней<br>✅Отличное внешнее состояние</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. QLXGC</p>]]></Description>
-        <Price>51990</Price>
-        
-        <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2289/2536974577/IMG_3739.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2353/2536974641/IMG_3740.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2369/2536974657/IMG_3741.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2417/2536974705/IMG_3743.jpg"/>
-        </Images>
-        <MemorySize>256</MemorySize>
-        <Color>серый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <RamSize>6</RamSize>
-        <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Есть</SimSlot>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-        <Devicework>Включается</Devicework>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <Akb>96</Akb>
       </Ad>
 
       <Ad>
@@ -6188,99 +6139,6 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1827159825</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Мобильные телефоны</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 11 Pro 64Gb Midnight Green бу</Title>
-        <Description><![CDATA[<p>iPhone 11 Pro 64Gb Midnight Green бу</p>
-<p>✅Отличное состояние, есть царапинки на дисплее, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 100%🔋 Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 18449</p>]]></Description>
-        <Price>15990</Price>
-        
-        <Model>iPhone 11 Pro Max</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/433/3023045041/IMG_7202.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/449/3023045057/IMG_7205.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/457/3023045065/IMG_7206.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/465/3023045073/IMG_7204.jpg"/>
-        </Images>
-        <MemorySize>64 ГБ</MemorySize>
-        <Color>зеленый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
-        <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 11 Pro Max</Model>
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1831829129</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 16 Pro 128Gb White Titanium бу</Title>
-        <Description><![CDATA[<p>iPhone 16 Pro 128Gb White Titanium бу</p>
-<p>✅Cостояние отличное, технически исправен<br>✅Комплект: устройство + коробка <br>✅Аккумулятор 89%🔋<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 51189</p>]]></Description>
-        <Price>60990</Price>
-        
-        <Model>iPhone 16 Pro</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1313/3035882785/IMG_3650.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1329/3035882801/IMG_3651.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1345/3035882817/IMG_3654.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1377/3035882849/IMG_3652.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1385/3035882857/IMG_3653.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>белый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
-        <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>89</Akb></Ad>
 
       <Ad>
         <Id>1832940497</Id>
@@ -7700,53 +7558,6 @@
       <ScreenCondition>Мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
-        <Id>1859688865</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 16 Pro 128Gb White Titanium e-sim бу</Title>
-        <Description><![CDATA[<p>iPhone 16 Pro 128Gb White Titanium e-sim бу</p>
-<p>✅Cостояние отличное, технически исправен<br>✅Комплект: устройство + коробка <br>✅Аккумулятор 93%🔋<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 55999</p>]]></Description>
-        <Price>53990</Price>
-        
-        <Model>iPhone 16 Pro</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6969/3129211705/IMG_1309_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6977/3129211713/IMG_1310_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6985/3129211721/IMG_1311_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6993/3129211729/IMG_1312_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7001/3129211737/IMG_1313_2.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>белый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
-        <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>93</Akb></Ad>
-
-      <Ad>
         <Id>1859692993</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -8246,54 +8057,6 @@
         <GoodsType>Планшеты</GoodsType>
         <RamSize>8</RamSize>
         <Model>iPad Pro 12.9 (5-го поколения) (2021)</Model>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Нет</SimSlot>
-        <Devicework>Включается</Devicework>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <Akb>100</Akb>
-      </Ad>
-
-      <Ad>
-        <Id>1868783761</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad Air 7 13&quot; (2025) 128Gb WiFi Blue бу</Title>
-        <Description><![CDATA[<p>Apple iPad Air 7 13" (2025) 128Gb WiFi Blue бу</p>
-<p>✅Комплект: устройство + кабель + блок <br>✅Гарантия от магазина: 180 дней<br>✅ Состояние нового планшета, просто вскрыт</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. c9x3x</p>]]></Description>
-        <Price>56990</Price>
-        
-        <Model>iPad Air 13 (2025)</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2513/3148868049/IMG_1643.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2537/3148868073/IMG_1644.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2553/3148868089/IMG_1645.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2561/3148868097/IMG_1646.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2569/3148868105/IMG_1647.jpg"/>
-        </Images>
-        <MemorySize>128</MemorySize>
-        <Color>голубой</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <RamSize>8</RamSize>
-        <Model>iPad Air 13 (2025)</Model>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -9726,4 +9489,143 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
+        <Id>1827159825</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Мобильные телефоны</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 11 Pro Max 64Gb Midnight Green бу</Title>
+        <Description><![CDATA[<p>iPhone 11 Pro Max 64Gb Midnight Green бу</p>
+<p>✅Отличное состояние, есть царапинки на дисплее, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 100%🔋 Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 18449</p>]]></Description>
+        <Price>15990</Price>
+        
+        <Model>iPhone 11 Pro Max</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/433/3023045041/IMG_7202.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/449/3023045057/IMG_7205.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/457/3023045065/IMG_7206.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/465/3023045073/IMG_7204.jpg"/>
+        </Images>
+        <MemorySize>64 ГБ</MemorySize>
+        <Color>зеленый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        <GoodsType>Мобильные телефоны</GoodsType>
+        <RamSize>4 ГБ</RamSize>
+        <Model>iPhone 11 Pro Max</Model>
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
+        <Id>1831829129</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 16 Pro 128Gb White Titanium бу</Title>
+        <Description><![CDATA[<p>iPhone 16 Pro 128Gb White Titanium бу</p>
+<p>✅Cостояние отличное, технически исправен<br>✅Комплект: устройство + коробка <br>✅Аккумулятор 89%🔋<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 51189</p>]]></Description>
+        <Price>59990</Price>
+        
+        <Model>iPhone 16 Pro</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/1313/3035882785/IMG_3650.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1329/3035882801/IMG_3651.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1345/3035882817/IMG_3654.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1377/3035882849/IMG_3652.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1385/3035882857/IMG_3653.jpg"/>
+        </Images>
+        <MemorySize>128 ГБ</MemorySize>
+        <Color>белый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        <GoodsType>iPhone</GoodsType>
+        <RamSize>8 ГБ</RamSize>
+        <Model>iPhone 16 Pro</Model>
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>89</Akb></Ad>
+
+      <Ad>
+        <Id>1874697249</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 16 256Gb Ultramarine бу</Title>
+        <Description><![CDATA[<p>iPhone 16 256Gb Ultramarine бу</p>
+<p>✅Отличное состояние телефона, технически исправен<br>✅Комплект: устройство<br>✅Аккумулятор 91%🔋 <br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 00981</p>]]></Description>
+        <Price>50990</Price>
+        
+        <Model>iPhone 16</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/7025/3165633393/IMG_2003.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/7049/3165633417/IMG_2004.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/7065/3165633433/IMG_2005.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/7073/3165633441/IMG_2006.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>голубой</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        <GoodsType>iPhone</GoodsType>
+        <RamSize>8 ГБ</RamSize>
+        <Model>iPhone 16</Model>
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>91</Akb></Ad>
 </Ads>
