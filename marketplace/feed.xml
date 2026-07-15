@@ -2160,7 +2160,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2973499</Revalidate></Ad>
+      <Revalidate>2973505</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2630,7 +2630,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973499</Revalidate></Ad>
+      <Revalidate>2973505</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2783,7 +2783,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973499</Revalidate></Ad>
+      <Revalidate>2973505</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2936,7 +2936,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973499</Revalidate></Ad>
+      <Revalidate>2973505</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3548,7 +3548,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973499</Revalidate></Ad>
+      <Revalidate>2973505</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3650,7 +3650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973499</Revalidate></Ad>
+      <Revalidate>2973505</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3956,7 +3956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973499</Revalidate></Ad>
+      <Revalidate>2973505</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4109,7 +4109,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973499</Revalidate></Ad>
+      <Revalidate>2973505</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -9447,4 +9447,53 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
+        <Id>1646615345</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Планшеты</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Планшеты и электронные книги</Category>
+        <Title>Apple iPad Pro 11&quot; 2021 M1 256Gb Space gray WiFi + LTE бу</Title>
+        <Description><![CDATA[<p>Apple iPad Pro 11" 2021 M1 256Gb Space gray WiFi + LTE бу</p>
+<p>✅Комплект: коробка + устройство <br>✅Гарантия от магазина: 180 дней<br>✅Отличное внешнее состояние</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. QLXGC</p>]]></Description>
+        <Price>51990</Price>
+        
+        <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/2289/2536974577/IMG_3739.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2353/2536974641/IMG_3740.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2369/2536974657/IMG_3741.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2417/2536974705/IMG_3743.jpg"/>
+        </Images>
+        <MemorySize>256</MemorySize>
+        <Color>серый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Планшеты и электронные книги</Category>
+        <GoodsType>Планшеты</GoodsType>
+        <RamSize>6</RamSize>
+        <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
+        <Condition>Б/у</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <ProductsType>Планшет</ProductsType>
+        <Brand>Apple</Brand>
+        <SimSlot>Есть</SimSlot>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+        <Devicework>Включается</Devicework>
+        <ScreenCondition>Без дефектов</ScreenCondition>
+        <CaseCondition>Без дефектов</CaseCondition>
+        <Akb>96</Akb>
+      </Ad>
 </Ads>
