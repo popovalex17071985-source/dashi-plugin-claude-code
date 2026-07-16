@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2973625</Revalidate></Ad>
+      <Revalidate>2973631</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2649,7 +2649,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973625</Revalidate></Ad>
+      <Revalidate>2973631</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2802,7 +2802,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973625</Revalidate></Ad>
+      <Revalidate>2973631</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2955,7 +2955,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973625</Revalidate></Ad>
+      <Revalidate>2973631</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3567,7 +3567,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973625</Revalidate></Ad>
+      <Revalidate>2973631</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3669,7 +3669,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973625</Revalidate></Ad>
+      <Revalidate>2973631</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3975,7 +3975,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973625</Revalidate></Ad>
+      <Revalidate>2973631</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4128,7 +4128,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973625</Revalidate></Ad>
+      <Revalidate>2973631</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -9436,152 +9436,6 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
-        <Id>1877383257</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad 7 (2019) 32Gb Gold WiFi бу</Title>
-        <Description><![CDATA[<p>Apple iPad 7 (2019) 32Gb Gold WiFi бу</p>
-<p>✅Отличное внешнее состояние, общие следы эксплуатации, технически исправен<br>✅Гарантия от магазина: 180 дней<br>✅Комплект: устройство + коробка</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. wmf3p</p>]]></Description>
-        <Price>10990</Price>
-        
-        <Model>iPad (7-го поколения) (2019)</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3801/3173592793/IMG_2174.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3809/3173592801/IMG_2175.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3817/3173592809/IMG_2176.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3825/3173592817/IMG_2177.jpg"/>
-        </Images>
-        <MemorySize>32 ГБ</MemorySize>
-        <Color>золотой</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <RamSize>2,0</RamSize>
-        <Model>iPad (7-го поколения) (2019)</Model>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Нет</SimSlot>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-        <Devicework>Включается</Devicework>
-        <ScreenCondition>1–2 мелкие царапины</ScreenCondition>
-        <CaseCondition>Мелкие царапины</CaseCondition>
-        <Akb>90</Akb>
-      </Ad>
-
-      <Ad>
-        <Id>1877403433</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Apple</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Ноутбуки</Category>
-        <Title>Apple MacBook Air 13&quot; 2023 M3/16GB/256GB Midnight MC8K4 бу</Title>
-        <Description><![CDATA[<p>Apple MacBook Air 13" 2023 M3/16GB/256GB Midnight MC8K4 бу</p>
-<p>✅Отличное сocтoяниe, общие следы эксплуатации, технически исправен<br>✅Koмплект: коробка + зарядка + устройство <br>✅Kоличeство циклов пeрезapядки: 68 циклов 100%🔋<br>✅Гapaнтия от магaзина 180 дней!</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. qd24r</p>
-<p> </p>]]></Description>
-        <Price>73990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4361/3173560585/IMG_2214.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4369/3173560593/IMG_2215.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4337/3173560561/IMG_2211.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4345/3173560569/IMG_2212.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4353/3173560577/IMG_2213.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4425/3173560649/IMG_2218.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4377/3173560601/IMG_2216.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4385/3173560609/IMG_2217.jpg"/>
-        </Images>
-        <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
-        <Condition>Б/у</Condition>
-        <Devicework>Включается</Devicework>
-        <AkbH>Больше 30 минут</AkbH>
-        <KBLayout>Есть кириллица</KBLayout>
-        <ScreenCondition>Мелкие царапины</ScreenCondition>
-        <CaseCondition>Мелкие царапины</CaseCondition>
-        <KBCondition>Без дефектов</KBCondition>
-      </Ad>
-
-      <Ad>
-        <Id>1877417513</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Apple</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Ноутбуки</Category>
-        <Title>Apple MacBook Air 15&quot; 2023 M3/8GB/256GB Starlight бу</Title>
-        <Description><![CDATA[<p>Apple MacBook Air 15" 2023 M3/8GB/256 Starlight бу</p>
-<p>✅Отличное сocтoяниe, технически исправен<br>✅Koмплект: зарядка + устройство + коробка<br>✅Kоличeство циклов пeрезapядки: 120 цикла 95%🔋<br>✅Гapaнтия от магaзина 180 дней!</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 6dkm</p>]]></Description>
-        <Price>66990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6257/3173562481/IMG_2241.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6249/3173562473/IMG_2240.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7121/3173563345/IMG_2230.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6153/3173562377/IMG_2232.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6177/3173562401/IMG_2233.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6217/3173562441/IMG_2238.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6193/3173562417/IMG_2237.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6497/3173562721/IMG_2242.jpg"/>
-        </Images>
-        <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
-        <Condition>Б/у</Condition>
-        <Devicework>Включается</Devicework>
-        <AkbH>Больше 30 минут</AkbH>
-        <KBLayout>Есть кириллица</KBLayout>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <KBCondition>Без дефектов</KBCondition>
-      </Ad>
-
-      <Ad>
         <Id>1877380745</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -9672,6 +9526,55 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>87</Akb></Ad>
+
+      <Ad>
+        <Id>1877383257</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Планшеты</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Планшеты и электронные книги</Category>
+        <Title>Apple iPad 7 (2019) 32Gb Gold WiFi бу</Title>
+        <Description><![CDATA[<p>Apple iPad 7 (2019) 32Gb Gold WiFi бу</p>
+<p>✅Отличное внешнее состояние, общие следы эксплуатации, технически исправен<br>✅Гарантия от магазина: 180 дней<br>✅Комплект: устройство + коробка</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. wmf3p</p>]]></Description>
+        <Price>10990</Price>
+        
+        <Model>iPad (7-го поколения) (2019)</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/3801/3173592793/IMG_2174.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3809/3173592801/IMG_2175.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3817/3173592809/IMG_2176.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3825/3173592817/IMG_2177.jpg"/>
+        </Images>
+        <MemorySize>32 ГБ</MemorySize>
+        <Color>золотой</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Планшеты и электронные книги</Category>
+        <GoodsType>Планшеты</GoodsType>
+        <RamSize>2,0</RamSize>
+        <Model>iPad (7-го поколения) (2019)</Model>
+        <Condition>Б/у</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <ProductsType>Планшет</ProductsType>
+        <Brand>Apple</Brand>
+        <SimSlot>Нет</SimSlot>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
+        <Devicework>Включается</Devicework>
+        <ScreenCondition>1–2 мелкие царапины</ScreenCondition>
+        <CaseCondition>Мелкие царапины</CaseCondition>
+        <Akb>90</Akb>
+      </Ad>
 
       <Ad>
         <Id>1877385041</Id>
@@ -9812,4 +9715,101 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>85</Akb></Ad>
+
+      <Ad>
+        <Id>1877403433</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Apple</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Ноутбуки</Category>
+        <Title>Apple MacBook Air 13&quot; 2023 M3/16GB/256GB Midnight MC8K4 бу</Title>
+        <Description><![CDATA[<p>Apple MacBook Air 13" 2023 M3/16GB/256GB Midnight MC8K4 бу</p>
+<p>✅Отличное сocтoяниe, общие следы эксплуатации, технически исправен<br>✅Koмплект: коробка + зарядка + устройство <br>✅Kоличeство циклов пeрезapядки: 68 циклов 100%🔋<br>✅Гapaнтия от магaзина 180 дней!</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. qd24r</p>
+<p> </p>]]></Description>
+        <Price>73990</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/4361/3173560585/IMG_2214.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4369/3173560593/IMG_2215.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4337/3173560561/IMG_2211.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4345/3173560569/IMG_2212.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4353/3173560577/IMG_2213.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4425/3173560649/IMG_2218.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4377/3173560601/IMG_2216.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/4385/3173560609/IMG_2217.jpg"/>
+        </Images>
+        <Category>Ноутбуки</Category>
+        <GoodsType>Apple</GoodsType>
+        <Condition>Б/у</Condition>
+        <Devicework>Включается</Devicework>
+        <AkbH>Больше 30 минут</AkbH>
+        <KBLayout>Есть кириллица</KBLayout>
+        <ScreenCondition>Мелкие царапины</ScreenCondition>
+        <CaseCondition>Мелкие царапины</CaseCondition>
+        <KBCondition>Без дефектов</KBCondition>
+      </Ad>
+
+      <Ad>
+        <Id>1877417513</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Apple</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Ноутбуки</Category>
+        <Title>Apple MacBook Air 15&quot; 2023 M3/8GB/256GB Starlight бу</Title>
+        <Description><![CDATA[<p>Apple MacBook Air 15" 2023 M3/8GB/256 Starlight бу</p>
+<p>✅Отличное сocтoяниe, технически исправен<br>✅Koмплект: зарядка + устройство + коробка<br>✅Kоличeство циклов пeрезapядки: 120 цикла 95%🔋<br>✅Гapaнтия от магaзина 180 дней!</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 6dkm</p>]]></Description>
+        <Price>66990</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/6257/3173562481/IMG_2241.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6249/3173562473/IMG_2240.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/7121/3173563345/IMG_2230.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6153/3173562377/IMG_2232.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6177/3173562401/IMG_2233.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6217/3173562441/IMG_2238.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6193/3173562417/IMG_2237.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6497/3173562721/IMG_2242.jpg"/>
+        </Images>
+        <Category>Ноутбуки</Category>
+        <GoodsType>Apple</GoodsType>
+        <Condition>Б/у</Condition>
+        <Devicework>Включается</Devicework>
+        <AkbH>Больше 30 минут</AkbH>
+        <KBLayout>Есть кириллица</KBLayout>
+        <ScreenCondition>Без дефектов</ScreenCondition>
+        <CaseCondition>Без дефектов</CaseCondition>
+        <KBCondition>Без дефектов</KBCondition>
+      </Ad>
 </Ads>
