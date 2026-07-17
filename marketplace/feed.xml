@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2973811</Revalidate></Ad>
+      <Revalidate>2973817</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2649,7 +2649,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973811</Revalidate></Ad>
+      <Revalidate>2973817</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2802,7 +2802,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973811</Revalidate></Ad>
+      <Revalidate>2973817</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2955,7 +2955,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973811</Revalidate></Ad>
+      <Revalidate>2973817</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3567,7 +3567,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973811</Revalidate></Ad>
+      <Revalidate>2973817</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3669,7 +3669,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973811</Revalidate></Ad>
+      <Revalidate>2973817</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3975,7 +3975,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2973811</Revalidate></Ad>
+      <Revalidate>2973817</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4128,7 +4128,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2973811</Revalidate></Ad>
+      <Revalidate>2973817</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -8291,53 +8291,6 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
-        <Id>1869010473</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 13 Pro Max 256Gb Sierra Blue бу</Title>
-        <Description><![CDATA[<p>iPhone 13 Pro Max 256Gb Sierra Blue бу</p>
-<p>✅Отличное внешнее состояние, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор: 100%🔋 Была замена аккумулятора<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 87958</p>]]></Description>
-        <Price>36990</Price>
-        
-        <Model>iPhone 13 Pro Max</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5505/3149272449/IMG_0930.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5513/3149272457/IMG_0931.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5521/3149272465/IMG_0934.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5529/3149272473/IMG_0933.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5537/3149272481/IMG_0932.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>голубой</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
-        <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro Max</Model>
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
         <Id>1869051057</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -9576,53 +9529,6 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1877385657</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 15 128Gb Pink бу</Title>
-        <Description><![CDATA[<p>iPhone 15 128Gb Pink бу</p>
-<p>✅Отличное состояние, есть царапинки на дисплее, технически исправен<br>✅Комплект: устройство + коробка + кабель<br>✅Аккумулятор 85%🔋 <br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 73851</p>]]></Description>
-        <Price>32990</Price>
-        
-        <Model>iPhone 15</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4393/3173593385/IMG_2182.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4425/3173593417/IMG_2192.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4401/3173593393/IMG_2183.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4409/3173593401/IMG_2184.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4417/3173593409/IMG_2185.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>розовый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
-        <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 15</Model>
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>85</Akb></Ad>
 
       <Ad>
         <Id>1877385897</Id>
