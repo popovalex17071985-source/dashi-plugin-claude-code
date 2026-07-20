@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974249</Revalidate></Ad>
+      <Revalidate>2974255</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2696,7 +2696,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974249</Revalidate></Ad>
+      <Revalidate>2974255</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2849,7 +2849,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974249</Revalidate></Ad>
+      <Revalidate>2974255</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -3002,7 +3002,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974249</Revalidate></Ad>
+      <Revalidate>2974255</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3614,7 +3614,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974249</Revalidate></Ad>
+      <Revalidate>2974255</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3716,7 +3716,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974249</Revalidate></Ad>
+      <Revalidate>2974255</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -4022,7 +4022,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974249</Revalidate></Ad>
+      <Revalidate>2974255</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4175,7 +4175,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974249</Revalidate></Ad>
+      <Revalidate>2974255</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -5583,55 +5583,6 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
       <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1805386401</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>Apple Watch SE 2024 44mm Midnight (б/у)</Title>
-        <Description><![CDATA[<p>Apple Watch SE 2024 44mm Midnight (б/у)</p>
-<p>✅Отличное состояние, технически исправны <br>✅Комплект: часы + коробка + кабель<br>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. nwqw</p>]]></Description>
-        <Price>17990</Price>
-        
-        <Model>Apple Watch SE</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5561/2983581113/IMG_9159.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5577/2983581129/IMG_9160.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5585/2983581137/IMG_9161.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5545/2983581097/IMG_9163.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5601/2983581153/IMG_9162.jpg"/>
-        </Images>
-        <Color>черный</Color>
-        <GoodsSubType>Смарт-часы</GoodsSubType>
-        <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch SE</Model>
-        <ProductType>Смарт-часы или браслет</ProductType>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Brand>Apple</Brand>
-        <ProductSubType>смарт-часы</ProductSubType>
-        <Gender>унисекс</Gender>
-        <StrapType>Полиуретановый</StrapType>
-        <DeviceWork>Включается</DeviceWork>
-        <Akb>100</Akb>
-        <ScreenFlaws>Без дефектов</ScreenFlaws>
-        <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
 
       <Ad>
         <Id>1805387273</Id>
@@ -9061,55 +9012,6 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>87</Akb></Ad>
 
       <Ad>
-        <Id>1877403433</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Apple</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Ноутбуки</Category>
-        <Title>Apple MacBook Air 13&quot; 2023 M3/16GB/256GB Midnight MC8K4 бу</Title>
-        <Description><![CDATA[<p>Apple MacBook Air 13" 2023 M3/16GB/256GB Midnight MC8K4 бу</p>
-<p>✅Отличное сocтoяниe, общие следы эксплуатации, технически исправен<br>✅Koмплект: коробка + зарядка + устройство <br>✅Kоличeство циклов пeрезapядки: 68 циклов 100%🔋<br>✅Гapaнтия от магaзина 180 дней!</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. qd24r</p>
-<p> </p>]]></Description>
-        <Price>76990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4361/3173560585/IMG_2214.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4369/3173560593/IMG_2215.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4337/3173560561/IMG_2211.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4345/3173560569/IMG_2212.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4353/3173560577/IMG_2213.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4425/3173560649/IMG_2218.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4377/3173560601/IMG_2216.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4385/3173560609/IMG_2217.jpg"/>
-        </Images>
-        <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
-        <Condition>Б/у</Condition>
-        <Devicework>Включается</Devicework>
-        <AkbH>Больше 30 минут</AkbH>
-        <KBLayout>Есть кириллица</KBLayout>
-        <ScreenCondition>Мелкие царапины</ScreenCondition>
-        <CaseCondition>Мелкие царапины</CaseCondition>
-        <KBCondition>Без дефектов</KBCondition>
-      </Ad>
-
-      <Ad>
         <Id>1877417513</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -9155,5 +9057,54 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
+      </Ad>
+
+      <Ad>
+        <Id>1805386401</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>Apple Watch SE 2024 44mm Midnight (б/у)</Title>
+        <Description><![CDATA[<p>Apple Watch SE 2024 44mm Midnight (б/у)</p>
+<p>✅Отличное состояние, технически исправны <br>✅Комплект: часы + коробка + кабель<br>✅Гарантия 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
+<p>Арт. nwqw</p>]]></Description>
+        <Price>14990</Price>
+        
+        <Model>Apple Watch SE</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/5561/2983581113/IMG_9159.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/5577/2983581129/IMG_9160.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/5585/2983581137/IMG_9161.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/5545/2983581097/IMG_9163.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/5601/2983581153/IMG_9162.jpg"/>
+        </Images>
+        <Color>черный</Color>
+        <GoodsSubType>Смарт-часы</GoodsSubType>
+        <Category>Телефоны</Category>
+        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        <Model>Apple Watch SE</Model>
+        <ProductType>Смарт-часы или браслет</ProductType>
+        <Condition>Б/у</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Brand>Apple</Brand>
+        <ProductSubType>смарт-часы</ProductSubType>
+        <Gender>унисекс</Gender>
+        <StrapType>Полиуретановый</StrapType>
+        <DeviceWork>Включается</DeviceWork>
+        <Akb>100</Akb>
+        <ScreenFlaws>Без дефектов</ScreenFlaws>
+        <CaseFlaws>Без дефектов</CaseFlaws>
       </Ad>
 </Ads>
