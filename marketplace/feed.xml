@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8" ?><Ads crm_version="InSalesAvitoModule" formatVersion="3" target="Avito.ru">
       <Ad>
+        <Id>261514780</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Клавиатуры и мыши</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Товары для компьютера</Category>
+        <Title>Apple Smart Keyboard iPad Pro 9.7</Title>
+        <Description><![CDATA[<p>Apple Smart Keyboard iPad Pro 9.7</p>
+<p>✅Отличное состояние.<br>✅Гарантия от магазина 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>]]></Description>
+        <Price>4990</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/3566/852356590/IMG_8450.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3567/852356591/IMG_8451.jpg"/>
+        </Images>
+        <Category>Товары для компьютера</Category>
+        <GoodsType>Клавиатуры и мыши</GoodsType>
+        <Condition>Б/у</Condition>
+      <GoodsSubType>Клавиатуры</GoodsSubType></Ad>
+
+      <Ad>
         <Id>408023389</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -801,6 +833,33 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
+
+      <Ad>
+        <Id>428075977</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Клавиатуры и мыши</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Товары для компьютера</Category>
+        <Title>Apple Magic Mouse 3</Title>
+        <Description><![CDATA[<p>Купите оригинальную мышку от Apple, Magic Mouse 3</p> <p>Доступна в цветах Silver (белая), Space Gray (черная)</p> <p>Гарантия на мышку Apple Magic Mouse 3 - 1 год с момента активации! ✅</p> <p> </p> <p>⭐️ Работаем для Вас в Перми с 2008 года</p> <p>🙌🏼 Знаем о технике Apple абсолютно всё и с радостью поможем настроить гарнитуру</p> <p>📦 Прямые поставки техники из Дубая и Гонконга дают Вам возможность купить технику по лучшей стоимости </p> <p>😊 Перенесем все данные с Вашего старого устройства на новое, во время переноса предложим Вам вкусный чай или кофе</p> <p> </p> <p> Оформите быструю доставку по городу</p> <p> Получите скидку сдав своё устройство Apple по программе Trade In </p> <p> Купите в рассрочку или в кредит, оплатите наличными или по банковской карте </p> <p> Зарегистрируйтесь в нашей программе лояльности и получайте до 3% кешбека на все покупки </p> <p> </p> <p>✅ Напишите нам сейчас в личные сообщения или позвоните, ответим быстро и Вы получите самое лучшее предложение по цене</p> <p> </p> <p>📍Заходите в гости: ул. Николая Островского 52 (ЖК Премьер, напротив ТРК Семья)</p> <p>Наши двери открыты для Вас ежедневно с 10:00 до 22:00</p> <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p> <p>*цены на всю технику указаны со скидкой за наличный расчёт</p> <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p> <p>*в связи с нестабильным курсом доллара стоимость на устройство может поменяться как в меньшую, так и в бОльшую сторону</p>]]></Description>
+        <Price>14990</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/929/835224481/magic_mouse.jpeg"/>
+        </Images>
+        <Category>Товары для компьютера</Category>
+        <GoodsType>Клавиатуры и мыши</GoodsType>
+        <Condition>новое</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+      <GoodsSubType>Мыши</GoodsSubType></Ad>
 
       <Ad>
         <Id>429722695</Id>
@@ -2167,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974237</Revalidate></Ad>
+      <Revalidate>2974242</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2637,7 +2696,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974237</Revalidate></Ad>
+      <Revalidate>2974242</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2790,7 +2849,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974237</Revalidate></Ad>
+      <Revalidate>2974242</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2943,7 +3002,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974237</Revalidate></Ad>
+      <Revalidate>2974242</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3555,7 +3614,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974237</Revalidate></Ad>
+      <Revalidate>2974242</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3657,7 +3716,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974237</Revalidate></Ad>
+      <Revalidate>2974242</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3963,7 +4022,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974237</Revalidate></Ad>
+      <Revalidate>2974242</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4116,7 +4175,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974237</Revalidate></Ad>
+      <Revalidate>2974242</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -9142,64 +9201,5 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
-
-      <Ad>
-        <Id>261514780</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Товары для компьютера</Category>
-        <Title>Apple Smart Keyboard iPad Pro 9.7</Title>
-        <Description><![CDATA[<p>Apple Smart Keyboard iPad Pro 9.7</p>
-<p>✅Отличное состояние.<br>✅Гарантия от магазина 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>]]></Description>
-        <Price>4990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3566/852356590/IMG_8450.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3567/852356591/IMG_8451.jpg"/>
-        </Images>
-        <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
-        <Condition>Б/у</Condition>
-      </Ad>
-
-      <Ad>
-        <Id>428075977</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Товары для компьютера</Category>
-        <Title>Apple Magic Mouse 3</Title>
-        <Description><![CDATA[<p>Купите оригинальную мышку от Apple, Magic Mouse 3</p> <p>Доступна в цветах Silver (белая), Space Gray (черная)</p> <p>Гарантия на мышку Apple Magic Mouse 3 - 1 год с момента активации! ✅</p> <p> </p> <p>⭐️ Работаем для Вас в Перми с 2008 года</p> <p>🙌🏼 Знаем о технике Apple абсолютно всё и с радостью поможем настроить гарнитуру</p> <p>📦 Прямые поставки техники из Дубая и Гонконга дают Вам возможность купить технику по лучшей стоимости </p> <p>😊 Перенесем все данные с Вашего старого устройства на новое, во время переноса предложим Вам вкусный чай или кофе</p> <p> </p> <p> Оформите быструю доставку по городу</p> <p> Получите скидку сдав своё устройство Apple по программе Trade In </p> <p> Купите в рассрочку или в кредит, оплатите наличными или по банковской карте </p> <p> Зарегистрируйтесь в нашей программе лояльности и получайте до 3% кешбека на все покупки </p> <p> </p> <p>✅ Напишите нам сейчас в личные сообщения или позвоните, ответим быстро и Вы получите самое лучшее предложение по цене</p> <p> </p> <p>📍Заходите в гости: ул. Николая Островского 52 (ЖК Премьер, напротив ТРК Семья)</p> <p>Наши двери открыты для Вас ежедневно с 10:00 до 22:00</p> <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p> <p>*цены на всю технику указаны со скидкой за наличный расчёт</p> <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p> <p>*в связи с нестабильным курсом доллара стоимость на устройство может поменяться как в меньшую, так и в бОльшую сторону</p>]]></Description>
-        <Price>14990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/929/835224481/magic_mouse.jpeg"/>
-        </Images>
-        <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
-        <Condition>новое</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
       </Ad>
 </Ads>
