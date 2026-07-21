@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974363</Revalidate></Ad>
+      <Revalidate>2974369</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2696,7 +2696,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974363</Revalidate></Ad>
+      <Revalidate>2974369</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2849,7 +2849,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974363</Revalidate></Ad>
+      <Revalidate>2974369</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -3002,7 +3002,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974363</Revalidate></Ad>
+      <Revalidate>2974369</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3614,7 +3614,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974363</Revalidate></Ad>
+      <Revalidate>2974369</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3716,7 +3716,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974363</Revalidate></Ad>
+      <Revalidate>2974369</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -4022,7 +4022,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974363</Revalidate></Ad>
+      <Revalidate>2974369</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4175,7 +4175,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974363</Revalidate></Ad>
+      <Revalidate>2974369</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -9107,4 +9107,99 @@
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
       </Ad>
+
+      <Ad>
+        <Id>1667509545</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 14 Pro Max 512Gb Deep Purple бу</Title>
+        <Description><![CDATA[<p>iPhone 14 Pro Max 512Gb Deep Purple бу</p>
+<p>✅Отличное состояние, минимальные следы эксплуатации, была замена дисплея на оригинал, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 86%🔋 <br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 42624</p>]]></Description>
+        <Price>41990</Price>
+        
+        <Model>iPhone 14 Pro Max</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/3817/2608492265/IMG_4673.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3833/2608492281/IMG_4674.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3841/2608492289/IMG_4675.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3849/2608492297/IMG_4676.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3865/2608492313/IMG_4677.jpg"/>
+        </Images>
+        <MemorySize>512 ГБ</MemorySize>
+        <Color>фиолетовый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        <GoodsType>iPhone</GoodsType>
+        <RamSize>6 ГБ</RamSize>
+        <Model>iPhone 14 Pro Max</Model>
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>86</Akb></Ad>
+
+      <Ad>
+        <Id>1874681721</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>Apple Watch Ultra 49mm Natural Titanium Yellow/Beige Trail Loop M/L бу</Title>
+        <Description><![CDATA[<p>Apple Watch Ultra 49mm Natural Titanium Yellow/Beige Trail Loop M/L бу</p>
+<p>✅Отличное состояние, технически исправны <br>✅Комплект: часы + зарядка + коробка<br>✅Гарантия 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
+<p>Арт.  775lq</p>]]></Description>
+        <Price>26990</Price>
+        
+        <Model>Apple Watch Ultra</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/2257/3165661393/IMG_2021.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2265/3165661401/IMG_2022.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2273/3165661409/IMG_2023.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2281/3165661417/IMG_2024.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2297/3165661433/IMG_2025.jpg"/>
+        </Images>
+        <Color>серый</Color>
+        <Category>Телефоны</Category>
+        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        <Model>Apple Watch Ultra</Model>
+        <ProductType>Смарт-часы или браслет</ProductType>
+        <Condition>Б/у</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Brand>Apple</Brand>
+        <ProductSubType>смарт-часы</ProductSubType>
+        <Gender>унисекс</Gender>
+        <StrapType>Текстиль</StrapType>
+        <DeviceWork>Включается</DeviceWork>
+        <Akb>85</Akb>
+        <ScreenFlaws>Без дефектов</ScreenFlaws>
+        <CaseFlaws>Без дефектов</CaseFlaws>
+      <GoodsSubType>Смарт-часы</GoodsSubType></Ad>
 </Ads>
