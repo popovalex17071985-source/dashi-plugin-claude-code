@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974709</Revalidate></Ad>
+      <Revalidate>2974711</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2650,7 +2650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974709</Revalidate></Ad>
+      <Revalidate>2974711</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2803,7 +2803,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974709</Revalidate></Ad>
+      <Revalidate>2974711</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2956,7 +2956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974709</Revalidate></Ad>
+      <Revalidate>2974711</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3568,7 +3568,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974709</Revalidate></Ad>
+      <Revalidate>2974711</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3670,7 +3670,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974709</Revalidate></Ad>
+      <Revalidate>2974711</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3976,7 +3976,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974709</Revalidate></Ad>
+      <Revalidate>2974711</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4129,7 +4129,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974709</Revalidate></Ad>
+      <Revalidate>2974711</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -8747,7 +8747,7 @@
 <p>Арт. m4xvw</p>]]></Description>
         <Price>26990</Price>
         
-        <Model>iPad Air 5 (2022)</Model>
+        <Model>iPad Air (5-го поколения) (2022)</Model>
         <Images>
           <Image url="https://static.insales-cdn.com/images/products/1/1185/3187762337/IMG_2436.jpg"/>
           <Image url="https://static.insales-cdn.com/images/products/1/1209/3187762361/IMG_2439.jpg"/>
