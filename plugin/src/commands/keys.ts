@@ -425,17 +425,34 @@ export function classifyPane(text: string): PaneState {
   ) {
     return 'dialog'
   }
-  if (chrome.includes('esc to interrupt')) {
+  // BUSY: pre-2.x builds print `esc to interrupt` in the spinner hint line.
+  // v2.x+ (Opus 4.8) ROTATES that hint away (it alternates with random Tips),
+  // so the reliable working signal is the spinner line's elapsed-timer
+  // parenthetical: `✻ Caramelizing… (6m 28s · ↓ 12.7k tokens)`. A `… (<digit>`
+  // never appears on an idle composer. (verified live on v2.x, 2026-07-24)
+  if (chrome.includes('esc to interrupt') || SPINNER_BUSY_RE.test(chrome)) {
     return 'busy'
   }
+  // IDLE: a POSITIVELY recognised composer (we reach here only when NOT busy).
+  // Manual mode → `? for shortcuts`. Auto modes (bypass/accept-edits/plan):
+  // pre-2.x → `shift+tab to cycle`; v2.x+ dropped that text and the persistent
+  // marker is the `⏵⏵` mode-toggle glyph (`⏵⏵ bypass permissions on · … · ←
+  // for agents`). (verified live on v2.x, 2026-07-24)
   if (
-    (chrome.includes('shift+tab to cycle') || chrome.includes('? for shortcuts')) &&
-    !chrome.includes('esc to interrupt')
+    chrome.includes('shift+tab to cycle') ||
+    chrome.includes('? for shortcuts') ||
+    chrome.includes('⏵⏵')
   ) {
     return 'idle'
   }
   return 'unknown'
 }
+
+// The spinner working-line's elapsed-timer parenthetical, e.g. `Caramelizing…
+// (6m 28s · …)` or `Working… (3s)`. Matches the `… (<digit>` handoff between the
+// working verb and the timer — present on every busy frame, absent when idle.
+// Also accepts a literal three-dot ellipsis in case a build renders `... (`.
+const SPINNER_BUSY_RE = /(?:…|\.\.\.)\s*\(\d/
 
 // Real timer sleep. Tests inject an instant no-op so the confirm-fire poll does
 // not actually wait ~1.5s.

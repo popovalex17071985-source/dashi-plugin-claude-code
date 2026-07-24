@@ -141,6 +141,29 @@ describe('classifyPane', () => {
     expect(classifyPane('')).toBe('unknown')
   })
 
+  // v2.x TUI (Opus 4.8, verified live 2026-07-24): the idle footer dropped
+  // `shift+tab to cycle`; the persistent marker is the `⏵⏵` mode glyph. Busy
+  // dropped the standalone `esc to interrupt` line — the spinner rotates a Tip
+  // in its place — so `… (<timer>` is the reliable working signal.
+  test('v2.x new-UI footer: idle via ⏵⏵ glyph, busy via spinner timer', () => {
+    const V2_IDLE = [
+      'assistant said something useful',
+      '❯ ',
+      '  🤖 Opus 4.8 (1M context) (high) | 💰 $82 session',
+      '  ⏵⏵ bypass permissions on · 1 shell · ← for agents',
+    ].join('\n')
+    const V2_BUSY = [
+      '✻ Caramelizing… (6m 28s · ↓ 12.7k tokens)',
+      '  ⎿  Tip: Use /btw to ask a quick side question',
+      '❯ ',
+      '  ⏵⏵ bypass permissions on · 1 shell · ← for agents',
+    ].join('\n')
+    expect(classifyPane(V2_IDLE)).toBe('idle')
+    // busy despite NO 'esc to interrupt' text and the ⏵⏵ idle marker present:
+    // the spinner timer wins because busy is checked before idle.
+    expect(classifyPane(V2_BUSY)).toBe('busy')
+  })
+
   // FIX-5 (Fable M3): markers are anchored to the BOTTOM UI chrome, so the
   // agent's own transcript quoting "Do you want to proceed?" / "esc to
   // interrupt" (this very plugin discusses these strings) far above the
