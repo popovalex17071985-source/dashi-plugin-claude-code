@@ -27,7 +27,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/3567/852356591/IMG_8451.jpg"/>
         </Images>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>Б/у</Condition>
       <GoodsSubType>Клавиатуры</GoodsSubType></Ad>
 
@@ -69,9 +69,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 12 Pro Max</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -100,8 +100,8 @@
           <Image url="https://static.insales-cdn.com/images/products/1/1204/838730932/airpods_pro_type-c.jpeg"/>
         </Images>
         <Category>Аудио и видео</Category>
-        <GoodsType>Наушники</GoodsType>
-        <Model>AirPods Pro 2</Model>
+        
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -148,8 +148,8 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
-        <Model>iPhone 15</Model>
+        
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       <MemorySize>128 ГБ</MemorySize><RamSize>6 ГБ</RamSize></Ad>
@@ -197,8 +197,8 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
-        <Model>iPhone 15</Model>
+        
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       <MemorySize>256 ГБ</MemorySize><RamSize>6 ГБ</RamSize></Ad>
@@ -246,7 +246,7 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       <MemorySize>512 ГБ</MemorySize><RamSize>6 ГБ</RamSize></Ad>
@@ -293,9 +293,9 @@
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 13</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -325,7 +325,7 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -374,9 +374,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -424,9 +424,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>512 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -474,7 +474,7 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -524,9 +524,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 15 Plus</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -576,9 +576,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 15 Plus</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -628,9 +628,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 15 Plus</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>512 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -659,9 +659,9 @@
         </Images>
         <Color>Серый</Color>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>8</RamSize>
-        <Model>iPad Pro 12.9 (6-го поколения) (2022)</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>128</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -692,7 +692,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/3291/842763483/apple_tv_4k_3rd_Gen.webp"/>
         </Images>
         <Category>Аудио и видео</Category>
-        <GoodsType>Аксессуары</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -719,7 +719,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/3485/842763677/apple_tv_4k_3rd_Gen.webp"/>
         </Images>
         <Category>Аудио и видео</Category>
-        <GoodsType>Аксессуары</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -746,7 +746,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/1309/855917853/airtag_1.webp"/>
         </Images>
         <Category>Телефоны</Category>
-        <GoodsType>Аксессуары</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Гарнитуры и наушники</ProductsType>
@@ -774,7 +774,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/1547/855918091/airtag_4.webp"/>
         </Images>
         <Category>Телефоны</Category>
-        <GoodsType>Аксессуары</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Гарнитуры и наушники</ProductsType>
@@ -802,7 +802,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/6659/835222019/pencil_2.jpeg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Стилусы</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -829,7 +829,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/6693/835222053/pencil_USB-C.jpeg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Стилусы</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -856,7 +856,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/929/835224481/magic_mouse.jpeg"/>
         </Images>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       <GoodsSubType>Мыши</GoodsSubType></Ad>
@@ -902,7 +902,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/4653/839864877/ps5_slim.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
-        <GoodsType>Игровые приставки</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductType>Игровые приставки</ProductType>
@@ -947,7 +947,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/2792/855919336/ps_5_slim_digital_edition.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
-        <GoodsType>Игровые приставки</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductType>Игровые приставки</ProductType>
@@ -994,7 +994,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/3841/839864065/Nintendo_lite_%D0%B1%D0%B8%D1%80%D1%8E%D0%B7%D0%BE%D0%B2%D0%B0%D1%8F.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
-        <GoodsType>Игровые приставки</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductType>Игровые приставки</ProductType>
@@ -1041,7 +1041,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/4182/839864406/Nintendo_lite_%D1%84%D0%B8%D0%BE%D0%BB%D0%B5%D1%82%D0%BE%D0%B2%D0%B0%D1%8F.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
-        <GoodsType>Игровые приставки</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductType>Игровые приставки</ProductType>
@@ -1088,7 +1088,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/812/858374956/steamdeck_oled.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
-        <GoodsType>Игровые приставки</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductType>Игровые приставки</ProductType>
@@ -1135,7 +1135,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/815/858374959/steamdeck_oled.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
-        <GoodsType>Игровые приставки</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductType>Игровые приставки</ProductType>
@@ -1221,9 +1221,9 @@
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>12</RamSize>
-        <Model>iPad Pro 11 (2025)</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1275,9 +1275,9 @@
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>12</RamSize>
-        <Model>iPad Pro 11 (2025)</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>512</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1329,9 +1329,9 @@
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>12</RamSize>
-        <Model>iPad Pro 13 (2025)</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1383,9 +1383,9 @@
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>12</RamSize>
-        <Model>iPad Pro 13 (2025)</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>512</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1437,9 +1437,9 @@
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>12</RamSize>
-        <Model>iPad Pro 13 (2025)</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1483,7 +1483,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/2122/881436746/large_IMG_8510.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -1531,9 +1531,9 @@
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -1572,8 +1572,8 @@
         </Images>
         <Color>черный</Color>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch 7</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1627,7 +1627,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/4178/1003630674/IMG_3521.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -1666,57 +1666,10 @@
           <Image url="https://static.insales-cdn.com/images/products/1/1208/1009280184/IMG_4033.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Стилусы</GoodsType>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
-
-      <Ad>
-        <Id>492976627</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad Pro 11&quot; 2021 M1 128Gb WiFi Space Gray бу</Title>
-        <Description><![CDATA[<p>Apple iPad Pro 11" 2021 M1 128Gb WiFi Space Gray бу</p>
-<p>✅Комплект: устройство + коробка <br>✅Гарантия от магазина: 180 дней<br>✅Внешние состояние как новый</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. hwk3x</p>
-<p> </p>]]></Description>
-        <Price>46990</Price>
-        
-        <Model>iPad Pro 11 (3-го поколения) (2021)</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6943/1010653983/IMG_4065.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6944/1010653984/IMG_4066.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6945/1010653985/IMG_4067.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6946/1010653986/IMG_4068.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6947/1010653987/IMG_4069.jpg"/>
-        </Images>
-        <MemorySize>128</MemorySize>
-        <Color>Серый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <RamSize>80</RamSize>
-        <Model>iPad Pro 11 (3-го поколения) (2021)</Model>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Нет</SimSlot>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>492976910</Id>
@@ -1753,9 +1706,9 @@
         <Color>Серебряный</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <RamSize>40</RamSize>
-        <Model>iPad Pro 11 (1-го поколения) (2018)</Model>
+        
+        <RamSize>4</RamSize>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -1812,9 +1765,9 @@
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1863,9 +1816,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1914,9 +1867,9 @@
         <Color>Розовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -1965,9 +1918,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -2016,9 +1969,9 @@
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>128 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -2067,9 +2020,9 @@
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -2118,9 +2071,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -2169,9 +2122,9 @@
         <Color>Розовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -2220,13 +2173,13 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974825</Revalidate></Ad>
+      <Revalidate>2974829</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2271,9 +2224,9 @@
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16</Model>
+        
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
@@ -2315,7 +2268,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/4993/2111558529/IMG_7295.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -2368,7 +2321,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/2433/2150025601/photo_2025-07-11_16.40.22.jpeg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <KBLayout>Нет кириллицы</KBLayout>
@@ -2412,9 +2365,9 @@
         <Color>фиолетовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -2459,9 +2412,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -2498,7 +2451,7 @@
         </Images>
         <GoodsSubType>Мыши</GoodsSubType>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -2541,9 +2494,9 @@
         <Color>фиолетовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -2593,9 +2546,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -2644,13 +2597,13 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974825</Revalidate></Ad>
+      <Revalidate>2974829</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2695,9 +2648,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -2746,9 +2699,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -2797,13 +2750,13 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974825</Revalidate></Ad>
+      <Revalidate>2974829</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2848,9 +2801,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -2899,9 +2852,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -2950,13 +2903,13 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974825</Revalidate></Ad>
+      <Revalidate>2974829</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3001,9 +2954,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3052,9 +3005,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3103,9 +3056,9 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3154,9 +3107,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3205,9 +3158,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -3256,9 +3209,9 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -3307,9 +3260,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -3358,9 +3311,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -3409,9 +3362,9 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -3460,9 +3413,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -3511,9 +3464,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3562,13 +3515,13 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974825</Revalidate></Ad>
+      <Revalidate>2974829</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3613,9 +3566,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3664,13 +3617,13 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974825</Revalidate></Ad>
+      <Revalidate>2974829</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3715,9 +3668,9 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3766,9 +3719,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3817,9 +3770,9 @@
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3868,9 +3821,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3919,9 +3872,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -3970,13 +3923,13 @@
         <Color>фиолетовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974825</Revalidate></Ad>
+      <Revalidate>2974829</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4021,9 +3974,9 @@
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
@@ -4072,9 +4025,9 @@
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -4123,13 +4076,13 @@
         <Color>фиолетовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974825</Revalidate></Ad>
+      <Revalidate>2974829</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -4174,9 +4127,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -4225,9 +4178,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -4276,9 +4229,9 @@
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
@@ -4322,9 +4275,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -4376,7 +4329,7 @@
         <Color>Бежевый</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -4431,7 +4384,7 @@
         <Color>Бежевый</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -4486,7 +4439,7 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -4541,7 +4494,7 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -4596,7 +4549,7 @@
         <Color>Бежевый</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -4643,9 +4596,9 @@
         <Color>фиолетовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -4690,9 +4643,9 @@
         <Color>фиолетовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -4733,9 +4686,9 @@
         <Color>Серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>8</RamSize>
-        <Model>iPad Pro 11 (4-го поколения) (2022)</Model>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -4782,9 +4735,9 @@
         <Color>Серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>6</RamSize>
-        <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -4827,7 +4780,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/5849/2536920793/IMG_3693.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Стилусы</GoodsType>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -4866,8 +4819,8 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch 8</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -4912,7 +4865,7 @@
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -4946,7 +4899,7 @@
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -4988,7 +4941,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/673/2550956705/IMG_3964.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -5036,9 +4989,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5082,9 +5035,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5132,9 +5085,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14 Pro Max</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5178,9 +5131,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5225,9 +5178,9 @@
         <Color>розовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>3 ГБ</RamSize>
-        <Model>iPhone 7 Plus</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5273,9 +5226,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5321,9 +5274,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 15 Plus</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5360,7 +5313,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/7897/2821922521/IMG_7553.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Стилусы</GoodsType>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -5395,7 +5348,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/5977/2821920601/IMG_7554.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Стилусы</GoodsType>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -5437,9 +5390,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro Max</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5480,8 +5433,8 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch SE</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -5529,8 +5482,8 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch 8</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -5576,7 +5529,7 @@
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -5613,7 +5566,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/1209/2983494841/IMG_9132.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
-        <GoodsType>Наушники</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -5651,8 +5604,8 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch Ultra</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -5700,8 +5653,8 @@
         <Color>Серебряный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch 9</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -5752,9 +5705,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 12</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -5799,9 +5752,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 12 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5842,9 +5795,9 @@
         <Color>Серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>6</RamSize>
-        <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -5892,7 +5845,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/7801/3002326649/IMG_9451.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
-        <GoodsType>Наушники</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -5933,9 +5886,9 @@
         <Color>красный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 12 mini</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -5979,9 +5932,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro Max</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -6025,9 +5978,9 @@
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 11 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6072,9 +6025,9 @@
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6118,9 +6071,9 @@
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 13 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6165,7 +6118,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/105/3040764009/IMG_0077.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -6212,9 +6165,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6258,9 +6211,9 @@
         <Color>серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6300,8 +6253,8 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch SE</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -6353,9 +6306,9 @@
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -6400,9 +6353,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -6447,9 +6400,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -6494,9 +6447,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -6540,9 +6493,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 15 Pro Max</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -6586,9 +6539,9 @@
         <Color>серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 15 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6625,7 +6578,7 @@
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -6667,9 +6620,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 12 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -6708,7 +6661,7 @@
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -6746,9 +6699,9 @@
         <Color>Серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <RamSize>20</RamSize>
-        <Model>iPad (7-го поколения) (2019)</Model>
+        
+        <RamSize>2</RamSize>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -6799,9 +6752,9 @@
         <Color>серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 15 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6845,9 +6798,9 @@
         <Color>серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone XS Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -6892,9 +6845,9 @@
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6940,9 +6893,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -6983,8 +6936,8 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch 9</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -7032,9 +6985,9 @@
         <Color>Серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>6</RamSize>
-        <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -7086,9 +7039,9 @@
         <Color>фиолетовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7133,9 +7086,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>3 ГБ</RamSize>
-        <Model>iPhone XR</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7183,9 +7136,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7230,9 +7183,9 @@
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7276,9 +7229,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 12 mini</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7323,9 +7276,9 @@
         <Color>красный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone SE (2022)</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -7365,7 +7318,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/4913/3129168689/IMG_1253.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
-        <GoodsType>Наушники</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -7407,9 +7360,9 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 15 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7450,9 +7403,9 @@
         <Color>Серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>8</RamSize>
-        <Model>iPad Pro 12.9 (5-го поколения) (2021)</Model>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -7497,7 +7450,7 @@
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -7540,9 +7493,9 @@
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -7586,9 +7539,9 @@
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 11 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -7628,7 +7581,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/7217/3165551665/B96C3771-50B8-4A33-AC28-E751845CC929.PNG"/>
         </Images>
         <Category>Настольные компьютеры</Category>
-        <GoodsType>Моноблоки</GoodsType>
+        
       <Condition>Б/у</Condition><GoodsSubType>Моноблоки</GoodsSubType></Ad>
 
       <Ad>
@@ -7670,9 +7623,9 @@
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -7717,9 +7670,9 @@
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -7764,9 +7717,9 @@
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7812,9 +7765,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7859,9 +7812,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>Мобильные телефоны</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -7906,9 +7859,9 @@
         <Color>желтый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>3 ГБ</RamSize>
-        <Model>iPhone XR</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -7953,9 +7906,9 @@
         <Color>Синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 12 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -8000,9 +7953,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 12</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -8047,9 +8000,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 14 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -8093,64 +8046,14 @@
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 12</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1874677177</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad Pro 11&quot; 2022 M2 128Gb Space gray WiFi бу</Title>
-        <Description><![CDATA[<p>Apple iPad Pro 11" 2022 M2 128Gb Space gray WiFi бу</p>
-<p>✅Комплект: коробка + устройство <br>✅Гарантия от магазина: 180 дней<br>✅Отличное внешнее состояние</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. g7d1</p>]]></Description>
-        <Price>43990</Price>
-        
-        <Model>iPad Pro 11 (4-го поколения) (2022)</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2745/3165661881/IMG_2026.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2753/3165661889/IMG_2027.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2761/3165661897/IMG_2028.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2769/3165661905/IMG_2029.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2777/3165661913/IMG_2030.jpg"/>
-        </Images>
-        <MemorySize>128</MemorySize>
-        <Color>Серый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <RamSize>8</RamSize>
-        <Model>iPad Pro 11 (4-го поколения) (2022)</Model>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Нет</SimSlot>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-        <Devicework>Включается</Devicework>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <Akb>86</Akb>
-      </Ad>
 
       <Ad>
         <Id>1874681721</Id>
@@ -8185,8 +8088,8 @@
         </Images>
         <Color>серый</Color>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch Ultra</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -8234,8 +8137,8 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch SE</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -8282,8 +8185,8 @@
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch SE</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -8330,7 +8233,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/6409/3165624585/IMG_1981.jpg"/>
         </Images>
         <Category>Товары для компьютера</Category>
-        <GoodsType>Сетевое оборудование</GoodsType>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
@@ -8373,9 +8276,9 @@
         <Color>серебристый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -8420,9 +8323,9 @@
         <Color>серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -8467,9 +8370,9 @@
         <Color>оранжевый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>12 ГБ</RamSize>
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -8515,7 +8418,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/4993/3187921793/IMG_2480.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -8563,7 +8466,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/6721/3187907137/IMG_2462.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -8610,7 +8513,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/5377/3187930369/IMG_2493.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -8658,7 +8561,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/1921/3187926913/IMG_2487.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -8703,8 +8606,8 @@
         </Images>
         <Color>зеленый</Color>
         <Category>Телефоны</Category>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <Model>Apple Watch 7</Model>
+        
+        
         <ProductType>Смарт-часы или браслет</ProductType>
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -8759,7 +8662,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/3521/3187764673/IMG_2454.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
@@ -8805,9 +8708,9 @@
         <Color>Серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>8</RamSize>
-        <Model>iPad Air 5 (2022)</Model>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -8857,8 +8760,8 @@
         <Color>Розовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
-        <Model>iPad (2025)</Model>
+        
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -8908,9 +8811,9 @@
         <Color>Серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
-        <GoodsType>Планшеты</GoodsType>
+        
         <RamSize>8</RamSize>
-        <Model>iPad Pro 12,9 M1 (2021)</Model>
+        
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <ProductsType>Планшет</ProductsType>
@@ -8960,9 +8863,9 @@
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 11</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -9007,9 +8910,9 @@
         <Color>серый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 15 Pro</Model>
+        
         <Condition>хорошее</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -9054,9 +8957,9 @@
         <Color>золотистый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro Max</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -9101,9 +9004,9 @@
         <Color>розовый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>6 ГБ</RamSize>
-        <Model>iPhone 15 Plus</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -9148,9 +9051,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 17</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -9195,9 +9098,9 @@
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>3 ГБ</RamSize>
-        <Model>iPhone XR</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
@@ -9242,9 +9145,9 @@
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
+        
         <RamSize>4 ГБ</RamSize>
-        <Model>iPhone 11</Model>
+        
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
@@ -9285,7 +9188,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/3929/3187576665/IMG_2401.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
-        <GoodsType>Наушники</GoodsType>
+        
         <Condition>Б/у</Condition>
       </Ad>
 
@@ -9327,7 +9230,7 @@
           <Image url="https://static.insales-cdn.com/images/products/1/3105/3187764257/IMG_2446.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
-        <GoodsType>Apple</GoodsType>
+        
         <Condition>Б/у</Condition>
         <Devicework>Включается</Devicework>
         <AkbH>Больше 30 минут</AkbH>
