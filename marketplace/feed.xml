@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974822</Revalidate></Ad>
+      <Revalidate>2974825</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2650,7 +2650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974822</Revalidate></Ad>
+      <Revalidate>2974825</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2803,7 +2803,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974822</Revalidate></Ad>
+      <Revalidate>2974825</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2956,7 +2956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974822</Revalidate></Ad>
+      <Revalidate>2974825</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3568,7 +3568,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974822</Revalidate></Ad>
+      <Revalidate>2974825</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3670,7 +3670,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974822</Revalidate></Ad>
+      <Revalidate>2974825</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3976,7 +3976,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974822</Revalidate></Ad>
+      <Revalidate>2974825</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4129,7 +4129,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974822</Revalidate></Ad>
+      <Revalidate>2974825</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -6314,53 +6314,6 @@
         <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
         <CaseFlaws>Царапины</CaseFlaws>
       </Ad>
-
-      <Ad>
-        <Id>1836839593</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 16 Pro 256Gb Black Titanium бу</Title>
-        <Description><![CDATA[<p>iPhone 16 Pro 256Gb Black Titanium бу</p>
-<p>✅Отличное внешнее состояние, технически исправен<br>✅Комплект: устройство<br>✅Аккумулятор 92%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 69317</p>
-]]></Description>
-        <Price>61990</Price>
-        
-        <Model>iPhone 16 Pro</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7609/3058851257/IMG_0350.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7625/3058851273/IMG_0351.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7633/3058851281/IMG_0352.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7649/3058851297/IMG_0353.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        <GoodsType>iPhone</GoodsType>
-        <RamSize>8 ГБ</RamSize>
-        <Model>iPhone 16 Pro</Model>
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>92</Akb></Ad>
 
       <Ad>
         <Id>1836847817</Id>
