@@ -1491,7 +1491,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>453766229</Id>
@@ -1635,7 +1635,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>492618752</Id>
@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974969</Revalidate></Ad>
+      <Revalidate>2974975</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2323,7 +2323,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Вмятины или сколы</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1494883073</Id>
@@ -2650,7 +2650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974969</Revalidate></Ad>
+      <Revalidate>2974975</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2803,7 +2803,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974969</Revalidate></Ad>
+      <Revalidate>2974975</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2956,7 +2956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974969</Revalidate></Ad>
+      <Revalidate>2974975</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3568,7 +3568,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974969</Revalidate></Ad>
+      <Revalidate>2974975</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3670,7 +3670,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974969</Revalidate></Ad>
+      <Revalidate>2974975</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3976,7 +3976,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974969</Revalidate></Ad>
+      <Revalidate>2974975</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4129,7 +4129,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974969</Revalidate></Ad>
+      <Revalidate>2974975</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -4996,7 +4996,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Потёртости</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1658523953</Id>
@@ -6173,7 +6173,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Потёртости</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1833140257</Id>
@@ -8282,7 +8282,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1877858121</Id>
@@ -8331,7 +8331,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1877858201</Id>
@@ -8379,7 +8379,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1877858297</Id>
@@ -8426,7 +8426,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1877858337</Id>
@@ -8474,7 +8474,7 @@
         <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Мелкие царапины</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1877859129</Id>
@@ -9048,5 +9048,5 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
-      </Ad>
+      <BoxSealed>Нет</BoxSealed></Ad>
 </Ads>
