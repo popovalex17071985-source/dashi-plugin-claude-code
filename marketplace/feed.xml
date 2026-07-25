@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974987</Revalidate></Ad>
+      <Revalidate>2974993</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2650,7 +2650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974987</Revalidate></Ad>
+      <Revalidate>2974993</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2803,7 +2803,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974987</Revalidate></Ad>
+      <Revalidate>2974993</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2956,7 +2956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974987</Revalidate></Ad>
+      <Revalidate>2974993</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3568,7 +3568,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974987</Revalidate></Ad>
+      <Revalidate>2974993</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3670,7 +3670,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974987</Revalidate></Ad>
+      <Revalidate>2974993</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3976,7 +3976,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974987</Revalidate></Ad>
+      <Revalidate>2974993</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4129,7 +4129,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974987</Revalidate></Ad>
+      <Revalidate>2974993</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -7819,53 +7819,6 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
       <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1874199177</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 12 128Gb Black бу</Title>
-        <Description><![CDATA[<p>iPhone 12 128Gb Black бу</p>
-<p>✅Отличное внешнее состояние, есть следы эксплуатации по корпусу, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 83%🔋<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 63245</p>]]></Description>
-        <Price>16990</Price>
-        
-        <Model>iPhone 12</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6249/3163191401/IMG_1855.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6257/3163191409/IMG_1856.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6265/3163191417/IMG_1857.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6281/3163191433/IMG_1858.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6289/3163191441/IMG_1860.JPG"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>4 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb></Ad>
 
       <Ad>
         <Id>1874200641</Id>
