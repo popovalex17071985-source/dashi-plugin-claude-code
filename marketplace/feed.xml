@@ -2179,7 +2179,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2974939</Revalidate></Ad>
+      <Revalidate>2974945</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974939</Revalidate></Ad>
+      <Revalidate>2974945</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974939</Revalidate></Ad>
+      <Revalidate>2974945</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974939</Revalidate></Ad>
+      <Revalidate>2974945</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974939</Revalidate></Ad>
+      <Revalidate>2974945</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974939</Revalidate></Ad>
+      <Revalidate>2974945</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2974939</Revalidate></Ad>
+      <Revalidate>2974945</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2974939</Revalidate></Ad>
+      <Revalidate>2974945</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -9096,4 +9096,51 @@
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
       </Ad>
+
+      <Ad>
+        <Id>492976627</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Планшеты</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Планшеты и электронные книги</Category>
+        <Title>Apple iPad Pro 11&quot; 2021 M1 128Gb WiFi Space Gray бу</Title>
+        <Description><![CDATA[<p>Apple iPad Pro 11" 2021 M1 128Gb WiFi Space Gray бу</p>
+<p>✅Комплект: устройство + коробка <br>✅Гарантия от магазина: 180 дней<br>✅Внешние состояние как новый</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. hwk3x</p>
+<p> </p>]]></Description>
+        <Price>46990</Price>
+        
+        <Model>iPad Pro 11 (3-го поколения) (2021)</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/6943/1010653983/IMG_4065.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6944/1010653984/IMG_4066.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6945/1010653985/IMG_4067.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6946/1010653986/IMG_4068.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/6947/1010653987/IMG_4069.jpg"/>
+        </Images>
+        <MemorySize>128</MemorySize>
+        <Color>Серый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Планшеты и электронные книги</Category>
+        
+        <RamSize>8</RamSize>
+        
+        <Condition>Б/у</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <ProductsType>Планшет</ProductsType>
+        <Brand>Apple</Brand>
+        <SimSlot>Нет</SimSlot>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 </Ads>
