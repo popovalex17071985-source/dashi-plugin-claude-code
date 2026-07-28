@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8" ?><Ads crm_version="InSalesAvitoModule" formatVersion="3" target="Avito.ru">
       <Ad>
+        <Id>261514780</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Клавиатуры и мыши</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Товары для компьютера</Category>
+        <Title>Apple Smart Keyboard iPad Pro 9.7</Title>
+        <Description><![CDATA[<p>Apple Smart Keyboard iPad Pro 9.7</p>
+<p>✅Отличное состояние.<br>✅Гарантия от магазина 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>]]></Description>
+        <Price>4990</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/3566/852356590/IMG_8450.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3567/852356591/IMG_8451.jpg"/>
+        </Images>
+        <Category>Товары для компьютера</Category>
+        
+        <Condition>Б/у</Condition>
+      <GoodsSubType>Клавиатуры</GoodsSubType></Ad>
+
+      <Ad>
         <Id>408023389</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -45,38 +77,6 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>82</Akb></Ad>
-
-      <Ad>
-        <Id>261514780</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Клавиатуры и мыши</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Товары для компьютера</Category>
-        <Title>Apple Smart Keyboard iPad Pro 9.7</Title>
-        <Description><![CDATA[<p>Apple Smart Keyboard iPad Pro 9.7</p>
-<p>✅Отличное состояние.<br>✅Гарантия от магазина 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>]]></Description>
-        <Price>4990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3566/852356590/IMG_8450.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3567/852356591/IMG_8451.jpg"/>
-        </Images>
-        <Category>Товары для компьютера</Category>
-        
-        <Condition>Б/у</Condition>
-      <GoodsSubType>Клавиатуры</GoodsSubType></Ad>
 
       <Ad>
         <Id>426971203</Id>
@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2975413</Revalidate></Ad>
+      <Revalidate>2975419</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2422,53 +2422,6 @@
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb><BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
-        <Id>1613973921</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Мобильные телефоны</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 16 Pro Max 256GB Black Titanium бу</Title>
-        <Description><![CDATA[<p>iPhone 16 Pro Max 256GB Black Titanium бу</p>
-<p>✅Отличное внешнее состояние, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 100%🔋<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 43488</p>]]></Description>
-        <Price>87990</Price>
-        
-        <Model>iPhone 16 Pro Max</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4809/2433815241/IMG_1502.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4817/2433815249/IMG_1503.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4825/2433815257/IMG_1504.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4833/2433815265/IMG_1505.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4841/2433815273/IMG_1506.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>8 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Вмятины или сколы</CaseCondition><Devicework>Включается</Devicework><Akb>96</Akb></Ad>
-
-      <Ad>
         <Id>1615196817</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -2650,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975413</Revalidate></Ad>
+      <Revalidate>2975419</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2803,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975413</Revalidate></Ad>
+      <Revalidate>2975419</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2956,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975413</Revalidate></Ad>
+      <Revalidate>2975419</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3568,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975413</Revalidate></Ad>
+      <Revalidate>2975419</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3670,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975413</Revalidate></Ad>
+      <Revalidate>2975419</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3976,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975413</Revalidate></Ad>
+      <Revalidate>2975419</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4129,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975413</Revalidate></Ad>
+      <Revalidate>2975419</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -5091,8 +5044,6 @@
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb></Ad>
 
-      
-
       <Ad>
         <Id>1689814889</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5665,52 +5616,6 @@
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
       </Ad>
-
-      <Ad>
-        <Id>1816833897</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 12 64Gb Blue бу</Title>
-        <Description><![CDATA[<p>iPhone 12 64Gb Blue бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство<br>✅Аккумулятор: 100%🔋Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 25931</p>]]></Description>
-        <Price>14990</Price>
-        
-        <Model>iPhone 12</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2041/3002484729/IMG_9485.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2049/3002484737/IMG_9486.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2057/3002484745/IMG_9487.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2073/3002484761/IMG_9488.jpg"/>
-        </Images>
-        <MemorySize>64 ГБ</MemorySize>
-        <Color>синий</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>4 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1816839529</Id>
@@ -6852,7 +6757,52 @@
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>86</Akb></Ad>
 
-      
+      <Ad>
+        <Id>1859701297</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Мобильные телефоны</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 16 Pro Max 256Gb Black Titanium бу</Title>
+        <Description><![CDATA[<p>iPhone 16 Pro Max 256Gb Black Titanium бу</p>
+<p>✅Отличное внешнее состояние, есть небольшой дефект на задней крышке, технически исправен<br>✅Комплект: устройство + коробка <br>✅Аккумулятор 96%🔋<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 43488</p>]]></Description>
+        <Price>65990</Price>
+        
+        <Model>iPhone 16 Pro Max</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/7809/3129294465/IMG_1375.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/7833/3129294489/IMG_1376.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/7841/3129294497/IMG_1377.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/7849/3129294505/IMG_1378.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/7857/3129294513/IMG_1379.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>черный</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>8 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Вмятины или сколы</CaseCondition><Devicework>Включается</Devicework><Akb>96</Akb></Ad>
 
       <Ad>
         <Id>1859705249</Id>
@@ -7387,7 +7337,7 @@
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>89</Akb></Ad>
 
       <Ad>
-        <Id>1874198945</Id>
+        <Id>1874676001</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
         <ListingFee>Package</ListingFee>
@@ -7399,9 +7349,9 @@
         <GoodsType>iPhone</GoodsType>
         <AdType>Товар приобретен на продажу</AdType>
         <Category>Телефоны</Category>
-        <Title>iPhone 12 Pro Max 256Gb Blue бу</Title>
-        <Description><![CDATA[<p>iPhone 12 Pro Max 256Gb Blue бу</p>
-<p>✅Отличное состояние, царапины на дисплее, следы эксплуатации по корпусу, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100% Заменен в нашем сервисном центре<br>✅Гарантия 180 дней</p>
+        <Title>iPhone 12 64Gb Blue бу</Title>
+        <Description><![CDATA[<p>iPhone 12 64Gb Blue бу</p>
+<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство<br>✅Аккумулятор: 100%🔋Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
 <p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
 <p>👍🏼 Гарантия лучшей стоимости</p>
 <p>💰Возможна покупка в кредит и по банковской карте</p>
@@ -7409,31 +7359,28 @@
 <p>⬇️ Сделаем скидку на предложение конкурента</p>
 <p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
 <p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 88877</p>
-]]></Description>
-        <Price>20990</Price>
+<p>Арт. 25931</p>]]></Description>
+        <Price>14990</Price>
         
-        <Model>iPhone 12 Pro Max</Model>
+        <Model>iPhone 12</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1433/3163235737/IMG_1877.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1449/3163235753/IMG_1878.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1457/3163235761/IMG_1879.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1465/3163235769/IMG_1880.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1841/3165194033/IMG_9485.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1849/3165194041/IMG_9486.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1857/3165194049/IMG_9487.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1865/3165194057/IMG_9488.jpg"/>
         </Images>
-        <MemorySize>256 ГБ</MemorySize>
+        <MemorySize>64 ГБ</MemorySize>
         <Color>синий</Color>
         <Vendor>Apple</Vendor>
         <Category>Телефоны</Category>
         
-        <RamSize>6 ГБ</RamSize>
+        <RamSize>4 ГБ</RamSize>
         
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Много мелких царапин</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1874681721</Id>
@@ -8472,4 +8419,97 @@
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
       <BoxSealed>Нет</BoxSealed></Ad>
+
+      <Ad>
+        <Id>1608052353</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 15 128Gb Pink бу</Title>
+        <Description><![CDATA[<p>iPhone 15 128Gb Pink бу</p>
+<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 86%🔋 <br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 27913</p>]]></Description>
+        <Price>44990</Price>
+        
+        <Model>iPhone 15</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/2713/2409450137/IMG_8139.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2721/2409450145/IMG_8141.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2729/2409450153/IMG_8142.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2737/2409450161/IMG_8143.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2753/2409450177/IMG_8144.jpg"/>
+        </Images>
+        <MemorySize>128 ГБ</MemorySize>
+        <Color>розовый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>6 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>82</Akb></Ad>
+
+      <Ad>
+        <Id>1760327337</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 13 Pro Max 256Gb Silver бу</Title>
+        <Description><![CDATA[<p>iPhone 13 Pro Max 256Gb Silver бу</p>
+<p>✅Отличное внешнее состояние, потертости по корпусу, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор: 100%🔋 Была замена аккумулятора<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 88877</p>]]></Description>
+        <Price>37990</Price>
+        
+        <Model>iPhone 13 Pro Max</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/2425/2811734393/IMG_0922_2.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2441/2811734409/IMG_0926_2.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2449/2811734417/IMG_0924_2.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/2457/2811734425/IMG_0925_2.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>серебристый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>6 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 </Ads>
