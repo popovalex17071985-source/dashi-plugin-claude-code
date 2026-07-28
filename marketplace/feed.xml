@@ -1538,7 +1538,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>84</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>87</Akb></Ad>
 
       <Ad>
         <Id>490852539</Id>
@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2975371</Revalidate></Ad>
+      <Revalidate>2975377</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2419,7 +2419,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb><BoxSealed>Нет</BoxSealed></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb><BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1613973921</Id>
@@ -2466,7 +2466,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Вмятины или сколы</CaseCondition><Devicework>Включается</Devicework><Akb>96</Akb></Ad>
 
       <Ad>
         <Id>1615196817</Id>
@@ -2548,7 +2548,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1640640105</Id>
@@ -2650,7 +2650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975371</Revalidate></Ad>
+      <Revalidate>2975377</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2803,7 +2803,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975371</Revalidate></Ad>
+      <Revalidate>2975377</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2956,7 +2956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975371</Revalidate></Ad>
+      <Revalidate>2975377</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3568,7 +3568,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975371</Revalidate></Ad>
+      <Revalidate>2975377</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3670,7 +3670,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975371</Revalidate></Ad>
+      <Revalidate>2975377</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3976,7 +3976,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975371</Revalidate></Ad>
+      <Revalidate>2975377</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4129,7 +4129,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975371</Revalidate></Ad>
+      <Revalidate>2975377</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -5043,7 +5043,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>84</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>84</Akb></Ad>
 
       <Ad>
         <Id>1658526385</Id>
@@ -5139,7 +5139,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>85</Akb></Ad>
+      <ScreenCondition>Сколы, трещины</ScreenCondition><CaseCondition>Вмятины или сколы</CaseCondition><Devicework>Включается</Devicework><Akb>85</Akb></Ad>
 
       <Ad>
         <Id>1730301473</Id>
@@ -5280,7 +5280,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1752517689</Id>
@@ -5444,7 +5444,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1805387273</Id>
@@ -5803,7 +5803,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>84</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Вмятины или сколы</CaseCondition><Devicework>Включается</Devicework><Akb>84</Akb></Ad>
 
       <Ad>
         <Id>1817277049</Id>
@@ -5937,7 +5937,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>82</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>82</Akb></Ad>
 
       <Ad>
         <Id>1822231401</Id>
@@ -6122,7 +6122,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1833107553</Id>
@@ -6311,7 +6311,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>94</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Крупные царапины</CaseCondition><Devicework>Включается</Devicework><Akb>94</Akb></Ad>
 
       <Ad>
         <Id>1836853865</Id>
@@ -6405,7 +6405,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>92</Akb></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>92</Akb></Ad>
 
       <Ad>
         <Id>1836884577</Id>
@@ -6452,7 +6452,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>91</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>91</Akb></Ad>
 
       <Ad>
         <Id>1836924937</Id>
@@ -6545,7 +6545,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Вмятины или сколы</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1837007129</Id>
@@ -6900,101 +6900,9 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>86</Akb></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>86</Akb></Ad>
 
-      <Ad>
-        <Id>1854044017</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone XR 64Gb Black бу</Title>
-        <Description><![CDATA[<p>iPhone XR 64Gb Black бу</p>
-<p>✅Отличное состояние, минимальные следы эксплуатации, технически исправен<br>✅Комплект: коробка + устройство + зарядка<br>✅Аккумулятор 100%🔋Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 66536</p>]]></Description>
-        <Price>8700</Price>
-        
-        <Model>iPhone Xr</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3521/3163188673/IMG_1845.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3529/3163188681/IMG_1846.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3537/3163188689/IMG_1847.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3545/3163188697/IMG_1848.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3553/3163188705/IMG_1849.JPG"/>
-        </Images>
-        <MemorySize>64 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>3 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1859701297</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Мобильные телефоны</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 16 Pro Max 256Gb Black Titanium бу</Title>
-        <Description><![CDATA[<p>iPhone 16 Pro Max 256Gb Black Titanium бу</p>
-<p>✅Отличное внешнее состояние, есть небольшой дефект на задней крышке, технически исправен<br>✅Комплект: устройство + коробка <br>✅Аккумулятор 96%🔋<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 43488</p>]]></Description>
-        <Price>65990</Price>
-        
-        <Model>iPhone 16 Pro Max</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7809/3129294465/IMG_1375.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7833/3129294489/IMG_1376.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7841/3129294497/IMG_1377.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7849/3129294505/IMG_1378.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7857/3129294513/IMG_1379.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>8 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>96</Akb></Ad>
+      
 
       <Ad>
         <Id>1859705249</Id>
@@ -7480,7 +7388,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1874146305</Id>
@@ -7527,7 +7435,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>93</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Вмятины или сколы</CaseCondition><Devicework>Включается</Devicework><Akb>93</Akb></Ad>
 
       <Ad>
         <Id>1874189705</Id>
@@ -7574,7 +7482,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>89</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>89</Akb></Ad>
 
       <Ad>
         <Id>1874198945</Id>
@@ -7621,53 +7529,9 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
-      <ScreenCondition>Много мелких царапин</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
-      <Ad>
-        <Id>1874676001</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 12 64Gb Blue бу</Title>
-        <Description><![CDATA[<p>iPhone 12 64Gb Blue бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство<br>✅Аккумулятор: 100%🔋Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 25931</p>]]></Description>
-        <Price>14990</Price>
-        
-        <Model>iPhone 12</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1841/3165194033/IMG_9485.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1849/3165194041/IMG_9486.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1857/3165194049/IMG_9487.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1865/3165194057/IMG_9488.jpg"/>
-        </Images>
-        <MemorySize>64 ГБ</MemorySize>
-        <Color>синий</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>4 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      
 
       <Ad>
         <Id>1874681721</Id>
@@ -8336,9 +8200,9 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
         <Devicework>Включается</Devicework>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-      </Ad>
+        <ScreenCondition>Сколы, трещины</ScreenCondition>
+        <CaseCondition>Мелкие царапины</CaseCondition>
+      <Akb>83</Akb></Ad>
 
       <Ad>
         <Id>1878721577</Id>
