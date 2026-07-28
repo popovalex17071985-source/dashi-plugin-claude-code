@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2975395</Revalidate></Ad>
+      <Revalidate>2975401</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2650,7 +2650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975395</Revalidate></Ad>
+      <Revalidate>2975401</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2803,7 +2803,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975395</Revalidate></Ad>
+      <Revalidate>2975401</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2956,7 +2956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975395</Revalidate></Ad>
+      <Revalidate>2975401</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3568,7 +3568,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975395</Revalidate></Ad>
+      <Revalidate>2975401</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3670,7 +3670,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975395</Revalidate></Ad>
+      <Revalidate>2975401</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3976,7 +3976,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975395</Revalidate></Ad>
+      <Revalidate>2975401</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4129,7 +4129,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975395</Revalidate></Ad>
+      <Revalidate>2975401</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -6806,56 +6806,6 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>92</Akb></Ad>
 
       <Ad>
-        <Id>1847315385</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad Pro 11&quot; 2021 M1 256Gb Space gray WiFi + LTE бу</Title>
-        <Description><![CDATA[<p>Apple iPad Pro 11" 2021 M1 256Gb Space gray WiFi + LTE бу</p>
-<p>✅Комплект: устройство <br>✅Гарантия от магазина: 180 дней<br>✅Отличное внешнее состояние</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. ywgdp</p>]]></Description>
-        <Price>46990</Price>
-        
-        <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6481/3148872017/IMG_1667.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6489/3148872025/IMG_1668.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6497/3148872033/IMG_1669.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6505/3148872041/IMG_1670.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6513/3148872049/IMG_1671.jpg"/>
-        </Images>
-        <MemorySize>256</MemorySize>
-        <Color>Серый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        
-        <RamSize>6</RamSize>
-        
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Есть</SimSlot>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-        <Devicework>Включается</Devicework>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <Akb>99</Akb>
-      </Ad>
-
-      <Ad>
         <Id>1850131785</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -7127,54 +7077,6 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>89</Akb></Ad>
-
-      <Ad>
-        <Id>1868769177</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad Pro 12,9&quot; 2021 M1 256Gb Space gray WiFi бу</Title>
-        <Description><![CDATA[<p>Apple iPad Pro 12,9" 2021 M1 256Gb Space gray WiFi бу</p>
-<p>✅Комплект: устройство + коробка<br>✅Гарантия от магазина: 180 дней<br>✅Отличное внешнее состояние</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. 2305q</p>]]></Description>
-        <Price>48990</Price>
-        
-        <Model>iPad Pro 12.9 (5-го поколения) (2021)</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4121/3148861465/IMG_1661.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4137/3148861481/IMG_1662.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4169/3148861513/IMG_1663.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4185/3148861529/IMG_1664.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4193/3148861537/IMG_1665.jpg"/>
-        </Images>
-        <MemorySize>256</MemorySize>
-        <Color>Серый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        
-        <RamSize>8</RamSize>
-        
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Нет</SimSlot>
-        <Devicework>Включается</Devicework>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <Akb>100</Akb>
-      </Ad>
 
       <Ad>
         <Id>1868865817</Id>
