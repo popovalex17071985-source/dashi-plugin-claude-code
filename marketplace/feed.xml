@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2975551</Revalidate></Ad>
+      <Revalidate>2975557</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2650,7 +2650,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975551</Revalidate></Ad>
+      <Revalidate>2975557</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2753,6 +2753,57 @@
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
       </Ad>
+
+      <Ad>
+        <Id>1640725481</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 17 Pro 256 ГБ Cosmic Orange (e-sim)</Title>
+        <Description><![CDATA[<p>Купите оригинальный iPhone 17 Pro 256 Gb Cosmic Orange (e-sim) в iPoint</p>
+<p>Только у нас пожизненная гарантия на все новые iPhone! ✅</p>
+<p>⭐️ Работаем для Вас в Перми с 2008 года</p>
+<p>🙌🏼 Знаем о технике Apple абсолютно всё и с радостью поделимся знаниями</p>
+<p>📦 Прямые поставки техники из Дубая и Гонконга дают Вам возможность купить технику по лучшей стоимости </p>
+<p>😊 Перенесем все данные с Вашего старого устройства на новое, во время переноса предложим Вам вкусный чай или кофе</p>
+<p> </p>
+<p> Оформите быструю доставку по городу</p>
+<p> Получите скидку сдав своё устройство Apple по программе Trade In </p>
+<p> Купите в рассрочку или в кредит, оплатите наличными или по банковской карте </p>
+<p> Зарегистрируйтесь в нашей программе лояльности и получайте до 3% кешбека на все покупки </p>
+<p> </p>
+<p>✅ Напишите нам сейчас в личные сообщения или позвоните, ответим быстро и дадим классное предложение по цене</p>
+<p> </p>
+<p>📍Заходите в гости: ул. Николая Островского 52 (ЖК Премьер, напротив ТРК Семья)</p>
+<p>Наши двери открыты для Вас ежедневно с 10:00 до 22:00</p>
+<p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
+<p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
+<p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
+        <Price>89490</Price>
+        
+        <Model>iPhone 17 Pro</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/5673/2515088937/17_Pro_Orange.jpeg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>оранжевый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>12 ГБ</RamSize>
+        
+        <Condition>новое</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <SimConfig>Только eSIM</SimConfig>
+      <Revalidate>2975557</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2905,7 +2956,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975551</Revalidate></Ad>
+      <Revalidate>2975557</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3517,7 +3568,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975551</Revalidate></Ad>
+      <Revalidate>2975557</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3619,7 +3670,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975551</Revalidate></Ad>
+      <Revalidate>2975557</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3925,7 +3976,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975551</Revalidate></Ad>
+      <Revalidate>2975557</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4078,7 +4129,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975551</Revalidate></Ad>
+      <Revalidate>2975557</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -4745,6 +4796,40 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <Akb>96</Akb>
+      </Ad>
+
+      <Ad>
+        <Id>1646730465</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Стилусы</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Планшеты и электронные книги</Category>
+        <Title>Apple Pencil 2 бу</Title>
+        <Description><![CDATA[<p>Apple Pencil 2 бу</p>
+<p>✅Идеальное состояние, полностью исправен<br>✅Гарантия от магазина 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. 3jkm9</p>]]></Description>
+        <Price>6990</Price>
+        
+        
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/1217/2536359105/IMG_4032.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1225/2536359113/IMG_4038.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1233/2536359121/IMG_4033.jpg"/>
+        </Images>
+        <Category>Планшеты и электронные книги</Category>
+        
+        <Condition>Б/у</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
       </Ad>
 
       <Ad>
@@ -8372,89 +8457,4 @@
         <CaseCondition>Без дефектов</CaseCondition>
         <KBCondition>Без дефектов</KBCondition>
       <BoxSealed>Нет</BoxSealed></Ad>
-
-      <Ad>
-        <Id>1640725481</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 17 Pro 256 ГБ Cosmic Orange (e-sim)</Title>
-        <Description><![CDATA[<p>Купите оригинальный iPhone 17 Pro 256 Gb Cosmic Orange (e-sim) в iPoint</p>
-<p>Только у нас пожизненная гарантия на все новые iPhone! ✅</p>
-<p>⭐️ Работаем для Вас в Перми с 2008 года</p>
-<p>🙌🏼 Знаем о технике Apple абсолютно всё и с радостью поделимся знаниями</p>
-<p>📦 Прямые поставки техники из Дубая и Гонконга дают Вам возможность купить технику по лучшей стоимости </p>
-<p>😊 Перенесем все данные с Вашего старого устройства на новое, во время переноса предложим Вам вкусный чай или кофе</p>
-<p> </p>
-<p> Оформите быструю доставку по городу</p>
-<p> Получите скидку сдав своё устройство Apple по программе Trade In </p>
-<p> Купите в рассрочку или в кредит, оплатите наличными или по банковской карте </p>
-<p> Зарегистрируйтесь в нашей программе лояльности и получайте до 3% кешбека на все покупки </p>
-<p> </p>
-<p>✅ Напишите нам сейчас в личные сообщения или позвоните, ответим быстро и дадим классное предложение по цене</p>
-<p> </p>
-<p>📍Заходите в гости: ул. Николая Островского 52 (ЖК Премьер, напротив ТРК Семья)</p>
-<p>Наши двери открыты для Вас ежедневно с 10:00 до 22:00</p>
-<p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
-<p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
-<p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>89490</Price>
-        
-        <Model>iPhone 17 Pro</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5673/2515088937/17_Pro_Orange.jpeg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>оранжевый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>12 ГБ</RamSize>
-        
-        <Condition>новое</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975551</Revalidate></Ad>
-
-      <Ad>
-        <Id>1646730465</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Стилусы</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple Pencil 2 бу</Title>
-        <Description><![CDATA[<p>Apple Pencil 2 бу</p>
-<p>✅Идеальное состояние, полностью исправен<br>✅Гарантия от магазина 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. 3jkm9</p>]]></Description>
-        <Price>6990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1217/2536359105/IMG_4032.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1225/2536359113/IMG_4038.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1233/2536359121/IMG_4033.jpg"/>
-        </Images>
-        <Category>Планшеты и электронные книги</Category>
-        
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
 </Ads>
