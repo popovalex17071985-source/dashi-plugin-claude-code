@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2975839</Revalidate></Ad>
+      <Revalidate>2975845</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975839</Revalidate></Ad>
+      <Revalidate>2975845</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975839</Revalidate></Ad>
+      <Revalidate>2975845</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975839</Revalidate></Ad>
+      <Revalidate>2975845</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3422,6 +3422,57 @@
       </Ad>
 
       <Ad>
+        <Id>1642058633</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 17 Pro Max 512 ГБ Silver</Title>
+        <Description><![CDATA[<p>Купите оригинальный iPhone 17 Pro Max 512 Gb Silver в iPoint</p>
+<p>Только у нас пожизненная гарантия на все новые iPhone! ✅</p>
+<p>⭐️ Работаем для Вас в Перми с 2008 года</p>
+<p>🙌🏼 Знаем о технике Apple абсолютно всё и с радостью поделимся знаниями</p>
+<p>📦 Прямые поставки техники из Дубая и Гонконга дают Вам возможность купить технику по лучшей стоимости </p>
+<p>😊 Перенесем все данные с Вашего старого устройства на новое, во время переноса предложим Вам вкусный чай или кофе</p>
+<p> </p>
+<p> Оформите быструю доставку по городу</p>
+<p> Получите скидку сдав своё устройство Apple по программе Trade In </p>
+<p> Купите в рассрочку или в кредит, оплатите наличными или по банковской карте </p>
+<p> Зарегистрируйтесь в нашей программе лояльности и получайте до 3% кешбека на все покупки </p>
+<p> </p>
+<p>✅ Напишите нам сейчас в личные сообщения или позвоните, ответим быстро и дадим классное предложение по цене</p>
+<p> </p>
+<p>📍Заходите в гости: ул. Николая Островского 52 (ЖК Премьер, напротив ТРК Семья)</p>
+<p>Наши двери открыты для Вас ежедневно с 10:00 до 22:00</p>
+<p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
+<p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
+<p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
+        <Price>128990</Price>
+        
+        <Model>iPhone 17 Pro Max</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/4321/2523812065/17_PM_Silver.jpeg"/>
+        </Images>
+        <MemorySize>512 ГБ</MemorySize>
+        <Color>серебристый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>12 ГБ</RamSize>
+        
+        <Condition>новое</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <SimConfig>SIM + eSIM</SimConfig>
+      </Ad>
+
+      <Ad>
         <Id>1642059545</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -3470,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975839</Revalidate></Ad>
+      <Revalidate>2975845</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3572,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975839</Revalidate></Ad>
+      <Revalidate>2975845</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3878,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975839</Revalidate></Ad>
+      <Revalidate>2975845</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4031,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975839</Revalidate></Ad>
+      <Revalidate>2975845</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -8136,53 +8187,6 @@
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
-        <Id>1884255561</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 14 256Gb Starlight бу</Title>
-        <Description><![CDATA[<p>iPhone 14 256Gb Starlight бу</p>
-<p>✅Отличное состояние, следы эксплуатации по корпусу, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100%🔋Заменён в нашем СЦ<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 49598</p>]]></Description>
-        <Price>30990</Price>
-        
-        <Model>iPhone 14</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3377/3199970609/IMG_2631.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3385/3199970617/IMG_2632.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3393/3199970625/IMG_2633.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3401/3199970633/IMG_2634.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3409/3199970641/IMG_2635.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>белый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>6 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
         <Id>1884255609</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -8779,7 +8783,7 @@
       </Ad>
 
       <Ad>
-        <Id>1642058633</Id>
+        <Id>1882170257</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
         <ListingFee>Package</ListingFee>
@@ -8788,44 +8792,41 @@
         <ManagerName>Тимофей</ManagerName>
         <ContactPhone>+73422140020</ContactPhone>
         <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
+        <GoodsType>Apple</GoodsType>
         <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 17 Pro Max 512 ГБ Silver</Title>
-        <Description><![CDATA[<p>Купите оригинальный iPhone 17 Pro Max 512 Gb Silver в iPoint</p>
-<p>Только у нас пожизненная гарантия на все новые iPhone! ✅</p>
-<p>⭐️ Работаем для Вас в Перми с 2008 года</p>
-<p>🙌🏼 Знаем о технике Apple абсолютно всё и с радостью поделимся знаниями</p>
-<p>📦 Прямые поставки техники из Дубая и Гонконга дают Вам возможность купить технику по лучшей стоимости </p>
-<p>😊 Перенесем все данные с Вашего старого устройства на новое, во время переноса предложим Вам вкусный чай или кофе</p>
-<p> </p>
-<p> Оформите быструю доставку по городу</p>
-<p> Получите скидку сдав своё устройство Apple по программе Trade In </p>
-<p> Купите в рассрочку или в кредит, оплатите наличными или по банковской карте </p>
-<p> Зарегистрируйтесь в нашей программе лояльности и получайте до 3% кешбека на все покупки </p>
-<p> </p>
-<p>✅ Напишите нам сейчас в личные сообщения или позвоните, ответим быстро и дадим классное предложение по цене</p>
-<p> </p>
-<p>📍Заходите в гости: ул. Николая Островского 52 (ЖК Премьер, напротив ТРК Семья)</p>
-<p>Наши двери открыты для Вас ежедневно с 10:00 до 22:00</p>
-<p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
-<p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
-<p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>128990</Price>
+        <Category>Ноутбуки</Category>
+        <Title>Apple MacBook Air 13&quot; 2022 M2/8GB/256GB Midnight MLY33 бу</Title>
+        <Description><![CDATA[<p>Apple MacBook Air 13" 2022 M2/8GB/256GB Midnight MLY33 бу </p>
+<p>✅Отличное состояние, технически исправен, <br>✅Комплект: устройство + коробка + кабель<br>✅Циклов перезарядки: 261, 75%<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
+<p>Арт. jfw2j</p>]]></Description>
+        <Price>47990</Price>
         
-        <Model>iPhone 17 Pro Max</Model>
+        
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4321/2523812065/17_PM_Silver.jpeg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3057/3187764209/IMG_2440.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3065/3187764217/IMG_2441.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3073/3187764225/IMG_2442.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3081/3187764233/IMG_2443.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3089/3187764241/IMG_2444.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3177/3187764329/IMG_2447.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3097/3187764249/IMG_2445.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3105/3187764257/IMG_2446.jpg"/>
         </Images>
-        <MemorySize>512 ГБ</MemorySize>
-        <Color>серебристый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
+        <Category>Ноутбуки</Category>
         
-        <RamSize>12 ГБ</RamSize>
-        
-        <Condition>новое</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <SimConfig>SIM + eSIM</SimConfig>
-      </Ad>
+        <Condition>Б/у</Condition>
+        <Devicework>Включается</Devicework>
+        <AkbH>Больше 30 минут</AkbH>
+        <KBLayout>Есть кириллица</KBLayout>
+        <ScreenCondition>Без дефектов</ScreenCondition>
+        <CaseCondition>Без дефектов</CaseCondition>
+        <KBCondition>Без дефектов</KBCondition>
+      <BoxSealed>Нет</BoxSealed></Ad>
 </Ads>
