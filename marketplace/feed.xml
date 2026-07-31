@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2975827</Revalidate></Ad>
+      <Revalidate>2975833</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975827</Revalidate></Ad>
+      <Revalidate>2975833</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975827</Revalidate></Ad>
+      <Revalidate>2975833</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975827</Revalidate></Ad>
+      <Revalidate>2975833</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975827</Revalidate></Ad>
+      <Revalidate>2975833</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975827</Revalidate></Ad>
+      <Revalidate>2975833</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975827</Revalidate></Ad>
+      <Revalidate>2975833</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975827</Revalidate></Ad>
+      <Revalidate>2975833</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -8659,53 +8659,6 @@
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>85</Akb></Ad>
 
       <Ad>
-        <Id>1887254273</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 15 Plus 256Gb Black бу</Title>
-        <Description><![CDATA[<p>iPhone 15 Plus 256Gb Black бу</p>
-<p>✅Отличное состояние, общие следы эксплуатации по корпусу, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 88%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 69364</p>]]></Description>
-        <Price>42990</Price>
-        
-        <Model>iPhone 15 Plus</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5953/3199973185/IMG_2645.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5961/3199973193/IMG_2646.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5969/3199973201/IMG_2647.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5977/3199973209/IMG_2648.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5985/3199973217/IMG_2649.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>6 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>88</Akb></Ad>
-
-      <Ad>
         <Id>1887254441</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -8925,4 +8878,51 @@
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
+
+      <Ad>
+        <Id>1884983977</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 16e 256Gb White бу</Title>
+        <Description><![CDATA[<p>iPhone 16e 256Gb White бу</p>
+<p>✅Отличное состояние, минимальные следы эксплуатации, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100%<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
+<p>Арт. 90477</p>]]></Description>
+        <Price>38990</Price>
+        
+        <Model>iPhone 16e</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/1033/3199976457/IMG_2650.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1041/3199976465/IMG_2651.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/569/3199975993/IMG_2654.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1049/3199976473/IMG_2652.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/1113/3199976537/IMG_2653.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>белый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>8 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 </Ads>
