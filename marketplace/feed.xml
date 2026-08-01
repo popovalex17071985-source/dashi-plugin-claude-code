@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2975977</Revalidate></Ad>
+      <Revalidate>2975983</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975977</Revalidate></Ad>
+      <Revalidate>2975983</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975977</Revalidate></Ad>
+      <Revalidate>2975983</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975977</Revalidate></Ad>
+      <Revalidate>2975983</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975977</Revalidate></Ad>
+      <Revalidate>2975983</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975977</Revalidate></Ad>
+      <Revalidate>2975983</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2975977</Revalidate></Ad>
+      <Revalidate>2975983</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2975977</Revalidate></Ad>
+      <Revalidate>2975983</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -5562,55 +5562,6 @@
         <StrapType>Миланский</StrapType>
         <DeviceWork>Включается</DeviceWork>
         <Akb>100</Akb>
-        <ScreenFlaws>Без дефектов</ScreenFlaws>
-        <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
-
-      <Ad>
-        <Id>1816306961</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>Apple Watch Series 9 41mm Silver Stainless Steel Milaneese Loop бу</Title>
-        <Description><![CDATA[<p>Apple Watch Series 9 41mm Silver Stainless Steel Milaneese Loop бу</p>
-<p>✅Отличное состояние, технически исправны <br>✅Комплект: часы + зарядка<br>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. T2461</p>]]></Description>
-        <Price>26990</Price>
-        
-        <Model>Apple Watch 9</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3729/2983669393/IMG_9184.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3745/2983669409/IMG_9185.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3761/2983669425/IMG_9186.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3785/2983669449/IMG_9187.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3793/2983669457/IMG_9188.jpg"/>
-        </Images>
-        <Color>Серебряный</Color>
-        <GoodsSubType>Смарт-часы</GoodsSubType>
-        <Category>Телефоны</Category>
-        
-        
-        <ProductType>Смарт-часы или браслет</ProductType>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Brand>Apple</Brand>
-        <ProductSubType>смарт-часы</ProductSubType>
-        <Gender>унисекс</Gender>
-        <StrapType>Миланский</StrapType>
-        <DeviceWork>Включается</DeviceWork>
-        <Akb>88</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
       </Ad>
@@ -8092,54 +8043,6 @@
       </Ad>
 
       <Ad>
-        <Id>1882170257</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Apple</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Ноутбуки</Category>
-        <Title>Apple MacBook Air 13&quot; 2022 M2/8GB/256GB Midnight MLY33 бу</Title>
-        <Description><![CDATA[<p>Apple MacBook Air 13" 2022 M2/8GB/256GB Midnight MLY33 бу </p>
-<p>✅Отличное состояние, технически исправен, <br>✅Комплект: устройство + коробка + кабель<br>✅Циклов перезарядки: 261, 75%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. jfw2j</p>]]></Description>
-        <Price>47990</Price>
-        
-        
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3057/3187764209/IMG_2440.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3065/3187764217/IMG_2441.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3073/3187764225/IMG_2442.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3081/3187764233/IMG_2443.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3089/3187764241/IMG_2444.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3177/3187764329/IMG_2447.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3097/3187764249/IMG_2445.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3105/3187764257/IMG_2446.jpg"/>
-        </Images>
-        <Category>Ноутбуки</Category>
-        
-        <Condition>Б/у</Condition>
-        <Devicework>Включается</Devicework>
-        <AkbH>Больше 30 минут</AkbH>
-        <KBLayout>Есть кириллица</KBLayout>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <KBCondition>Без дефектов</KBCondition>
-      <BoxSealed>Нет</BoxSealed></Ad>
-
-      <Ad>
         <Id>1884255513</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -8516,52 +8419,6 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><GoodsSubType>Смарт-часы</GoodsSubType></Ad>
 
       <Ad>
-        <Id>1886447481</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 14 128Gb Starlight бу</Title>
-        <Description><![CDATA[<p>iPhone 14 128Gb Starlight бу</p>
-<p>✅Отличное состояние, мелкие царапинки, общие следы эксплуатации, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 85%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 21318</p>]]></Description>
-        <Price>25990</Price>
-        
-        <Model>iPhone 14</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2305/3199969537/IMG_2627.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2313/3199969545/IMG_2628.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2321/3199969553/IMG_2629.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2329/3199969561/IMG_2630.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>белый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>6 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>85</Akb></Ad>
-
-      <Ad>
         <Id>1887254441</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -8607,99 +8464,6 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
-
-      <Ad>
-        <Id>1887841273</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 14 Pro Max 256Gb Deep Purple бу</Title>
-        <Description><![CDATA[<p>iPhone 14 Pro Max 256Gb Deep Purple бу</p>
-<p>✅Отличное состояние, общие следы эксплуатации по корпусу от чехла, технически исправен<br>✅Комплект: устройство<br>✅Аккумулятор 85%🔋 <br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 35048</p>]]></Description>
-        <Price>39990</Price>
-        
-        <Model>iPhone 14 Pro Max</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7513/3200015705/IMG_2688.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7521/3200015713/IMG_2689.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7561/3200015753/IMG_2690.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7577/3200015769/IMG_2691.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>фиолетовый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>6 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>85</Akb></Ad>
-
-      <Ad>
-        <Id>1887878713</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 15 128Gb Pink бу</Title>
-        <Description><![CDATA[<p>iPhone 15 128Gb Pink бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 82%🔋 <br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 27913</p>]]></Description>
-        <Price>32990</Price>
-        
-        <Model>iPhone 15</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4057/3199971289/IMG_2640.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4065/3199971297/IMG_2641.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4081/3199971313/IMG_2642.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4089/3199971321/IMG_2643.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4097/3199971329/IMG_2644.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>розовый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>6 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>82</Akb></Ad>
 
       <Ad>
         <Id>1887979745</Id>
