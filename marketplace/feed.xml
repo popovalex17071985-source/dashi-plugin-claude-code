@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2976091</Revalidate></Ad>
+      <Revalidate>2976097</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976091</Revalidate></Ad>
+      <Revalidate>2976097</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976091</Revalidate></Ad>
+      <Revalidate>2976097</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976091</Revalidate></Ad>
+      <Revalidate>2976097</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976091</Revalidate></Ad>
+      <Revalidate>2976097</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976091</Revalidate></Ad>
+      <Revalidate>2976097</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976091</Revalidate></Ad>
+      <Revalidate>2976097</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976091</Revalidate></Ad>
+      <Revalidate>2976097</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -8041,6 +8041,53 @@
       </Ad>
 
       <Ad>
+        <Id>1884255561</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 14 256Gb Starlight бу</Title>
+        <Description><![CDATA[<p>iPhone 14 256Gb Starlight бу</p>
+<p>✅Отличное состояние, следы эксплуатации по корпусу, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100%🔋Заменён в нашем СЦ<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
+<p>Арт. 49598</p>]]></Description>
+        <Price>30990</Price>
+        
+        <Model>iPhone 14</Model>
+        <Images>
+          <Image url="https://static.insales-cdn.com/images/products/1/3377/3199970609/IMG_2631.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3385/3199970617/IMG_2632.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3393/3199970625/IMG_2633.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3401/3199970633/IMG_2634.jpg"/>
+          <Image url="https://static.insales-cdn.com/images/products/1/3409/3199970641/IMG_2635.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>белый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>6 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
         <Id>1884255609</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -8402,51 +8449,4 @@
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
       </Ad>
-
-      <Ad>
-        <Id>1884255561</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 14 256Gb Starlight бу</Title>
-        <Description><![CDATA[<p>iPhone 14 256Gb Starlight бу</p>
-<p>✅Отличное состояние, следы эксплуатации по корпусу, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100%🔋Заменён в нашем СЦ<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 49598</p>]]></Description>
-        <Price>30990</Price>
-        
-        <Model>iPhone 14</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3377/3199970609/IMG_2631.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3385/3199970617/IMG_2632.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3393/3199970625/IMG_2633.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3401/3199970633/IMG_2634.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3409/3199970641/IMG_2635.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>белый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>6 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 </Ads>
