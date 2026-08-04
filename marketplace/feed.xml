@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2976409</Revalidate></Ad>
+      <Revalidate>2976415</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976409</Revalidate></Ad>
+      <Revalidate>2976415</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976409</Revalidate></Ad>
+      <Revalidate>2976415</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976409</Revalidate></Ad>
+      <Revalidate>2976415</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976409</Revalidate></Ad>
+      <Revalidate>2976415</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976409</Revalidate></Ad>
+      <Revalidate>2976415</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976409</Revalidate></Ad>
+      <Revalidate>2976415</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976409</Revalidate></Ad>
+      <Revalidate>2976415</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -5346,55 +5346,6 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Много мелких царапин</Screen_Condition>
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1805387273</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>Apple Watch Series 8 45mm Midnight бу</Title>
-        <Description><![CDATA[<p>Apple Watch Series 8 45mm Midnight бу</p>
-<p>✅Отличное состояние, технически исправны <br>✅Комплект: часы + коробка + зарядка<br>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. 67t2k</p>]]></Description>
-        <Price>13990</Price>
-        
-        <Model>Apple Watch 8</Model>
-        <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/8001/2983657281/IMG_9164.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8017/2983657297/IMG_9165.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8033/2983657313/IMG_9166.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7969/2983657249/IMG_9168.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8049/2983657329/IMG_9167.jpg"/>
-        </Images>
-        <Color>черный</Color>
-        <GoodsSubType>Смарт-часы</GoodsSubType>
-        <Category>Телефоны</Category>
-        
-        
-        <ProductType>Смарт-часы или браслет</ProductType>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Brand>Apple</Brand>
-        <ProductSubType>смарт-часы</ProductSubType>
-        <Gender>унисекс</Gender>
-        <StrapType>Полиуретановый</StrapType>
-        <DeviceWork>Включается</DeviceWork>
-        <Akb>85</Akb>
-        <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
-        <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
 
       <Ad>
         <Id>1805387785</Id>
