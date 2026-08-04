@@ -23,8 +23,8 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3566/852356590/IMG_8450.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3567/852356591/IMG_8451.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3566/852356590/IMG_8450.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3567/852356591/IMG_8451.jpg"/>
         </Images>
         <Category>Товары для компьютера</Category>
         
@@ -59,11 +59,11 @@
         
         <Model>iPhone 12 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3492/842788260/IMG_7044.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3494/842788262/IMG_7050.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3493/842788261/IMG_7048.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3497/842788265/IMG_7053.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3495/842788263/IMG_7052.JPG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3492/842788260/IMG_7044.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3494/842788262/IMG_7050.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3493/842788261/IMG_7048.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3497/842788265/IMG_7053.JPG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3495/842788263/IMG_7052.JPG"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>синий</Color>
@@ -97,7 +97,7 @@
         
         <Model>AirPods Pro 2</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1204/838730932/airpods_pro_type-c.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1204/838730932/airpods_pro_type-c.jpeg"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -143,7 +143,7 @@
         
         <Model>iPhone 15</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3244/831958188/15.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3244/831958188/15.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -192,7 +192,7 @@
         
         <Model>iPhone 15</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3382/831958326/15.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3382/831958326/15.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -241,7 +241,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6864/842824400/photo_2024-04-05_16.04.17.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6864/842824400/photo_2024-04-05_16.04.17.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -288,7 +288,7 @@
         
         <Model>iPhone 13</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5198/896070734/13.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5198/896070734/13.jpeg"/>
         </Images>
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
@@ -320,7 +320,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7736/838729272/photo_2024-03-27_14.21.45.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7736/838729272/photo_2024-03-27_14.21.45.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -369,7 +369,7 @@
         
         <Model>iPhone 14</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5953/896071489/14.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5953/896071489/14.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -419,7 +419,7 @@
         
         <Model>iPhone 14</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7914/838729450/photo_2024-03-27_14.21.45.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7914/838729450/photo_2024-03-27_14.21.45.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -469,7 +469,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/376/836428152/photo_2024-03-21_13.01.22.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/376/836428152/photo_2024-03-21_13.01.22.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -519,7 +519,7 @@
         
         <Model>iPhone 15 Plus</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5960/896071496/ip_15.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5960/896071496/ip_15.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -571,7 +571,7 @@
         
         <Model>iPhone 15 Plus</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6029/896071565/ip_15.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6029/896071565/ip_15.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -623,7 +623,7 @@
         
         <Model>iPhone 15 Plus</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3232/896085152/ip_15.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3232/896085152/ip_15.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -655,7 +655,7 @@
         
         <Model>iPad Pro 12.9 (6-го поколения) (2022)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6740/832944724/ipad_pro_12.9.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6740/832944724/ipad_pro_12.9.jpeg"/>
         </Images>
         <Color>Серый</Color>
         <Category>Планшеты и электронные книги</Category>
@@ -689,7 +689,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3291/842763483/apple_tv_4k_3rd_Gen.webp"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3291/842763483/apple_tv_4k_3rd_Gen.webp"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -716,7 +716,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3485/842763677/apple_tv_4k_3rd_Gen.webp"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3485/842763677/apple_tv_4k_3rd_Gen.webp"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -743,7 +743,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1309/855917853/airtag_1.webp"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1309/855917853/airtag_1.webp"/>
         </Images>
         <Category>Телефоны</Category>
         
@@ -771,7 +771,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1547/855918091/airtag_4.webp"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1547/855918091/airtag_4.webp"/>
         </Images>
         <Category>Телефоны</Category>
         
@@ -799,7 +799,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6659/835222019/pencil_2.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6659/835222019/pencil_2.jpeg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
         
@@ -826,7 +826,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6693/835222053/pencil_USB-C.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6693/835222053/pencil_USB-C.jpeg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
         
@@ -853,7 +853,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/929/835224481/magic_mouse.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/929/835224481/magic_mouse.jpeg"/>
         </Images>
         <Category>Товары для компьютера</Category>
         
@@ -899,7 +899,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4653/839864877/ps5_slim.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4653/839864877/ps5_slim.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
         
@@ -944,7 +944,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2792/855919336/ps_5_slim_digital_edition.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2792/855919336/ps_5_slim_digital_edition.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
         
@@ -991,7 +991,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3841/839864065/Nintendo_lite_%D0%B1%D0%B8%D1%80%D1%8E%D0%B7%D0%BE%D0%B2%D0%B0%D1%8F.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3841/839864065/Nintendo_lite_%D0%B1%D0%B8%D1%80%D1%8E%D0%B7%D0%BE%D0%B2%D0%B0%D1%8F.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
         
@@ -1038,7 +1038,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4182/839864406/Nintendo_lite_%D1%84%D0%B8%D0%BE%D0%BB%D0%B5%D1%82%D0%BE%D0%B2%D0%B0%D1%8F.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4182/839864406/Nintendo_lite_%D1%84%D0%B8%D0%BE%D0%BB%D0%B5%D1%82%D0%BE%D0%B2%D0%B0%D1%8F.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
         
@@ -1085,7 +1085,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/812/858374956/steamdeck_oled.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/812/858374956/steamdeck_oled.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
         
@@ -1132,7 +1132,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/815/858374959/steamdeck_oled.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/815/858374959/steamdeck_oled.jpeg"/>
         </Images>
         <Category>Игры, приставки и программы</Category>
         
@@ -1171,7 +1171,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6466/882972994/%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0_%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B8%CC%86.PNG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6466/882972994/%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0_%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B8%CC%86.PNG"/>
         </Images>
         <Category>Предложение услуг</Category>
         <ServiceSubtype>Мобильные устройства</ServiceSubtype>
@@ -1217,7 +1217,7 @@
         
         <Model>iPad Pro 11 (2025)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7040/874863488/ipad_Pro_11_m4_.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7040/874863488/ipad_Pro_11_m4_.jpeg"/>
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
@@ -1271,7 +1271,7 @@
         
         <Model>iPad Pro 11 (2025)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7934/874864382/ipad_Pro_11_m4_.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7934/874864382/ipad_Pro_11_m4_.jpeg"/>
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
@@ -1325,7 +1325,7 @@
         
         <Model>iPad Pro 13 (2025)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2016/874866656/ipad_Pro_11_m4_.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2016/874866656/ipad_Pro_11_m4_.jpeg"/>
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
@@ -1379,7 +1379,7 @@
         
         <Model>iPad Pro 13 (2025)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3014/874867654/ipad_Pro_11_m4_.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3014/874867654/ipad_Pro_11_m4_.jpeg"/>
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
@@ -1433,7 +1433,7 @@
         
         <Model>iPad Pro 13 (2025)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5112/874869752/ipad_Pro_11_m4_.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5112/874869752/ipad_Pro_11_m4_.jpeg"/>
         </Images>
         <Color>Черный</Color>
         <Category>Планшеты и электронные книги</Category>
@@ -1475,12 +1475,12 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2125/881436749/large_IMG_8512.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2123/881436747/large_IMG_8511.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2129/881436753/large_IMG_8515.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2126/881436750/large_IMG_8513.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2127/881436751/large_IMG_8514.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2122/881436746/large_IMG_8510.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2125/881436749/large_IMG_8512.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2123/881436747/large_IMG_8511.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2129/881436753/large_IMG_8515.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2126/881436750/large_IMG_8513.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2127/881436751/large_IMG_8514.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2122/881436746/large_IMG_8510.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
         
@@ -1521,11 +1521,11 @@
         
         <Model>iPhone 13 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6049/958420897/IMG_9118.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6050/958420898/IMG_9121.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6051/958420899/IMG_9122.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6052/958420900/IMG_9123.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6053/958420901/IMG_9124.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6049/958420897/IMG_9118.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6050/958420898/IMG_9121.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6051/958420899/IMG_9122.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6052/958420900/IMG_9123.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6053/958420901/IMG_9124.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>зеленый</Color>
@@ -1565,10 +1565,10 @@
         
         <Model>Apple Watch 7</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2504/1003342280/IMG_3427.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2503/1003342279/IMG_3426.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2506/1003342282/IMG_3429.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2505/1003342281/IMG_3428.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2504/1003342280/IMG_3427.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2503/1003342279/IMG_3426.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2506/1003342282/IMG_3429.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2505/1003342281/IMG_3428.jpg"/>
         </Images>
         <Color>черный</Color>
         <Category>Телефоны</Category>
@@ -1617,14 +1617,14 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4188/1003630684/IMG_3524.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4192/1003630688/IMG_3525.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4193/1003630689/IMG_3526.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4262/1003630758/IMG_3528.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4260/1003630756/IMG_3527.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4185/1003630681/IMG_3523.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4180/1003630676/IMG_3522.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4178/1003630674/IMG_3521.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4188/1003630684/IMG_3524.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4192/1003630688/IMG_3525.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4193/1003630689/IMG_3526.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4262/1003630758/IMG_3528.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4260/1003630756/IMG_3527.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4185/1003630681/IMG_3523.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4180/1003630676/IMG_3522.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4178/1003630674/IMG_3521.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
         
@@ -1661,9 +1661,9 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1206/1009280182/IMG_4032.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1210/1009280186/IMG_4038.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1208/1009280184/IMG_4033.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1206/1009280182/IMG_4032.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1210/1009280186/IMG_4038.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1208/1009280184/IMG_4033.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
         
@@ -1696,11 +1696,11 @@
         
         <Model>iPad Pro 11 (3-го поколения) (2021)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6943/1010653983/IMG_4065.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6944/1010653984/IMG_4066.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6945/1010653985/IMG_4067.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6946/1010653986/IMG_4068.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6947/1010653987/IMG_4069.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6943/1010653983/IMG_4065.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6944/1010653984/IMG_4066.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6945/1010653985/IMG_4067.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6946/1010653986/IMG_4068.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6947/1010653987/IMG_4069.jpg"/>
         </Images>
         <MemorySize>128</MemorySize>
         <Color>Серый</Color>
@@ -1743,11 +1743,11 @@
         
         <Model>iPad Pro 11 (1-го поколения) (2018)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7157/1010654197/IMG_4044.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7153/1010654193/IMG_4039.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7154/1010654194/IMG_4040.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7155/1010654195/IMG_4041.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7156/1010654196/IMG_4042.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7157/1010654197/IMG_4044.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7153/1010654193/IMG_4039.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7154/1010654194/IMG_4040.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7155/1010654195/IMG_4041.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7156/1010654196/IMG_4042.jpg"/>
         </Images>
         <MemorySize>64</MemorySize>
         <Color>Серебряный</Color>
@@ -1807,7 +1807,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1580/1019676204/photo_2025-05-27_17.15.14.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1580/1019676204/photo_2025-05-27_17.15.14.jpeg"/>
         </Images>
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
@@ -1858,7 +1858,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3278/1019677902/photo_2025-05-27_17.15.11.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3278/1019677902/photo_2025-05-27_17.15.11.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -1909,7 +1909,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3774/1019678398/photo_2025-05-27_17.15.20.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3774/1019678398/photo_2025-05-27_17.15.20.jpeg"/>
         </Images>
         <Color>розовый</Color>
         <Vendor>Apple</Vendor>
@@ -1960,7 +1960,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4566/1019679190/photo_2025-05-27_17.15.17.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4566/1019679190/photo_2025-05-27_17.15.17.jpeg"/>
         </Images>
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
@@ -2011,7 +2011,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4829/1019679453/photo_2025-05-27_17.15.23.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4829/1019679453/photo_2025-05-27_17.15.23.jpeg"/>
         </Images>
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
@@ -2062,7 +2062,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5657/1019680281/photo_2025-05-27_17.15.14.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5657/1019680281/photo_2025-05-27_17.15.14.jpeg"/>
         </Images>
         <Color>белый</Color>
         <Vendor>Apple</Vendor>
@@ -2113,7 +2113,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6542/1019681166/photo_2025-05-27_17.15.11.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6542/1019681166/photo_2025-05-27_17.15.11.jpeg"/>
         </Images>
         <Color>черный</Color>
         <Vendor>Apple</Vendor>
@@ -2164,7 +2164,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7011/1019681635/photo_2025-05-27_17.15.20.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7011/1019681635/photo_2025-05-27_17.15.20.jpeg"/>
         </Images>
         <Color>розовый</Color>
         <Vendor>Apple</Vendor>
@@ -2215,7 +2215,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7228/1019681852/photo_2025-05-27_17.15.17.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7228/1019681852/photo_2025-05-27_17.15.17.jpeg"/>
         </Images>
         <Color>голубой</Color>
         <Vendor>Apple</Vendor>
@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2976433</Revalidate></Ad>
+      <Revalidate>2976439</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2266,7 +2266,7 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7511/1019682135/photo_2025-05-27_17.15.23.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7511/1019682135/photo_2025-05-27_17.15.23.jpeg"/>
         </Images>
         <Color>зеленый</Color>
         <Vendor>Apple</Vendor>
@@ -2306,13 +2306,13 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4737/2111558273/IMG_7299.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5505/2111559041/IMG_7300.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5761/2111559297/IMG_7302.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4097/2111557633/IMG_7296.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4481/2111558017/IMG_7297.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4865/2111558401/IMG_7298.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4993/2111558529/IMG_7295.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4737/2111558273/IMG_7299.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5505/2111559041/IMG_7300.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5761/2111559297/IMG_7302.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4097/2111557633/IMG_7296.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4481/2111558017/IMG_7297.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4865/2111558401/IMG_7298.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4993/2111558529/IMG_7295.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
         
@@ -2365,7 +2365,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2433/2150025601/photo_2025-07-11_16.40.22.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2433/2150025601/photo_2025-07-11_16.40.22.jpeg"/>
         </Images>
         <Category>Ноутбуки</Category>
         
@@ -2402,11 +2402,11 @@
         
         <Model>iPhone 14 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4161/2433749057/IMG_1512.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4169/2433749065/IMG_1513.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4177/2433749073/IMG_1514.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4185/2433749081/IMG_1515.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4193/2433749089/IMG_1516.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4161/2433749057/IMG_1512.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4169/2433749065/IMG_1513.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4177/2433749073/IMG_1514.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4185/2433749081/IMG_1515.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4193/2433749089/IMG_1516.jpg"/>
         </Images>
         <MemorySize>1024 ГБ</MemorySize>
         <Color>фиолетовый</Color>
@@ -2446,8 +2446,8 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2321/2433845521/IMG_1485.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2337/2433845537/IMG_1486.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2321/2433845521/IMG_1485.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2337/2433845537/IMG_1486.jpg"/>
         </Images>
         <GoodsSubType>Мыши</GoodsSubType>
         <Category>Товары для компьютера</Category>
@@ -2484,11 +2484,11 @@
         
         <Model>iPhone 14 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7153/2498337777/IMG_2653.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7161/2498337785/IMG_2654.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7169/2498337793/IMG_2655.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7193/2498337817/IMG_2656.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7209/2498337833/IMG_2657.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7153/2498337777/IMG_2653.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7161/2498337785/IMG_2654.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7169/2498337793/IMG_2655.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7193/2498337817/IMG_2656.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7209/2498337833/IMG_2657.jpg"/>
         </Images>
         <MemorySize>1024 ГБ</MemorySize>
         <Color>фиолетовый</Color>
@@ -2540,7 +2540,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1833/2514749225/17_PM_Silver.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1833/2514749225/17_PM_Silver.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -2591,7 +2591,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7713/2514787873/17_PM_Orange.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7713/2514787873/17_PM_Orange.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976433</Revalidate></Ad>
+      <Revalidate>2976439</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2642,7 +2642,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/561/2514846257/17_PM_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/561/2514846257/17_PM_Blue.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>синий</Color>
@@ -2693,7 +2693,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6001/2515048305/17_Pro_Silver.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6001/2515048305/17_Pro_Silver.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -2744,7 +2744,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5673/2515088937/17_Pro_Orange.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5673/2515088937/17_Pro_Orange.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976433</Revalidate></Ad>
+      <Revalidate>2976439</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2795,7 +2795,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5569/2515121601/17_Pro_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5569/2515121601/17_Pro_Blue.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>синий</Color>
@@ -2846,7 +2846,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5721/2515392089/17_PM_Silver.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5721/2515392089/17_PM_Silver.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -2897,7 +2897,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/361/2515403113/17_PM_Orange.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/361/2515403113/17_PM_Orange.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976433</Revalidate></Ad>
+      <Revalidate>2976439</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -2948,7 +2948,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6793/2515425929/17_PM_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6793/2515425929/17_PM_Blue.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>синий</Color>
@@ -2999,7 +2999,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4721/2515440241/17_Pro_Silver.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4721/2515440241/17_Pro_Silver.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -3050,7 +3050,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7649/2515451361/17_Pro_Orange.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7649/2515451361/17_Pro_Orange.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -3101,7 +3101,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5649/2515465745/17_Pro_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5649/2515465745/17_Pro_Blue.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>синий</Color>
@@ -3152,7 +3152,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5825/2523739841/17_PM_Silver.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5825/2523739841/17_PM_Silver.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -3203,7 +3203,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1889/2523752289/17_PM_Orange.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1889/2523752289/17_PM_Orange.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -3254,7 +3254,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6841/2523765433/17_PM_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6841/2523765433/17_PM_Blue.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>синий</Color>
@@ -3305,7 +3305,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1185/2523776161/17_Pro_Silver.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1185/2523776161/17_Pro_Silver.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -3356,7 +3356,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3313/2523786481/17_Pro_Orange.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3313/2523786481/17_Pro_Orange.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -3407,7 +3407,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3721/2523803273/17_Pro_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3721/2523803273/17_Pro_Blue.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>синий</Color>
@@ -3458,7 +3458,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4321/2523812065/17_PM_Silver.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4321/2523812065/17_PM_Silver.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -3509,7 +3509,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5401/2523821337/17_PM_Orange.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5401/2523821337/17_PM_Orange.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976433</Revalidate></Ad>
+      <Revalidate>2976439</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3560,7 +3560,7 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6985/2523831113/17_PM_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6985/2523831113/17_PM_Blue.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>синий</Color>
@@ -3611,7 +3611,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6017/2523838337/17_Pro_Silver.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6017/2523838337/17_Pro_Silver.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976433</Revalidate></Ad>
+      <Revalidate>2976439</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3662,7 +3662,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5185/2523845697/17_Pro_Orange.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5185/2523845697/17_Pro_Orange.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -3713,7 +3713,7 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5897/2523854601/17_Pro_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5897/2523854601/17_Pro_Blue.jpeg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>синий</Color>
@@ -3764,7 +3764,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6737/2532809297/17_White.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6737/2532809297/17_White.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>белый</Color>
@@ -3815,7 +3815,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5993/2532816745/17_Black.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5993/2532816745/17_Black.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>черный</Color>
@@ -3866,7 +3866,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/721/2532827857/17_Mist_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/721/2532827857/17_Mist_Blue.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>голубой</Color>
@@ -3917,7 +3917,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7185/2532834321/17_Lavander.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7185/2532834321/17_Lavander.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>фиолетовый</Color>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976433</Revalidate></Ad>
+      <Revalidate>2976439</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -3968,7 +3968,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2921/2532838249/17_Sage.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2921/2532838249/17_Sage.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>зеленый</Color>
@@ -4019,7 +4019,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/513/2532844033/17_Sage.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/513/2532844033/17_Sage.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>зеленый</Color>
@@ -4070,7 +4070,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5569/2532849089/17_Lavander.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5569/2532849089/17_Lavander.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>фиолетовый</Color>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976433</Revalidate></Ad>
+      <Revalidate>2976439</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -4121,7 +4121,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1657/2532853369/17_Mist_Blue.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1657/2532853369/17_Mist_Blue.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>голубой</Color>
@@ -4172,7 +4172,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6697/2532858409/17_Black.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6697/2532858409/17_Black.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>черный</Color>
@@ -4223,7 +4223,7 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4649/2532864553/17_White.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4649/2532864553/17_White.jpeg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>белый</Color>
@@ -4265,11 +4265,11 @@
         
         <Model>iPhone 13 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1281/2533754113/IMG_3525.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1297/2533754129/IMG_3526.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1313/2533754145/IMG_3527.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1361/2533754193/IMG_3528.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1369/2533754201/IMG_3529.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1281/2533754113/IMG_3525.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1297/2533754129/IMG_3526.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1313/2533754145/IMG_3527.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1361/2533754193/IMG_3528.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1369/2533754201/IMG_3529.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>голубой</Color>
@@ -4324,7 +4324,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4889/2533274393/watch_se.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4889/2533274393/watch_se.jpeg"/>
         </Images>
         <Color>Бежевый</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -4379,7 +4379,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3817/2533281513/watch_se.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3817/2533281513/watch_se.jpeg"/>
         </Images>
         <Color>Бежевый</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -4434,7 +4434,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4585/2533290473/series_9.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4585/2533290473/series_9.jpeg"/>
         </Images>
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -4489,7 +4489,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2441/2533296521/series_9.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2441/2533296521/series_9.jpeg"/>
         </Images>
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -4544,7 +4544,7 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7985/2533310257/watch_ultra.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7985/2533310257/watch_ultra.jpeg"/>
         </Images>
         <Color>Бежевый</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -4587,10 +4587,10 @@
         
         <Model>iPhone 14 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2017/2535671777/IMG_3613.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2033/2535671793/IMG_3614.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2041/2535671801/IMG_3615.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2049/2535671809/IMG_3616.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2017/2535671777/IMG_3613.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2033/2535671793/IMG_3614.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2041/2535671801/IMG_3615.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2049/2535671809/IMG_3616.jpg"/>
         </Images>
         <MemorySize>1024 ГБ</MemorySize>
         <Color>фиолетовый</Color>
@@ -4633,11 +4633,11 @@
         
         <Model>iPhone 14 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2329/2535672089/IMG_3617.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2337/2535672097/IMG_3618.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2345/2535672105/IMG_3619.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2353/2535672113/IMG_3620.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2361/2535672121/IMG_3621.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2329/2535672089/IMG_3617.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2337/2535672097/IMG_3618.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2345/2535672105/IMG_3619.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2353/2535672113/IMG_3620.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2361/2535672121/IMG_3621.jpg"/>
         </Images>
         <MemorySize>1024 ГБ</MemorySize>
         <Color>фиолетовый</Color>
@@ -4676,11 +4676,11 @@
         
         <Model>iPad Pro 11 (4-го поколения) (2022)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5385/2536977673/IMG_3698.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5545/2536977833/IMG_3703.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5401/2536977689/IMG_3699.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5465/2536977753/IMG_3700.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5489/2536977777/IMG_3702.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5385/2536977673/IMG_3698.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5545/2536977833/IMG_3703.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5401/2536977689/IMG_3699.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5465/2536977753/IMG_3700.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5489/2536977777/IMG_3702.jpg"/>
         </Images>
         <MemorySize>256</MemorySize>
         <Color>Серый</Color>
@@ -4726,9 +4726,9 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5905/2536920849/IMG_3696.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5897/2536920841/IMG_3695.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5849/2536920793/IMG_3693.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5905/2536920849/IMG_3696.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5897/2536920841/IMG_3695.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5849/2536920793/IMG_3693.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
         
@@ -4761,11 +4761,11 @@
         
         <Model>Apple Watch 8</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6577/2551609777/IMG_4007.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6593/2551609793/IMG_4008.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6609/2551609809/IMG_4009.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6617/2551609817/IMG_4010.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6633/2551609833/IMG_4011.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6577/2551609777/IMG_4007.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6593/2551609793/IMG_4008.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6609/2551609809/IMG_4009.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6617/2551609817/IMG_4010.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6633/2551609833/IMG_4011.jpg"/>
         </Images>
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -4810,9 +4810,9 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3865/2550845209/IMG_3949.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3873/2550845217/IMG_3950.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3881/2550845225/IMG_3951.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3865/2550845209/IMG_3949.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3873/2550845217/IMG_3950.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3881/2550845225/IMG_3951.jpg"/>
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
@@ -4844,9 +4844,9 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6977/2550856513/IMG_3946.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6985/2550856521/IMG_3947.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6993/2550856529/IMG_3948.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6977/2550856513/IMG_3946.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6985/2550856521/IMG_3947.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6993/2550856529/IMG_3948.jpg"/>
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
@@ -4882,14 +4882,14 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/697/2550956729/IMG_3968.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/713/2550956745/IMG_3969.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/649/2550956681/IMG_3960.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/689/2550956721/IMG_3967.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/681/2550956713/IMG_3966.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/657/2550956689/IMG_3961.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/665/2550956697/IMG_3963.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/673/2550956705/IMG_3964.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/697/2550956729/IMG_3968.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/713/2550956745/IMG_3969.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/649/2550956681/IMG_3960.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/689/2550956721/IMG_3967.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/681/2550956713/IMG_3966.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/657/2550956689/IMG_3961.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/665/2550956697/IMG_3963.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/673/2550956705/IMG_3964.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
         
@@ -4930,11 +4930,11 @@
         
         <Model>iPhone 13 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/825/2572649273/IMG_4237.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/841/2572649289/IMG_4238.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/857/2572649305/IMG_4239.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/809/2572649257/IMG_4241.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/873/2572649321/IMG_4240.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/825/2572649273/IMG_4237.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/841/2572649289/IMG_4238.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/857/2572649305/IMG_4239.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/809/2572649257/IMG_4241.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/873/2572649321/IMG_4240.jpg"/>
         </Images>
         <MemorySize>128 ГБ</MemorySize>
         <Color>голубой</Color>
@@ -4977,10 +4977,10 @@
         
         <Model>iPhone 13 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6937/2573163289/IMG_4313.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6945/2573163297/IMG_4314.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6953/2573163305/IMG_4315.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6969/2573163321/IMG_4316.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6937/2573163289/IMG_4313.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6945/2573163297/IMG_4314.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6953/2573163305/IMG_4315.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6969/2573163321/IMG_4316.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>голубой</Color>
@@ -5023,12 +5023,12 @@
         
         <Model>iPhone 14 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7753/2657689161/IMG_5596.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8025/2657689433/IMG_5597.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7785/2657689193/IMG_5600.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7793/2657689201/IMG_5599.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7841/2657689249/IMG_5598.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7769/2657689177/IMG_5601.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7753/2657689161/IMG_5596.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8025/2657689433/IMG_5597.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7785/2657689193/IMG_5600.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7793/2657689201/IMG_5599.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7841/2657689249/IMG_5598.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7769/2657689177/IMG_5601.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>черный</Color>
@@ -5071,10 +5071,10 @@
         
         <Model>iPhone 13 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6465/2738649409/IMG_2368.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6489/2738649433/IMG_2375.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6497/2738649441/IMG_2376.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6505/2738649449/IMG_2377.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6465/2738649409/IMG_2368.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6489/2738649433/IMG_2375.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6497/2738649441/IMG_2376.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6505/2738649449/IMG_2377.jpg"/>
         </Images>
         <MemorySize>1024 ГБ</MemorySize>
         <Color>голубой</Color>
@@ -5117,11 +5117,11 @@
         
         <Model>iPhone 7 Plus</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7145/2794666985/IMG_7289.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7153/2794666993/IMG_7290.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7185/2794667025/IMG_7291.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7201/2794667041/IMG_7292.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7217/2794667057/IMG_7293.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7145/2794666985/IMG_7289.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7153/2794666993/IMG_7290.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7185/2794667025/IMG_7291.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7201/2794667041/IMG_7292.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7217/2794667057/IMG_7293.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>розовый</Color>
@@ -5164,10 +5164,10 @@
         
         <Model>iPhone 13 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2425/2811734393/IMG_0922_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2441/2811734409/IMG_0926_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2449/2811734417/IMG_0924_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2457/2811734425/IMG_0925_2.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2425/2811734393/IMG_0922_2.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2441/2811734409/IMG_0926_2.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2449/2811734417/IMG_0924_2.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2457/2811734425/IMG_0925_2.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -5206,10 +5206,10 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7913/2821922537/IMG_7559.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7921/2821922545/IMG_7563.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7937/2821922561/IMG_7564.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7897/2821922521/IMG_7553.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7913/2821922537/IMG_7559.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7921/2821922545/IMG_7563.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7937/2821922561/IMG_7564.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7897/2821922521/IMG_7553.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
         
@@ -5241,10 +5241,10 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5985/2821920609/IMG_7560.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6001/2821920625/IMG_7561.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6009/2821920633/IMG_7562.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5977/2821920601/IMG_7554.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5985/2821920609/IMG_7560.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6001/2821920625/IMG_7561.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6009/2821920633/IMG_7562.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5977/2821920601/IMG_7554.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
         
@@ -5280,10 +5280,10 @@
         
         <Model>iPhone 13 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1377/3040429409/IMG_9996.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1409/3040429441/IMG_9997.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1385/3040429417/IMG_9999.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1393/3040429425/IMG_9998.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1377/3040429409/IMG_9996.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1409/3040429441/IMG_9997.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1385/3040429417/IMG_9999.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1393/3040429425/IMG_9998.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>голубой</Color>
@@ -5323,10 +5323,10 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3897/3002322745/IMG_9427.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3905/3002322753/IMG_9428.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3913/3002322761/IMG_9429.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3921/3002322769/IMG_9430.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3897/3002322745/IMG_9427.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3905/3002322753/IMG_9428.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3913/3002322761/IMG_9429.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3921/3002322769/IMG_9430.jpg"/>
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
@@ -5360,11 +5360,11 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1153/2983494785/IMG_9128.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1161/2983494793/IMG_9129.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1177/2983494809/IMG_9130.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1193/2983494825/IMG_9131.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1209/2983494841/IMG_9132.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1153/2983494785/IMG_9128.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1161/2983494793/IMG_9129.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1177/2983494809/IMG_9130.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1193/2983494825/IMG_9131.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1209/2983494841/IMG_9132.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -5396,11 +5396,11 @@
         
         <Model>Apple Watch Ultra</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5769/2983499401/IMG_9127.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5777/2983499409/IMG_9121.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5785/2983499417/IMG_9122.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5793/2983499425/IMG_9123.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5817/2983499449/IMG_9124.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5769/2983499401/IMG_9127.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5777/2983499409/IMG_9121.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5785/2983499417/IMG_9122.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5793/2983499425/IMG_9123.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5817/2983499449/IMG_9124.jpg"/>
         </Images>
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -5448,10 +5448,10 @@
         
         <Model>iPhone 12</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5169/3002496049/IMG_9489.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5185/3002496065/IMG_9490.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5193/3002496073/IMG_9491.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5201/3002496081/IMG_9492.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5169/3002496049/IMG_9489.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5185/3002496065/IMG_9490.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5193/3002496073/IMG_9491.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5201/3002496081/IMG_9492.jpg"/>
         </Images>
         <MemorySize>64 ГБ</MemorySize>
         <Color>черный</Color>
@@ -5494,11 +5494,11 @@
         
         <Model>iPhone 12 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/8129/3040313281/IMG_9932.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8145/3040313297/IMG_9935.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8153/3040313305/IMG_9934.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8161/3040313313/IMG_9933.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8137/3040313289/IMG_9936.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8129/3040313281/IMG_9932.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8145/3040313297/IMG_9935.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8153/3040313305/IMG_9934.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8161/3040313313/IMG_9933.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8137/3040313289/IMG_9936.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>синий</Color>
@@ -5537,11 +5537,11 @@
         
         <Model>iPad Pro 11 (2-го поколения) (2020)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2025/3002329065/IMG_9442.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2017/3002329057/IMG_9441.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2033/3002329073/IMG_9443.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2041/3002329081/IMG_9444.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2049/3002329089/IMG_9445.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2025/3002329065/IMG_9442.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2017/3002329057/IMG_9441.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2033/3002329073/IMG_9443.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2041/3002329081/IMG_9444.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2049/3002329089/IMG_9445.jpg"/>
         </Images>
         <MemorySize>256</MemorySize>
         <Color>Серый</Color>
@@ -5589,12 +5589,12 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7689/3002326537/IMG_9446.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7697/3002326545/IMG_9447.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7705/3002326553/IMG_9448.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7721/3002326569/IMG_9449.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7793/3002326641/IMG_9450.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7801/3002326649/IMG_9451.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7689/3002326537/IMG_9446.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7697/3002326545/IMG_9447.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7705/3002326553/IMG_9448.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7721/3002326569/IMG_9449.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7793/3002326641/IMG_9450.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7801/3002326649/IMG_9451.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -5629,10 +5629,10 @@
         
         <Model>iPhone 13 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6921/3023084297/IMG_0922_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6929/3023084305/IMG_0926_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6937/3023084313/IMG_0925_2.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6945/3023084321/IMG_0924_2.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6921/3023084297/IMG_0922_2.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6929/3023084305/IMG_0926_2.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6937/3023084313/IMG_0925_2.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6945/3023084321/IMG_0924_2.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -5675,10 +5675,10 @@
         
         <Model>iPhone 11 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/433/3023045041/IMG_7202.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/449/3023045057/IMG_7205.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/457/3023045065/IMG_7206.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/465/3023045073/IMG_7204.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/433/3023045041/IMG_7202.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/449/3023045057/IMG_7205.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/457/3023045065/IMG_7206.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/465/3023045073/IMG_7204.jpg"/>
         </Images>
         <MemorySize>64 ГБ</MemorySize>
         <Color>зеленый</Color>
@@ -5721,11 +5721,11 @@
         
         <Model>iPhone 16 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1313/3035882785/IMG_3650.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1329/3035882801/IMG_3651.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1345/3035882817/IMG_3654.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1377/3035882849/IMG_3652.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1385/3035882857/IMG_3653.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1313/3035882785/IMG_3650.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1329/3035882801/IMG_3651.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1345/3035882817/IMG_3654.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1377/3035882849/IMG_3652.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1385/3035882857/IMG_3653.jpg"/>
         </Images>
         <MemorySize>128 ГБ</MemorySize>
         <Color>белый</Color>
@@ -5768,10 +5768,10 @@
         
         <Model>iPhone 13 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3497/3040390569/IMG_9975.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3537/3040390609/IMG_9976.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3505/3040390577/IMG_9978.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3521/3040390593/IMG_9977.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3497/3040390569/IMG_9975.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3537/3040390609/IMG_9976.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3505/3040390577/IMG_9978.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3521/3040390593/IMG_9977.jpg"/>
         </Images>
         <MemorySize>1024 ГБ</MemorySize>
         <Color>голубой</Color>
@@ -5814,14 +5814,14 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/8089/3040763801/IMG_0070.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8097/3040763809/IMG_0071.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8113/3040763825/IMG_0072.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8121/3040763833/IMG_0073.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8145/3040763857/IMG_0074.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/73/3040763977/IMG_0076.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/8153/3040763865/IMG_0075.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/105/3040764009/IMG_0077.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8089/3040763801/IMG_0070.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8097/3040763809/IMG_0071.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8113/3040763825/IMG_0072.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8121/3040763833/IMG_0073.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8145/3040763857/IMG_0074.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/73/3040763977/IMG_0076.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/8153/3040763865/IMG_0075.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/105/3040764009/IMG_0077.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
         
@@ -5862,10 +5862,10 @@
         
         <Model>iPhone 16 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/953/3040814009/IMG_9660.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/969/3040814025/IMG_9664.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/977/3040814033/IMG_9663.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/993/3040814049/IMG_9662.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/953/3040814009/IMG_9660.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/969/3040814025/IMG_9664.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/977/3040814033/IMG_9663.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/993/3040814049/IMG_9662.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>черный</Color>
@@ -5905,10 +5905,10 @@
         
         <Model>Apple Watch SE</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1577/3058648617/IMG_0327.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1633/3058648673/IMG_0328.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1689/3058648729/IMG_0329.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1713/3058648753/IMG_0330.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1577/3058648617/IMG_0327.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1633/3058648673/IMG_0328.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1689/3058648729/IMG_0329.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1713/3058648753/IMG_0330.jpg"/>
         </Images>
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -5956,11 +5956,11 @@
         
         <Model>iPhone 16 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1777/3058878193/IMG_0369.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1801/3058878217/IMG_0370.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1825/3058878241/IMG_0371.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1841/3058878257/IMG_0372.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1857/3058878273/IMG_0373.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1777/3058878193/IMG_0369.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1801/3058878217/IMG_0370.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1825/3058878241/IMG_0371.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1841/3058878257/IMG_0372.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1857/3058878273/IMG_0373.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>золотистый</Color>
@@ -6003,11 +6003,11 @@
         
         <Model>iPhone 16 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/993/3058893793/IMG_0379.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1009/3058893809/IMG_0380.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1017/3058893817/IMG_0381.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1041/3058893841/IMG_0382.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1057/3058893857/IMG_0383.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/993/3058893793/IMG_0379.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1009/3058893809/IMG_0380.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1017/3058893817/IMG_0381.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1041/3058893841/IMG_0382.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1057/3058893857/IMG_0383.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>черный</Color>
@@ -6051,10 +6051,10 @@
         
         <Model>iPhone 16 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3161/3058846809/IMG_0346.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3193/3058846841/IMG_0347.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3225/3058846873/IMG_0348.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3265/3058846913/IMG_0349.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3161/3058846809/IMG_0346.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3193/3058846841/IMG_0347.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3225/3058846873/IMG_0348.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3265/3058846913/IMG_0349.jpg"/>
         </Images>
         <MemorySize>128 ГБ</MemorySize>
         <Color>черный</Color>
@@ -6097,10 +6097,10 @@
         
         <Model>iPhone 15 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/129/3058458753/IMG_0306.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/145/3058458769/IMG_0307.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/153/3058458777/IMG_0308.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/161/3058458785/IMG_0309.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/129/3058458753/IMG_0306.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/145/3058458769/IMG_0307.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/153/3058458777/IMG_0308.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/161/3058458785/IMG_0309.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>серый</Color>
@@ -6143,11 +6143,11 @@
         
         <Model>iPhone 15 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7305/3058457737/IMG_0299.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7433/3058457865/IMG_0300.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7449/3058457881/IMG_0301.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7457/3058457889/IMG_0303.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7465/3058457897/IMG_0304.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7305/3058457737/IMG_0299.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7433/3058457865/IMG_0300.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7449/3058457881/IMG_0301.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7457/3058457889/IMG_0303.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7465/3058457897/IMG_0304.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>синий</Color>
@@ -6187,8 +6187,8 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5377/3058357505/IMG_0255.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5385/3058357513/IMG_0256.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5377/3058357505/IMG_0255.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5385/3058357513/IMG_0256.jpg"/>
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
@@ -6225,10 +6225,10 @@
         
         <Model>iPhone 12 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5969/3059103569/IMG_0402.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6041/3059103641/IMG_0405.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5985/3059103585/IMG_0403.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6009/3059103609/IMG_0404.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5969/3059103569/IMG_0402.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6041/3059103641/IMG_0405.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5985/3059103585/IMG_0403.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6009/3059103609/IMG_0404.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>синий</Color>
@@ -6268,10 +6268,10 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/625/3073827441/IMG_0585.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/649/3073827465/IMG_0587.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/641/3073827457/IMG_0586.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/601/3073827417/IMG_0584.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/625/3073827441/IMG_0585.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/649/3073827465/IMG_0587.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/641/3073827457/IMG_0586.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/601/3073827417/IMG_0584.jpg"/>
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
@@ -6307,10 +6307,10 @@
         
         <Model>iPhone Xs Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7241/3095911497/IMG_0811.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7281/3095911537/IMG_0812.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7289/3095911545/IMG_0813.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7297/3095911553/IMG_0814.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7241/3095911497/IMG_0811.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7281/3095911537/IMG_0812.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7289/3095911545/IMG_0813.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7297/3095911553/IMG_0814.jpg"/>
         </Images>
         <MemorySize>64 ГБ</MemorySize>
         <Color>серый</Color>
@@ -6353,11 +6353,11 @@
         
         <Model>iPhone 16 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6873/3096017625/IMG_0876.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6889/3096017641/IMG_0877.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6897/3096017649/IMG_0878.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6905/3096017657/IMG_0879.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6913/3096017665/IMG_0880.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6873/3096017625/IMG_0876.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6889/3096017641/IMG_0877.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6897/3096017649/IMG_0878.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6905/3096017657/IMG_0879.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6913/3096017665/IMG_0880.jpg"/>
         </Images>
         <MemorySize>128 ГБ</MemorySize>
         <Color>золотистый</Color>
@@ -6400,11 +6400,11 @@
         
         <Model>iPhone 14 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5553/3095909809/IMG_4673.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5561/3095909817/IMG_4674.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5577/3095909833/IMG_4675.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5585/3095909841/IMG_4676.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5593/3095909849/IMG_4677.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5553/3095909809/IMG_4673.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5561/3095909817/IMG_4674.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5577/3095909833/IMG_4675.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5585/3095909841/IMG_4676.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5593/3095909849/IMG_4677.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>фиолетовый</Color>
@@ -6447,11 +6447,11 @@
         
         <Model>iPhone 16 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2737/3129289393/IMG_1359.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2761/3129289417/IMG_1360.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2769/3129289425/IMG_1361.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2777/3129289433/IMG_1362.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2785/3129289441/IMG_1363.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2737/3129289393/IMG_1359.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2761/3129289417/IMG_1360.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2769/3129289425/IMG_1361.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2777/3129289433/IMG_1362.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2785/3129289441/IMG_1363.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>золотистый</Color>
@@ -6494,10 +6494,10 @@
         
         <Model>iPhone 12 mini</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1841/3129173809/IMG_1268.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1849/3129173817/IMG_1269.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1857/3129173825/IMG_1270.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1881/3129173849/IMG_1271.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1841/3129173809/IMG_1268.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1849/3129173817/IMG_1269.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1857/3129173825/IMG_1270.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1881/3129173849/IMG_1271.jpg"/>
         </Images>
         <MemorySize>64 ГБ</MemorySize>
         <Color>черный</Color>
@@ -6538,11 +6538,11 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4881/3129168657/IMG_1249.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4889/3129168665/IMG_1250.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4897/3129168673/IMG_1251.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4905/3129168681/IMG_1252.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4913/3129168689/IMG_1253.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4881/3129168657/IMG_1249.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4889/3129168665/IMG_1250.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4897/3129168673/IMG_1251.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4905/3129168681/IMG_1252.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4913/3129168689/IMG_1253.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -6574,11 +6574,11 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5465/3148871001/IMG_1672.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5449/3148870985/IMG_1671.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5481/3148871017/IMG_1673.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5489/3148871025/IMG_1674.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5497/3148871033/IMG_1675.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5465/3148871001/IMG_1672.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5449/3148870985/IMG_1671.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5481/3148871017/IMG_1673.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5489/3148871025/IMG_1674.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5497/3148871033/IMG_1675.jpg"/>
         </Images>
         <GoodsSubType>Клавиатуры</GoodsSubType>
         <Category>Товары для компьютера</Category>
@@ -6614,10 +6614,10 @@
         
         <Model>iPhone 11 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7753/3149373001/IMG_7202.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7769/3149373017/IMG_7205.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7777/3149373025/IMG_7206.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7785/3149373033/IMG_7204.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7753/3149373001/IMG_7202.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7769/3149373017/IMG_7205.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7777/3149373025/IMG_7206.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7785/3149373033/IMG_7204.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>зеленый</Color>
@@ -6660,9 +6660,9 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7201/3165551649/9BE259CD-0D0E-4F97-BE08-3ADB365481B9.PNG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7193/3165551641/D52554E4-2B3F-4AA5-B41E-438C60913E0B.PNG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7217/3165551665/B96C3771-50B8-4A33-AC28-E751845CC929.PNG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7201/3165551649/9BE259CD-0D0E-4F97-BE08-3ADB365481B9.PNG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7193/3165551641/D52554E4-2B3F-4AA5-B41E-438C60913E0B.PNG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7217/3165551665/B96C3771-50B8-4A33-AC28-E751845CC929.PNG"/>
         </Images>
         <Category>Настольные компьютеры</Category>
         
@@ -6697,11 +6697,11 @@
         
         <Model>iPhone 16 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2081/3163293729/IMG_1925.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2089/3163293737/IMG_1926.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2105/3163293753/IMG_1927.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2113/3163293761/IMG_1928.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2121/3163293769/IMG_1929.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2081/3163293729/IMG_1925.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2089/3163293737/IMG_1926.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2105/3163293753/IMG_1927.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2113/3163293761/IMG_1928.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2121/3163293769/IMG_1929.jpg"/>
         </Images>
         <MemorySize>128 ГБ</MemorySize>
         <Color>золотистый</Color>
@@ -6744,11 +6744,11 @@
         
         <Model>iPhone 16 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4449/3163296097/IMG_1939.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4465/3163296113/IMG_1940.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4473/3163296121/IMG_1941.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4481/3163296129/IMG_1942.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4489/3163296137/IMG_1943.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4449/3163296097/IMG_1939.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4465/3163296113/IMG_1940.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4473/3163296121/IMG_1941.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4481/3163296129/IMG_1942.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4489/3163296137/IMG_1943.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>золотистый</Color>
@@ -6791,11 +6791,11 @@
         
         <Model>iPhone 16 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/633/3163308665/IMG_1956.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/649/3163308681/IMG_1957.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/657/3163308689/IMG_1958.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/665/3163308697/IMG_1959.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/681/3163308713/IMG_1960.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/633/3163308665/IMG_1956.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/649/3163308681/IMG_1957.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/657/3163308689/IMG_1958.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/665/3163308697/IMG_1959.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/681/3163308713/IMG_1960.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>черный</Color>
@@ -6838,11 +6838,11 @@
         
         <Model>iPhone Xr</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1417/3163194761/IMG_1850.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1425/3163194769/IMG_1851.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1433/3163194777/IMG_1852.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1441/3163194785/IMG_1853.JPG"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1449/3163194793/IMG_1854.JPG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1417/3163194761/IMG_1850.JPG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1425/3163194769/IMG_1851.JPG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1433/3163194777/IMG_1852.JPG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1441/3163194785/IMG_1853.JPG"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1449/3163194793/IMG_1854.JPG"/>
         </Images>
         <MemorySize>128 ГБ</MemorySize>
         <Color>желтый</Color>
@@ -6882,11 +6882,11 @@
         
         <Model>Apple Watch Ultra</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2257/3165661393/IMG_2021.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2265/3165661401/IMG_2022.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2273/3165661409/IMG_2023.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2281/3165661417/IMG_2024.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2297/3165661433/IMG_2025.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2257/3165661393/IMG_2021.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2265/3165661401/IMG_2022.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2273/3165661409/IMG_2023.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2281/3165661417/IMG_2024.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2297/3165661433/IMG_2025.jpg"/>
         </Images>
         <Color>серый</Color>
         <Category>Телефоны</Category>
@@ -6930,11 +6930,11 @@
         
         <Model>Apple Watch SE</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3513/3165629881/IMG_1993.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3521/3165629889/IMG_1994.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3529/3165629897/IMG_1995.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3545/3165629913/IMG_1996.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3553/3165629921/IMG_1997.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3513/3165629881/IMG_1993.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3521/3165629889/IMG_1994.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3529/3165629897/IMG_1995.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3545/3165629913/IMG_1996.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3553/3165629921/IMG_1997.jpg"/>
         </Images>
         <Color>черный</Color>
         <GoodsSubType>Смарт-часы</GoodsSubType>
@@ -6982,9 +6982,9 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6385/3165624561/IMG_1980.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6417/3165624593/IMG_1982.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6409/3165624585/IMG_1981.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6385/3165624561/IMG_1980.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6417/3165624593/IMG_1982.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6409/3165624585/IMG_1981.jpg"/>
         </Images>
         <Category>Товары для компьютера</Category>
         
@@ -7020,11 +7020,11 @@
         
         <Model>iPhone 17 Pro</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4305/3187577041/IMG_2421.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4313/3187577049/IMG_2422.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4321/3187577057/IMG_2423.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4329/3187577065/IMG_2424.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4337/3187577073/IMG_2425.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4305/3187577041/IMG_2421.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4313/3187577049/IMG_2422.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4321/3187577057/IMG_2423.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4329/3187577065/IMG_2424.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4337/3187577073/IMG_2425.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>серебристый</Color>
@@ -7067,11 +7067,11 @@
         
         <Model>iPhone 16 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4921/3187577657/IMG_2406.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4937/3187577673/IMG_2407.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4953/3187577689/IMG_2408.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4961/3187577697/IMG_2409.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4977/3187577713/IMG_2410.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4921/3187577657/IMG_2406.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4937/3187577673/IMG_2407.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4953/3187577689/IMG_2408.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4961/3187577697/IMG_2409.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4977/3187577713/IMG_2410.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>серый</Color>
@@ -7114,11 +7114,11 @@
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4665/3187577401/IMG_2411.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4673/3187577409/IMG_2412.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4681/3187577417/IMG_2413.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4689/3187577425/IMG_2414.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4705/3187577441/IMG_2415.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4665/3187577401/IMG_2411.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4673/3187577409/IMG_2412.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4681/3187577417/IMG_2413.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4689/3187577425/IMG_2414.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4705/3187577441/IMG_2415.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>оранжевый</Color>
@@ -7161,14 +7161,14 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6697/3187907113/IMG_2460.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6657/3187907073/IMG_2459.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6617/3187907033/IMG_2456.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6633/3187907049/IMG_2457.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6649/3187907065/IMG_2458.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6609/3187907025/IMG_2463.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6705/3187907121/IMG_2461.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6721/3187907137/IMG_2462.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6697/3187907113/IMG_2460.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6657/3187907073/IMG_2459.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6617/3187907033/IMG_2456.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6633/3187907049/IMG_2457.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6649/3187907065/IMG_2458.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6609/3187907025/IMG_2463.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6705/3187907121/IMG_2461.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6721/3187907137/IMG_2462.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
         
@@ -7209,13 +7209,13 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5305/3187930297/IMG_2495.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5385/3187930377/IMG_2494.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5337/3187930329/IMG_2489.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5345/3187930337/IMG_2490.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5361/3187930353/IMG_2491.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5369/3187930361/IMG_2492.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5377/3187930369/IMG_2493.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5305/3187930297/IMG_2495.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5385/3187930377/IMG_2494.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5337/3187930329/IMG_2489.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5345/3187930337/IMG_2490.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5361/3187930353/IMG_2491.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5369/3187930361/IMG_2492.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5377/3187930369/IMG_2493.jpg"/>
         </Images>
         <Category>Ноутбуки</Category>
         
@@ -7255,11 +7255,11 @@
         
         <Model>Apple Watch 7</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3393/3187576129/IMG_2395.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3417/3187576153/IMG_2396.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3441/3187576177/IMG_2397.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3465/3187576201/IMG_2398.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3473/3187576209/IMG_2399.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3393/3187576129/IMG_2395.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3417/3187576153/IMG_2396.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3441/3187576177/IMG_2397.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3465/3187576201/IMG_2398.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3473/3187576209/IMG_2399.jpg"/>
         </Images>
         <Color>зеленый</Color>
         <Category>Телефоны</Category>
@@ -7308,10 +7308,10 @@
         
         <Model>iPad Pro 12.9 (5-го поколения) (2021)</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1633/3187762785/IMG_2428.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1641/3187762793/IMG_2429.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1649/3187762801/IMG_2430.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1657/3187762809/IMG_2431.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1633/3187762785/IMG_2428.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1641/3187762793/IMG_2429.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1649/3187762801/IMG_2430.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1657/3187762809/IMG_2431.jpg"/>
         </Images>
         <MemorySize>256</MemorySize>
         <Color>Серый</Color>
@@ -7360,11 +7360,11 @@
         
         <Model>iPhone 16 Pro Max</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1337/3187574073/IMG_2416.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1345/3187574081/IMG_2417.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1353/3187574089/IMG_2418.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1361/3187574097/IMG_2419.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1369/3187574105/IMG_2420.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1337/3187574073/IMG_2416.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1345/3187574081/IMG_2417.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1353/3187574089/IMG_2418.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1361/3187574097/IMG_2419.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1369/3187574105/IMG_2420.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>золотистый</Color>
@@ -7407,11 +7407,11 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/7473/3187547441/IMG_2363.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7481/3187547449/IMG_2364.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7497/3187547465/IMG_2365.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7505/3187547473/IMG_2366.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/7521/3187547489/IMG_2367.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7473/3187547441/IMG_2363.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7481/3187547449/IMG_2364.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7497/3187547465/IMG_2365.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7505/3187547473/IMG_2366.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7521/3187547489/IMG_2367.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>черный</Color>
@@ -7454,11 +7454,11 @@
         
         <Model>iPhone Xr</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3857/3187543825/IMG_2390.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3873/3187543841/IMG_2391.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3881/3187543849/IMG_2392.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3889/3187543857/IMG_2393.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3897/3187543865/IMG_2394.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3857/3187543825/IMG_2390.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3873/3187543841/IMG_2391.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3881/3187543849/IMG_2392.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3889/3187543857/IMG_2393.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3897/3187543865/IMG_2394.jpg"/>
         </Images>
         <MemorySize>128 ГБ</MemorySize>
         <Color>белый</Color>
@@ -7499,12 +7499,12 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3913/3187576649/IMG_2405.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3961/3187576697/IMG_2404.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3937/3187576673/IMG_2402.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3945/3187576681/IMG_2403.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3921/3187576657/IMG_2400.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3929/3187576665/IMG_2401.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3913/3187576649/IMG_2405.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3961/3187576697/IMG_2404.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3937/3187576673/IMG_2402.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3945/3187576681/IMG_2403.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3921/3187576657/IMG_2400.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3929/3187576665/IMG_2401.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -7539,10 +7539,10 @@
         
         <Model>iPhone 14 Plus</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/5201/3199972433/IMG_2636.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5233/3199972465/IMG_2637.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5241/3199972473/IMG_2638.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5249/3199972481/IMG_2639.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5201/3199972433/IMG_2636.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5233/3199972465/IMG_2637.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5241/3199972473/IMG_2638.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5249/3199972481/IMG_2639.jpg"/>
         </Images>
         <MemorySize>128 ГБ</MemorySize>
         <Color>белый</Color>
@@ -7585,11 +7585,11 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/6353/3199998161/IMG_2666.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6377/3199998185/IMG_2667.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6385/3199998193/IMG_2668.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6401/3199998209/IMG_2669.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/6425/3199998233/IMG_2670.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6353/3199998161/IMG_2666.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6377/3199998185/IMG_2667.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6385/3199998193/IMG_2668.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6401/3199998209/IMG_2669.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6425/3199998233/IMG_2670.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>черный</Color>
@@ -7631,10 +7631,10 @@
         
         <Model>AirPods Pro 3</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3345/3200011537/IMG_2681.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3353/3200011545/IMG_2682.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3361/3200011553/IMG_2683.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3377/3200011569/IMG_2684.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3345/3200011537/IMG_2681.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3353/3200011545/IMG_2682.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3361/3200011553/IMG_2683.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3377/3200011569/IMG_2684.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -7671,10 +7671,10 @@
         
         <Model>iPhone 17</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/2169/3199985785/IMG_2662.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2217/3199985833/IMG_2663.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2233/3199985849/IMG_2664.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2241/3199985857/IMG_2665.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2169/3199985785/IMG_2662.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2217/3199985833/IMG_2663.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2233/3199985849/IMG_2664.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2241/3199985857/IMG_2665.jpg"/>
         </Images>
         <MemorySize>256 ГБ</MemorySize>
         <Color>белый</Color>
@@ -7716,11 +7716,11 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4969/3200004969/IMG_2671.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4977/3200004977/IMG_2672.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4985/3200004985/IMG_2673.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5033/3200005033/IMG_2674.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/5041/3200005041/IMG_2675.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4969/3200004969/IMG_2671.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4977/3200004977/IMG_2672.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4985/3200004985/IMG_2673.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5033/3200005033/IMG_2674.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5041/3200005041/IMG_2675.jpg"/>
         </Images>
         <Color>белый</Color>
         <Category>Телефоны</Category>
@@ -7768,11 +7768,11 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/1945/3200001945/IMG_2676.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1985/3200001985/IMG_2677.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/1993/3200001993/IMG_2678.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2001/3200002001/IMG_2679.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/2009/3200002009/IMG_2680.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1945/3200001945/IMG_2676.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1985/3200001985/IMG_2677.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/1993/3200001993/IMG_2678.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2001/3200002001/IMG_2679.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2009/3200002009/IMG_2680.jpg"/>
         </Images>
         <Color>синий</Color>
         <Category>Телефоны</Category>
@@ -7821,11 +7821,11 @@
         
         <Model>iPhone 16</Model>
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/4353/3199987969/IMG_2657.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4361/3199987977/IMG_2658.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4377/3199987993/IMG_2659.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4385/3199988001/IMG_2660.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/4401/3199988017/IMG_2661.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4353/3199987969/IMG_2657.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4361/3199987977/IMG_2658.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4377/3199987993/IMG_2659.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4385/3199988001/IMG_2660.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/4401/3199988017/IMG_2661.jpg"/>
         </Images>
         <MemorySize>512 ГБ</MemorySize>
         <Color>черный</Color>
@@ -7864,9 +7864,9 @@
         
         
         <Images>
-          <Image url="https://static.insales-cdn.com/images/products/1/3057/3200027633/IMG_2685.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3089/3200027665/IMG_2687.jpg"/>
-          <Image url="https://static.insales-cdn.com/images/products/1/3081/3200027657/IMG_2686.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3057/3200027633/IMG_2685.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3089/3200027665/IMG_2687.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3081/3200027657/IMG_2686.jpg"/>
         </Images>
         <Category>Планшеты и электронные книги</Category>
         
