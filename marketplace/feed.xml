@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2976715</Revalidate></Ad>
+      <Revalidate>2976721</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976715</Revalidate></Ad>
+      <Revalidate>2976721</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976715</Revalidate></Ad>
+      <Revalidate>2976721</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976715</Revalidate></Ad>
+      <Revalidate>2976721</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976715</Revalidate></Ad>
+      <Revalidate>2976721</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976715</Revalidate></Ad>
+      <Revalidate>2976721</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976715</Revalidate></Ad>
+      <Revalidate>2976721</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976715</Revalidate></Ad>
+      <Revalidate>2976721</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -5350,52 +5350,6 @@
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
       </Ad>
-
-      <Ad>
-        <Id>1816839529</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 12 64Gb Black бу</Title>
-        <Description><![CDATA[<p>iPhone 12 64Gb Black бу</p>
-<p>✅Отличное внешнее состояние, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 95% Аккумулятор менялся ранее<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 58279</p>]]></Description>
-        <Price>14990</Price>
-        
-        <Model>iPhone 12</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5169/3002496049/IMG_9489.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5185/3002496065/IMG_9490.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5193/3002496073/IMG_9491.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5201/3002496081/IMG_9492.jpg"/>
-        </Images>
-        <MemorySize>64 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>4 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>95</Akb></Ad>
 
       <Ad>
         <Id>1816967233</Id>
@@ -7269,53 +7223,6 @@
         <Category>Телефоны</Category>
         
         <RamSize>8 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1881573105</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone XR 128Gb White бу</Title>
-        <Description><![CDATA[<p>iPhone XR 128Gb White бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство + коробка <br>✅Аккумулятор 100%🔋 Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 20141</p>]]></Description>
-        <Price>10990</Price>
-        
-        <Model>iPhone Xr</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3857/3187543825/IMG_2390.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3873/3187543841/IMG_2391.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3881/3187543849/IMG_2392.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3889/3187543857/IMG_2393.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3897/3187543865/IMG_2394.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>белый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>3 ГБ</RamSize>
         
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
