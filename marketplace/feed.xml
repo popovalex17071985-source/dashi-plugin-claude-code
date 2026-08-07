@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2976841</Revalidate></Ad>
+      <Revalidate>2976847</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976841</Revalidate></Ad>
+      <Revalidate>2976847</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976841</Revalidate></Ad>
+      <Revalidate>2976847</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976841</Revalidate></Ad>
+      <Revalidate>2976847</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976841</Revalidate></Ad>
+      <Revalidate>2976847</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976841</Revalidate></Ad>
+      <Revalidate>2976847</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2976841</Revalidate></Ad>
+      <Revalidate>2976847</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2976841</Revalidate></Ad>
+      <Revalidate>2976847</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -6270,53 +6270,6 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>86</Akb></Ad>
 
       <Ad>
-        <Id>1859705249</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 16 Pro Max 256Gb Desert Titanium бу</Title>
-        <Description><![CDATA[<p>iPhone 16 Pro Max 256Gb Desert Titanium бу</p>
-<p>✅Отличное внешнее состояние, царапинки на дисплее, общие следы эксплуатации, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 91%🔋 <br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 72537</p>]]></Description>
-        <Price>64990</Price>
-        
-        <Model>iPhone 16 Pro Max</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2737/3129289393/IMG_1359.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2761/3129289417/IMG_1360.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2769/3129289425/IMG_1361.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2777/3129289433/IMG_1362.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2785/3129289441/IMG_1363.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>золотистый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>8 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>91</Akb></Ad>
-
-      <Ad>
         <Id>1859734489</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -7634,54 +7587,6 @@
       <Akb>99</Akb><BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
-        <Id>1896768609</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Apple</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Ноутбуки</Category>
-        <Title>Apple MacBook Air 13&quot; 2022 M2/8/256GB Space Gray MLXW3 бу</Title>
-        <Description><![CDATA[<p>Apple MacBook Air 13" 2022 M2/8/256GB Space Gray MLXW3 бу </p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство + кабель<br>✅Циклов перезарядки: 180<br>✅Аккумулятор 98%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. l44gr</p>]]></Description>
-        <Price>51990</Price>
-        
-        
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5817/3215890105/IMG_2912.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5825/3215890113/IMG_2913.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5833/3215890121/IMG_2914.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5841/3215890129/IMG_2915.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5873/3215890161/IMG_2916.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5905/3215890193/IMG_2918.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5881/3215890169/IMG_2917.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5921/3215890209/IMG_2919.jpg"/>
-        </Images>
-        <Category>Ноутбуки</Category>
-        
-        <Condition>Б/у</Condition>
-        <Devicework>Включается</Devicework>
-        <AkbH>Больше 30 минут</AkbH>
-        <KBLayout>Есть кириллица</KBLayout>
-        <ScreenCondition>Без дефектов</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <KBCondition>Без дефектов</KBCondition>
-      <Akb>98</Akb><BoxSealed>Нет</BoxSealed></Ad>
-
-      <Ad>
         <Id>1896768777</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -7926,4 +7831,51 @@
         <KBCondition>Без дефектов</KBCondition>
         <Akb>86</Akb>
       <BoxSealed>Нет</BoxSealed></Ad>
+
+      <Ad>
+        <Id>1859705249</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 16 Pro Max 256Gb Desert Titanium бу</Title>
+        <Description><![CDATA[<p>iPhone 16 Pro Max 256Gb Desert Titanium бу</p>
+<p>✅Отличное внешнее состояние, царапинки на дисплее, общие следы эксплуатации, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 91%🔋 <br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 72537</p>]]></Description>
+        <Price>64990</Price>
+        
+        <Model>iPhone 16 Pro Max</Model>
+        <Images>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2737/3129289393/IMG_1359.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2761/3129289417/IMG_1360.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2769/3129289425/IMG_1361.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2777/3129289433/IMG_1362.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2785/3129289441/IMG_1363.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>золотистый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>8 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>91</Akb></Ad>
 </Ads>
