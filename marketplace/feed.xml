@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2977399</Revalidate></Ad>
+      <Revalidate>2977405</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977399</Revalidate></Ad>
+      <Revalidate>2977405</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977399</Revalidate></Ad>
+      <Revalidate>2977405</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977399</Revalidate></Ad>
+      <Revalidate>2977405</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977399</Revalidate></Ad>
+      <Revalidate>2977405</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977399</Revalidate></Ad>
+      <Revalidate>2977405</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977399</Revalidate></Ad>
+      <Revalidate>2977405</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977399</Revalidate></Ad>
+      <Revalidate>2977405</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -4734,55 +4734,6 @@
         
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
-
-      <Ad>
-        <Id>1650144321</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>Apple Watch Series 8 45mm Midnight бу</Title>
-        <Description><![CDATA[<p>Apple Watch Series 8 45mm Midnight бу</p>
-<p>✅Хорошее состояние, технически исправны <br>✅Комплект: часы <br>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. hkq1v</p>]]></Description>
-        <Price>13990</Price>
-        
-        <Model>Apple Watch 8</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6577/2551609777/IMG_4007.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6593/2551609793/IMG_4008.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6609/2551609809/IMG_4009.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6617/2551609817/IMG_4010.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6633/2551609833/IMG_4011.jpg"/>
-        </Images>
-        <Color>черный</Color>
-        <GoodsSubType>Смарт-часы</GoodsSubType>
-        <Category>Телефоны</Category>
-        
-        
-        <ProductType>Смарт-часы или браслет</ProductType>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Brand>Apple</Brand>
-        <ProductSubType>смарт-часы</ProductSubType>
-        <Gender>унисекс</Gender>
-        <StrapType>Полиуретановый</StrapType>
-        <DeviceWork>Включается</DeviceWork>
-        <Akb>82</Akb>
-        <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
-        <CaseFlaws>Царапины</CaseFlaws>
       </Ad>
 
       <Ad>
@@ -6994,6 +6945,53 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
+        <Id>1881572353</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 17 256Gb Black бу</Title>
+        <Description><![CDATA[<p>iPhone 17 256Gb Black бу</p>
+<p>✅Состояние отличное, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 100%🔋 <br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
+<p>Арт. 62413</p>]]></Description>
+        <Price>64990</Price>
+        
+        <Model>iPhone 17</Model>
+        <Images>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7473/3187547441/IMG_2363.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7481/3187547449/IMG_2364.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7497/3187547465/IMG_2365.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7505/3187547473/IMG_2366.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7521/3187547489/IMG_2367.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>черный</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>8 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
         <Id>1881581577</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -7076,6 +7074,99 @@
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb></Ad>
+
+      <Ad>
+        <Id>1884255633</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 17 256Gb Black бу</Title>
+        <Description><![CDATA[<p>iPhone 17 256Gb Black бу</p>
+<p>✅Отличное состояние, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100%<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
+<p>Арт. 72949</p>]]></Description>
+        <Price>64990</Price>
+        
+        <Model>iPhone 17</Model>
+        <Images>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6353/3199998161/IMG_2666.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6377/3199998185/IMG_2667.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6385/3199998193/IMG_2668.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6401/3199998209/IMG_2669.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6425/3199998233/IMG_2670.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>черный</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>8 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
+        <Id>1884667553</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 17 256Gb White бу</Title>
+        <Description><![CDATA[<p>iPhone 17 256Gb White бу</p>
+<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 100%<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
+<p>Арт. 56263</p>]]></Description>
+        <Price>64990</Price>
+        
+        <Model>iPhone 17</Model>
+        <Images>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2169/3199985785/IMG_2662.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2217/3199985833/IMG_2663.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2233/3199985849/IMG_2664.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/2241/3199985857/IMG_2665.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>белый</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>8 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1887254441</Id>
@@ -7296,6 +7387,53 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>98</Akb></Ad>
+
+      <Ad>
+        <Id>1896054969</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 17 256Gb Blue бу</Title>
+        <Description><![CDATA[<p>iPhone 17 256Gb Blue бу</p>
+<p>✅Отличное состояние, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100%<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
+<p>Арт. 41770</p>]]></Description>
+        <Price>64990</Price>
+        
+        <Model>iPhone 17</Model>
+        <Images>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7073/3216047009/IMG_2943.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7065/3216047001/IMG_2947.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7081/3216047017/IMG_2944.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7097/3216047033/IMG_2945.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7105/3216047041/IMG_2946.jpg"/>
+        </Images>
+        <MemorySize>256 ГБ</MemorySize>
+        <Color>голубой</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>8 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1896055065</Id>
@@ -7542,7 +7680,7 @@
       <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
-        <Id>1881572353</Id>
+        <Id>1650144321</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
         <ListingFee>Package</ListingFee>
@@ -7551,226 +7689,42 @@
         <ManagerName>Тимофей</ManagerName>
         <ContactPhone>+73422140020</ContactPhone>
         <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
+        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
         <AdType>Товар приобретен на продажу</AdType>
         <Category>Телефоны</Category>
-        <Title>iPhone 17 256Gb Black бу</Title>
-        <Description><![CDATA[<p>iPhone 17 256Gb Black бу</p>
-<p>✅Состояние отличное, технически исправен<br>✅Комплект: устройство + коробка<br>✅Аккумулятор 100%🔋 <br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 62413</p>]]></Description>
-        <Price>64990</Price>
+        <Title>Apple Watch Series 8 45mm Midnight бу</Title>
+        <Description><![CDATA[<p>Apple Watch Series 8 45mm Midnight бу</p>
+<p>✅Хорошее состояние, технически исправны <br>✅Комплект: часы <br>✅Гарантия 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
+<p>Арт. hkq1v</p>]]></Description>
+        <Price>13990</Price>
         
-        <Model>iPhone 17</Model>
+        <Model>Apple Watch 8</Model>
         <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7473/3187547441/IMG_2363.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7481/3187547449/IMG_2364.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7497/3187547465/IMG_2365.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7505/3187547473/IMG_2366.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7521/3187547489/IMG_2367.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6577/2551609777/IMG_4007.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6593/2551609793/IMG_4008.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6609/2551609809/IMG_4009.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6617/2551609817/IMG_4010.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/6633/2551609833/IMG_4011.jpg"/>
         </Images>
-        <MemorySize>256 ГБ</MemorySize>
         <Color>черный</Color>
-        <Vendor>Apple</Vendor>
+        <GoodsSubType>Смарт-часы</GoodsSubType>
         <Category>Телефоны</Category>
         
-        <RamSize>8 ГБ</RamSize>
         
-        <Condition>отличное</Condition>
+        <ProductType>Смарт-часы или браслет</ProductType>
+        <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1884255633</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 17 256Gb Black бу</Title>
-        <Description><![CDATA[<p>iPhone 17 256Gb Black бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 72949</p>]]></Description>
-        <Price>64990</Price>
-        
-        <Model>iPhone 17</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6353/3199998161/IMG_2666.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6377/3199998185/IMG_2667.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6385/3199998193/IMG_2668.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6401/3199998209/IMG_2669.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6425/3199998233/IMG_2670.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>8 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1884667553</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 17 256Gb White бу</Title>
-        <Description><![CDATA[<p>iPhone 17 256Gb White бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 100%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 56263</p>]]></Description>
-        <Price>64990</Price>
-        
-        <Model>iPhone 17</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2169/3199985785/IMG_2662.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2217/3199985833/IMG_2663.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2233/3199985849/IMG_2664.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2241/3199985857/IMG_2665.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>белый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>8 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1896054969</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 17 256Gb Blue бу</Title>
-        <Description><![CDATA[<p>iPhone 17 256Gb Blue бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 41770</p>]]></Description>
-        <Price>64990</Price>
-        
-        <Model>iPhone 17</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7073/3216047009/IMG_2943.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7065/3216047001/IMG_2947.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7081/3216047017/IMG_2944.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7097/3216047033/IMG_2945.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7105/3216047041/IMG_2946.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>голубой</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>8 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1897376057</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 11 128Gb Black бу</Title>
-        <Description><![CDATA[<p>iPhone 11 128Gb Black бу</p>
-<p>✅Отличное внешнее состояние, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 100%🔋 Была замена аккумулятора<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 06026</p>]]></Description>
-        <Price>11990</Price>
-        
-        <Model>iPhone 11</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6473/3216079177/IMG_2977.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6497/3216079201/IMG_2978.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6505/3216079209/IMG_2979.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6513/3216079217/IMG_2980.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>черный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>4 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+        <Brand>Apple</Brand>
+        <ProductSubType>смарт-часы</ProductSubType>
+        <Gender>унисекс</Gender>
+        <StrapType>Полиуретановый</StrapType>
+        <DeviceWork>Включается</DeviceWork>
+        <Akb>82</Akb>
+        <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
+        <CaseFlaws>Царапины</CaseFlaws>
+      </Ad>
 </Ads>
