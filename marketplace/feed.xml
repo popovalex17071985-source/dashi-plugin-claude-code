@@ -2226,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2977699</Revalidate></Ad>
+      <Revalidate>2977705</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2603,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977699</Revalidate></Ad>
+      <Revalidate>2977705</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2756,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977699</Revalidate></Ad>
+      <Revalidate>2977705</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2909,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977699</Revalidate></Ad>
+      <Revalidate>2977705</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3521,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977699</Revalidate></Ad>
+      <Revalidate>2977705</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3623,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977699</Revalidate></Ad>
+      <Revalidate>2977705</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3929,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977699</Revalidate></Ad>
+      <Revalidate>2977705</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4082,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977699</Revalidate></Ad>
+      <Revalidate>2977705</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -6463,53 +6463,6 @@
         <Category>Телефоны</Category>
         
         <RamSize>12 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1877852497</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 16 Pro Max 256Gb Natural Titanium бу</Title>
-        <Description><![CDATA[<p>Apple iPhone 16 Pro Max 256GB Natural Titanium </p>
-<p>✅ Состояние нового устройства, заменен производителем по гарантии, без ремонтов, технически исправен<br>✅Аккумулятор 100%<br>✅Комплект: устройство + коробка<br>✅Гарантия пожизненная</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 48805</p>]]></Description>
-        <Price>89490</Price>
-        
-        <Model>iPhone 16 Pro Max</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/4921/3187577657/IMG_2406.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/4937/3187577673/IMG_2407.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/4953/3187577689/IMG_2408.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/4961/3187577697/IMG_2409.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/4977/3187577713/IMG_2410.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>серый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>8 ГБ</RamSize>
         
         <Condition>отличное</Condition>
         <AdType>Товар приобретен на продажу</AdType>
