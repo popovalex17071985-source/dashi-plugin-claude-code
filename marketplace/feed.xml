@@ -1719,6 +1719,57 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
+        <Id>492976910</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Планшеты</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Планшеты и электронные книги</Category>
+        <Title>Apple iPad Pro 11&quot; 2018 64Gb WiFi + LTE Silver бу</Title>
+        <Description><![CDATA[<p>Apple iPad Pro 11" 2018 64Gb WiFi + LTE Silver бу</p>
+<p>✅Комплект: устройство <br>✅Гарантия от магазина: 180 дней<br>✅Внешние состояние как новый</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. nkd81</p>
+<p> </p>]]></Description>
+        <Price>25990</Price>
+        
+        <Model>iPad Pro 11 (1-го поколения) (2018)</Model>
+        <Images>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7157/1010654197/IMG_4044.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7153/1010654193/IMG_4039.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7154/1010654194/IMG_4040.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7155/1010654195/IMG_4041.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/7156/1010654196/IMG_4042.jpg"/>
+        </Images>
+        <MemorySize>64</MemorySize>
+        <Color>Серебряный</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Планшеты и электронные книги</Category>
+        
+        <RamSize>4</RamSize>
+        
+        <Condition>Б/у</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <ProductsType>Планшет</ProductsType>
+        <Brand>Apple</Brand>
+        <SimSlot>Есть</SimSlot>
+        <Case_Condition>Без дефектов</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+        <Devicework>Включается</Devicework>
+        <ScreenCondition>Без дефектов</ScreenCondition>
+        <CaseCondition>Без дефектов</CaseCondition>
+        <Akb>100</Akb>
+      </Ad>
+
+      <Ad>
         <Id>496124396</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -2175,7 +2226,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2977843</Revalidate></Ad>
+      <Revalidate>2977849</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2552,7 +2603,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977843</Revalidate></Ad>
+      <Revalidate>2977849</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2705,7 +2756,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977843</Revalidate></Ad>
+      <Revalidate>2977849</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2858,7 +2909,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977843</Revalidate></Ad>
+      <Revalidate>2977849</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3470,7 +3521,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977843</Revalidate></Ad>
+      <Revalidate>2977849</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3572,7 +3623,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977843</Revalidate></Ad>
+      <Revalidate>2977849</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3878,7 +3929,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977843</Revalidate></Ad>
+      <Revalidate>2977849</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4031,7 +4082,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977843</Revalidate></Ad>
+      <Revalidate>2977849</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -6515,53 +6566,6 @@
       <BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
-        <Id>1877858297</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Apple</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Ноутбуки</Category>
-        <Title>Apple MacBook Pro 13&quot; 2013 i5/2,4/16GB/512GB Silver бу</Title>
-        <Description><![CDATA[<p>Apple MacBook Pro 13" 2013 i5/2.4/16GB/512GB Silver бу</p>
-<p>✅Отличное состояние, общие следы эксплуатации, технически исправен<br>✅Комплект: устройство<br>✅Циклов перезарядки: 0<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. kfh05</p>]]></Description>
-        <Price>17990</Price>
-        
-        
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5305/3187930297/IMG_2495.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5385/3187930377/IMG_2494.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5337/3187930329/IMG_2489.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5345/3187930337/IMG_2490.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5361/3187930353/IMG_2491.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5369/3187930361/IMG_2492.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5377/3187930369/IMG_2493.jpg"/>
-        </Images>
-        <Category>Ноутбуки</Category>
-        
-        <Condition>Б/у</Condition>
-        <Devicework>Включается</Devicework>
-        <AkbH>Больше 30 минут</AkbH>
-        <KBLayout>Есть кириллица</KBLayout>
-        <ScreenCondition>Мелкие царапины</ScreenCondition>
-        <CaseCondition>Без дефектов</CaseCondition>
-        <KBCondition>Без дефектов</KBCondition>
-      <BoxSealed>Нет</BoxSealed></Ad>
-
-      <Ad>
         <Id>1877859129</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -7307,59 +7311,6 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><GoodsSubType>Смарт-часы</GoodsSubType></Ad>
 
       <Ad>
-        <Id>1896055169</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>Apple Watch Series 7 45mm Green Aluminium Case Green Sport Band бу</Title>
-        <Description><![CDATA[<p>Apple Watch Series 7 45mm Green Aluminium Case Green Sport Band бу </p>
-<p>✅Отличное состояние, технически исправен<br>✅Аккумулятор 96%<br>✅Комплект: устройство + зарядка + коробка<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. h7xdc</p>]]></Description>
-        <Price>14990</Price>
-        
-        <Model>Apple Watch 7</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/217/3225805017/tempImagekclgG0.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/225/3225805025/tempImage7h79nn.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/241/3225805041/tempImageAhhGAB.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/257/3225805057/tempImageMie2HN.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/265/3225805065/tempImageRTZzKX.jpg"/>
-        </Images>
-        <Color>зеленый</Color>
-        <Category>Телефоны</Category>
-        
-        
-        <ProductType>Смарт-часы или браслет</ProductType>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-        <Brand>Apple</Brand>
-        <ProductSubType>смарт-часы</ProductSubType>
-        <Gender>унисекс</Gender>
-        <StrapType>Полиуретановый</StrapType>
-        <AkbH>Больше 30 минут</AkbH>
-        <DeviceWork>Включается</DeviceWork>
-        <Akb>96</Akb>
-        <ScreenFlaws>Без дефектов</ScreenFlaws>
-        <CaseFlaws>Без дефектов</CaseFlaws>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><GoodsSubType>Смарт-часы</GoodsSubType></Ad>
-
-      <Ad>
         <Id>1896414105</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -7791,7 +7742,7 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
-        <Id>492976910</Id>
+        <Id>1877858297</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
         <ListingFee>Package</ListingFee>
@@ -7800,44 +7751,40 @@
         <ManagerName>Тимофей</ManagerName>
         <ContactPhone>+73422140020</ContactPhone>
         <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Планшеты</GoodsType>
+        <GoodsType>Apple</GoodsType>
         <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple iPad Pro 11&quot; 2018 64Gb WiFi + LTE Silver бу</Title>
-        <Description><![CDATA[<p>Apple iPad Pro 11" 2018 64Gb WiFi + LTE Silver бу</p>
-<p>✅Комплект: устройство <br>✅Гарантия от магазина: 180 дней<br>✅Внешние состояние как новый</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. nkd81</p>
-<p> </p>]]></Description>
-        <Price>25990</Price>
+        <Category>Ноутбуки</Category>
+        <Title>Apple MacBook Pro 13&quot; 2013 i5/2,4/16GB/512GB Silver бу</Title>
+        <Description><![CDATA[<p>Apple MacBook Pro 13" 2013 i5/2.4/16GB/512GB Silver бу</p>
+<p>✅Отличное состояние, общие следы эксплуатации, технически исправен<br>✅Комплект: устройство<br>✅Циклов перезарядки: 0<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
+<p>Арт. kfh05</p>]]></Description>
+        <Price>17990</Price>
         
-        <Model>iPad Pro 11 (1-го поколения) (2018)</Model>
+        
         <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7157/1010654197/IMG_4044.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7153/1010654193/IMG_4039.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7154/1010654194/IMG_4040.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7155/1010654195/IMG_4041.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7156/1010654196/IMG_4042.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5305/3187930297/IMG_2495.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5385/3187930377/IMG_2494.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5337/3187930329/IMG_2489.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5345/3187930337/IMG_2490.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5361/3187930353/IMG_2491.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5369/3187930361/IMG_2492.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/5377/3187930369/IMG_2493.jpg"/>
         </Images>
-        <MemorySize>64</MemorySize>
-        <Color>Серебряный</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Планшеты и электронные книги</Category>
-        
-        <RamSize>4</RamSize>
+        <Category>Ноутбуки</Category>
         
         <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <ProductsType>Планшет</ProductsType>
-        <Brand>Apple</Brand>
-        <SimSlot>Есть</SimSlot>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
         <Devicework>Включается</Devicework>
-        <ScreenCondition>Без дефектов</ScreenCondition>
+        <AkbH>Больше 30 минут</AkbH>
+        <KBLayout>Есть кириллица</KBLayout>
+        <ScreenCondition>Мелкие царапины</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
-        <Akb>100</Akb>
-      </Ad>
+        <KBCondition>Без дефектов</KBCondition>
+      <BoxSealed>Нет</BoxSealed></Ad>
 </Ads>
