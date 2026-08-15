@@ -2179,7 +2179,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2977981</Revalidate></Ad>
+      <Revalidate>2977987</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2556,7 +2556,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977981</Revalidate></Ad>
+      <Revalidate>2977987</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2709,7 +2709,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977981</Revalidate></Ad>
+      <Revalidate>2977987</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2862,7 +2862,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977981</Revalidate></Ad>
+      <Revalidate>2977987</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3474,7 +3474,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977981</Revalidate></Ad>
+      <Revalidate>2977987</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3576,7 +3576,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977981</Revalidate></Ad>
+      <Revalidate>2977987</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3882,7 +3882,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2977981</Revalidate></Ad>
+      <Revalidate>2977987</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4035,7 +4035,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2977981</Revalidate></Ad>
+      <Revalidate>2977987</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -6003,54 +6003,6 @@
         <Category>Настольные компьютеры</Category>
         
       <Condition>Б/у</Condition><GoodsSubType>Моноблоки</GoodsSubType></Ad>
-
-      <Ad>
-        <Id>1874129185</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 16 Pro 128Gb Desert Titanium бу</Title>
-        <Description><![CDATA[<p>iPhone 16 Pro 128Gb Desert Titanium бу</p>
-<p>✅Отличное внешнее состояние, технически исправен<br>✅Комплект: устройство + коробка <br>✅Аккумулятор 90%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70% на это устройство</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена нашим сервисным центром по чек листу из 27 пунктов и является полноценно функционирующей</p>
-<p>Арт. 90157</p>
-]]></Description>
-        <Price>54990</Price>
-        
-        <Model>iPhone 16 Pro</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2081/3163293729/IMG_1925.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2089/3163293737/IMG_1926.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2105/3163293753/IMG_1927.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2113/3163293761/IMG_1928.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/2121/3163293769/IMG_1929.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>золотистый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>8 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>90</Akb></Ad>
 
       <Ad>
         <Id>1874139697</Id>
