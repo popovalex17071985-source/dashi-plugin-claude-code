@@ -637,7 +637,7 @@ function runOnPaneChain<T>(target: TmuxKeysTarget, fn: () => Promise<T>): Promis
 }
 
 function paneKey(target: TmuxKeysTarget): string {
-  return `${target.socketPath ?? ''} ${target.socketName ?? ''} ${target.paneTarget}`
+  return `${target.socketPath ?? ''}\0${target.socketName ?? ''}\0${target.paneTarget}`
 }
 
 // Reliable control-command injection: probe → (optionally interrupt) → send →
