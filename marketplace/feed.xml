@@ -2179,7 +2179,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2978137</Revalidate></Ad>
+      <Revalidate>2978143</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2556,7 +2556,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978137</Revalidate></Ad>
+      <Revalidate>2978143</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2709,7 +2709,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978137</Revalidate></Ad>
+      <Revalidate>2978143</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2862,7 +2862,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978137</Revalidate></Ad>
+      <Revalidate>2978143</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3474,7 +3474,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978137</Revalidate></Ad>
+      <Revalidate>2978143</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3576,7 +3576,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978137</Revalidate></Ad>
+      <Revalidate>2978143</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3882,7 +3882,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978137</Revalidate></Ad>
+      <Revalidate>2978143</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -4035,7 +4035,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978137</Revalidate></Ad>
+      <Revalidate>2978143</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -6735,52 +6735,6 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
-        <Id>1894486665</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 11 Pro 64Gb Silver бу</Title>
-        <Description><![CDATA[<p>iPhone 11 Pro 64Gb Silver бу</p>
-<p>✅Хорошее состояние, дисплей царапины, грани потертости, технически исправен<br>✅Комплект: устройство <br>✅Аккумулятор 100% Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 76475</p>]]></Description>
-        <Price>12990</Price>
-        
-        <Model>iPhone 11 Pro</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5289/3229357225/IMG_7801.jpeg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5313/3229357249/IMG_7802.jpeg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5321/3229357257/IMG_7803.jpeg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5329/3229357265/IMG_7805.jpeg"/>
-        </Images>
-        <MemorySize>64 ГБ</MemorySize>
-        <Color>серебристый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>4 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
         <Id>1896054969</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -7355,50 +7309,4 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
-
-      <Ad>
-        <Id>1884255609</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 14 Plus 128Gb Starlight бу</Title>
-        <Description><![CDATA[<p>iPhone 14 Plus 128Gb Starlight бу</p>
-<p>✅Отличное состояние, общие следы эксплуатации по корпусу, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 83%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 75367</p>]]></Description>
-        <Price>28990</Price>
-        
-        <Model>iPhone 14 Plus</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5201/3199972433/IMG_2636.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5233/3199972465/IMG_2637.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5241/3199972473/IMG_2638.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5249/3199972481/IMG_2639.jpg"/>
-        </Images>
-        <MemorySize>128 ГБ</MemorySize>
-        <Color>белый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>6 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Мелкие царапины</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb></Ad>
 </Ads>
