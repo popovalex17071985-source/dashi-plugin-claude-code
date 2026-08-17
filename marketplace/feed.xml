@@ -2129,7 +2129,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2978275</Revalidate></Ad>
+      <Revalidate>2978281</Revalidate></Ad>
 
       <Ad>
         <Id>496127545</Id>
@@ -2506,7 +2506,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978275</Revalidate></Ad>
+      <Revalidate>2978281</Revalidate></Ad>
 
       <Ad>
         <Id>1640714561</Id>
@@ -2659,7 +2659,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978275</Revalidate></Ad>
+      <Revalidate>2978281</Revalidate></Ad>
 
       <Ad>
         <Id>1640726593</Id>
@@ -2812,7 +2812,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978275</Revalidate></Ad>
+      <Revalidate>2978281</Revalidate></Ad>
 
       <Ad>
         <Id>1640736641</Id>
@@ -3424,7 +3424,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978275</Revalidate></Ad>
+      <Revalidate>2978281</Revalidate></Ad>
 
       <Ad>
         <Id>1642060329</Id>
@@ -3526,7 +3526,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978275</Revalidate></Ad>
+      <Revalidate>2978281</Revalidate></Ad>
 
       <Ad>
         <Id>1642061641</Id>
@@ -3832,7 +3832,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978275</Revalidate></Ad>
+      <Revalidate>2978281</Revalidate></Ad>
 
       <Ad>
         <Id>1645613473</Id>
@@ -3985,7 +3985,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978275</Revalidate></Ad>
+      <Revalidate>2978281</Revalidate></Ad>
 
       <Ad>
         <Id>1645614297</Id>
@@ -4637,55 +4637,6 @@
         
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
-
-      <Ad>
-        <Id>1650144321</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Смарт-часы и фитнес-браслеты</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>Apple Watch Series 8 45mm Midnight бу</Title>
-        <Description><![CDATA[<p>Apple Watch Series 8 45mm Midnight бу</p>
-<p>✅Хорошее состояние, технически исправны <br>✅Комплект: часы <br>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. hkq1v</p>]]></Description>
-        <Price>13990</Price>
-        
-        <Model>Apple Watch 8</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6577/2551609777/IMG_4007.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6593/2551609793/IMG_4008.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6609/2551609809/IMG_4009.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6617/2551609817/IMG_4010.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/6633/2551609833/IMG_4011.jpg"/>
-        </Images>
-        <Color>черный</Color>
-        <GoodsSubType>Смарт-часы</GoodsSubType>
-        <Category>Телефоны</Category>
-        
-        
-        <ProductType>Смарт-часы или браслет</ProductType>
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Brand>Apple</Brand>
-        <ProductSubType>смарт-часы</ProductSubType>
-        <Gender>унисекс</Gender>
-        <StrapType>Полиуретановый</StrapType>
-        <DeviceWork>Включается</DeviceWork>
-        <Akb>82</Akb>
-        <ScreenFlaws>1-2 мелкие царапины</ScreenFlaws>
-        <CaseFlaws>Царапины</CaseFlaws>
       </Ad>
 
       <Ad>
@@ -7027,52 +6978,6 @@
       <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
-        <Id>1899159369</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 13 256Gb Midnight бу</Title>
-        <Description><![CDATA[<p>iPhone 13 256Gb Midnight бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 99% Была замена аккумулятора <br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 96578</p>]]></Description>
-        <Price>25990</Price>
-        
-        <Model>iPhone 13</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/425/3226026409/tempImage2Cl3yd.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/441/3226026425/tempImage7lWMXd.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/457/3226026441/tempImagejOUAKB.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/481/3226026465/tempImagewfO2tc.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/489/3226026473/tempImageNTQYnT.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>4 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>99</Akb><Color>черный</Color></Ad>
-
-      <Ad>
         <Id>1899159385</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -7166,4 +7071,51 @@
         <Case_Condition>Без дефектов</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+
+      <Ad>
+        <Id>1890676977</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>iPhone</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Телефоны</Category>
+        <Title>iPhone 12 128Gb Black бу</Title>
+        <Description><![CDATA[<p>iPhone 12 128Gb Black бу</p>
+<p>✅Отличное состояние, общие следы эксплуатации, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 100% Заменен в нашем СЦ<br>✅Гарантия 180 дней</p>
+<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
+<p>👍🏼 Гарантия лучшей стоимости</p>
+<p>💰Возможна покупка в кредит и по банковской карте</p>
+<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
+<p>⬇️ Сделаем скидку на предложение конкурента</p>
+<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
+<p>Арт. 56855</p>]]></Description>
+        <Price>18990</Price>
+        
+        <Model>iPhone 12</Model>
+        <Images>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3449/3229371769/IMG_7827.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3457/3229371777/IMG_7828.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3465/3229371785/IMG_7829.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3473/3229371793/IMG_7830.jpeg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3489/3229371809/IMG_7831.jpeg"/>
+        </Images>
+        <MemorySize>128 ГБ</MemorySize>
+        <Color>черный</Color>
+        <Vendor>Apple</Vendor>
+        <Category>Телефоны</Category>
+        
+        <RamSize>4 ГБ</RamSize>
+        
+        <Condition>отличное</Condition>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Case_Condition>Мелкие царапины</Case_Condition>
+        <Screen_Condition>Без дефектов</Screen_Condition>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 </Ads>
