@@ -236,6 +236,17 @@ while :; do
     FROM=\$(upd '.message.chat.id // empty'); TEXT=\$(upd '.message.text // empty')
     [ "\$FROM" = "\$TELEGRAM_CHAT_ID" ] || continue
     VOICE=\$(upd '.message.voice.file_id // empty')
+    # фото: берём последний размер (самый большой), подпись = промпт
+    PHOTO=\$(upd '[.message.photo[]?.file_id] | last // empty')
+    IMGARG=""; rm -f "\$WORKDIR/photo.jpg"
+    if [ -n "\$PHOTO" ]; then
+      FP=\$(curl -s "\$API/getFile?file_id=\$PHOTO" | jq -r '.result.file_path // empty')
+      if [ -n "\$FP" ] && curl -sf -o "\$WORKDIR/photo.jpg" "https://api.telegram.org/file/bot\$TELEGRAM_TOKEN/\$FP"; then
+        IMGARG="--image \$WORKDIR/photo.jpg"
+        [ -z "\$TEXT" ] && TEXT=\$(upd '.message.caption // empty')
+        [ -z "\$TEXT" ] && TEXT="Что на фото? Опиши и скажи, что с этим делать."
+      else log "фото не скачалось"; fi
+    fi
     if [ -z "\$TEXT" ] && [ -n "\$VOICE" ] && [ -n "\${GROQ_API_KEY:-}" ]; then
       # голосовое -> текст через Groq Whisper
       FP=\$(curl -s "\$API/getFile?file_id=\$VOICE" | jq -r '.result.file_path // empty')
@@ -250,7 +261,7 @@ while :; do
     fi
     if [ -z "\$TEXT" ]; then
       if [ -n "\$VOICE" ]; then send "Не разобрал голосовое. Голосовые работают при заданном ключе Groq (см. гайд, раздел про голосовые)."
-      else send "Понимаю только текст и голосовые."; fi
+      else send "Понимаю текст, голосовые и фото."; fi
       continue
     fi
     # Живой прогресс: статус-сообщение в чате обновляется последней строкой работы
@@ -264,7 +275,7 @@ while :; do
     RESUME=""
     [ -f .session_started ] && RESUME="resume --last"
     OUT=\$(mktemp); : > task.log
-    timeout 600 "\$CODEX" exec \$RESUME --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" > task.log 2>&1 &
+    timeout 600 "\$CODEX" exec \$RESUME \$IMGARG --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" > task.log 2>&1 &
     PID=\$!
     PREV=""; START=\$(date +%s)
     while kill -0 "\$PID" 2>/dev/null; do
@@ -296,7 +307,7 @@ STEPS_EOF
       # resume не взлетел (сессия протухла/не найдена) — повтор с чистого листа
       log "resume rc=\$RC, повтор без resume"
       rm -f .session_started
-      timeout 600 "\$CODEX" exec --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" >> task.log 2>&1
+      timeout 600 "\$CODEX" exec \$IMGARG --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" >> task.log 2>&1
       RC=\$?
     fi
     [ \$RC -eq 0 ] && touch .session_started
