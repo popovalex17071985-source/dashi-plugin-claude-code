@@ -390,8 +390,10 @@ Environment=LANG=en_US.UTF-8
 Type=forking
 ExecStart=/usr/bin/tmux new-session -d -s channel-$AGENT_NAME \\
   claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel
-# Первый запуск спрашивает про внешние импорты и dev-каналы — прожимаем Enter
-ExecStartPost=/bin/sh -c 'sleep 6 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Enter && sleep 2 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Enter'
+# Первый запуск спрашивает: сначала «Bypass Permissions» (по умолчанию выбрано
+# «No, exit» — надо стрелка вниз + Enter, иначе Claude просто выходит), потом
+# внешние импорты и dev-каналы — там достаточно Enter.
+ExecStartPost=/bin/sh -c 'sleep 6 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Down && sleep 1 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Enter && sleep 3 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Enter && sleep 2 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Enter'
 ExecStop=/usr/bin/tmux kill-session -t channel-$AGENT_NAME
 
 # on-failure, а не always: иначе welcome-промт крутит перезапуск по кругу
