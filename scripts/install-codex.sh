@@ -451,7 +451,10 @@ ok "вход в ChatGPT выполнен"
 # 8. Поднимаем
 # ─────────────────────────────────────────────────────────────────────────────
 say "Запуск"
-systemctl enable --now agent-main agent-watchdog >/dev/null 2>&1 || true
+systemctl enable agent-main agent-watchdog >/dev/null 2>&1 || true
+# restart, а не только enable --now: повторный прогон переписывает bridge.sh,
+# и уже работающий сервис должен подхватить свежий код
+systemctl restart agent-main agent-watchdog >/dev/null 2>&1 || true
 sleep 5
 
 if systemctl is-active --quiet agent-main && systemctl is-active --quiet agent-watchdog; then
