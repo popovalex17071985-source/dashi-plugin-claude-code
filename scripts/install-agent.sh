@@ -116,6 +116,16 @@ fi
 # tmux держит интерактивную сессию Claude под systemd
 apt-get install -y -qq git unzip tmux curl jq
 
+# На 1 ГБ памяти сборка и Claude Code упираются в потолок и падают молча.
+# Ставим своп — дешевле, чем объяснять человеку OOM.
+mem_kb=$(awk '/MemTotal/{print $2}' /proc/meminfo)
+if (( mem_kb < 1800000 )) && ! swapon --show --noheadings | grep -q .; then
+  fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none
+  chmod 600 /swapfile && mkswap -q /swapfile && swapon /swapfile
+  grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  ok "своп 2 ГБ (памяти всего $(( mem_kb / 1024 )) МБ)"
+fi
+
 if ! command -v claude >/dev/null; then
   npm install -g @anthropic-ai/claude-code >/dev/null
   ok "Claude Code $(claude --version 2>/dev/null || echo установлен)"
