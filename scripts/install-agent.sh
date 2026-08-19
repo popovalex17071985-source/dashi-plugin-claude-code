@@ -341,7 +341,8 @@ say "Hooks"
 if as_agent "grep -q dashi-channel ~/.claude/settings.json 2>/dev/null"; then
   skip "хуки прописаны"
 else
-  as_agent "cd '$PLUGIN_DIR' && bash scripts/install-hooks.sh \
+  # install-hooks.sh зовёт `bun` по имени, а в неинтерактивном su его нет в PATH.
+  as_agent "export PATH=\$HOME/.bun/bin:\$PATH; cd '$PLUGIN_DIR' && bash scripts/install-hooks.sh \
       --settings ~/.claude/settings.json \
       --chat-id '$USER_ID' \
       --webhook-url http://127.0.0.1:8089/hooks/agent \
