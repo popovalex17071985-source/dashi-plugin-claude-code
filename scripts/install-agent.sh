@@ -345,7 +345,7 @@ fi
 if as_agent "test -s '$WORKSPACE/state/telegram/config.json'"; then
   skip "карточка прогресса настроена"
 else
-  as_agent "mkdir -p '$WORKSPACE/state/telegram' && printf '%s\\n' '{ \"progress\": { \"enabled\": true } }' > '$WORKSPACE/state/telegram/config.json'"
+  as_agent "mkdir -p '$WORKSPACE/state/telegram' && printf '%s\\n' '{ \"webhook\": { \"enabled\": true }, \"progress\": { \"enabled\": true } }' > '$WORKSPACE/state/telegram/config.json'"
   ok "карточка прогресса включена"
 fi
 
