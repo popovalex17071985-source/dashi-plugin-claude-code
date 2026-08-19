@@ -220,16 +220,29 @@ while :; do
     OUT=\$(mktemp); : > task.log
     timeout 600 "\$CODEX" exec --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" > task.log 2>&1 &
     PID=\$!
-    PREV=""
+    PREV=""; START=\$(date +%s)
     while kill -0 "\$PID" 2>/dev/null; do
       sleep 5
-      LAST=\$(tail -c 4000 task.log | grep -v '^[[:space:]]*\$' | tail -1 | cut -c1-180)
-      if [ -n "\$LAST" ] && [ -n "\$MSGID" ] && [ "\$LAST" != "\$PREV" ]; then
+      # Карточка как у dashi: «работаю — Nс» + последние шаги, текущий со стрелкой
+      STEPS=\$(grep -v '^[[:space:]]*\$' task.log | tail -3 | cut -c1-120)
+      N=\$(printf '%s\n' "\$STEPS" | wc -l)
+      CARD="⏳ Работаю — \$(( \$(date +%s) - START ))с"
+      i=0
+      while IFS= read -r st; do
+        i=\$((i+1))
+        [ -z "\$st" ] && continue
+        if [ "\$i" -eq "\$N" ]; then CARD="\$CARD
+→ \$st"; else CARD="\$CARD
+✓ \$st"; fi
+      done <<STEPS_EOF
+\$STEPS
+STEPS_EOF
+      if [ -n "\$MSGID" ] && [ "\$CARD" != "\$PREV" ]; then
         curl -s -X POST "\$API/editMessageText" \
           --data-urlencode chat_id="\$TELEGRAM_CHAT_ID" \
           -d message_id="\$MSGID" \
-          --data-urlencode text="⏳ \$LAST" >/dev/null
-        PREV="\$LAST"
+          --data-urlencode text="\$CARD" >/dev/null
+        PREV="\$CARD"
       fi
     done
     wait "\$PID"; RC=\$?
