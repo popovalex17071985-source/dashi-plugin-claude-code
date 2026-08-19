@@ -332,12 +332,21 @@ TELEGRAM_EXPECTED_BOT_ID=${BOT_TOKEN%%:*}
 TELEGRAM_ALLOWED_USER_IDS=$USER_ID
 TELEGRAM_ALLOWED_CHAT_IDS=$USER_ID
 TELEGRAM_WORKSPACE_ROOT=$CLAUDE_DIR
+TELEGRAM_STATE_DIR=$WORKSPACE/state/telegram
 AGENT_ID=$AGENT_NAME
 GROQ_API_KEY=$GROQ_KEY
 EOF
   chown "root:$SERVICE_USER" "$ENV_FILE"
   chmod 640 "$ENV_FILE"
   ok "конфиг записан (640 root:$SERVICE_USER)"
+fi
+
+# Живая карточка «работаю…» в Telegram: в плагине выключена по умолчанию.
+if as_agent "test -s '$WORKSPACE/state/telegram/config.json'"; then
+  skip "карточка прогресса настроена"
+else
+  as_agent "mkdir -p '$WORKSPACE/state/telegram' && printf '%s\\n' '{ \"progress\": { \"enabled\": true } }' > '$WORKSPACE/state/telegram/config.json'"
+  ok "карточка прогресса включена"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
