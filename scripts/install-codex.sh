@@ -109,7 +109,9 @@ export PATH="$HOME/.local/bin:$PATH"
 if command -v codex >/dev/null; then
   skip "codex $(codex --version 2>/dev/null | head -1)"
 else
-  curl -fsSL https://chatgpt.com/codex/install.sh | sh
+  # </dev/null: установщик Codex спрашивает «Start Codex now?» — глушим stdin,
+  # чтобы он не запускал интерактивный Codex и не ронял скрипт (set -e)
+  curl -fsSL https://chatgpt.com/codex/install.sh | sh </dev/null || true
   command -v codex >/dev/null || die "codex не встал — прогони установку руками: curl -fsSL https://chatgpt.com/codex/install.sh | sh"
   ok "codex $(codex --version 2>/dev/null | head -1)"
 fi
