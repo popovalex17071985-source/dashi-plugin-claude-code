@@ -22,7 +22,7 @@ MAIN_DIR=/root/agent-main
 WATCH_DIR=/root/agent-watchdog
 CODEX_HOME=/root/.codex
 
-BOT_TOKEN=""; WATCH_TOKEN=""; CHAT_ID=""; ASSUME_YES=0
+BOT_TOKEN=""; WATCH_TOKEN=""; CHAT_ID=""; GROQ_KEY=""; ASSUME_YES=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
@@ -39,6 +39,7 @@ while [[ $# -gt 0 ]]; do
     --token)          BOT_TOKEN="$2";   shift 2 ;;
     --watchdog-token) WATCH_TOKEN="$2"; shift 2 ;;
     --chat-id)        CHAT_ID="$2";     shift 2 ;;
+    --groq-key)       GROQ_KEY="$2";    shift 2 ;;
     --yes|-y)         ASSUME_YES=1;     shift ;;
     --help|-h)        usage ;;
     *) die "неизвестный аргумент: $1 (--help для справки)" ;;
@@ -72,6 +73,9 @@ fi
 if [[ ! -f "$MAIN_DIR/.env" || ! -f "$WATCH_DIR/.env" ]]; then
   [[ -n "$CHAT_ID" ]] || ask CHAT_ID "Твой Telegram id от @userinfobot: "
   [[ "$CHAT_ID" =~ ^-?[0-9]+$ ]] || die "id должен быть числом: $CHAT_ID"
+  if [[ -z "$GROQ_KEY" ]]; then
+    read -r -p "Ключ Groq для голосовых (Enter — пропустить): " GROQ_KEY </dev/tty || true
+  fi
 fi
 [[ -f "$MAIN_DIR/.env" && -f "$WATCH_DIR/.env" ]] && skip "оба .env на месте"
 
@@ -171,11 +175,18 @@ if [[ ! -f "$MAIN_DIR/.env" ]]; then
   cat > "$MAIN_DIR/.env" <<EOF
 TELEGRAM_TOKEN=$BOT_TOKEN
 TELEGRAM_CHAT_ID=$CHAT_ID
+GROQ_API_KEY=$GROQ_KEY
 EOF
   chmod 600 "$MAIN_DIR/.env"
   ok ".env записан"
 else
-  skip ".env на месте"
+  # дозапись ключа голосовых в существующий конфиг
+  if [[ -n "$GROQ_KEY" ]] && ! grep -q '^GROQ_API_KEY=' "$MAIN_DIR/.env"; then
+    echo "GROQ_API_KEY=$GROQ_KEY" >> "$MAIN_DIR/.env"
+    ok "ключ Groq дописан в .env"
+  else
+    skip ".env на месте"
+  fi
 fi
 
 # Мост пишем сами, детерминированно — а не просим Codex сгенерировать:
@@ -213,7 +224,24 @@ while :; do
     OFFSET=\$(( \$(upd .update_id) + 1 )); printf '%s' "\$OFFSET" > .offset
     FROM=\$(upd '.message.chat.id // empty'); TEXT=\$(upd '.message.text // empty')
     [ "\$FROM" = "\$TELEGRAM_CHAT_ID" ] || continue
-    if [ -z "\$TEXT" ]; then send "Понимаю только текст — голосовые и файлы пока мимо."; continue; fi
+    VOICE=\$(upd '.message.voice.file_id // empty')
+    if [ -z "\$TEXT" ] && [ -n "\$VOICE" ] && [ -n "\${GROQ_API_KEY:-}" ]; then
+      # голосовое -> текст через Groq Whisper
+      FP=\$(curl -s "\$API/getFile?file_id=\$VOICE" | jq -r '.result.file_path // empty')
+      if [ -n "\$FP" ]; then
+        curl -s -o voice.ogg "https://api.telegram.org/file/bot\$TELEGRAM_TOKEN/\$FP"
+        TEXT=\$(curl -s https://api.groq.com/openai/v1/audio/transcriptions \
+          -H "Authorization: Bearer \$GROQ_API_KEY" \
+          -F "file=@voice.ogg" -F "model=whisper-large-v3" | jq -r '.text // empty')
+        rm -f voice.ogg
+        [ -z "\$TEXT" ] && log "распознавание голосового не вернуло текст"
+      fi
+    fi
+    if [ -z "\$TEXT" ]; then
+      if [ -n "\$VOICE" ]; then send "Не разобрал голосовое. Голосовые работают при заданном ключе Groq (см. гайд, раздел про голосовые)."
+      else send "Понимаю только текст и голосовые."; fi
+      continue
+    fi
     # Живой прогресс: статус-сообщение в чате обновляется последней строкой работы
     # Codex каждые 5 сек — видно, что агент не завис.
     MSGID=\$(curl -s -X POST "\$API/sendMessage" \
