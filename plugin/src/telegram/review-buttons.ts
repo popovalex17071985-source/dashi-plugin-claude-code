@@ -82,8 +82,12 @@ export async function handleReviewCallback(ctx: ReviewCallbackContext, opts: Rev
     } else if (res.ok) {
       await ctx.editReplyMarkup([[{ text: res.label, callback_data: 'rev:locked' }]])
     } else {
-      // Publish failed — keep the buttons so она can retry, don't leave it ambiguous.
-      await ctx.editReplyMarkup(LIVE_KEYBOARD(src, id))
+      // Publish failed — keep the buttons AND say so on the button itself;
+      // a silently restored keyboard reads as "nothing happened" (2026-08-19).
+      await ctx.editReplyMarkup([
+        [{ text: '⚠️ Ошибка — Запостить ещё раз', callback_data: `rev:ok:${src}:${id}` }],
+        [{ text: '✏️ Править', callback_data: `rev:edit:${src}:${id}` }],
+      ])
     }
     opts.log.info('review callback handled', { action, src, ok: res.ok, error: res.error })
   } catch (err) {
