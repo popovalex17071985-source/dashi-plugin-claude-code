@@ -337,6 +337,8 @@ TELEGRAM_STATE_DIR=$WORKSPACE/state/telegram
 # прописанные на 8089, стучатся в пустоту — карточка «работаю…» не появляется.
 TELEGRAM_WEBHOOK_HOST=127.0.0.1
 TELEGRAM_WEBHOOK_PORT=8089
+# Хуки без токена молча ничего не отправляют — обе стороны читают эту строку.
+TELEGRAM_WEBHOOK_TOKEN=$(openssl rand -hex 16 2>/dev/null || head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')
 AGENT_ID=$AGENT_NAME
 GROQ_API_KEY=$GROQ_KEY
 EOF
