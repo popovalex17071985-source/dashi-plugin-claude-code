@@ -161,6 +161,12 @@ else
   as_agent 'test -x ~/.bun/bin/bun' || die "bun не встал — проверь, что unzip на месте"
   ok "bun $(as_agent '~/.bun/bin/bun --version')"
 fi
+# Симлинк в /usr/local/bin: скрипты плагина зовут `bun` по имени, а в
+# неинтерактивном su его PATH не видит.
+if [[ ! -e /usr/local/bin/bun ]]; then
+  ln -sf "/home/$SERVICE_USER/.bun/bin/bun" /usr/local/bin/bun
+  ok "bun доступен как команду системы"
+fi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. Workspace и плагин
