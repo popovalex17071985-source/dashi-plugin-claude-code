@@ -78,6 +78,11 @@ if [[ ! -f "$ENV_FILE" ]]; then
   [[ -n "$USER_ID" ]] || ask USER_ID "Твой Telegram id от @userinfobot: "
   [[ "$USER_ID" =~ ^-?[0-9]+$ ]] || die "id должен быть числом: $USER_ID"
   [[ -n "$GROQ_KEY" ]] || ask GROQ_KEY "Ключ Groq для голосовых (Enter — пропустить): " 0
+else
+  # Повторный прогон: id нужен ниже для хуков, берём из готового конфига,
+  # иначе хуки встанут с пустым chat-id и прогресс-пузырёк уедет в никуда.
+  USER_ID="$(sed -n 's/^TELEGRAM_ALLOWED_USER_IDS=//p' "$ENV_FILE" | head -1)"
+  [[ -n "$USER_ID" ]] || die "в $ENV_FILE нет TELEGRAM_ALLOWED_USER_IDS — почини файл или удали его и запусти снова"
 fi
 
 if [[ $ASSUME_YES -eq 0 ]]; then
@@ -98,18 +103,18 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 say "Система и Claude Code"
 export DEBIAN_FRONTEND=noninteractive
+apt-get update -qq
 
 if ! command -v node >/dev/null || [[ "$(node -v | cut -c2- | cut -d. -f1)" -lt "$NODE_MAJOR" ]]; then
-  apt-get update -qq
   curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | bash - >/dev/null
-  # unzip нужен установщику Bun — без него он падает уже после установки
-  apt-get install -y -qq nodejs git unzip tmux curl
+  apt-get install -y -qq nodejs
   ok "Node.js $(node -v)"
 else
-  # git/unzip/tmux могли не поставиться, если node уже был
-  apt-get install -y -qq git unzip tmux curl 2>/dev/null || true
   skip "Node.js $(node -v)"
 fi
+# unzip нужен установщику Bun — без него тот падает уже после скачивания;
+# tmux держит интерактивную сессию Claude под systemd
+apt-get install -y -qq git unzip tmux curl
 
 if ! command -v claude >/dev/null; then
   npm install -g @anthropic-ai/claude-code >/dev/null
