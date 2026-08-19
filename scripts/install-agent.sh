@@ -438,6 +438,14 @@ EOF
 chmod 644 "/etc/cron.d/dashi-$AGENT_NAME-advisor"
 ok "советник включён (по понедельникам в 10:00)"
 
+# Прожиматель модалок: «Switch model?» и подобные вопросы Claude блокируют
+# очередь сообщений, пока кто-то не нажмёт 1 — жмём из крона раз в минуту.
+cat > "/etc/cron.d/dashi-$AGENT_NAME-modal" <<EOF
+* * * * * $SERVICE_USER /bin/bash $CLAUDE_DIR/dashi-plugin-claude-code/scripts/modal-watch.sh channel-$AGENT_NAME >/dev/null 2>&1
+EOF
+chmod 644 "/etc/cron.d/dashi-$AGENT_NAME-modal"
+ok "прожиматель модалок включён"
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 9. Вход в Claude — единственное, что нельзя сделать за человека
 # ─────────────────────────────────────────────────────────────────────────────
