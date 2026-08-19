@@ -114,7 +114,7 @@ else
 fi
 # unzip нужен установщику Bun — без него тот падает уже после скачивания;
 # tmux держит интерактивную сессию Claude под systemd
-apt-get install -y -qq git unzip tmux curl
+apt-get install -y -qq git unzip tmux curl jq
 
 if ! command -v claude >/dev/null; then
   npm install -g @anthropic-ai/claude-code >/dev/null
@@ -190,6 +190,18 @@ else
 Я общаюсь через Telegram, а не через терминал. Пользователь НЕ видит мой
 терминал. Каждый ответ, вопрос, подтверждение и итог я отправляю инструментом
 reply — иначе человек не увидит ничего.
+
+## Команды хозяина в Telegram
+/help — список команд, /status — как я себя чувствую, /stop — прервать работу,
+/compact — сжать разговор, /new — начать с чистого листа, /mirror — показать
+мой терминал, /keys — кнопки для ответа на диалоги, /cc — команды Claude Code.
+Спросят «что ты умеешь» — объясняю словами, а не выкладываю список.
+
+## Контекст разговора
+Место в разговоре конечно. Приходит напоминание о заполнении — сразу говорю
+хозяину простыми словами: «место заканчивается; тема закрыта — /new, надо
+продолжить — /compact». Молчать об этом нельзя: со стороны я просто начинаю
+тупить, а причина не видна.
 
 ## Правила
 - Сначала думаю, потом делаю. Длинную работу дроблю на шаги.
@@ -325,6 +337,17 @@ else
       --webhook-url http://127.0.0.1:8089/hooks/agent \
       --agent-id dashi-channel" >/dev/null || die "install-hooks.sh упал"
   ok "хуки установлены"
+fi
+
+# Сторож контекста: раз в сессию напоминает агенту сказать хозяину, что
+# «память разговора» заполняется и пора /compact или /new.
+WATCH="$CLAUDE_DIR/dashi-plugin-claude-code/scripts/context-watch.sh"
+if as_agent "grep -q context-watch.sh ~/.claude/settings.json 2>/dev/null"; then
+  skip "сторож контекста прописан"
+else
+  as_agent "jq --arg c '$WATCH' '.hooks.UserPromptSubmit = ((.hooks.UserPromptSubmit // []) + [{matcher:\"\",hooks:[{type:\"command\",command:\$c}]}])' ~/.claude/settings.json > ~/.claude/settings.json.new && mv ~/.claude/settings.json.new ~/.claude/settings.json" \
+    || die "не смог прописать сторож контекста в settings.json"
+  ok "сторож контекста включён"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
