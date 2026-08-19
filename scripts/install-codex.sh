@@ -212,10 +212,30 @@ while :; do
     FROM=\$(upd '.message.chat.id // empty'); TEXT=\$(upd '.message.text // empty')
     [ "\$FROM" = "\$TELEGRAM_CHAT_ID" ] || continue
     if [ -z "\$TEXT" ]; then send "Понимаю только текст — голосовые и файлы пока мимо."; continue; fi
-    curl -s "\$API/sendChatAction" -d chat_id="\$TELEGRAM_CHAT_ID" -d action=typing >/dev/null
-    OUT=\$(mktemp)
-    timeout 600 "\$CODEX" exec --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" >> codex.log 2>&1
-    RC=\$?
+    # Живой прогресс: статус-сообщение в чате обновляется последней строкой работы
+    # Codex каждые 5 сек — видно, что агент не завис.
+    MSGID=\$(curl -s -X POST "\$API/sendMessage" \
+      --data-urlencode chat_id="\$TELEGRAM_CHAT_ID" \
+      --data-urlencode text="⏳ Работаю..." | jq -r '.result.message_id // empty')
+    OUT=\$(mktemp); : > task.log
+    timeout 600 "\$CODEX" exec --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" > task.log 2>&1 &
+    PID=\$!
+    PREV=""
+    while kill -0 "\$PID" 2>/dev/null; do
+      sleep 5
+      LAST=\$(tail -c 4000 task.log | grep -v '^[[:space:]]*\$' | tail -1 | cut -c1-180)
+      if [ -n "\$LAST" ] && [ -n "\$MSGID" ] && [ "\$LAST" != "\$PREV" ]; then
+        curl -s -X POST "\$API/editMessageText" \
+          --data-urlencode chat_id="\$TELEGRAM_CHAT_ID" \
+          -d message_id="\$MSGID" \
+          --data-urlencode text="⏳ \$LAST" >/dev/null
+        PREV="\$LAST"
+      fi
+    done
+    wait "\$PID"; RC=\$?
+    cat task.log >> codex.log
+    [ -n "\$MSGID" ] && curl -s -X POST "\$API/deleteMessage" \
+      -d chat_id="\$TELEGRAM_CHAT_ID" -d message_id="\$MSGID" >/dev/null
     ANSWER=\$(cat "\$OUT" 2>/dev/null); rm -f "\$OUT"
     if [ -z "\$ANSWER" ]; then
       if [ \$RC -eq 124 ]; then
