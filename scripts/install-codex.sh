@@ -158,10 +158,15 @@ else
 - Задача непонятна — задай уточняющий вопрос, не выдумывай.
 
 # Память
-- Твоя постоянная память — файл MEMORY.md в рабочей папке.
-- В начале каждой задачи прочитай MEMORY.md, если он есть.
-- Я написал «запомни ...» — допиши суть одной строкой в MEMORY.md и подтверди.
-- Узнал обо мне что-то важное для будущих задач — тоже дописывай туда.
+- Постоянная память живёт в рабочей папке: MEMORY.md — индекс (одна строка на
+  тему), папка memory/ — файлы фактов по темам, journal.md — журнал сделанного.
+- В начале КАЖДОЙ задачи прочитай MEMORY.md. Нужны детали по теме — найди файл
+  в memory/ (grep по ключевым словам) и прочитай его.
+- Я написал «запомни ...» — сохрани суть в memory/<тема>.md (создай или дополни),
+  добавь/обнови строку-указатель в MEMORY.md и подтверди мне, что записал.
+- Узнал в работе что-то важное обо мне, моих делах или как делать задачи —
+  сохраняй так же сам, не жди команды «запомни».
+- Закончил заметную задачу — одна строка-итог в journal.md (дата + что сделано).
 
 # Правила безопасности (красные линии)
 - Никогда не удаляй файлы и данные без моей явной просьбы.
@@ -253,8 +258,13 @@ while :; do
     MSGID=\$(curl -s -X POST "\$API/sendMessage" \
       --data-urlencode chat_id="\$TELEGRAM_CHAT_ID" \
       --data-urlencode text="⏳ Работаю..." | jq -r '.result.message_id // empty')
+    if [ "\$TEXT" = "/new" ]; then rm -f .session_started; send "Начал новую сессию — контекст диалога чистый, память в файлах на месте."; continue; fi
+    # Непрерывность диалога: продолжаем прошлую сессию Codex (resume --last),
+    # /new — начать с чистого листа
+    RESUME=""
+    [ -f .session_started ] && RESUME="resume --last"
     OUT=\$(mktemp); : > task.log
-    timeout 600 "\$CODEX" exec --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" > task.log 2>&1 &
+    timeout 600 "\$CODEX" exec \$RESUME --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" > task.log 2>&1 &
     PID=\$!
     PREV=""; START=\$(date +%s)
     while kill -0 "\$PID" 2>/dev/null; do
@@ -282,6 +292,14 @@ STEPS_EOF
       fi
     done
     wait "\$PID"; RC=\$?
+    if [ \$RC -ne 0 ] && [ -n "\$RESUME" ]; then
+      # resume не взлетел (сессия протухла/не найдена) — повтор с чистого листа
+      log "resume rc=\$RC, повтор без resume"
+      rm -f .session_started
+      timeout 600 "\$CODEX" exec --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" >> task.log 2>&1
+      RC=\$?
+    fi
+    [ \$RC -eq 0 ] && touch .session_started
     cat task.log >> codex.log
     [ -n "\$MSGID" ] && curl -s -X POST "\$API/deleteMessage" \
       -d chat_id="\$TELEGRAM_CHAT_ID" -d message_id="\$MSGID" >/dev/null
