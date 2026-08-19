@@ -353,7 +353,9 @@ fi
 # 7. Hooks
 # ─────────────────────────────────────────────────────────────────────────────
 say "Hooks"
-if as_agent "grep -q dashi-channel ~/.claude/settings.json 2>/dev/null"; then
+# Маркер именно хуков: строка «dashi-channel» может попасть в settings.json
+# и другими путями (MCP-сервер), и тогда шаг молча пропускался.
+if as_agent "grep -q dashi-channel-hook ~/.claude/settings.json 2>/dev/null"; then
   skip "хуки прописаны"
 else
   # install-hooks.sh зовёт `bun` по имени, а в неинтерактивном su его нет в PATH.
