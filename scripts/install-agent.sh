@@ -333,6 +333,10 @@ TELEGRAM_ALLOWED_USER_IDS=$USER_ID
 TELEGRAM_ALLOWED_CHAT_IDS=$USER_ID
 TELEGRAM_WORKSPACE_ROOT=$CLAUDE_DIR
 TELEGRAM_STATE_DIR=$WORKSPACE/state/telegram
+# Приёмник событий от Claude. Без явного порта плагин берёт случайный, и хуки,
+# прописанные на 8089, стучатся в пустоту — карточка «работаю…» не появляется.
+TELEGRAM_WEBHOOK_HOST=127.0.0.1
+TELEGRAM_WEBHOOK_PORT=8089
 AGENT_ID=$AGENT_NAME
 GROQ_API_KEY=$GROQ_KEY
 EOF
