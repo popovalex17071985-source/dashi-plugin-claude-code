@@ -360,19 +360,16 @@ fi
 # 7. Hooks
 # ─────────────────────────────────────────────────────────────────────────────
 say "Hooks"
-# Маркер именно хуков: строка «dashi-channel» может попасть в settings.json
-# и другими путями (MCP-сервер), и тогда шаг молча пропускался.
-if as_agent "grep -q dashi-channel-hook ~/.claude/settings.json 2>/dev/null"; then
-  skip "хуки прописаны"
-else
-  # install-hooks.sh зовёт `bun` по имени, а в неинтерактивном su его нет в PATH.
-  as_agent "export PATH=\$HOME/.bun/bin:\$PATH; cd '$PLUGIN_DIR' && bash scripts/install-hooks.sh \
-      --settings ~/.claude/settings.json \
-      --chat-id '$USER_ID' \
-      --webhook-url http://127.0.0.1:8089/hooks/agent \
-      --agent-id dashi-channel" >/dev/null || die "install-hooks.sh упал"
-  ok "хуки установлены"
-fi
+# Гоняем ВСЕГДА, без skip по маркеру: install-hooks.sh идемпотентен (заменяет
+# свою запись), а skip консервировал старые хуки с устаревшим matcher —
+# у агента с июльским плагином шаги задач так и не попадали в карточку (20.08).
+# install-hooks.sh зовёт `bun` по имени, а в неинтерактивном su его нет в PATH.
+as_agent "export PATH=\$HOME/.bun/bin:\$PATH; cd '$PLUGIN_DIR' && bash scripts/install-hooks.sh \
+    --settings ~/.claude/settings.json \
+    --chat-id '$USER_ID' \
+    --webhook-url http://127.0.0.1:8089/hooks/agent \
+    --agent-id dashi-channel" >/dev/null || die "install-hooks.sh упал"
+ok "хуки актуализированы"
 
 # Сторож контекста: раз в сессию напоминает агенту сказать хозяину, что
 # «память разговора» заполняется и пора /compact или /new.
