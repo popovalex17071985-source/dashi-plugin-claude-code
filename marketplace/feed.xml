@@ -2725,7 +2725,7 @@
 <p>Арт. 44684</p>]]></Description>
         <Price>18990</Price>
         
-        <Model>Apple iPad Pro 10,5 (2017)</Model>
+        <Model>iPad Pro 10.5 (2-го поколения) (2017)</Model>
         <Images>
           <Image url="https://cdn.insales-shop.ru/images/products/1/3097/3237587993/tempImageh4fcVZ.jpg"/>
           <Image url="https://cdn.insales-shop.ru/images/products/1/3113/3237588009/tempImagefeknDI.jpg"/>
@@ -2748,7 +2748,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <Akb>75</Akb>
-      </Ad>
+      <Color>Серый</Color><RamSize>4</RamSize></Ad>
 
       <Ad>
         <Id>1896055065</Id>
@@ -3199,7 +3199,7 @@
 <p>Арт. 7pdcf</p>]]></Description>
         <Price>15990</Price>
         
-        <Model>iPad 9 (2021)</Model>
+        <Model>iPad (9-го поколения) (2021)</Model>
         <Images>
           <Image url="https://cdn.insales-shop.ru/images/products/1/6577/3237599665/tempImageWYqdIK.jpg"/>
           <Image url="https://cdn.insales-shop.ru/images/products/1/6593/3237599681/tempImagermJoPq.jpg"/>
@@ -3277,7 +3277,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <Akb>93</Akb>
-      </Ad>
+      <Color>Серебряный</Color></Ad>
 
       <Ad>
         <Id>1904052537</Id>
@@ -3699,7 +3699,7 @@
 <p>Арт. 9g4pf</p>]]></Description>
         <Price>54990</Price>
         
-        <Model>iPad Air 7 (2025)</Model>
+        <Model>iPad Air 13 (2025)</Model>
         <Images>
           <Image url="https://cdn.insales-shop.ru/images/products/1/977/3237577681/tempImagez4hk2I.jpg"/>
           <Image url="https://cdn.insales-shop.ru/images/products/1/993/3237577697/tempImageaN5vmx.jpg"/>
@@ -3752,7 +3752,7 @@
 <p>Арт. qkc6n</p>]]></Description>
         <Price>42990</Price>
         
-        <Model>iPad Pro 12.9 (5-го поколения) (2021)</Model>
+        <Model>iPad Pro 12.9 (3-го поколения) (2018)</Model>
         <Images>
           <Image url="https://cdn.insales-shop.ru/images/products/1/5713/3237615185/tempImagectsac0.jpg"/>
           <Image url="https://cdn.insales-shop.ru/images/products/1/5721/3237615193/tempImageghtx4B.jpg"/>
@@ -3763,7 +3763,7 @@
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
         
-        <RamSize>8</RamSize>
+        <RamSize>6</RamSize>
         
         <Condition>Б/у</Condition>
         <AdType>Товар приобретен на продажу</AdType>
@@ -3776,7 +3776,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <Akb>75</Akb>
-      <MemorySize>1024</MemorySize></Ad>
+      <MemorySize>1024</MemorySize><Color>Серый</Color></Ad>
 
       <Ad>
         <Id>1905316937</Id>
@@ -5555,7 +5555,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2978685</Revalidate></Ad>
+      <Revalidate>2978687</Revalidate></Ad>
 <Ad>
         <Id>496127545</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5753,7 +5753,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978685</Revalidate></Ad>
+      <Revalidate>2978687</Revalidate></Ad>
 <Ad>
         <Id>1640714561</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5903,7 +5903,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978685</Revalidate></Ad>
+      <Revalidate>2978687</Revalidate></Ad>
 <Ad>
         <Id>1640726593</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -6053,7 +6053,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978685</Revalidate></Ad>
+      <Revalidate>2978687</Revalidate></Ad>
 <Ad>
         <Id>1640736641</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -6653,7 +6653,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978685</Revalidate></Ad>
+      <Revalidate>2978687</Revalidate></Ad>
 <Ad>
         <Id>1642060329</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -6753,7 +6753,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978685</Revalidate></Ad>
+      <Revalidate>2978687</Revalidate></Ad>
 <Ad>
         <Id>1642061641</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -7053,7 +7053,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2978685</Revalidate></Ad>
+      <Revalidate>2978687</Revalidate></Ad>
 <Ad>
         <Id>1645613473</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -7203,7 +7203,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2978685</Revalidate></Ad>
+      <Revalidate>2978687</Revalidate></Ad>
 <Ad>
         <Id>1645614297</Id>
         <DateBegin>2023-03-01</DateBegin>
