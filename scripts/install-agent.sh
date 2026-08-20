@@ -26,6 +26,7 @@ say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
 skip() { printf '    \033[2m· %s (уже сделано)\033[0m\n' "$*"; }
 die()  { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
+warn() { printf '    \033[33m! %s\033[0m\n' "$*"; }
 
 usage() {
   sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
@@ -422,6 +423,25 @@ WantedBy=multi-user.target
 EOF
 systemctl daemon-reload
 ok "юнит записан"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8a. Sudo для самообслуживания
+# ─────────────────────────────────────────────────────────────────────────────
+# Без этого агент не может сам перезапустить свой мост и посмотреть его логи —
+# и гоняет человека в терминал под root. Права точечные: ровно свой сервис.
+say "Sudo для самообслуживания"
+SUDOERS_FILE="/etc/sudoers.d/dashi-$AGENT_NAME"
+cat > "$SUDOERS_FILE" <<EOF
+# Агент $AGENT_NAME может сам обслуживать СВОЙ сервис — и только его
+$SERVICE_USER ALL=(root) NOPASSWD: /usr/bin/systemctl restart $UNIT, /usr/bin/systemctl status $UNIT, /usr/bin/journalctl -u $UNIT *
+EOF
+chmod 440 "$SUDOERS_FILE"
+if visudo -cf "$SUDOERS_FILE" >/dev/null 2>&1; then
+  ok "агент может сам: restart/status/логи своего сервиса"
+else
+  rm -f "$SUDOERS_FILE"
+  warn "sudoers не прошёл проверку visudo — пропускаю (агент не сможет сам перезапускаться)"
+fi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 8b. Предохранитель
