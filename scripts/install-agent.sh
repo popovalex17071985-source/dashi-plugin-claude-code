@@ -417,6 +417,25 @@ EOF
 chmod 755 /usr/local/bin/dashi-press-dialogs
 ok "диалоги жмутся по содержимому экрана, не вслепую"
 
+# Держатель сессии: Type=forking с tmux ненадёжен — systemd теряет main PID
+# демонизировавшегося tmux-сервера и тут же зовёт ExecStop, убивая только что
+# поднятого агента (кейс 20.08.2026). Type=simple + процесс, живущий пока жива
+# сессия, — проверенная схема.
+cat > /usr/local/bin/dashi-run <<'EOF'
+#!/usr/bin/env bash
+# Поднимает tmux-сессию с Claude и живёт, пока жива она (для Type=simple).
+set -u
+SESSION="${1:?usage: dashi-run <tmux-session> <plugin-dir>}"
+PLUGIN="${2:?usage: dashi-run <tmux-session> <plugin-dir>}"
+tmux kill-session -t "$SESSION" 2>/dev/null || true
+tmux new-session -d -s "$SESSION" \
+  "/bin/bash -lc 'cd $PLUGIN && exec claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'"
+/usr/local/bin/dashi-press-dialogs "$SESSION" &
+while tmux has-session -t "$SESSION" 2>/dev/null; do sleep 15; done
+EOF
+chmod 755 /usr/local/bin/dashi-run
+ok "держатель сессии установлен"
+
 say "Автозапуск ($UNIT)"
 cat > "/etc/systemd/system/$UNIT.service" <<EOF
 [Unit]
@@ -433,21 +452,14 @@ Environment=HOME=$HOME_DIR
 Environment=PATH=$HOME_DIR/.bun/bin:$HOME_DIR/.local/bin:/usr/local/bin:/usr/bin:/bin
 Environment=LANG=en_US.UTF-8
 
-# Claude Code интерактивный — держим в tmux, иначе нет TTY
-Type=forking
-# «-» = не падать, если сессии нет; лечит «duplicate session» от осиротевшей tmux-сессии
-ExecStartPre=-/usr/bin/tmux kill-session -t channel-$AGENT_NAME
-# bash -l = полное окружение юзера (PATH с bun и т.п.) — ровно как при ручном
-# запуске; голый claude в юните умирал на env-диффах (живой кейс 20.08)
-ExecStart=/usr/bin/tmux new-session -d -s channel-$AGENT_NAME \\
-  /bin/bash -lc 'cd $PLUGIN_DIR && exec claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'
-# Стартовые диалоги (Bypass Permissions, dev-каналы, trust) жмёт умный
-# прожиматель — по содержимому экрана, набор диалогов от запуска к запуску разный
-ExecStartPost=/usr/local/bin/dashi-press-dialogs channel-$AGENT_NAME
+# Claude Code интерактивный — живёт в tmux (нужен TTY); dashi-run поднимает
+# сессию, прожимает стартовые диалоги по содержимому экрана и живёт, пока жива
+# сессия, — systemd честно видит смерть агента и перезапускает
+Type=simple
+ExecStart=/usr/local/bin/dashi-run channel-$AGENT_NAME $PLUGIN_DIR
 ExecStop=/usr/bin/tmux kill-session -t channel-$AGENT_NAME
 
-# on-failure, а не always: иначе welcome-промт крутит перезапуск по кругу
-Restart=on-failure
+Restart=always
 RestartSec=15s
 
 [Install]
