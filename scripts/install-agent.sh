@@ -388,6 +388,35 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 # 8. systemd
 # ─────────────────────────────────────────────────────────────────────────────
+# Прожиматель стартовых диалогов: смотрит на экран и жмёт нужное. Слепой
+# Down+Enter ломался, когда bypass-вопрос уже принят: Down попадал в диалог
+# dev-каналов и выбирал «Exit» — сервис сам убивал Claude (кейс 20.08.2026).
+say "Прожиматель стартовых диалогов"
+cat > /usr/local/bin/dashi-press-dialogs <<'EOF'
+#!/usr/bin/env bash
+# Bypass Permissions -> Down+Enter (дефолт «No, exit»), остальные диалоги
+# (dev channels, trust, внешние импорты) -> Enter. Всегда exit 0 — это
+# ExecStartPost, падать ему нельзя.
+set -u
+SESSION="${1:?usage: dashi-press-dialogs <tmux-session>}"
+for _ in $(seq 1 15); do
+  sleep 3
+  screen="$(tmux capture-pane -pt "$SESSION" 2>/dev/null)" || exit 0
+  if grep -q "Bypass Permissions" <<<"$screen"; then
+    tmux send-keys -t "$SESSION" Down
+    sleep 1
+    tmux send-keys -t "$SESSION" Enter
+  elif grep -qE "development channels|Do you trust|Enter to confirm" <<<"$screen"; then
+    tmux send-keys -t "$SESSION" Enter
+  elif grep -q "bypass permissions on" <<<"$screen"; then
+    exit 0  # диалоги пройдены, Claude работает
+  fi
+done
+exit 0
+EOF
+chmod 755 /usr/local/bin/dashi-press-dialogs
+ok "диалоги жмутся по содержимому экрана, не вслепую"
+
 say "Автозапуск ($UNIT)"
 cat > "/etc/systemd/system/$UNIT.service" <<EOF
 [Unit]
@@ -412,10 +441,9 @@ ExecStartPre=-/usr/bin/tmux kill-session -t channel-$AGENT_NAME
 # запуске; голый claude в юните умирал на env-диффах (живой кейс 20.08)
 ExecStart=/usr/bin/tmux new-session -d -s channel-$AGENT_NAME \\
   /bin/bash -lc 'cd $PLUGIN_DIR && exec claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'
-# Первый запуск спрашивает: сначала «Bypass Permissions» (по умолчанию выбрано
-# «No, exit» — надо стрелка вниз + Enter, иначе Claude просто выходит), потом
-# внешние импорты и dev-каналы — там достаточно Enter.
-ExecStartPost=/bin/sh -c 'sleep 6 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Down && sleep 1 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Enter && sleep 3 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Enter && sleep 2 && /usr/bin/tmux send-keys -t channel-$AGENT_NAME Enter'
+# Стартовые диалоги (Bypass Permissions, dev-каналы, trust) жмёт умный
+# прожиматель — по содержимому экрана, набор диалогов от запуска к запуску разный
+ExecStartPost=/usr/local/bin/dashi-press-dialogs channel-$AGENT_NAME
 ExecStop=/usr/bin/tmux kill-session -t channel-$AGENT_NAME
 
 # on-failure, а не always: иначе welcome-промт крутит перезапуск по кругу
