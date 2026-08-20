@@ -12,10 +12,12 @@
 > контекста. Прежний ручной путь (14 шагов) — ниже, он нужен, когда что-то
 > пошло не так и хочется понимать, что происходит.
 >
-> v5 (20.08.2026), после живого ремонта чужого агента: раздел про месячный
-> перелогин (главная причина «агент вдруг замолчал»), правила прав («агент всё
-> делает сам, никаких „сходи под root"»), установщик даёт агенту точечный sudo
-> на свой сервис, новые строки в траблшутинге.
+> v5 (20.08.2026), после живого ремонта и перевода чужого агента на установщик:
+> раздел про месячный перелогин (главная причина «агент вдруг замолчал»),
+> правила прав («агент всё делает сам, никаких „сходи под root"»), точечный sudo
+> на свой сервис, переписанная схема systemd (Type=simple + держатель + умное
+> нажатие стартовых диалогов), раздел «перевод ручного агента на установщик»,
+> новые строки в траблшутинге.
 
 ---
 
@@ -337,6 +339,31 @@ chown -R agent:agent /путь/к/папке/проекта
 | хуки не прописаны (`grep -c dashi-channel-hook ~/.claude/settings.json` = 0) | шаг молча пропускался | свежий установщик |
 | машина зависает на 1 ГБ памяти | нет свопа | свежий установщик делает своп сам |
 
+Ставил до **20.08.2026** — ещё три, все лечатся одним прогоном свежего установщика:
+
+| Симптом | Причина |
+|---|---|
+| сервис «Started» и через секунду inactive (dead) | Type=forking терял главный процесс tmux — теперь Type=simple + держатель |
+| в логе `duplicate session` и рестарты по кругу | осиротевшая tmux-сессия — теперь чистится перед стартом |
+| Claude сам «выходит» на старте | слепые нажатия попадали в «Exit» — теперь кнопки жмутся по содержимому экрана |
+
+> Скачал установщик, а фиксы «не подействовали»? GitHub отдаёт raw-файлы с
+> кэшем до ~5 минут. Качай с довеском `?v=2` (цифру меняй) в конце ссылки.
+
+## Агент ставился руками по старой инструкции — перевод на установщик
+
+Проверено вживую 20.08.2026. Ничего личного он не перезапишет: CLAUDE.md,
+память и конфиг с токеном трогаются только если их нет.
+
+1. Бэкап (под юзером агента): `tar czf ~/backup-$(date +%F).tar.gz ~/.claude-lab/<имя> ~/.claude ~/.claude.json`
+2. Установщик под root с ТВОИМИ путями: `bash install-agent.sh --user <юзер-агента>`,
+   на вопрос об имени — имя workspace-папки (то, что в `~/.claude-lab/<имя>`).
+   Токен и id — те же, что были.
+3. Убить ручную tmux-сессию старого запуска: `su - <юзер> -c "tmux kill-server"` —
+   иначе старый и новый Claude дерутся за одного бота, и он глохнет.
+4. `systemctl restart dashi-<имя>` → status → active (running) → написать боту.
+   Дальше руками ничего не поднимать: только `systemctl restart` и месячный /login.
+
 
 Полезные команды (выполняй на сервере под root):
 
@@ -651,45 +678,32 @@ bun ../skills/doctor-dashi-plugin/scripts/doctor.ts --plugin-dir "$PWD"
 Зачем: агент стартует сам при перезагрузке и поднимается после сбоя. Claude
 Code — интерактивная программа, ей нужен «экран», поэтому держим её в tmux.
 
-**[СЕРВЕР]** (под root — юниты живут в системной папке; выйди из agent: `exit`):
-```
-nano /etc/systemd/system/dashi.service
-```
-Вставь (подставь своего юзера/пути, если менял; здесь юзер `agent`):
-```
-[Unit]
-Description=Dashi agent (Telegram to Claude Code)
-After=network-online.target
+Проще всего НЕ писать юнит руками, а прогнать установщик (шаг 2 быстрого пути,
+`--user agent`) — он ставит уже отлаженную схему. Живой день отладки 20.08.2026
+показал, что наивный юнит ломается сразу тремя способами:
 
-[Service]
-User=agent
-WorkingDirectory=/home/agent/.claude-lab/myagent/.claude/dashi-plugin-claude-code/plugin
-EnvironmentFile=/home/agent/.claude-lab/myagent/secrets/channel.env
-Environment=HOME=/home/agent
-Environment=PATH=/home/agent/.bun/bin:/usr/local/bin:/usr/bin:/bin
-Type=forking
-ExecStart=/usr/bin/tmux new-session -d -s dashi /usr/bin/claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel
-ExecStartPost=/bin/sh -c 'sleep 8 && /usr/bin/tmux send-keys -t dashi Enter && sleep 2 && /usr/bin/tmux send-keys -t dashi Enter'
-ExecStop=/usr/bin/tmux kill-session -t dashi
-Restart=on-failure
-RestartSec=15s
+> ⚠️ ГРАБЛЯ: `Type=forking` + tmux — мина. systemd теряет главный процесс
+> демонизировавшегося tmux и через секунду сам гасит только что поднятого
+> агента. Рабочая схема: `Type=simple` + скрипт-держатель, который поднимает
+> сессию и живёт, пока жива она.
+> ⚠️ ГРАБЛЯ: слепые `send-keys Enter` по таймеру жмут не те кнопки: набор
+> стартовых вопросов от запуска к запуску РАЗНЫЙ (принятые запоминаются), и
+> «вниз+Enter» попадал в диалог dev-каналов, выбирая «Exit» — сервис сам убивал
+> Claude. Жать надо глядя на экран (`tmux capture-pane` → нужная клавиша).
+> ⚠️ ГРАБЛЯ: запуск голого `claude` в юните умирает на окружении — запускать
+> через `/bin/bash -lc '...'`, чтобы подтянулся PATH юзера (bun и прочее).
 
-[Install]
-WantedBy=multi-user.target
-```
-Включи:
-```
-systemctl daemon-reload
-systemctl enable --now dashi
-systemctl status dashi        # ждём active (running)
-```
+Если всё же руками — установщик кладёт два скрипта, повтори их логику:
+`/usr/local/bin/dashi-run <сессия> <папка-plugin>` (kill-session → new-session
+с `bash -lc 'cd ... && exec claude ...'` → фоновый прожиматель диалогов → цикл
+`while tmux has-session; do sleep 15; done`) и `/usr/local/bin/dashi-press-dialogs`
+(смотрит экран: «Bypass Permissions» → Down+Enter, остальные диалоги → Enter).
+Юнит: `Type=simple`, `ExecStart=/usr/local/bin/dashi-run ...`,
+`ExecStop=tmux kill-session`, `Restart=always`, `RestartSec=15s`, плюс
+`EnvironmentFile` с токенами и `Environment=HOME=...`. Точный текст — в
+`scripts/install-agent.sh` репозитория, секция «8. systemd».
 
-> ⚠️ ГРАБЛЯ: `ExecStartPost` с двумя `Enter` нужен, чтобы «нажать» те самые 2
-> первых вопроса Claude (внешние импорты + dev-каналы) при холодном старте.
-> Без него сессия зависает на вопросе и бот молчит.
-> ⚠️ ГРАБЛЯ: `Type=forking` + tmux обязательны — Claude нужен псевдотерминал,
-> напрямую как демон он не живёт.
-> Проверь автозапуск после перезагрузки: `systemctl is-enabled dashi` → `enabled`.
+Проверь автозапуск после перезагрузки: `systemctl is-enabled dashi-<имя>` → `enabled`.
 
 Приём для богатого характера: скорми боту файл-интервью — попроси задать по
 порядку вопросы (чем занимаешься, как обращаться, стиль, часовой пояс, запреты) и
