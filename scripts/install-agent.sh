@@ -406,6 +406,8 @@ Environment=LANG=en_US.UTF-8
 
 # Claude Code интерактивный — держим в tmux, иначе нет TTY
 Type=forking
+# «-» = не падать, если сессии нет; лечит «duplicate session» от осиротевшей tmux-сессии
+ExecStartPre=-/usr/bin/tmux kill-session -t channel-$AGENT_NAME
 ExecStart=/usr/bin/tmux new-session -d -s channel-$AGENT_NAME \\
   claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel
 # Первый запуск спрашивает: сначала «Bypass Permissions» (по умолчанию выбрано
