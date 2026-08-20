@@ -3776,7 +3776,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <Akb>75</Akb>
-      </Ad>
+      <MemorySize>1024</MemorySize></Ad>
 
       <Ad>
         <Id>1905316937</Id>
