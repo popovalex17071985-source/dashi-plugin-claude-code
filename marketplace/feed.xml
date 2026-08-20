@@ -2748,7 +2748,7 @@
         <ScreenCondition>Без дефектов</ScreenCondition>
         <CaseCondition>Без дефектов</CaseCondition>
         <Akb>75</Akb>
-      <Color>Серый</Color><RamSize>4</RamSize></Ad>
+      <RamSize>4</RamSize><Color>Серый</Color></Ad>
 
       <Ad>
         <Id>1896055065</Id>
@@ -3708,7 +3708,7 @@
           <Image url="https://cdn.insales-shop.ru/images/products/1/1017/3237577721/tempImageUOnJjs.jpg"/>
         </Images>
         <MemorySize>128</MemorySize>
-        <Color>Синий</Color>
+        <Color>Голубой</Color>
         <Vendor>Apple</Vendor>
         <Category>Планшеты и электронные книги</Category>
         
