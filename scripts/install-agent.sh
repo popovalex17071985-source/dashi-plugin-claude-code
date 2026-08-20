@@ -408,8 +408,10 @@ Environment=LANG=en_US.UTF-8
 Type=forking
 # «-» = не падать, если сессии нет; лечит «duplicate session» от осиротевшей tmux-сессии
 ExecStartPre=-/usr/bin/tmux kill-session -t channel-$AGENT_NAME
+# bash -l = полное окружение юзера (PATH с bun и т.п.) — ровно как при ручном
+# запуске; голый claude в юните умирал на env-диффах (живой кейс 20.08)
 ExecStart=/usr/bin/tmux new-session -d -s channel-$AGENT_NAME \\
-  claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel
+  /bin/bash -lc 'cd $PLUGIN_DIR && exec claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'
 # Первый запуск спрашивает: сначала «Bypass Permissions» (по умолчанию выбрано
 # «No, exit» — надо стрелка вниз + Enter, иначе Claude просто выходит), потом
 # внешние импорты и dev-каналы — там достаточно Enter.
