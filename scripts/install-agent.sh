@@ -127,6 +127,11 @@ if (( mem_kb < 1800000 )) && ! swapon --show --noheadings | grep -q .; then
   ok "своп 2 ГБ (памяти всего $(( mem_kb / 1024 )) МБ)"
 fi
 
+# Журнал systemd без потолка за месяцы съедает гигабайты на маленьком VPS
+mkdir -p /etc/systemd/journald.conf.d
+printf '[Journal]\nSystemMaxUse=500M\n' > /etc/systemd/journald.conf.d/dashi.conf
+systemctl try-restart systemd-journald 2>/dev/null || true
+
 if ! command -v claude >/dev/null; then
   npm install -g @anthropic-ai/claude-code >/dev/null
   ok "Claude Code $(claude --version 2>/dev/null || echo установлен)"
@@ -148,6 +153,8 @@ else
   ok "создан $SERVICE_USER"
 fi
 HOME_DIR="$(getent passwd "$SERVICE_USER" | cut -d: -f6)"
+# Читать журнал своего сервиса без sudo (советник, самодиагностика)
+usermod -aG systemd-journal "$SERVICE_USER" 2>/dev/null || true
 
 as_agent() { su - "$SERVICE_USER" -c "$1"; }
 
@@ -164,10 +171,9 @@ else
 fi
 # Симлинк в /usr/local/bin: скрипты плагина зовут `bun` по имени, а в
 # неинтерактивном su его PATH не видит.
-if [[ ! -e /usr/local/bin/bun ]]; then
-  ln -sf "/home/$SERVICE_USER/.bun/bin/bun" /usr/local/bin/bun
-  ok "bun доступен как команду системы"
-fi
+# ln -sf всегда: старый симлинк мог остаться от другого юзера/агента и висеть
+ln -sf "/home/$SERVICE_USER/.bun/bin/bun" /usr/local/bin/bun
+ok "bun доступен как команда системы"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. Workspace и плагин
@@ -181,9 +187,9 @@ as_agent "mkdir -p '$CLAUDE_DIR' '$WORKSPACE/secrets' && chmod 700 '$WORKSPACE/s
 # красит файлы агента в root, и он молча теряет право писать в собственные
 # папки (20-21.08: киоск, потом secrets/ — «не могу сохранить токен»). Установщик
 # идёт под root, поэтому каждый прогон возвращает всё хозяйство юзеру.
-if [[ -d "$WORKSPACE" ]]; then
-  chown -R "$SERVICE_USER:$SERVICE_USER" "$WORKSPACE"
-  ok "владелец workspace нормализован ($SERVICE_USER)"
+if [[ -d "/home/$SERVICE_USER" ]]; then
+  chown -R "$SERVICE_USER:$SERVICE_USER" "/home/$SERVICE_USER"
+  ok "владелец домашней папки нормализован ($SERVICE_USER)"
 fi
 
 if [[ -d "$CLAUDE_DIR/dashi-plugin-claude-code/.git" ]]; then
@@ -252,6 +258,24 @@ reply — иначе человек не увидит ничего.
 
 Всегда в контексте только два лёгких файла, остальное читаю по нужде — иначе
 каждый запуск жжёт контекст на том, что сегодня не понадобится.
+
+## Самообслуживание (мои права на этом сервере)
+
+Мой мост — сервис «$UNIT», tmux-сессия «channel-$AGENT_NAME». Хозяина в
+терминал НЕ гоняю: всё штатное я умею сам. Через sudo мне разрешён ровно один
+инструмент — dashi-ctl-$AGENT_NAME:
+- sudo /usr/local/bin/dashi-ctl-$AGENT_NAME restart — перезапустить мой сервис.
+  Рестарт — ПОСЛЕДНЕЕ действие хода: сначала ответ хозяину, потом рестарт.
+- ... status — состояние сервиса; ... logs 200 — последние строки журнала
+- ... fix-owner — вернуть мне владение моими файлами (если после чьей-то
+  root-починки не могу писать в свои папки — это оно, чинюсь сам)
+- ... vacuum — ужать журнал systemd, если кончается диск
+- ... update-claude — обновить Claude Code (после — restart)
+
+Конфиг канала $ENV_FILE могу читать и править сам (новый ключ, chat_id);
+после правки — restart. Новые секреты от хозяина кладу в secrets/ сам.
+Обновить плагин: git pull в $CLAUDE_DIR/dashi-plugin-claude-code, затем
+bun install в plugin/, затем restart.
 
 @core/USER.md
 @core/rules.md
@@ -332,7 +356,9 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 say "Конфиг $ENV_FILE"
 if [[ -f "$ENV_FILE" ]]; then
-  skip "конфиг на месте"
+  # 660: агент сам правит канальный конфиг (новый ключ, chat_id) без терминала
+  chown "root:$SERVICE_USER" "$ENV_FILE"; chmod 660 "$ENV_FILE"
+  skip "конфиг на месте (права обновлены: 660)"
 else
   mkdir -p "$(dirname "$ENV_FILE")"
   cat > "$ENV_FILE" <<EOF
@@ -353,8 +379,8 @@ AGENT_ID=$AGENT_NAME
 GROQ_API_KEY=$GROQ_KEY
 EOF
   chown "root:$SERVICE_USER" "$ENV_FILE"
-  chmod 640 "$ENV_FILE"
-  ok "конфиг записан (640 root:$SERVICE_USER)"
+  chmod 660 "$ENV_FILE"
+  ok "конфиг записан (660 root:$SERVICE_USER — агент может править сам)"
 fi
 
 # Живая карточка «работаю…» в Telegram: в плагине выключена по умолчанию.
@@ -405,7 +431,8 @@ cat > /usr/local/bin/dashi-press-dialogs <<'EOF'
 # ExecStartPost, падать ему нельзя.
 set -u
 SESSION="${1:?usage: dashi-press-dialogs <tmux-session>}"
-for _ in $(seq 1 15); do
+# 40×3с = 2 мин: на слабом VPS (1 ГБ + своп) Claude грузится дольше 45 секунд
+for _ in $(seq 1 40); do
   sleep 3
   screen="$(tmux capture-pane -pt "$SESSION" 2>/dev/null)" || exit 0
   if grep -q "Bypass Permissions" <<<"$screen"; then
@@ -430,14 +457,31 @@ ok "диалоги жмутся по содержимому экрана, не �
 cat > /usr/local/bin/dashi-run <<'EOF'
 #!/usr/bin/env bash
 # Поднимает tmux-сессию с Claude и живёт, пока жива она (для Type=simple).
-set -u
-SESSION="${1:?usage: dashi-run <tmux-session> <plugin-dir>}"
-PLUGIN="${2:?usage: dashi-run <tmux-session> <plugin-dir>}"
+# Плюс сторож моста: Telegram-мост (вебхук 127.0.0.1:PORT) был жив и пропал
+# на 2 проверки подряд -> выходим ненулевым, systemd перезапустит всё целиком.
+# Иначе классика «tmux жив, мост сдох»: systemd доволен, бот молчит, ремонт
+# только терминалом. До первого подъёма моста порт не проверяем — на свежей
+# установке Claude может стоять на логине сколько угодно.
+set -uo pipefail
+SESSION="${1:?usage: dashi-run <tmux-session> <plugin-dir> [webhook-port]}"
+PLUGIN="${2:?usage: dashi-run <tmux-session> <plugin-dir> [webhook-port]}"
+PORT="${3:-8089}"
 tmux kill-session -t "$SESSION" 2>/dev/null || true
 tmux new-session -d -s "$SESSION" \
   "/bin/bash -lc 'cd $PLUGIN && exec claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'"
+sleep 3
+tmux has-session -t "$SESSION" 2>/dev/null || { echo "tmux session did not start" >&2; exit 1; }
 /usr/local/bin/dashi-press-dialogs "$SESSION" &
-while tmux has-session -t "$SESSION" 2>/dev/null; do sleep 15; done
+seen_up=0 down=0
+while tmux has-session -t "$SESSION" 2>/dev/null; do
+  if (exec 3<>"/dev/tcp/127.0.0.1/$PORT") 2>/dev/null; then
+    seen_up=1 down=0
+  elif (( seen_up )); then
+    down=$((down + 1))
+    (( down >= 2 )) && { echo "bridge port $PORT dead, restarting" >&2; exit 1; }
+  fi
+  sleep 15
+done
 EOF
 chmod 755 /usr/local/bin/dashi-run
 ok "держатель сессии установлен"
@@ -480,16 +524,34 @@ ok "юнит записан"
 # Без этого агент не может сам перезапустить свой мост и посмотреть его логи —
 # и гоняет человека в терминал под root. Права точечные: ровно свой сервис.
 say "Sudo для самообслуживания"
+# Никаких wildcard-прав в sudoers (journalctl * читает произвольные файлы через
+# --file=, chown по глобу эскалируется через симлинки). Вместо этого один
+# root-owned скрипт с зашитыми путями — валидация аргументов внутри него.
+CTL="/usr/local/bin/dashi-ctl-$AGENT_NAME"
+cat > "$CTL" <<EOF
+#!/usr/bin/env bash
+# Самообслуживание агента $AGENT_NAME. Принадлежит root, зовётся через sudo.
+set -euo pipefail
+case "\${1:-}" in
+  restart)       exec systemctl restart $UNIT ;;
+  status)        exec systemctl status $UNIT --no-pager ;;
+  logs)          n="\${2:-100}"; [[ "\$n" =~ ^[0-9]{1,5}\$ ]] || exit 2
+                 exec journalctl -u $UNIT -n "\$n" --no-pager ;;
+  fix-owner)     exec chown -R $SERVICE_USER:$SERVICE_USER /home/$SERVICE_USER ;;
+  vacuum)        exec journalctl --vacuum-size=500M ;;
+  update-claude) exec npm install -g @anthropic-ai/claude-code ;;
+  *) echo "usage: dashi-ctl-$AGENT_NAME restart|status|logs [N]|fix-owner|vacuum|update-claude" >&2; exit 2 ;;
+esac
+EOF
+chmod 755 "$CTL"
 SUDOERS_FILE="/etc/sudoers.d/dashi-$AGENT_NAME"
 cat > "$SUDOERS_FILE" <<EOF
-# Агент $AGENT_NAME может сам обслуживать СВОЙ сервис — и только его
-$SERVICE_USER ALL=(root) NOPASSWD: /usr/bin/systemctl restart $UNIT, /usr/bin/systemctl status $UNIT, /usr/bin/journalctl -u $UNIT *
-# ...и вернуть себе владение своими файлами, если их покрасила root-починка
-$SERVICE_USER ALL=(root) NOPASSWD: /usr/bin/chown -R $SERVICE_USER\:$SERVICE_USER /home/$SERVICE_USER/*
+# Агент $AGENT_NAME обслуживает себя ТОЛЬКО через root-owned dashi-ctl
+$SERVICE_USER ALL=(root) NOPASSWD: $CTL
 EOF
 chmod 440 "$SUDOERS_FILE"
 if visudo -cf "$SUDOERS_FILE" >/dev/null 2>&1; then
-  ok "агент может сам: restart/status/логи своего сервиса"
+  ok "агент может сам: restart/status/логи/fix-owner/vacuum/update-claude"
 else
   rm -f "$SUDOERS_FILE"
   warn "sudoers не прошёл проверку visudo — пропускаю (агент не сможет сам перезапускаться)"
@@ -505,7 +567,9 @@ say "Предохранитель"
 cat > "/etc/cron.d/dashi-$AGENT_NAME-advisor" <<EOF
 # Советы по обслуживанию агента $AGENT_NAME — понедельник, 10:00
 SHELL=/bin/bash
-0 10 * * 1 root /bin/bash $CLAUDE_DIR/dashi-plugin-claude-code/scripts/agent-advisor.sh $AGENT_NAME >/dev/null 2>&1
+# Не root: скрипт лежит в agent-owned папке — root-кроном отсюда исполнять
+# нельзя (перезапись файла = произвольный код под root)
+0 10 * * 1 $SERVICE_USER /bin/bash $CLAUDE_DIR/dashi-plugin-claude-code/scripts/agent-advisor.sh $AGENT_NAME >/dev/null 2>&1
 EOF
 chmod 644 "/etc/cron.d/dashi-$AGENT_NAME-advisor"
 ok "советник включён (по понедельникам в 10:00)"
