@@ -311,4 +311,71 @@ describe('oob /relogin and /restart', () => {
     // The ctl path travels as $0 — never interpolated into the script text.
     expect(calls[0]!.args[calls[0]!.args.length - 1]).toBe('/usr/local/bin/dashi-ctl-canary')
   })
+
+  test('/update without a ctl script replies gracefully, runs nothing', async () => {
+    let ran = 0
+    const ctx = makeCtx({
+      restart: {
+        agentId: 'canary',
+        fileExists: () => false,
+        runCtl: async () => { ran++; return { code: 0, out: 'UPTODATE' } },
+      },
+    })
+    const res = await handleOobCommand(parseOobCommand('/update')!, ctx)
+    expect(res.replyToTelegram!.text).toContain('нет штатного dashi-ctl')
+    expect(ran).toBe(0)
+  })
+
+  test('/update DIRTY → refuses, names files, no restart; force passes the flag', async () => {
+    const calls: string[][] = []
+    const spawned: string[] = []
+    const ctx = makeCtx({
+      restart: {
+        agentId: 'canary',
+        fileExists: (p) => p === '/usr/local/bin/dashi-ctl-canary',
+        runCtl: async (_ctl, args) => { calls.push([...args]); return { code: 3, out: 'DIRTY plugin/src/x.ts\n' } },
+        spawnDetached: (cmd) => { spawned.push(cmd) },
+      },
+    })
+    const res = await handleOobCommand(parseOobCommand('/update')!, ctx)
+    expect(res.replyToTelegram!.text).toContain('plugin/src/x.ts')
+    expect(res.replyToTelegram!.text).toContain('/update force')
+    expect(spawned).toHaveLength(0)
+    await handleOobCommand(parseOobCommand('/update force')!, ctx)
+    expect(calls).toEqual([['update'], ['update', 'force']])
+  })
+
+  test('/update UPDATED → reports sha and schedules the detached restart', async () => {
+    const calls: Array<{ cmd: string; args: readonly string[] }> = []
+    const ctx = makeCtx({
+      restart: {
+        agentId: 'canary',
+        fileExists: (p) => p === '/usr/local/bin/dashi-ctl-canary',
+        runCtl: async () => ({ code: 0, out: 'UPDATED 3 abc1234\n' }),
+        spawnDetached: (cmd, args) => { calls.push({ cmd, args }) },
+      },
+    })
+    const res = await handleOobCommand(parseOobCommand('/update')!, ctx)
+    expect(res.replyToTelegram!.text).toContain('abc1234')
+    expect(res.replyToTelegram!.text).toContain('перезапускаю')
+    expect(calls).toHaveLength(1)
+    expect(calls[0]!.args[calls[0]!.args.length - 1]).toBe('/usr/local/bin/dashi-ctl-canary')
+  })
+
+  test('/update UPTODATE and ROLLBACK → plain replies, no restart', async () => {
+    for (const [out, expected] of [['UPTODATE', 'последняя версия'], ['ROLLBACK', 'откатил']] as const) {
+      const spawned: string[] = []
+      const ctx = makeCtx({
+        restart: {
+          agentId: 'canary',
+          fileExists: () => true,
+          runCtl: async () => ({ code: 0, out }),
+          spawnDetached: (cmd) => { spawned.push(cmd) },
+        },
+      })
+      const res = await handleOobCommand(parseOobCommand('/update')!, ctx)
+      expect(res.replyToTelegram!.text).toContain(expected)
+      expect(spawned).toHaveLength(0)
+    }
+  })
 })

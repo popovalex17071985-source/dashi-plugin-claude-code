@@ -25,7 +25,7 @@
 //   - /stop sends Escape (interrupt) into the pane; falls back to a channel
 //     signal when no pane is resolvable.
 
-import { spawn } from 'node:child_process'
+import { spawn, execFile } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import type { AppConfig } from '../config.js'
 import type { Logger } from '../log.js'
@@ -67,6 +67,7 @@ export type OobCommandName =
   | 'cc'
   | 'relogin'
   | 'restart'
+  | 'update'
 
 const KNOWN_COMMANDS = new Set<OobCommandName>([
   'help',
@@ -79,6 +80,7 @@ const KNOWN_COMMANDS = new Set<OobCommandName>([
   'cc',
   'relogin',
   'restart',
+  'update',
 ])
 
 // Sub-actions for /mirror. We accept the bare command (= same as `status`),
@@ -207,6 +209,9 @@ export interface OobContext {
     agentId?: string
     fileExists?: (path: string) => boolean
     spawnDetached?: (cmd: string, args: readonly string[]) => void
+    // /update: runs `sudo -n <ctl> update [force]` and returns its status
+    // line (see install-agent.sh ctl template). Tests inject a fake.
+    runCtl?: (ctl: string, args: readonly string[]) => Promise<{ code: number; out: string }>
   }
 }
 
@@ -237,7 +242,8 @@ function helpText(): string {
     + '<code>/keys</code> — панель кнопок: тап = нажатие в сессии (ответить на нативный диалог Claude Code; есть ⌫ backspace и 🧹 clear)\n'
     + '<code>/cc</code> — панель команд Claude Code (тап = выполнить); либо <code>/cc &lt;команда&gt;</code>: <code>/cc model opus</code>\n'
     + '<code>/relogin</code> — обновить вход в Claude: пришлю ссылку, потом жду код сюда\n'
-    + '<code>/restart</code> — перезапустить мост (systemd, связь моргнёт)\n\n'
+    + '<code>/restart</code> — перезапустить мост (systemd, связь моргнёт)\n'
+    + '<code>/update</code> — обновить мост до свежей версии (бэкап, откат при сбое, рестарт)\n\n'
     + '<i>примечание: /stop — best-effort: посылает Escape в сессию, но не может '
     + 'гарантировать прерывание посреди вызова инструмента.</i>'
   )
@@ -260,6 +266,7 @@ export const BOT_COMMANDS: ReadonlyArray<BotCommandSpec> = [
   { command: 'cc', description: 'панель команд Claude Code (тап) или /cc <команда>' },
   { command: 'relogin', description: 'обновить вход в Claude (ссылка + код)' },
   { command: 'restart', description: 'перезапустить мост (systemd)' },
+  { command: 'update', description: 'обновить мост до свежей версии' },
 ]
 
 // ponytail: Jarvis-specific paths hardcoded — this is Jarvis's own fork, not
@@ -854,6 +861,82 @@ export async function handleOobCommand(
           parseMode: 'HTML',
         },
       }
+    }
+
+    case 'update': {
+      // Plugin self-update from chat. The work (dirty check → backup → git
+      // reset → bun install, rollback on failure) lives in the root-owned
+      // dashi-ctl script; here we only translate its one-word status into a
+      // reply and, on UPDATED, schedule the same detached restart as /restart.
+      const agentId = ctx.restart?.agentId ?? process.env.AGENT_ID
+      const fileExists = ctx.restart?.fileExists ?? existsSync
+      const ctl =
+        agentId !== undefined && /^[A-Za-z0-9_-]+$/.test(agentId)
+          ? `/usr/local/bin/dashi-ctl-${agentId}`
+          : undefined
+      if (ctl === undefined || !fileExists(ctl)) {
+        return {
+          handled: true,
+          command: 'update',
+          replyToTelegram: {
+            text: '<b>update</b> — на этом сервере нет штатного dashi-ctl. Обнови плагин руками (git pull + bun install + restart).',
+            parseMode: 'HTML',
+          },
+        }
+      }
+      const runCtl =
+        ctx.restart?.runCtl
+        ?? ((cmd: string, args: readonly string[]) =>
+          new Promise<{ code: number; out: string }>((resolve) => {
+            execFile('sudo', ['-n', cmd, ...args], { timeout: 180_000 }, (err, stdout) => {
+              const code = err && typeof (err as { code?: unknown }).code === 'number'
+                ? (err as { code: number }).code
+                : err ? 1 : 0
+              resolve({ code, out: String(stdout ?? '') })
+            })
+          }))
+      const args = parsed.hasForceFlag ? ['update', 'force'] : ['update']
+      ctx.log.info('oob /update', { chat_id: ctx.chatId, ctl, force: parsed.hasForceFlag })
+      const { code, out } = await runCtl(ctl, args)
+      const line = out.trim().split('\n').pop() ?? ''
+      const [word = '', ...rest] = line.split(/\s+/)
+      let text: string
+      let restart = false
+      switch (word) {
+        case 'UPTODATE':
+          text = '<b>update</b> — уже стоит последняя версия, обновлять нечего.'
+          break
+        case 'DIRTY':
+          text =
+            '<b>update</b> — в коде плагина есть правки руками: '
+            + `<code>${escapeHtml(rest.join(' ') || '?')}</code>. Обновление их перетрёт. `
+            + 'Сохрани их или ответь <code>/update force</code> — перетру, бэкап оставлю рядом (.bak).'
+          break
+        case 'NOFETCH':
+          text = '<b>update</b> — не дотянулся до GitHub, попробуй позже.'
+          break
+        case 'ROLLBACK':
+          text = '<b>update</b> — обновление упало, откатил на прежнюю версию. Сервис не трогал, всё работает как раньше.'
+          break
+        case 'UPDATED': {
+          const [n = '?', sha = '?'] = rest
+          text = `<b>update</b> — обновил до <code>${escapeHtml(sha)}</code> (${escapeHtml(n)} коммит.), перезапускаю. Связь моргнёт на ~10 сек.`
+          restart = true
+          break
+        }
+        default:
+          text = `<b>update</b> — dashi-ctl ответил непонятно (код ${code}): <code>${escapeHtml(line || 'пусто')}</code>. Посмотри логи.`
+      }
+      if (restart) {
+        const spawnDetached =
+          ctx.restart?.spawnDetached
+          ?? ((cmd: string, a: readonly string[]): void => {
+            const child = spawn(cmd, a as string[], { detached: true, stdio: 'ignore' })
+            child.unref()
+          })
+        spawnDetached('bash', ['-c', 'sleep 2; exec sudo -n "$0" restart', ctl])
+      }
+      return { handled: true, command: 'update', replyToTelegram: { text, parseMode: 'HTML' } }
     }
   }
 }

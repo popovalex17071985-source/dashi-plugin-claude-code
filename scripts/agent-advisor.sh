@@ -137,3 +137,19 @@ fi
 
 [[ $DRY -eq 1 ]] && echo "(dry-run: ничего не отправлено)"
 exit 0
+
+# ── Вышло обновление моста? Хозяин решает сам: поставить — /update, нет — игнор.
+# Ключ с sha: новое письмо только когда в origin появились новые коммиты.
+REPO="$WS/dashi-plugin-claude-code"
+if [[ -d "$REPO/.git" ]] && git -C "$REPO" fetch -q --depth 30 origin main 2>/dev/null; then
+  newlog="$(git -C "$REPO" log --oneline HEAD..FETCH_HEAD 2>/dev/null | head -15)"
+  if [[ -n "$newlog" ]]; then
+    sha="$(git -C "$REPO" rev-parse --short FETCH_HEAD)"
+    n="$(git -C "$REPO" rev-list --count HEAD..FETCH_HEAD)"
+    body="$(echo "$newlog" | sed -E 's/^[0-9a-f]+ /• /' | sed 's/&/\&amp;/g; s/</\&lt;/g')"
+    advise "plugin-update-$sha" "🔄 Вышло обновление моста ($n коммит.):
+$body
+
+Ставить не обязательно. Хочешь — ответь <code>/update</code>: сделаю бэкап, обновлюсь и перезапущусь (при сбое откачусь сам)."
+  fi
+fi

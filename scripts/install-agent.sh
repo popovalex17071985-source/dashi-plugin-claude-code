@@ -278,11 +278,13 @@ reply — иначе человек не увидит ничего.
   root-починки не могу писать в свои папки — это оно, чинюсь сам)
 - ... vacuum — ужать журнал systemd, если кончается диск
 - ... update-claude — обновить Claude Code (после — restart)
+- ... check — что нового в плагине; ... update [force] — обновить плагин
+  (бэкап, откат при сбое; после UPDATED — restart). Хозяин делает то же
+  командой /update в чате, советник раз в неделю сам пишет ему, если есть новое.
 
 Конфиг канала $ENV_FILE могу читать и править сам (новый ключ, chat_id);
 после правки — restart. Новые секреты от хозяина кладу в secrets/ сам.
-Обновить плагин: git pull в $CLAUDE_DIR/dashi-plugin-claude-code, затем
-bun install в plugin/, затем restart.
+Обновить плагин: sudo dashi-ctl-$AGENT_NAME update, затем restart.
 
 @core/USER.md
 @core/rules.md
@@ -535,6 +537,7 @@ say "Sudo для самообслуживания"
 # --file=, chown по глобу эскалируется через симлинки). Вместо этого один
 # root-owned скрипт с зашитыми путями — валидация аргументов внутри него.
 CTL="/usr/local/bin/dashi-ctl-$AGENT_NAME"
+REPO_DIR="$CLAUDE_DIR/dashi-plugin-claude-code"
 cat > "$CTL" <<EOF
 #!/usr/bin/env bash
 # Самообслуживание агента $AGENT_NAME. Принадлежит root, зовётся через sudo.
@@ -547,7 +550,27 @@ case "\${1:-}" in
   fix-owner)     exec chown -R $SERVICE_USER:$SERVICE_USER /home/$SERVICE_USER ;;
   vacuum)        exec journalctl --vacuum-size=500M ;;
   update-claude) exec npm install -g @anthropic-ai/claude-code ;;
-  *) echo "usage: dashi-ctl-$AGENT_NAME restart|status|logs [N]|fix-owner|vacuum|update-claude" >&2; exit 2 ;;
+  check)         # что нового в origin/main — список коммитов, пусто = свежий
+                 runuser -u $SERVICE_USER -- git -C $REPO_DIR fetch -q --depth 30 origin main
+                 exec runuser -u $SERVICE_USER -- git -C $REPO_DIR log --oneline HEAD..FETCH_HEAD ;;
+  update)        # Обновление плагина из чата (/update). Одно слово статуса в stdout:
+                 # DIRTY <файлы> | UPTODATE | NOFETCH | UPDATED <n> <sha> | ROLLBACK.
+                 # Бэкап рядом (.bak), падение reset/bun = откат на бэкап. Рестарт НЕ
+                 # делает — его зовёт плагин отдельно, чтобы ответ успел уйти в чат.
+                 g() { runuser -u $SERVICE_USER -- git -C $REPO_DIR "\$@"; }
+                 dirty="\$(g status --porcelain -- . ':!plugin/bun.lock' | awk '{print \$2}' | head -5 | tr '\n' ' ')"
+                 if [[ -n "\$dirty" && "\${2:-}" != force ]]; then echo "DIRTY \$dirty"; exit 3; fi
+                 g fetch -q --depth 30 origin main || { echo NOFETCH; exit 5; }
+                 n="\$(g rev-list --count HEAD..FETCH_HEAD)"
+                 [[ "\$n" == 0 ]] && { echo UPTODATE; exit 0; }
+                 rm -rf $REPO_DIR.bak; cp -a $REPO_DIR $REPO_DIR.bak
+                 if g reset -q --hard FETCH_HEAD \\
+                    && runuser -u $SERVICE_USER -- bash -lc "cd '$PLUGIN_DIR' && ~/.bun/bin/bun install --silent"; then
+                   echo "UPDATED \$n \$(g rev-parse --short HEAD)"
+                 else
+                   rm -rf $REPO_DIR; mv $REPO_DIR.bak $REPO_DIR; echo ROLLBACK; exit 4
+                 fi ;;
+  *) echo "usage: dashi-ctl-$AGENT_NAME restart|status|logs [N]|fix-owner|vacuum|update-claude|check|update [force]" >&2; exit 2 ;;
 esac
 EOF
 chmod 755 "$CTL"
@@ -558,7 +581,7 @@ $SERVICE_USER ALL=(root) NOPASSWD: $CTL
 EOF
 chmod 440 "$SUDOERS_FILE"
 if visudo -cf "$SUDOERS_FILE" >/dev/null 2>&1; then
-  ok "агент может сам: restart/status/логи/fix-owner/vacuum/update-claude"
+  ok "агент может сам: restart/status/логи/fix-owner/vacuum/update-claude/check/update"
 else
   rm -f "$SUDOERS_FILE"
   warn "sudoers не прошёл проверку visudo — пропускаю (агент не сможет сам перезапускаться)"
