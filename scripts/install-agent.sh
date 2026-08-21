@@ -13,6 +13,7 @@
 # Использование:
 #   bash install-agent.sh                      # спросит всё интерактивно
 #   bash install-agent.sh --name jarvis --token 123:AA... --user-id 140141496
+#   ... --openai-key sk-...                  # + семантическая память OpenViking (docker)
 #
 set -euo pipefail
 
@@ -20,7 +21,7 @@ NODE_MAJOR=22
 REPO_URL="${DASHI_REPO_URL:-https://github.com/popovalex17071985-source/dashi-plugin-claude-code.git}"
 SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
 
-AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; ASSUME_YES=0
+AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; ASSUME_YES=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
@@ -39,6 +40,8 @@ while [[ $# -gt 0 ]]; do
     --token)     BOT_TOKEN="$2";  shift 2 ;;
     --user-id)   USER_ID="$2";    shift 2 ;;
     --groq-key)  GROQ_KEY="$2";   shift 2 ;;
+    --groq-key)  GROQ_KEY="$2";   shift 2 ;;
+    --openai-key) OPENAI_KEY="$2"; shift 2 ;;   # включает семантическую память OpenViking
     --user)      SERVICE_USER="$2"; shift 2 ;;
     --repo)      REPO_URL="$2";   shift 2 ;;
     --yes|-y)    ASSUME_YES=1;    shift ;;
@@ -79,6 +82,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
   [[ -n "$USER_ID" ]] || ask USER_ID "Твой Telegram id от @userinfobot: "
   [[ "$USER_ID" =~ ^-?[0-9]+$ ]] || die "id должен быть числом: $USER_ID"
   [[ -n "$GROQ_KEY" ]] || ask GROQ_KEY "Ключ Groq для голосовых (Enter — пропустить): " 0
+  [[ -n "$OPENAI_KEY" ]] || ask OPENAI_KEY "Ключ OpenAI для семантической памяти OpenViking (Enter — без неё): " 0
 else
   # Повторный прогон: id нужен ниже для хуков, берём из готового конфига,
   # иначе хуки встанут с пустым chat-id и прогресс-пузырёк уедет в никуда.
@@ -653,6 +657,89 @@ else
   printf '      claude plugin install superpowers@superpowers-dev\n'
 fi
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5d. Семантическая память OpenViking (опция: --openai-key)
+# ─────────────────────────────────────────────────────────────────────────────
+# Файловая память (MEMORY.md) ищет по словам; OpenViking — по смыслу, по всей
+# истории разговоров. Сервер — docker-контейнер (~400 МБ RAM, host-network,
+# 127.0.0.1:1933), эмбеддинги и разбор — через ключ OpenAI хозяина (копейки).
+# ponytail: один агент на машину — порт 1933 зашит; второй агент на том же
+# хосте переиспользует тот же контейнер (запись идёт под своим agentId).
+say "Память OpenViking"
+OV_DIR="/home/$SERVICE_USER/.openviking"
+if [[ -z "$OPENAI_KEY" && ! -s "$OV_DIR/ov.conf" ]]; then
+  skip "без семантической памяти (повторный прогон с --openai-key KEY включит)"
+else
+  if ! command -v docker >/dev/null 2>&1; then
+    apt-get install -y -qq docker.io >/dev/null 2>&1 && systemctl enable --now docker >/dev/null 2>&1 \
+      || die "docker не встал — поставь руками (apt install docker.io) и повтори"
+    ok "docker установлен"
+  fi
+  as_agent "mkdir -p '$OV_DIR/claude-code-memory-plugin'"
+  if [[ -n "$OPENAI_KEY" ]]; then
+    # Ключ только в этом файле (600, владелец — агент). Повторный прогон с ключом
+    # перезаписывает его (смена ключа), без ключа — оставляет как есть.
+    cat > "$OV_DIR/ov.conf" <<EOF
+{
+  "embedding": {
+    "dense": {
+      "provider": "openai", "api_base": "https://api.openai.com/v1",
+      "api_key": "$OPENAI_KEY", "model": "text-embedding-3-small", "dimension": 1536
+    }
+  },
+  "vlm": {
+    "provider": "openai", "api_base": "https://api.openai.com/v1",
+    "api_key": "$OPENAI_KEY", "model": "gpt-4o-mini"
+  }
+}
+EOF
+    chown "$SERVICE_USER:$SERVICE_USER" "$OV_DIR/ov.conf"; chmod 600 "$OV_DIR/ov.conf"
+    ok "ov.conf записан"
+  fi
+  if [[ ! -s "$OV_DIR/claude-code-memory-plugin/config.json" ]]; then
+    cat > "$OV_DIR/claude-code-memory-plugin/config.json" <<EOF
+{
+  "mode": "local",
+  "agentId": "$AGENT_NAME",
+  "recallLimit": 3,
+  "scoreThreshold": 0.25,
+  "captureMode": "semantic",
+  "captureTimeoutMs": 30000,
+  "captureAssistantTurns": false
+}
+EOF
+    chown "$SERVICE_USER:$SERVICE_USER" "$OV_DIR/claude-code-memory-plugin/config.json"
+  fi
+  if docker ps -a --format '{{.Names}}' | grep -qx openviking; then
+    docker start openviking >/dev/null 2>&1 || true
+    skip "контейнер openviking на месте"
+  else
+    docker run -d --name openviking --network host --restart unless-stopped \
+      -v "$OV_DIR:/app/.openviking" -e OPENVIKING_CONFIG_FILE=/app/.openviking/ov.conf \
+      ghcr.io/volcengine/openviking:latest >/dev/null 2>&1 || die "контейнер openviking не запустился (docker logs openviking)"
+    ok "контейнер openviking запущен"
+  fi
+  for _ in $(seq 1 45); do
+    curl -s -o /dev/null http://127.0.0.1:1933/ 2>/dev/null && break; sleep 2
+  done
+  curl -s -o /dev/null http://127.0.0.1:1933/ 2>/dev/null && ok "сервер памяти отвечает на 1933" \
+    || warn "сервер памяти не ответил за 90 сек — смотри docker logs openviking; плагин подхватит, когда поднимется"
+  # Плагин Claude Code: env в settings.json + marketplace + install (всё под агентом)
+  as_agent "jq --arg a '$OV_DIR/ov.conf' --arg b '$OV_DIR/claude-code-memory-plugin/config.json' \
+    '.env.OPENVIKING_CONFIG_FILE=\$a | .env.OPENVIKING_CC_CONFIG_FILE=\$b
+     | .extraKnownMarketplaces[\"openviking-plugin\"]={source:{source:\"github\",repo:\"Castor6/openviking-plugins\"}}' \
+    ~/.claude/settings.json > ~/.claude/settings.json.new && mv ~/.claude/settings.json.new ~/.claude/settings.json" \
+    || die "не смог прописать OpenViking в settings.json"
+  if as_agent 'test -d ~/.claude/plugins/marketplaces/openviking-plugin'; then
+    skip "плагин памяти на месте"
+  elif as_agent 'claude plugin marketplace add Castor6/openviking-plugins >/dev/null 2>&1 &&
+                 claude plugin install claude-code-memory-plugin@openviking-plugin >/dev/null 2>&1'; then
+    ok "плагин памяти установлен (вспоминает при каждом сообщении, запоминает сам)"
+  else
+    warn "плагин памяти не встал — потом руками: claude plugin marketplace add Castor6/openviking-plugins && claude plugin install claude-code-memory-plugin@openviking-plugin"
+  fi
+fi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 10. Поднимаем
