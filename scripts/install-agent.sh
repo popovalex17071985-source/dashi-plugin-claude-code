@@ -177,6 +177,14 @@ fi
 # «no MCP server configured with that name» у всех, кто положил его рядом.
 say "Workspace $WORKSPACE"
 as_agent "mkdir -p '$CLAUDE_DIR' '$WORKSPACE/secrets' && chmod 700 '$WORKSPACE/secrets'"
+# Самолечение владельца: любая root-починка руками (tmux под root, root-скрипты)
+# красит файлы агента в root, и он молча теряет право писать в собственные
+# папки (20-21.08: киоск, потом secrets/ — «не могу сохранить токен»). Установщик
+# идёт под root, поэтому каждый прогон возвращает всё хозяйство юзеру.
+if [[ -d "$WORKSPACE" ]]; then
+  chown -R "$SERVICE_USER:$SERVICE_USER" "$WORKSPACE"
+  ok "владелец workspace нормализован ($SERVICE_USER)"
+fi
 
 if [[ -d "$CLAUDE_DIR/dashi-plugin-claude-code/.git" ]]; then
   skip "плагин склонирован"
@@ -476,6 +484,8 @@ SUDOERS_FILE="/etc/sudoers.d/dashi-$AGENT_NAME"
 cat > "$SUDOERS_FILE" <<EOF
 # Агент $AGENT_NAME может сам обслуживать СВОЙ сервис — и только его
 $SERVICE_USER ALL=(root) NOPASSWD: /usr/bin/systemctl restart $UNIT, /usr/bin/systemctl status $UNIT, /usr/bin/journalctl -u $UNIT *
+# ...и вернуть себе владение своими файлами, если их покрасила root-починка
+$SERVICE_USER ALL=(root) NOPASSWD: /usr/bin/chown -R $SERVICE_USER\:$SERVICE_USER /home/$SERVICE_USER/*
 EOF
 chmod 440 "$SUDOERS_FILE"
 if visudo -cf "$SUDOERS_FILE" >/dev/null 2>&1; then
