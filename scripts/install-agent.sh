@@ -128,7 +128,7 @@ else
 fi
 # unzip нужен установщику Bun — без него тот падает уже после скачивания;
 # tmux держит интерактивную сессию Claude под systemd
-apt-get install -y -qq git unzip tmux curl jq
+apt-get install -y -qq git unzip tmux curl jq python3
 
 # На 1 ГБ памяти сборка и Claude Code упираются в потолок и падают молча.
 # Ставим своп — дешевле, чем объяснять человеку OOM.
@@ -753,6 +753,26 @@ EOF
   else
     warn "плагин памяти не встал — потом руками: claude plugin marketplace add Castor6/openviking-plugins && claude plugin install claude-code-memory-plugin@openviking-plugin"
   fi
+  # Свои хуки вместо плагинных auto-capture/auto-recall (21.08.2026). Плагин писал в
+  # память каждое сообщение как есть, с телеграм-обёрткой (chat_id, message_id), и
+  # искал сырым промптом — всё было похоже на всё, попадание ~1 из 3, подсказки
+  # сыпались даже на «ок». Хуки из scripts/memory/: Stop кладёт выжимку хода
+  # (чистый вопрос + ответ, который оператор реально видел), UserPromptSubmit ищет
+  # по очищенному вопросу с порогом и молчит на пустяках. MCP-тулы memory_recall /
+  # memory_store плагина остаются. Хуки читаются из репо — обновляются вместе с ним.
+  as_agent "jq '.autoRecall=false | .autoCapture=false' '$OV_DIR/claude-code-memory-plugin/config.json' \
+    > '$OV_DIR/claude-code-memory-plugin/config.json.new' \
+    && mv '$OV_DIR/claude-code-memory-plugin/config.json.new' '$OV_DIR/claude-code-memory-plugin/config.json'" \
+    || warn "не смог выключить плагинный auto-capture/auto-recall — хуки будут дублировать подсказки"
+  OV_HOOKS="$REPO_DIR/scripts/memory"
+  as_agent "jq --arg r '$OV_HOOKS/ov-recall.py' --arg c '$OV_HOOKS/ov-digest-capture.py' '
+      def add(ev; cmd; t): .hooks[ev] = ((.hooks[ev] // [])
+        | if any(.[]; .hooks[]?.command == cmd) then .
+          else . + [{matcher: \"\", hooks: [{type: \"command\", command: cmd, timeout: t}]}] end);
+      add(\"UserPromptSubmit\"; \$r; 8) | add(\"Stop\"; \$c; 10)' \
+    ~/.claude/settings.json > ~/.claude/settings.json.new && mv ~/.claude/settings.json.new ~/.claude/settings.json" \
+    && ok "хуки памяти прописаны (чистая запись + подсказки с порогом)" \
+    || die "не смог прописать хуки памяти в settings.json"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
