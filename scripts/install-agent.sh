@@ -105,6 +105,9 @@ fi
 say "Система и Claude Code"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
+# curl ставим ПЕРВЫМ — он нужен уже для nodesource-скрипта ниже; на голой
+# машине без curl прогон падал bit «command not found» до установки Node.
+apt-get install -y -qq curl ca-certificates
 
 if ! command -v node >/dev/null || [[ "$(node -v | cut -c2- | cut -d. -f1)" -lt "$NODE_MAJOR" ]]; then
   curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | bash - >/dev/null
