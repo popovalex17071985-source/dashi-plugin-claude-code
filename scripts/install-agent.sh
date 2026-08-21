@@ -682,6 +682,7 @@ else
     # перезаписывает его (смена ключа), без ключа — оставляет как есть.
     cat > "$OV_DIR/ov.conf" <<EOF
 {
+  "server": { "host": "127.0.0.1", "port": 1933 },
   "embedding": {
     "dense": {
       "provider": "openai", "api_base": "https://api.openai.com/v1",
