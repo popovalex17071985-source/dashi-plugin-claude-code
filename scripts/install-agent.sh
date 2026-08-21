@@ -664,6 +664,8 @@ fi
 # Файловая память (MEMORY.md) ищет по словам; OpenViking — по смыслу, по всей
 # истории разговоров. Сервер — docker-контейнер (~400 МБ RAM, host-network,
 # 127.0.0.1:1933), эмбеддинги и разбор — через ключ OpenAI хозяина (копейки).
+# Entrypoint образа биндит 0.0.0.0, если не сказать иначе (OPENVIKING_SERVER_HOST) —
+# с host-network это открыло бы память наружу; dev-auth сам отказывается так стартовать.
 # ponytail: один агент на машину — порт 1933 зашит; второй агент на том же
 # хосте переиспользует тот же контейнер (запись идёт под своим agentId).
 say "Память OpenViking"
@@ -718,6 +720,7 @@ EOF
   else
     docker run -d --name openviking --network host --restart unless-stopped \
       -v "$OV_DIR:/app/.openviking" -e OPENVIKING_CONFIG_FILE=/app/.openviking/ov.conf \
+      -e OPENVIKING_SERVER_HOST=127.0.0.1 \
       ghcr.io/volcengine/openviking:latest >/dev/null 2>&1 || die "контейнер openviking не запустился (docker logs openviking)"
     ok "контейнер openviking запущен"
   fi
