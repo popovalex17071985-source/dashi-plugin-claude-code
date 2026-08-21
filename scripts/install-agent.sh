@@ -193,7 +193,11 @@ if [[ -d "/home/$SERVICE_USER" ]]; then
 fi
 
 if [[ -d "$CLAUDE_DIR/dashi-plugin-claude-code/.git" ]]; then
-  skip "плагин склонирован"
+  # Повторный прогон = обновление плагина, иначе фиксы моста не доезжают.
+  # set-url обязателен: старые установки смотрят origin'ом в чужое репо.
+  as_agent "cd '$CLAUDE_DIR/dashi-plugin-claude-code' && git remote set-url origin '$REPO_URL' && git fetch --depth 1 origin main && git reset --hard FETCH_HEAD" >/dev/null 2>&1 \
+    && ok "плагин обновлён до свежего main" \
+    || warn "не смог обновить плагин (нет сети до GitHub?) — работаю на том, что есть"
 else
   as_agent "git clone --depth 1 '$REPO_URL' '$CLAUDE_DIR/dashi-plugin-claude-code'" >/dev/null 2>&1 \
     || die "не удалось склонировать $REPO_URL"
