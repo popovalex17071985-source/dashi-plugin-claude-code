@@ -141,7 +141,8 @@ fi
 # ── Вышло обновление моста? Хозяин решает сам: поставить — /update, нет — игнор.
 # Ключ с sha: новое письмо только когда в origin появились новые коммиты.
 REPO="$WS/dashi-plugin-claude-code"
-if [[ -d "$REPO/.git" ]] && git -C "$REPO" fetch -q --depth 30 origin main 2>/dev/null; then
+BRANCH="$(sed -n 's/^DASHI_BRANCH=//p' "$ENV_FILE" | head -1)"; BRANCH="${BRANCH:-main}"
+if [[ -d "$REPO/.git" ]] && git -C "$REPO" fetch -q --depth 30 origin "$BRANCH" 2>/dev/null; then
   newlog="$(git -C "$REPO" log --oneline HEAD..FETCH_HEAD 2>/dev/null | head -15)"
   if [[ -n "$newlog" ]]; then
     sha="$(git -C "$REPO" rev-parse --short FETCH_HEAD)"

@@ -14,11 +14,16 @@
 #   bash install-agent.sh                      # спросит всё интерактивно
 #   bash install-agent.sh --name jarvis --token 123:AA... --user-id 140141496
 #   ... --openai-key sk-...                  # + семантическая память OpenViking (docker)
+#   ... --branch feature/x                   # staging-агент: обновляется с feature-ветки, не с main
 #
 set -euo pipefail
 
 NODE_MAJOR=22
 REPO_URL="${DASHI_REPO_URL:-https://github.com/popovalex17071985-source/dashi-plugin-claude-code.git}"
+# Ветка, с которой агент обновляется (/update, советник, повторный прогон).
+# main = проверенное, раскатывается всем после обсуждения; staging-агенты
+# (Smith) сидят на feature-ветке и видят изменения первыми.
+BRANCH="${DASHI_BRANCH:-main}"
 SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
 
 AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; ASSUME_YES=0
@@ -44,6 +49,7 @@ while [[ $# -gt 0 ]]; do
     --openai-key) OPENAI_KEY="$2"; shift 2 ;;   # включает семантическую память OpenViking
     --user)      SERVICE_USER="$2"; shift 2 ;;
     --repo)      REPO_URL="$2";   shift 2 ;;
+    --branch)    BRANCH="$2";     shift 2 ;;   # main (по умолчанию) | feature-ветка для staging
     --yes|-y)    ASSUME_YES=1;    shift ;;
     --help|-h)   usage ;;
     *) die "неизвестный аргумент: $1 (--help для справки)" ;;
@@ -202,11 +208,11 @@ fi
 if [[ -d "$CLAUDE_DIR/dashi-plugin-claude-code/.git" ]]; then
   # Повторный прогон = обновление плагина, иначе фиксы моста не доезжают.
   # set-url обязателен: старые установки смотрят origin'ом в чужое репо.
-  as_agent "cd '$CLAUDE_DIR/dashi-plugin-claude-code' && git remote set-url origin '$REPO_URL' && git fetch --depth 1 origin main && git reset --hard FETCH_HEAD" >/dev/null 2>&1 \
-    && ok "плагин обновлён до свежего main" \
+  as_agent "cd '$CLAUDE_DIR/dashi-plugin-claude-code' && git remote set-url origin '$REPO_URL' && git fetch --depth 1 origin '$BRANCH' && git reset --hard FETCH_HEAD" >/dev/null 2>&1 \
+    && ok "плагин обновлён до свежего $BRANCH" \
     || warn "не смог обновить плагин (нет сети до GitHub?) — работаю на том, что есть"
 else
-  as_agent "git clone --depth 1 '$REPO_URL' '$CLAUDE_DIR/dashi-plugin-claude-code'" >/dev/null 2>&1 \
+  as_agent "git clone --depth 1 --branch '$BRANCH' '$REPO_URL' '$CLAUDE_DIR/dashi-plugin-claude-code'" >/dev/null 2>&1 \
     || die "не удалось склонировать $REPO_URL"
   ok "плагин склонирован"
 fi
@@ -371,7 +377,10 @@ say "Конфиг $ENV_FILE"
 if [[ -f "$ENV_FILE" ]]; then
   # 660: агент сам правит канальный конфиг (новый ключ, chat_id) без терминала
   chown "root:$SERVICE_USER" "$ENV_FILE"; chmod 660 "$ENV_FILE"
-  skip "конфиг на месте (права обновлены: 660)"
+  # Ветка обновлений: старые конфиги без строки → дописать; --branch меняет.
+  if grep -q "^DASHI_BRANCH=" "$ENV_FILE"; then sed -i "s#^DASHI_BRANCH=.*#DASHI_BRANCH=$BRANCH#" "$ENV_FILE"
+  else echo "DASHI_BRANCH=$BRANCH" >> "$ENV_FILE"; fi
+  skip "конфиг на месте (права обновлены: 660, ветка $BRANCH)"
 else
   mkdir -p "$(dirname "$ENV_FILE")"
   cat > "$ENV_FILE" <<EOF
@@ -390,6 +399,7 @@ TELEGRAM_WEBHOOK_PORT=8089
 TELEGRAM_WEBHOOK_TOKEN=$(openssl rand -hex 16 2>/dev/null || head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')
 AGENT_ID=$AGENT_NAME
 GROQ_API_KEY=$GROQ_KEY
+DASHI_BRANCH=$BRANCH
 EOF
   chown "root:$SERVICE_USER" "$ENV_FILE"
   chmod 660 "$ENV_FILE"
@@ -555,7 +565,7 @@ case "\${1:-}" in
   vacuum)        exec journalctl --vacuum-size=500M ;;
   update-claude) exec npm install -g @anthropic-ai/claude-code ;;
   check)         # что нового в origin/main — список коммитов, пусто = свежий
-                 runuser -u $SERVICE_USER -- git -C $REPO_DIR fetch -q --depth 30 origin main
+                 runuser -u $SERVICE_USER -- git -C $REPO_DIR fetch -q --depth 30 origin $BRANCH
                  exec runuser -u $SERVICE_USER -- git -C $REPO_DIR log --oneline HEAD..FETCH_HEAD ;;
   update)        # Обновление плагина из чата (/update). Одно слово статуса в stdout:
                  # DIRTY <файлы> | UPTODATE | NOFETCH | UPDATED <n> <sha> | ROLLBACK.
@@ -564,7 +574,7 @@ case "\${1:-}" in
                  g() { runuser -u $SERVICE_USER -- git -C $REPO_DIR "\$@"; }
                  dirty="\$(g status --porcelain -- . ':!plugin/bun.lock' | awk '{print \$2}' | head -5 | tr '\n' ' ')"
                  if [[ -n "\$dirty" && "\${2:-}" != force ]]; then echo "DIRTY \$dirty"; exit 3; fi
-                 g fetch -q --depth 30 origin main || { echo NOFETCH; exit 5; }
+                 g fetch -q --depth 30 origin $BRANCH || { echo NOFETCH; exit 5; }
                  n="\$(g rev-list --count HEAD..FETCH_HEAD)"
                  [[ "\$n" == 0 ]] && { echo UPTODATE; exit 0; }
                  rm -rf $REPO_DIR.bak; cp -a $REPO_DIR $REPO_DIR.bak
