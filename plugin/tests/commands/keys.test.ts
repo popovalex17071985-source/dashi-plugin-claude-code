@@ -63,8 +63,10 @@ describe('sendKeys', () => {
     if ('error' in parsed) throw new Error('parse failed')
     const res = await sendKeys({ paneTarget: '%5', socketPath: '/tmp/sock' }, parsed, exec)
     expect(res.ok).toBe(true)
+    // `--` after -l: option-parsing terminator so literal text starting
+    // with `-` (e.g. an OAuth code from /relogin) is never read as a flag.
     expect(calls).toEqual([
-      ['-S', '/tmp/sock', 'send-keys', '-t', '%5', '-l', '2'],
+      ['-S', '/tmp/sock', 'send-keys', '-t', '%5', '-l', '--', '2'],
       ['-S', '/tmp/sock', 'send-keys', '-t', '%5', 'Enter'],
     ])
   })
@@ -74,11 +76,11 @@ describe('sendKeys', () => {
     const parsed = parseKeyTokens('y')
     if ('error' in parsed) throw new Error('parse failed')
     await sendKeys({ paneTarget: 'sess:0.0', socketName: 'channel-x' }, parsed, exec)
-    expect(calls[0]).toEqual(['-L', 'channel-x', 'send-keys', '-t', 'sess:0.0', '-l', 'y'])
+    expect(calls[0]).toEqual(['-L', 'channel-x', 'send-keys', '-t', 'sess:0.0', '-l', '--', 'y'])
 
     const second = capture()
     await sendKeys({ paneTarget: 'sess:0.0' }, parsed, second.exec)
-    expect(second.calls[0]).toEqual(['send-keys', '-t', 'sess:0.0', '-l', 'y'])
+    expect(second.calls[0]).toEqual(['send-keys', '-t', 'sess:0.0', '-l', '--', 'y'])
   })
 
   test('stops on first tmux failure and reports stderr', async () => {

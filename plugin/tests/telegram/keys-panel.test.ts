@@ -280,7 +280,7 @@ describe('handleKkeyCallback — auth gate', () => {
     const consumed = await handleKkeyCallback(ctx, deps)
     expect(consumed).toBe(true)
     // Exactly one send-keys invocation, carrying the literal token «2».
-    expect(calls).toEqual([['-S', '/tmp/s', 'send-keys', '-t', '%1', '-l', '2']])
+    expect(calls).toEqual([['-S', '/tmp/s', 'send-keys', '-t', '%1', '-l', '--', '2']])
     expect(toasts).toEqual(['нажато: 2'])
   })
 

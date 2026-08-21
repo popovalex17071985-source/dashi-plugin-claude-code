@@ -55,6 +55,12 @@ import {
 } from '../commands/oob.js'
 import type { TmuxKeysTarget } from '../commands/keys.js'
 import {
+  isReloginPending,
+  looksLikeOauthCode,
+  submitReloginCode,
+  type ReloginIo,
+} from '../commands/relogin.js'
+import {
   isPermissionApprover,
   parsePermissionTextReply,
   type PermissionRelayHooks,
@@ -1301,6 +1307,44 @@ export async function handleInboundText(ctx: Context, deps: HandlerDeps): Promis
       await executeOobResult(result, oobCtx, deps.server)
       return
     }
+  }
+
+  // /relogin phase 2 — OAuth-code interception (commands/relogin.ts).
+  //
+  // While the relogin-pending flag is live (armed by the /relogin flow when
+  // it delivered the OAuth URL; 15-min TTL via file mtime), an inbound DM
+  // that LOOKS like an OAuth code (single long token, no spaces, base64url
+  // charset + `#`) is typed into the tmux pane literally instead of being
+  // forwarded to Claude — the session is mid-login and could not act on it
+  // anyway. Everything else (normal words, URLs, slash commands) keeps
+  // flowing through the ordinary paths below, flag or no flag.
+  //
+  // Gating mirrors the OOB short-circuit exactly: private chat + sender in
+  // allowed_user_ids + chat in allowed_chat_ids — only the owner may feed
+  // keystrokes into the pane. SECURITY: the code is a live credential; it is
+  // never logged (no text in the log call) and submitReloginCode scrubs it
+  // from any screen-tail reply.
+  if (
+    deps.tmuxKeys
+    && ctx.chat?.type === 'private'
+    && ctx.chat?.id !== undefined
+    && ctx.from?.id !== undefined
+    && deps.config.allowed_user_ids.includes(ctx.from.id)
+    && new Set(deps.config.allowed_chat_ids.map((v) => String(v))).has(String(ctx.chat.id))
+    && isReloginPending(deps.statePaths.root)
+    && looksLikeOauthCode(text)
+  ) {
+    const chatId = String(ctx.chat.id)
+    deps.log.info('relogin: oauth code intercepted from chat', { chat_id: chatId })
+    const io: ReloginIo = {
+      target: deps.tmuxKeys.target,
+      chatId,
+      stateDir: deps.statePaths.root,
+      telegramApi: deps.telegramApi,
+      log: deps.log,
+    }
+    await submitReloginCode(io, text.trim())
+    return
   }
 
   // PR-A3 watcher hook (after OOB resolution, before gate/notify): if Claude

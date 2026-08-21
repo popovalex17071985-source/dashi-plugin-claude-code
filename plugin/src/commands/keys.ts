@@ -167,12 +167,16 @@ export async function sendKeys(
       ? ['-L', target.socketName]
       : []
   for (const step of parsed.steps) {
+    // `--` terminates option parsing for LITERAL steps so text that begins
+    // with `-` (e.g. a base64url OAuth code pasted by the /relogin flow) can
+    // never be misread as a tmux flag. Named keys keep the bare form — tmux
+    // key names never start with `-`.
     const args = [
       ...socketArgs,
       'send-keys',
       '-t',
       target.paneTarget,
-      ...(step.literal ? ['-l'] : []),
+      ...(step.literal ? ['-l', '--'] : []),
       step.key,
     ]
     const res = await exec(args)
@@ -357,6 +361,35 @@ export async function capturePane(
       ? ['-L', target.socketName]
       : []
   const res = await exec([...socketArgs, 'capture-pane', '-p', '-t', target.paneTarget])
+  if (res.exitCode !== 0) return ''
+  return res.stdout
+}
+
+// Snapshot the pane INCLUDING scrollback history (`capture-pane -p -J -S -N`).
+// -J re-joins soft-wrapped lines, which matters for long URLs (the /relogin
+// flow greps an OAuth URL that always wraps in an 80-col pane). Returns '' on
+// ANY tmux failure — same fail-safe contract as capturePane above.
+export async function capturePaneHistory(
+  target: TmuxKeysTarget,
+  historyLines: number,
+  exec: KeysCaptureExec = defaultKeysCaptureExec,
+): Promise<string> {
+  const socketArgs = target.socketPath
+    ? ['-S', target.socketPath]
+    : target.socketName
+      ? ['-L', target.socketName]
+      : []
+  const lines = Math.max(0, Math.floor(historyLines))
+  const res = await exec([
+    ...socketArgs,
+    'capture-pane',
+    '-p',
+    '-J',
+    '-S',
+    `-${lines}`,
+    '-t',
+    target.paneTarget,
+  ])
   if (res.exitCode !== 0) return ''
   return res.stdout
 }

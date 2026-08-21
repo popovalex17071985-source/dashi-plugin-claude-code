@@ -25,7 +25,8 @@
 //   - /stop sends Escape (interrupt) into the pane; falls back to a channel
 //     signal when no pane is resolvable.
 
-import { readFileSync } from 'node:fs'
+import { spawn } from 'node:child_process'
+import { existsSync, readFileSync } from 'node:fs'
 import type { AppConfig } from '../config.js'
 import type { Logger } from '../log.js'
 import type { TelegramApi, InlineKeyboardLike } from '../channel/tools.js'
@@ -43,6 +44,11 @@ import {
   type KeysExec,
   type TmuxKeysTarget,
 } from './keys.js'
+import {
+  reloginPendingRemainingMs,
+  runReloginFlow,
+  type ReloginIo,
+} from './relogin.js'
 import { buildKeysKeyboard, KEYS_PANEL_HEADER } from '../telegram/keys-panel-ui.js'
 import { buildCcKeyboard, CC_PANEL_HEADER } from '../telegram/cc-panel-ui.js'
 import { buildNewConfirmCard } from '../telegram/newq-confirm-ui.js'
@@ -50,7 +56,17 @@ import { controlFailureMessage } from '../telegram/control-result.js'
 import { readContextUsage, formatContextUsage } from '../status/context-usage.js'
 import { DEFAULT_CONTEXT_WINDOW_TOKENS } from '../config.js'
 
-export type OobCommandName = 'help' | 'status' | 'stop' | 'compact' | 'new' | 'mirror' | 'keys' | 'cc'
+export type OobCommandName =
+  | 'help'
+  | 'status'
+  | 'stop'
+  | 'compact'
+  | 'new'
+  | 'mirror'
+  | 'keys'
+  | 'cc'
+  | 'relogin'
+  | 'restart'
 
 const KNOWN_COMMANDS = new Set<OobCommandName>([
   'help',
@@ -61,6 +77,8 @@ const KNOWN_COMMANDS = new Set<OobCommandName>([
   'mirror',
   'keys',
   'cc',
+  'relogin',
+  'restart',
 ])
 
 // Sub-actions for /mirror. We accept the bare command (= same as `status`),
@@ -182,6 +200,14 @@ export interface OobContext {
   contextWindowTokens?: number
   // Process uptime in seconds (process.uptime()); rendered when present.
   uptimeSeconds?: number
+  // /restart test seams. Production leaves this undefined and the handler
+  // falls back to process.env.AGENT_ID / fs.existsSync / a real detached
+  // spawn — tests inject all three to avoid touching the host system.
+  restart?: {
+    agentId?: string
+    fileExists?: (path: string) => boolean
+    spawnDetached?: (cmd: string, args: readonly string[]) => void
+  }
 }
 
 export interface OobResult {
@@ -209,7 +235,9 @@ function helpText(): string {
     + '<code>/new</code> — начать новый диалог (очистит контекст — спросит подтверждение)\n'
     + '<code>/mirror on|off|status</code> — управлять зеркалом терминала (tmux, обновляется в реальном времени)\n'
     + '<code>/keys</code> — панель кнопок: тап = нажатие в сессии (ответить на нативный диалог Claude Code; есть ⌫ backspace и 🧹 clear)\n'
-    + '<code>/cc</code> — панель команд Claude Code (тап = выполнить); либо <code>/cc &lt;команда&gt;</code>: <code>/cc model opus</code>\n\n'
+    + '<code>/cc</code> — панель команд Claude Code (тап = выполнить); либо <code>/cc &lt;команда&gt;</code>: <code>/cc model opus</code>\n'
+    + '<code>/relogin</code> — обновить вход в Claude: пришлю ссылку, потом жду код сюда\n'
+    + '<code>/restart</code> — перезапустить мост (systemd, связь моргнёт)\n\n'
     + '<i>примечание: /stop — best-effort: посылает Escape в сессию, но не может '
     + 'гарантировать прерывание посреди вызова инструмента.</i>'
   )
@@ -230,6 +258,8 @@ export const BOT_COMMANDS: ReadonlyArray<BotCommandSpec> = [
   { command: 'mirror', description: 'зеркало терминала: on | off | status' },
   { command: 'keys', description: 'панель кнопок для подтверждений (нажатия в сессию)' },
   { command: 'cc', description: 'панель команд Claude Code (тап) или /cc <команда>' },
+  { command: 'relogin', description: 'обновить вход в Claude (ссылка + код)' },
+  { command: 'restart', description: 'перезапустить мост (systemd)' },
 ]
 
 // ponytail: Jarvis-specific paths hardcoded — this is Jarvis's own fork, not
@@ -712,6 +742,115 @@ export async function handleOobCommand(
           text: sent.ok
             ? `<b>отправлено в сессию:</b> <code>${escapeHtml(shown)}</code>`
             : `<b>/cc</b> — tmux ошибка: <code>${escapeHtml(sent.error)}</code>`,
+          parseMode: 'HTML',
+        },
+      }
+    }
+
+    case 'relogin': {
+      // Monthly Claude re-login, end-to-end from chat (relogin.ts). The flow
+      // runs DETACHED: the ack below is delivered by executeOobResult right
+      // away, while the background task types /login, hunts the OAuth URL for
+      // ~40s and reports every outcome via its own Telegram messages. It must
+      // work even when Claude is stuck on «Login expired», which is exactly
+      // why it uses the blind 3-shot instead of the state-aware sender.
+      if (!ctx.tmuxKeys || !ctx.stateDir) {
+        return {
+          handled: true,
+          command: 'relogin',
+          replyToTelegram: {
+            text: '<b>relogin</b> — недоступно: плагин не знает tmux-pane или state-dir.',
+            parseMode: 'HTML',
+          },
+        }
+      }
+      // Double-invocation guard: a live relogin-pending flag means a link is
+      // already out and the code-interception window is open. Launching a
+      // SECOND flow would type another /login into the pane and invalidate
+      // the link the owner may be mid-way through using.
+      const remainingMs = reloginPendingRemainingMs(ctx.stateDir)
+      if (remainingMs !== undefined) {
+        const mins = Math.max(1, Math.ceil(remainingMs / 60_000))
+        return {
+          handled: true,
+          command: 'relogin',
+          replyToTelegram: {
+            text:
+              '<b>перелогин</b> — уже жду код: отправь его сюда '
+              + `или подожди ~${mins} мин, пока окно закроется.`,
+            parseMode: 'HTML',
+          },
+        }
+      }
+      ctx.log.info('oob /relogin', { chat_id: ctx.chatId })
+      const io: ReloginIo = {
+        target: ctx.tmuxKeys.target,
+        chatId: ctx.chatId,
+        stateDir: ctx.stateDir,
+        telegramApi: ctx.telegramApi,
+        log: ctx.log,
+        ...(ctx.tmuxKeys.exec ? { exec: ctx.tmuxKeys.exec } : {}),
+        ...(ctx.tmuxKeys.captureExec ? { captureExec: ctx.tmuxKeys.captureExec } : {}),
+        ...(ctx.tmuxKeys.sleep ? { sleep: ctx.tmuxKeys.sleep } : {}),
+      }
+      // runReloginFlow never rejects by contract (all errors handled inside);
+      // the void marks the deliberate fire-and-forget.
+      void runReloginFlow(io)
+      return {
+        handled: true,
+        command: 'relogin',
+        replyToTelegram: {
+          text: '<b>перелогин</b> — отправил /login в сессию, ищу ссылку (до 40 сек)…',
+          parseMode: 'HTML',
+        },
+      }
+    }
+
+    case 'restart': {
+      // Full bridge restart via the root-owned per-agent ctl script that
+      // install-agent.sh drops into /usr/local/bin (sudoers NOPASSWD, exactly
+      // this one path). Executed DETACHED with a 2s grace so the ack reply
+      // reaches Telegram before systemd kills this very process.
+      const agentId = ctx.restart?.agentId ?? process.env.AGENT_ID
+      const fileExists = ctx.restart?.fileExists ?? existsSync
+      // Defensive shape check: the id becomes part of an absolute path. The
+      // installer only ever writes [a-z0-9-] names, so anything else means a
+      // corrupted env — refuse rather than probe a weird path.
+      const ctl =
+        agentId !== undefined && /^[A-Za-z0-9_-]+$/.test(agentId)
+          ? `/usr/local/bin/dashi-ctl-${agentId}`
+          : undefined
+      if (ctl === undefined || !fileExists(ctl)) {
+        return {
+          handled: true,
+          command: 'restart',
+          replyToTelegram: {
+            text:
+              '<b>restart</b> — на этом сервере нет штатного dashi-ctl '
+              + `(${ctl !== undefined ? `<code>${escapeHtml(ctl)}</code> отсутствует` : 'AGENT_ID не задан в окружении'}). `
+              + 'Перезапусти сервис руками.',
+            parseMode: 'HTML',
+          },
+        }
+      }
+      ctx.log.info('oob /restart', { chat_id: ctx.chatId, ctl })
+      const spawnDetached =
+        ctx.restart?.spawnDetached
+        ?? ((cmd: string, args: readonly string[]): void => {
+          const child = spawn(cmd, args as string[], { detached: true, stdio: 'ignore' })
+          child.unref()
+        })
+      // bash -c with the ctl path passed as $0 — never interpolated into the
+      // script text. `sleep 2` decouples the restart from this process's
+      // lifetime AND from the ack send racing it. sudo -n: the sudoers rule
+      // is NOPASSWD; if it is missing, failing silently-detached is the
+      // accepted trade-off (the ack already told the owner what was attempted).
+      spawnDetached('bash', ['-c', 'sleep 2; exec sudo -n "$0" restart', ctl])
+      return {
+        handled: true,
+        command: 'restart',
+        replyToTelegram: {
+          text: '<b>restart</b> — принято, перезапускаю сервис. Связь моргнёт на ~10 сек.',
           parseMode: 'HTML',
         },
       }
