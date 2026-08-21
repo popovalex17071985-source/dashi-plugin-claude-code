@@ -31,6 +31,9 @@ CHAT="$(sed -n 's/^TELEGRAM_ALLOWED_USER_IDS=//p' "$ENV_FILE" | head -1 | cut -d
 WS="$(sed -n 's/^TELEGRAM_WORKSPACE_ROOT=//p' "$ENV_FILE" | head -1)"
 [[ -n "$TOKEN" && -n "$CHAT" && -d "$WS" ]] || { echo "конфиг неполный"; exit 1; }
 
+# cwd от вызывающего (root: /root) ломает find у агента («Failed to restore initial
+# working directory») — под set -e это тихая смерть всего советника.
+cd "$WS"
 STATE="$WS/.advisor-state"
 COOLDOWN_DAYS=30
 touch "$STATE"
@@ -135,9 +138,6 @@ if (( facts == 0 && age_days >= 14 )); then
 интервью и заполни профиль», и я спрошу сам."
 fi
 
-[[ $DRY -eq 1 ]] && echo "(dry-run: ничего не отправлено)"
-exit 0
-
 # ── Вышло обновление моста? Хозяин решает сам: поставить — /update, нет — игнор.
 # Ключ с sha: новое письмо только когда в origin появились новые коммиты.
 REPO="$WS/dashi-plugin-claude-code"
@@ -153,3 +153,6 @@ $body
 Ставить не обязательно. Хочешь — ответь <code>/update</code>: сделаю бэкап, обновлюсь и перезапущусь (при сбое откачусь сам)."
   fi
 fi
+
+[[ $DRY -eq 1 ]] && echo "(dry-run: ничего не отправлено)"
+exit 0
