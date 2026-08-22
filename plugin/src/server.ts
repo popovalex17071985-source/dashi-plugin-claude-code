@@ -251,6 +251,7 @@ process.on('uncaughtException', err => {
 // Parse env strictly via Zod so downstream code can rely on the shape.
 const env = RuntimeEnvSchema.parse({
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+  ...(process.env.TELEGRAM_API_ROOT !== undefined ? { TELEGRAM_API_ROOT: process.env.TELEGRAM_API_ROOT } : {}),
   ...(process.env.TELEGRAM_STATE_DIR !== undefined ? { TELEGRAM_STATE_DIR: process.env.TELEGRAM_STATE_DIR } : {}),
   ...(process.env.TELEGRAM_CONFIG_FILE !== undefined ? { TELEGRAM_CONFIG_FILE: process.env.TELEGRAM_CONFIG_FILE } : {}),
   ...(process.env.TELEGRAM_EXPECTED_BOT_ID !== undefined ? { TELEGRAM_EXPECTED_BOT_ID: process.env.TELEGRAM_EXPECTED_BOT_ID } : {}),
