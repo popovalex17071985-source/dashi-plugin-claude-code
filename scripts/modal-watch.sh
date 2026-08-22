@@ -46,7 +46,7 @@ if printf '%s' "$pane" | grep -qE 'Login expired|Please run /login'; then
       if curl -sf -m 10 -o /dev/null \
            --data-urlencode "text=Вход в Claude протух — отправь /relogin" \
            -d "chat_id=$CHAT" \
-           "https://api.telegram.org/bot$TOKEN/sendMessage"; then
+           "${TELEGRAM_API_ROOT:-https://api.telegram.org}/bot$TOKEN/sendMessage"; then
         touch "$FLAG" 2>/dev/null || true
         logger -t modal-watch "login expired in $SESSION — owner alerted" 2>/dev/null || true
       fi

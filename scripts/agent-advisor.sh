@@ -59,7 +59,7 @@ advise() {  # advise <ключ> <текст>
   fi
   curl -s -o /dev/null --data-urlencode "text=$text" \
     -d "chat_id=$CHAT" -d "parse_mode=HTML" \
-    "https://api.telegram.org/bot$TOKEN/sendMessage" || return 0
+    "${TELEGRAM_API_ROOT:-https://api.telegram.org}/bot$TOKEN/sendMessage" || return 0
   mark_sent "$key"
 }
 
