@@ -423,7 +423,9 @@ if (!tokenLock.acquire(statePaths)) {
 // Telegram client + MCP server
 // ─────────────────────────────────────────────────────────────────────
 
-const bot = new Bot(env.TELEGRAM_BOT_TOKEN)
+const bot = new Bot(env.TELEGRAM_BOT_TOKEN, {
+  client: { apiRoot: env.TELEGRAM_API_ROOT ?? 'https://api.telegram.org' },
+})
 // Raw API talks to grammy. Safe wrapper sits in front of every downstream
 // consumer (StatusManager, oob, handlers, poller, webhook). The wrapper:
 //   1. redactSecrets(text, logSecrets) before delegating to raw API.

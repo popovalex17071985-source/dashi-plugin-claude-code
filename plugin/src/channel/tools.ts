@@ -17,6 +17,7 @@ import type { ReactionTypeEmoji } from 'grammy/types'
 import { z } from 'zod'
 
 import type { AppConfig, StatePaths } from '../config.js'
+import { fetchTelegramFile } from '../telegram/media.js'
 import type { Logger } from '../log.js'
 import type { MultichatPolicy } from '../chats/policy-loader.js'
 import type { StatusManager, StatusState } from '../status/status-manager.js'
@@ -197,10 +198,9 @@ export function createTelegramApi(bot: Bot, token: string): TelegramApi {
     async downloadFile(fileId, destDir) {
       const file = await bot.api.getFile(fileId)
       if (!file.file_path) throw new Error('Telegram returned no file_path — file may have expired')
-      const url = `https://api.telegram.org/file/bot${token}/${file.file_path}`
-      const res = await fetch(url)
-      if (!res.ok) throw new Error(`download failed: HTTP ${res.status}`)
-      const buf = Buffer.from(await res.arrayBuffer())
+      const bytes = await fetchTelegramFile(file.file_path, token)
+      if (!bytes) throw new Error('download failed — Telegram file fetch returned no data')
+      const buf = Buffer.from(bytes)
       const rawExt = file.file_path.includes('.') ? file.file_path.split('.').pop() ?? 'bin' : 'bin'
       const ext = rawExt.replace(/[^a-zA-Z0-9]/g, '') || 'bin'
       const uniqueId = (file.file_unique_id ?? '').replace(/[^a-zA-Z0-9_-]/g, '') || 'dl'

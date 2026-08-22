@@ -15,6 +15,7 @@
 // handler — we emit a `transcription_status="missing_key"` descriptor and
 // let Claude decide whether to ask the user to enable it.
 
+import { readFile } from 'fs/promises'
 import { escapeHtmlAttr } from '../format/html.js'
 import type { AppConfig } from '../config.js'
 
@@ -369,6 +370,39 @@ export interface BotApiForDownload {
   }
 }
 
+const CLOUD_API_ROOT = 'https://api.telegram.org'
+
+/** Bot API root: cloud by default, or a self-hosted tdlib/telegram-bot-api. */
+export function telegramApiRoot(): string {
+  return (process.env.TELEGRAM_API_ROOT ?? CLOUD_API_ROOT).replace(/\/+$/, '')
+}
+
+export function isCloudApi(): boolean {
+  return telegramApiRoot() === CLOUD_API_ROOT
+}
+
+/**
+ * Fetch a file returned by getFile. With a self-hosted server in --local mode
+ * file_path is an absolute path on this host — read it straight from disk;
+ * otherwise download via <root>/file/bot<token>/<path>. undefined = failure.
+ */
+export async function fetchTelegramFile(
+  filePath: string,
+  token: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<Uint8Array | undefined> {
+  if (filePath.startsWith('/')) {
+    try {
+      return new Uint8Array(await readFile(filePath))
+    } catch {
+      return undefined
+    }
+  }
+  const res = await fetchFn(`${telegramApiRoot()}/file/bot${token}/${filePath}`)
+  if (!res.ok) return undefined
+  return new Uint8Array(await res.arrayBuffer())
+}
+
 export interface DownloadPhotoDeps {
   fetchImpl?: typeof fetch
   writeFile?: (path: string, data: Uint8Array) => Promise<void>
@@ -389,14 +423,12 @@ export async function downloadPhotoToInbox(
     if (!file.file_path) return undefined
 
     // 20MB Bot API download cap — matches Telegram's documented limit
-    // and gateway.py:873 TG_MAX_FILE_MB default.
+    // and gateway.py:873 TG_MAX_FILE_MB default. A self-hosted server has no cap.
     const maxBytes = 20 * 1024 * 1024
-    if (file.file_size !== undefined && file.file_size > maxBytes) return undefined
+    if (isCloudApi() && file.file_size !== undefined && file.file_size > maxBytes) return undefined
 
-    const url = `https://api.telegram.org/file/bot${token}/${file.file_path}`
-    const res = await fetchFn(url)
-    if (!res.ok) return undefined
-    const buf = new Uint8Array(await res.arrayBuffer())
+    const buf = await fetchTelegramFile(file.file_path, token, fetchFn)
+    if (!buf) return undefined
 
     const rawExt = file.file_path.includes('.') ? (file.file_path.split('.').pop() ?? 'jpg') : 'jpg'
     const ext = rawExt.replace(/[^a-zA-Z0-9]/g, '') || 'jpg'

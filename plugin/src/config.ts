@@ -351,6 +351,9 @@ export type AppConfig = z.infer<typeof AppConfigSchema>
 
 export const RuntimeEnvSchema = z.object({
   TELEGRAM_BOT_TOKEN: z.string().min(1),
+  // Self-hosted Bot API server (tdlib/telegram-bot-api --local): lifts the
+  // 20MB download cap. Default is the cloud API.
+  TELEGRAM_API_ROOT: z.string().url().optional(),
   TELEGRAM_STATE_DIR: z.string().optional(),
   TELEGRAM_CONFIG_FILE: z.string().optional(),
   TELEGRAM_EXPECTED_BOT_ID: z.coerce.number().int().positive().optional(),
