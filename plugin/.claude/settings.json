@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ANTHROPIC_MODEL=claude-sonnet-5 npx @nizos/probity --agent claude-code",
+            "timeout": 90
+          }
+        ]
+      }
+    ]
+  }
+}
