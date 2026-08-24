@@ -676,6 +676,10 @@ async function postFallback(config: FallbackConfig, chatId: string, text: string
 }
 
 async function main(): Promise<void> {
+  // A nested `claude -p` spawned by our own tooling (e.g. the memory pilot's
+  // question/judge generation) must not forward its final text to the user —
+  // that leaks internal JSON into the chat. The spawner sets this to opt out.
+  if (process.env.DASHI_SUPPRESS_FALLBACK === '1') return
   let raw = ''
   try {
     raw = await readStdin()
