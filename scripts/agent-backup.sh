@@ -43,6 +43,12 @@ crontab -l >deploy/crontab.txt 2>/dev/null || true
 for u in "/etc/systemd/system/dashi-$AGENT.service" "$HOME/.config/systemd/user/dashi-$AGENT.service"; do
   [[ -f "$u" ]] && cp -f "$u" deploy/ 2>/dev/null || true
 done
+# channel.env (токен бота, доступ, пути) живёт в /etc, вне workspace — без него
+# восстановление неполное (агент не подключится к Telegram). Он root:agent 660,
+# группа agent читает. Кладём в снимок, чтобы restore был однокомандным.
+cp -f "/etc/dashi-plugin/$AGENT/channel.env" deploy/channel.env 2>/dev/null || true
+# cron.d юниты агента (советник/модалки/бэкап) — тоже вне workspace.
+for c in "/etc/cron.d/dashi-$AGENT"-*; do [[ -f "$c" ]] && cp -f "$c" deploy/ 2>/dev/null || true; done
 
 # Что бэкапим (относительно WORKSPACE): всё незаменимое, чего нет в git-репе плагина.
 ITEMS=(".claude" "secrets" "state" "deploy")
