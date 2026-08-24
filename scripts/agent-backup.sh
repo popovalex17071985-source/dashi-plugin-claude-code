@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# Шифрованный бэкап того, чего НЕТ на GitHub: память агента, его характер,
+# секреты, состояние канала. Один AES-256 (GPG symmetric) архив в день, ротация
+# последних RETAIN штук. Если настроен rclone-remote — копия ещё и off-site
+# (смерть VPS = весь смысл бэкапа именно в этом).
+#
+# ВАЖНО про пароль: он лежит в secrets/backup.pass НА СЕРВЕРЕ. Если сервер умрёт,
+# а копию пароля ты нигде больше не сохранил — off-site архив расшифровать НЕЧЕМ.
+# Установщик показывает пароль один раз и просит сохранить его отдельно.
+#
+# Восстановление (нужен пароль):
+#   gpg -d -o restore.tar.gz <архив>.tar.gz.gpg && tar xzf restore.tar.gz
+#
+# Запускается кроном раз в сутки. Всегда exit 0 — чтобы не заклинить крон;
+# ошибки пишутся в лог.
+set -uo pipefail
+
+AGENT="${DASHI_AGENT:?DASHI_AGENT не задан}"
+WORKSPACE="${DASHI_WORKSPACE:?DASHI_WORKSPACE не задан}"   # /home/<user>/.claude-lab/<agent>
+BACKUP_DIR="${DASHI_BACKUP_DIR:-$WORKSPACE/backups}"
+PASS_FILE="${DASHI_BACKUP_PASS:-$WORKSPACE/secrets/backup.pass}"
+LOG="$WORKSPACE/logs/backup.log"
+RCLONE_BIN="${RCLONE_BIN:-$(command -v rclone 2>/dev/null || echo "$HOME/.local/bin/rclone")}"
+RCLONE_REMOTE="${DASHI_RCLONE_REMOTE:-gdrive}"        # имя rclone-remote (off-site)
+RCLONE_PATH="${DASHI_RCLONE_PATH:-dashi-$AGENT-backups}"
+RETAIN="${DASHI_BACKUP_RETAIN:-7}"
+
+STAMP="$(date +%Y%m%d-%H%M)"
+ARCHIVE="$BACKUP_DIR/$AGENT-$STAMP.tar.gz.gpg"
+
+mkdir -p "$BACKUP_DIR" "$(dirname "$LOG")"
+log() { echo "[$(date '+%F %T %Z')] $*" >>"$LOG"; }
+fail() { log "FAIL: $*"; exit 0; }   # exit 0: крон не должен клинить на ошибке
+
+[[ -s "$PASS_FILE" ]] || fail "нет пароля: $PASS_FILE — прогони установку бэкапа"
+
+cd "$WORKSPACE" || fail "не могу зайти в $WORKSPACE"
+
+# Снимок системного конфига, живущего ВНЕ workspace: crontab агента и systemd-юнит.
+# Без него на новом VPS не будет ни расписания, ни сервиса.
+mkdir -p deploy
+crontab -l >deploy/crontab.txt 2>/dev/null || true
+for u in "/etc/systemd/system/dashi-$AGENT.service" "$HOME/.config/systemd/user/dashi-$AGENT.service"; do
+  [[ -f "$u" ]] && cp -f "$u" deploy/ 2>/dev/null || true
+done
+
+# Что бэкапим (относительно WORKSPACE): всё незаменимое, чего нет в git-репе плагина.
+ITEMS=(".claude" "secrets" "state" "deploy")
+present=()
+for it in "${ITEMS[@]}"; do [[ -e "$it" ]] && present+=("$it"); done
+[[ ${#present[@]} -gt 0 ]] || fail "нечего бэкапить"
+
+# Исключаем сам git-репозиторий плагина (он на GitHub) и node_modules — иначе
+# архив раздувается гигабайтами того, что и так восстановится git-клоном.
+tar czf - \
+  --exclude='.claude/dashi-plugin-claude-code' \
+  --exclude='*/node_modules' \
+  --exclude='state/telegram/inbox' \
+  "${present[@]}" 2>>"$LOG" \
+  | gpg --batch --yes --symmetric --cipher-algo AES256 \
+        --passphrase-file "$PASS_FILE" -o "$ARCHIVE" 2>>"$LOG"
+rc=("${PIPESTATUS[@]}"); tar_rc=${rc[0]}; gpg_rc=${rc[1]}
+# tar exit 1 = «файл изменился при чтении» (архив валиден); 2 = фатально.
+if [[ $tar_rc -gt 1 || $gpg_rc -ne 0 ]]; then
+  rm -f "$ARCHIVE"; fail "tar|gpg упал (tar=$tar_rc gpg=$gpg_rc)"
+fi
+# Self-check: свежий архив ОБЯЗАН расшифровываться и разворачиваться. Битый бэкап
+# хуже отсутствующего — создаёт ложное чувство защиты. Не прошёл — удаляем и фейлим.
+if ! gpg --batch --quiet --passphrase-file "$PASS_FILE" -d "$ARCHIVE" 2>>"$LOG" | tar tzf - >/dev/null 2>>"$LOG"; then
+  rm -f "$ARCHIVE"; fail "self-check: свежий архив не расшифровался/не читается — удалён"
+fi
+log "OK local: $ARCHIVE ($(du -h "$ARCHIVE" | cut -f1)), self-check пройден"
+
+# Ротация локально.
+mapfile -t old < <(ls -1t "$BACKUP_DIR/$AGENT"-*.tar.gz.gpg 2>/dev/null | tail -n +$((RETAIN + 1)))
+for f in "${old[@]:-}"; do [[ -n "$f" ]] && rm -f "$f" && log "rotated: $f"; done
+
+# Off-site — только если rclone и remote настроены.
+if [[ -x "$RCLONE_BIN" ]] && "$RCLONE_BIN" listremotes 2>/dev/null | grep -q "^${RCLONE_REMOTE}:"; then
+  if "$RCLONE_BIN" copy "$ARCHIVE" "${RCLONE_REMOTE}:${RCLONE_PATH}/" 2>>"$LOG"; then
+    log "OK off-site: ${RCLONE_REMOTE}:${RCLONE_PATH}/$(basename "$ARCHIVE")"
+    "$RCLONE_BIN" delete --min-age "${RETAIN}d" "${RCLONE_REMOTE}:${RCLONE_PATH}/" 2>>"$LOG" || true
+  else
+    fail "rclone copy в ${RCLONE_REMOTE} упал (локальная копия цела)"
+  fi
+else
+  log "WARN: нет rclone-remote '${RCLONE_REMOTE}' — бэкап ТОЛЬКО локальный (смерть VPS не переживёт)"
+fi
+exit 0

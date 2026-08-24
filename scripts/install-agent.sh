@@ -633,6 +633,56 @@ chmod 644 "/etc/cron.d/dashi-$AGENT_NAME-modal"
 ok "прожиматель модалок включён"
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 8d. Шифрованный бэкап (по желанию)
+# ─────────────────────────────────────────────────────────────────────────────
+# Память агента, его характер и секреты живут ТОЛЬКО на этом сервере (в git их
+# нет). Умрёт VPS — всё пропадёт. Бэкап шифрует эти данные и, если подключить
+# облако, кладёт копию за пределы сервера. По желанию: человек сам решает.
+say "Шифрованный бэкап (по желанию)"
+cat <<'EOF'
+    Память, характер и секреты агента лежат только на этом сервере — в GitHub их
+    нет. Если сервер умрёт, всё это пропадёт безвозвратно. Бэкап делает
+    шифрованный слепок этих данных раз в сутки. Если подключишь облако (Google
+    Drive через rclone) — копия уедет за пределы сервера, и тогда после смерти
+    VPS агента можно поднять заново из бэкапа.
+    ВАЖНО: пароль от бэкапа сохрани ОТДЕЛЬНО (не только на этом сервере) — иначе
+    облачную копию нечем будет расшифровать, когда сервер пропадёт.
+EOF
+setup_backup=0
+if [[ $ASSUME_YES -eq 1 ]]; then
+  setup_backup=1   # неинтерактивно: включаем (данные важнее, off-site настроят потом)
+else
+  read -r -p "    Включить шифрованный бэкап? [Y/n] " __b </dev/tty || true
+  [[ ! "$__b" =~ ^[Nn] ]] && setup_backup=1
+fi
+if [[ $setup_backup -eq 1 ]]; then
+  PASS_FILE="$WORKSPACE/secrets/backup.pass"
+  if ! as_agent "test -s '$PASS_FILE'"; then
+    BK_PASS="$(head -c 24 /dev/urandom | base64 | tr -d '/+=' | head -c 24)"
+    as_agent "umask 077; printf '%s\n' '$BK_PASS' > '$PASS_FILE'"
+    printf '\n    \033[1;33mПАРОЛЬ ОТ БЭКАПА (сохрани отдельно от сервера!):\033[0m %s\n\n' "$BK_PASS"
+    [[ $ASSUME_YES -eq 0 ]] && read -r -p "    Сохранил пароль? Enter для продолжения " _ </dev/tty || true
+  else
+    skip "пароль бэкапа уже есть ($PASS_FILE)"
+  fi
+  cat > "/etc/cron.d/dashi-$AGENT_NAME-backup" <<EOF
+# Шифрованный бэкап агента $AGENT_NAME — каждый день в 03:40
+SHELL=/bin/bash
+40 3 * * * $SERVICE_USER DASHI_AGENT=$AGENT_NAME DASHI_WORKSPACE=$WORKSPACE /bin/bash $CLAUDE_DIR/dashi-plugin-claude-code/scripts/agent-backup.sh >/dev/null 2>&1
+EOF
+  chmod 644 "/etc/cron.d/dashi-$AGENT_NAME-backup"
+  ok "бэкап включён (ежедневно 03:40, локально в $WORKSPACE/backups)"
+  if as_agent "command -v rclone >/dev/null 2>&1 && rclone listremotes 2>/dev/null | grep -q ."; then
+    ok "rclone-remote найден — копия уедет off-site автоматически"
+  else
+    warn "off-site не настроен: бэкап пока ТОЛЬКО локальный (смерть VPS не переживёт)."
+    warn "Подключить облако: под юзером $SERVICE_USER выполнить 'rclone config' (remote 'gdrive')."
+  fi
+else
+  skip "бэкап пропущен по выбору пользователя"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 9. Вход в Claude — единственное, что нельзя сделать за человека
 # ─────────────────────────────────────────────────────────────────────────────
 logged_in() { as_agent 'test -s ~/.claude/.credentials.json' 2>/dev/null; }
