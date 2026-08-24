@@ -53,6 +53,12 @@ mark_sent() {
 
 advise() {  # advise <ключ> <текст>
   local key="$1" text="$2"
+  # Подпись: сообщение шлёт крон-скрипт от имени бота, агент о нём не знает.
+  # Без подписи агент честно говорит «я этого не писал» и пугает хозяина
+  # «подделкой» (реальный случай, 2026-08-24).
+  text="⚙️ Автосоветник (плановый крон-скрипт при агенте, не сам агент):
+
+$text"
   recently_sent "$key" && return 0
   if [[ $DRY -eq 1 ]]; then
     echo "--- [$key]"; echo "$text"; return 0
@@ -64,7 +70,8 @@ advise() {  # advise <ключ> <текст>
 }
 
 # ── 1. Память переросла файловый поиск ───────────────────────────────────────
-facts=$(find "$WS/memory" -name '*.md' ! -name 'MEMORY.md' 2>/dev/null | wc -l)
+# || true: без него pipefail+set -e молча убивают весь советник на WS без memory/
+facts=$(find "$WS/memory" -name '*.md' ! -name 'MEMORY.md' 2>/dev/null | wc -l || true)
 if (( facts >= 150 )); then
   advise memory-semantic "Братан, пора подключать семантическую память.
 
@@ -105,13 +112,19 @@ if (( always > 60000 )); then
 fi
 
 # ── 4. Сервис падает ─────────────────────────────────────────────────────────
+# Одно падение = одна строка «Scheduled restart» (раньше считали ещё и «Failed
+# with result» — каждое падение шло за два). Алерт только если падало и за
+# последние сутки: недельное окно ловило шторм времён установки, давно
+# починенный, и советник слал «я падаю» по мёртвым цифрам.
 restarts=$(journalctl -u "dashi-$AGENT" --since "7 days ago" 2>/dev/null \
-           | grep -c "Scheduled restart\|Failed with result" || true)
-if (( restarts >= 10 )); then
+           | grep -c "Scheduled restart" || true)
+recent=$(journalctl -u "dashi-$AGENT" --since "24 hours ago" 2>/dev/null \
+         | grep -c "Scheduled restart" || true)
+if (( restarts >= 10 && recent >= 1 )); then
   advise restarts "Братан, я падаю чаще обычного.
 
-За неделю $restarts перезапусков. Обычно это протухший вход в Claude, кончившееся
-место на диске или память.
+За неделю $restarts перезапусков, из них за последние сутки $recent. Обычно это
+протухший вход в Claude, кончившееся место на диске или память.
 
 Посмотри: journalctl -u dashi-$AGENT -n 50
 Если там про вход — просто перелогинься: su - agent, потом claude."
