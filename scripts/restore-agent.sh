@@ -47,6 +47,14 @@ CLAUDE_DIR="$WORKSPACE/.claude"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 as_agent() { su - "$SERVICE_USER" -c "$1"; }
 
+# gpg нужен для расшифровки, на минимальном VPS его может не быть. Ставим сами.
+if ! command -v gpg >/dev/null 2>&1; then
+  say "Ставлю gnupg (нужен для расшифровки)"
+  (apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq gnupg >/dev/null 2>&1) \
+    || die "не смог поставить gnupg — поставь вручную: apt install gnupg"
+  ok "gnupg установлен"
+fi
+
 # Пользователь агента должен существовать до распаковки в его домашку.
 if ! id "$SERVICE_USER" >/dev/null 2>&1; then
   say "Создаю пользователя $SERVICE_USER"
