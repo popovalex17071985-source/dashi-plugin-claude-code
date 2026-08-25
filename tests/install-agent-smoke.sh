@@ -35,6 +35,11 @@ grep -q 'claude setup-token'          "$S" || fail "нет входа через
 grep -q 'CLAUDE_CODE_OAUTH_TOKEN='    "$S" || fail "токен не пишется в channel.env"
 grep -q -- '--claude-token'           "$S" || fail "нет флага --claude-token для готового токена"
 
+# Модель агента: флаг --model → DASHI_MODEL в channel.env → --model у claude в tmux
+grep -q -- '--model)'                 "$S" || fail "нет флага --model"
+grep -q 'DASHI_MODEL=\$MODEL'         "$S" || fail "модель не пишется в channel.env"
+grep -q 'claude \${DASHI_MODEL:+--model \$DASHI_MODEL}' "$S" || fail "dashi-run не передаёт модель claude"
+
 # Ремонтник-страховка: отдельный бот, отдельный юнит, не под root
 grep -q -- '--repair-token'           "$S" || fail "нет флага --repair-token (бот-страховка)"
 grep -q 'claude-code-telegram'        "$S" || fail "ремонтник не ставит claude-code-telegram"

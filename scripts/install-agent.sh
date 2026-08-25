@@ -16,6 +16,7 @@
 #   bash install-agent.sh --name jarvis --token 123:AA... --user-id 140141496
 #   ... --openai-key sk-...                  # + семантическая память OpenViking (docker)
 #   ... --branch feature/x                   # staging-агент: обновляется с feature-ветки, не с main
+#   ... --model opus                         # модель Claude для агента (opus|sonnet|haiku|полный id); без флага — дефолт аккаунта
 #   ... --claude-token sk-ant-oat01-...      # готовый годовой токен (claude setup-token на любой машине)
 #   ... --repair-token 123:BB...             # бот-ремонтник: страховка на случай «агент лёг и молчит»
 #
@@ -30,6 +31,7 @@ BRANCH="${DASHI_BRANCH:-main}"
 SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
 
 AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; REPAIR_TOKEN=""; ASSUME_YES=0
+MODEL="${DASHI_MODEL:-}"
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
@@ -54,6 +56,7 @@ while [[ $# -gt 0 ]]; do
     --user)      SERVICE_USER="$2"; shift 2 ;;
     --repo)      REPO_URL="$2";   shift 2 ;;
     --branch)    BRANCH="$2";     shift 2 ;;   # main (по умолчанию) | feature-ветка для staging
+    --model)     MODEL="$2";      shift 2 ;;   # opus|sonnet|haiku|полный id; пусто = дефолт аккаунта
     --yes|-y)    ASSUME_YES=1;    shift ;;
     --help|-h)   usage ;;
     *) die "неизвестный аргумент: $1 (--help для справки)" ;;
@@ -243,11 +246,17 @@ else
 Личный ассистент. Отвечаю по-русски, коротко, суть вперёд, без воды и извинений.
 
 ## Первое знакомство
-Я только что установлен и ещё не знаю ни хозяина, ни своих задач. В первом же
-разговоре спрашиваю: как обращаться к хозяину, чем я буду заниматься, что важно.
-Ответы сразу записываю сюда (в CLAUDE.md) и в память — и больше не переспрашиваю.
+Я только что установлен и не знаю ни хозяина, ни своих задач. Поэтому НА САМОЕ
+ПЕРВОЕ сообщение хозяина (какое бы оно ни было) я сначала коротко представляюсь
+и провожу мини-интервью, а уже потом отвечаю на само сообщение. Спрашиваю одним
+сообщением, простым языком:
+1) как к вам обращаться; 2) чем вы занимаетесь (работа/бизнес, чем конкретно);
+3) какие задачи планируете мне поручать; 4) какой у вас часовой пояс и график.
+Ответы СРАЗУ записываю сюда в CLAUDE.md (раздел «Хозяин и задачи» — создать) и
+в память — и больше никогда не переспрашиваю то, что уже знаю.
 Дальше дополняю картину сам по ходу работы: новые факты о хозяине и задачах —
-в память, устойчивые правила — сюда.
+в память, устойчивые правила — сюда. Если хозяин отмахнулся от интервью —
+не давлю, собираю то же самое постепенно из рабочих разговоров.
 
 ## ГЛАВНОЕ ПРАВИЛО КАНАЛА
 Я общаюсь через Telegram, а не через терминал. Пользователь НЕ видит мой
@@ -401,6 +410,11 @@ if [[ -f "$ENV_FILE" ]]; then
   # Ветка обновлений: старые конфиги без строки → дописать; --branch меняет.
   if grep -q "^DASHI_BRANCH=" "$ENV_FILE"; then sed -i "s#^DASHI_BRANCH=.*#DASHI_BRANCH=$BRANCH#" "$ENV_FILE"
   else echo "DASHI_BRANCH=$BRANCH" >> "$ENV_FILE"; fi
+  # Модель: --model меняет, без флага существующая строка не трогается.
+  if [[ -n "$MODEL" ]]; then
+    if grep -q "^DASHI_MODEL=" "$ENV_FILE"; then sed -i "s#^DASHI_MODEL=.*#DASHI_MODEL=$MODEL#" "$ENV_FILE"
+    else echo "DASHI_MODEL=$MODEL" >> "$ENV_FILE"; fi
+  fi
   skip "конфиг на месте (права обновлены: 660, ветка $BRANCH)"
 else
   mkdir -p "$(dirname "$ENV_FILE")"
@@ -421,6 +435,9 @@ TELEGRAM_WEBHOOK_TOKEN=$(openssl rand -hex 16 2>/dev/null || head -c 16 /dev/ura
 AGENT_ID=$AGENT_NAME
 GROQ_API_KEY=$GROQ_KEY
 DASHI_BRANCH=$BRANCH
+# Модель Claude (opus|sonnet|haiku|полный id). Пусто = дефолт аккаунта владельца.
+# Поменять: вписать сюда и systemctl restart dashi-<агент>.
+DASHI_MODEL=$MODEL
 EOF
   chown "root:$SERVICE_USER" "$ENV_FILE"
   chmod 660 "$ENV_FILE"
@@ -514,7 +531,7 @@ PLUGIN="${2:?usage: dashi-run <tmux-session> <plugin-dir> [webhook-port]}"
 PORT="${3:-8089}"
 tmux kill-session -t "$SESSION" 2>/dev/null || true
 tmux new-session -d -s "$SESSION" \
-  "/bin/bash -lc 'cd $PLUGIN && exec claude --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'"
+  "/bin/bash -lc 'cd $PLUGIN && exec claude ${DASHI_MODEL:+--model $DASHI_MODEL} --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'"
 sleep 3
 tmux has-session -t "$SESSION" 2>/dev/null || { echo "tmux session did not start" >&2; exit 1; }
 /usr/local/bin/dashi-press-dialogs "$SESSION" &
