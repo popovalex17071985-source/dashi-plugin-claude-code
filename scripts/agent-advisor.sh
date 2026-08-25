@@ -73,7 +73,7 @@ $text"
 # || true: без него pipefail+set -e молча убивают весь советник на WS без memory/
 facts=$(find "$WS/memory" -name '*.md' ! -name 'MEMORY.md' 2>/dev/null | wc -l || true)
 if (( facts >= 150 )); then
-  advise memory-semantic "Братан, пора подключать семантическую память.
+  advise memory-semantic "Пора подключать семантическую память.
 
 Фактов накопилось $facts — по индексу я их уже нахожу через раз: он ищет по
 словам, а не по смыслу. Спроси про «доставку» — факт, записанный как «отгрузка»,
@@ -86,7 +86,7 @@ fi
 # ── 2. Тёплый слой зарос ─────────────────────────────────────────────────────
 dec="$WS/core/warm/decisions.md"
 if [[ -f "$dec" ]] && (( $(wc -l < "$dec") > 400 )); then
-  advise warm-bloat "Братан, надо почистить решения.
+  advise warm-bloat "Надо почистить решения.
 
 В core/warm/decisions.md уже $(wc -l < "$dec") строк, а слой рассчитан
 примерно на две недели. Разросшийся тёплый слой я перечитываю дольше и чаще
@@ -102,7 +102,7 @@ for f in "$WS/CLAUDE.md" "$WS/core/USER.md" "$WS/core/rules.md"; do
   [[ -f "$f" ]] && always=$(( always + $(wc -c < "$f") ))
 done
 if (( always > 60000 )); then
-  advise context-bloat "Братан, я жру контекст на старте.
+  advise context-bloat "Я жру контекст на старте.
 
 Файлы, которые читаются при каждом запуске, разрослись до $(( always / 1024 )) КБ.
 Это уходит в каждый мой запуск — и в счёт тоже.
@@ -121,7 +121,7 @@ restarts=$(journalctl -u "dashi-$AGENT" --since "7 days ago" 2>/dev/null \
 recent=$(journalctl -u "dashi-$AGENT" --since "24 hours ago" 2>/dev/null \
          | grep -c "Scheduled restart" || true)
 if (( restarts >= 10 && recent >= 1 )); then
-  advise restarts "Братан, я падаю чаще обычного.
+  advise restarts "Я падаю чаще обычного.
 
 За неделю $restarts перезапусков, из них за последние сутки $recent. Обычно это
 протухший вход в Claude, кончившееся место на диске или память.
@@ -133,7 +133,7 @@ fi
 # ── 5. Диск ──────────────────────────────────────────────────────────────────
 used=$(df --output=pcent "$WS" 2>/dev/null | tail -1 | tr -dc '0-9')
 if [[ -n "$used" ]] && (( used >= 85 )); then
-  advise disk "Братан, кончается диск — занято ${used}%.
+  advise disk "Кончается диск — занято ${used}%.
 
 Когда упрётся в сотню, я перестану писать память и логи, причём молча.
 Обычно жрут логи: journalctl --vacuum-time=7d освобождает прилично."
@@ -144,7 +144,7 @@ fi
 # память надо наполнять словами «запомни, что…».
 age_days=$(( ( $(date +%s) - $(stat -c %Y "$WS/CLAUDE.md" 2>/dev/null || date +%s) ) / 86400 ))
 if (( facts == 0 && age_days >= 14 )); then
-  advise memory-empty "Братан, я до сих пор ничего о тебе не помню.
+  advise memory-empty "Я до сих пор ничего о тебе не помню.
 
 Работаю уже $age_days дней, а память пустая — каждый раз начинаю с чистого листа.
 Заполняется просто: скажи «запомни, что…» — и я сохраню. Или «проведи со мной
