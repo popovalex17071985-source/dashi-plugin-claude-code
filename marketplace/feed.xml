@@ -2077,6 +2077,44 @@
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
+        <Id>1881581577</Id>
+        <DateBegin>2023-03-01</DateBegin>
+        <DateEnd>2033-03-31</DateEnd>
+        <ListingFee>Package</ListingFee>
+        <AdStatus>Free</AdStatus>
+        
+        <ManagerName>Тимофей</ManagerName>
+        <ContactPhone>+73422140020</ContactPhone>
+        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
+        <GoodsType>Наушники</GoodsType>
+        <AdType>Товар приобретен на продажу</AdType>
+        <Category>Аудио и видео</Category>
+        <Title>Apple AirPods Max Blue Type-C бу</Title>
+        <Description><![CDATA[<p>Apple AirPods Max Blue Type-C бу</p>
+<p>✅Комплект: наушники </p>
+<p>✅Гарантия 180 дней!</p>
+<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
+<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
+<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
+<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
+<p>Арт. 000jla</p>]]></Description>
+        <Price>27490</Price>
+        
+        
+        <Images>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3913/3187576649/IMG_2405.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3961/3187576697/IMG_2404.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3937/3187576673/IMG_2402.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3945/3187576681/IMG_2403.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3921/3187576657/IMG_2400.jpg"/>
+          <Image url="https://cdn.insales-shop.ru/images/products/1/3929/3187576665/IMG_2401.jpg"/>
+        </Images>
+        <Category>Аудио и видео</Category>
+        
+        <Condition>Б/у</Condition>
+      </Ad>
+
+      <Ad>
         <Id>1887254441</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -2803,44 +2841,6 @@
           <Image url="https://cdn.insales-shop.ru/images/products/1/8065/3239731073/IMG_5617.jpg"/>
           <Image url="https://cdn.insales-shop.ru/images/products/1/8073/3239731081/IMG_5619.jpg"/>
           <Image url="https://cdn.insales-shop.ru/images/products/1/8081/3239731089/IMG_5621.jpg"/>
-        </Images>
-        <Category>Аудио и видео</Category>
-        
-        <Condition>Б/у</Condition>
-      </Ad>
-
-      <Ad>
-        <Id>1881581577</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Наушники</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Аудио и видео</Category>
-        <Title>Apple AirPods Max Blue Type-C бу</Title>
-        <Description><![CDATA[<p>Apple AirPods Max Blue Type-C бу</p>
-<p>✅Комплект: наушники </p>
-<p>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. 000jla</p>]]></Description>
-        <Price>27490</Price>
-        
-        
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3913/3187576649/IMG_2405.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3961/3187576697/IMG_2404.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3937/3187576673/IMG_2402.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3945/3187576681/IMG_2403.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3921/3187576657/IMG_2400.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3929/3187576665/IMG_2401.jpg"/>
         </Images>
         <Category>Аудио и видео</Category>
         
@@ -4588,7 +4588,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2979409</Revalidate></Ad>
+      <Revalidate>2979415</Revalidate></Ad>
 <Ad>
         <Id>496127545</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -4786,7 +4786,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2979409</Revalidate></Ad>
+      <Revalidate>2979415</Revalidate></Ad>
 <Ad>
         <Id>1640714561</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -4936,7 +4936,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2979409</Revalidate></Ad>
+      <Revalidate>2979415</Revalidate></Ad>
 <Ad>
         <Id>1640726593</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5086,7 +5086,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2979409</Revalidate></Ad>
+      <Revalidate>2979415</Revalidate></Ad>
 <Ad>
         <Id>1640736641</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5686,7 +5686,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2979409</Revalidate></Ad>
+      <Revalidate>2979415</Revalidate></Ad>
 <Ad>
         <Id>1642060329</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5786,7 +5786,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2979409</Revalidate></Ad>
+      <Revalidate>2979415</Revalidate></Ad>
 <Ad>
         <Id>1642061641</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -6086,7 +6086,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2979409</Revalidate></Ad>
+      <Revalidate>2979415</Revalidate></Ad>
 <Ad>
         <Id>1645613473</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -6236,7 +6236,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2979409</Revalidate></Ad>
+      <Revalidate>2979415</Revalidate></Ad>
 <Ad>
         <Id>1645614297</Id>
         <DateBegin>2023-03-01</DateBegin>
