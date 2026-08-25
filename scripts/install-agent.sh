@@ -699,9 +699,9 @@ logged_in()  { as_agent 'test -s ~/.claude/.credentials.json' 2>/dev/null; }
 have_token() { grep -q '^CLAUDE_CODE_OAUTH_TOKEN=sk-ant-' "$ENV_FILE" 2>/dev/null; }
 TOKEN_WRITTEN=0
 write_token() {
-  # Настоящий токен ~130-150 знаков; низкий порог принимал бы обрезок,
-  # если pty перенёс строку посреди токена — сервис бы молча не завёлся
-  [[ "$1" =~ ^sk-ant-[A-Za-z0-9_-]{100,}$ ]] || die "это не похоже на токен Claude (жду sk-ant-oat01-..., целиком)"
+  # Настоящий токен ~101 знак после sk-ant-; порог ниже реального ловит обрезок
+  # (pty перенёс строку посреди токена — сервис бы молча не завёлся), но с запасом
+  [[ "$1" =~ ^sk-ant-[A-Za-z0-9_-]{80,}$ ]] || die "это не похоже на токен Claude (жду sk-ant-oat01-..., целиком)"
   if grep -q '^CLAUDE_CODE_OAUTH_TOKEN=' "$ENV_FILE" 2>/dev/null; then
     sed -i "s#^CLAUDE_CODE_OAUTH_TOKEN=.*#CLAUDE_CODE_OAUTH_TOKEN=$1#" "$ENV_FILE"
   else
@@ -749,7 +749,7 @@ EOF
   # script(1) даёт setup-token настоящий TTY и параллельно пишет экран в файл —
   # оттуда сами выловим напечатанный токен, чтобы человек его не копировал.
   script -qec "su - $SERVICE_USER -c 'claude setup-token'" "$TOKEN_LOG" </dev/tty >/dev/tty 2>&1 || true
-  CLAUDE_TOKEN="$(grep -aoE 'sk-ant-[A-Za-z0-9_-]{100,}' "$TOKEN_LOG" | tail -1 || true)"
+  CLAUDE_TOKEN="$(grep -aoE 'sk-ant-[A-Za-z0-9_-]{80,}' "$TOKEN_LOG" | tail -1 || true)"
   rm -f "$TOKEN_LOG"; trap - INT TERM EXIT
   if [[ -z "$CLAUDE_TOKEN" ]]; then
     warn "не смог выловить токен с экрана"
