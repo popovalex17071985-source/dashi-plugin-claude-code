@@ -929,7 +929,10 @@ else
     command -v uv >/dev/null 2>&1 \
       || curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh >/dev/null 2>&1 \
       || die "не встал uv — проверь сеть и повтори"
-    # Коммит запинен: ровно тот, что месяцами работает у живого Томми/Richard
+    # Коммит запинен: ровно тот, что месяцами работает у живого Томми/Richard.
+    # UV_PYTHON_INSTALL_DIR обязателен: без него uv (мы под root) кладёт CPython
+    # в /root (0700), venv-симлинк туда — и сервис под agent умирает с EACCES
+    export UV_PYTHON_INSTALL_DIR="$R_DIR/python"
     uv venv "$R_DIR/venv" --python 3.12 >/dev/null 2>&1 \
       && uv pip install --python "$R_DIR/venv/bin/python" -q \
            'git+https://github.com/RichardAtCT/claude-code-telegram@4c63df52c5767f03c5031f8f9f956485a4d9eda5' \
