@@ -8,13 +8,15 @@
 # Что человек делает сам (автоматизировать нельзя):
 #   1. арендует VPS и заходит на него root'ом
 #   2. заводит бота у @BotFather и узнаёт свой id у @userinfobot
-#   3. логинится в Claude по ссылке (OAuth) — скрипт останавливается и говорит как
+#   3. проходит вход в Claude по ссылке (OAuth) — скрипт сам запускает
+#      `claude setup-token` и забирает ГОДОВОЙ токен (никаких перелогинов раз в месяц)
 #
 # Использование:
 #   bash install-agent.sh                      # спросит всё интерактивно
 #   bash install-agent.sh --name jarvis --token 123:AA... --user-id 140141496
 #   ... --openai-key sk-...                  # + семантическая память OpenViking (docker)
 #   ... --branch feature/x                   # staging-агент: обновляется с feature-ветки, не с main
+#   ... --claude-token sk-ant-oat01-...      # готовый годовой токен (claude setup-token на любой машине)
 #
 set -euo pipefail
 
@@ -26,7 +28,7 @@ REPO_URL="${DASHI_REPO_URL:-https://github.com/popovalex17071985-source/dashi-pl
 BRANCH="${DASHI_BRANCH:-main}"
 SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
 
-AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; ASSUME_YES=0
+AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; ASSUME_YES=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
@@ -35,7 +37,7 @@ die()  { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 warn() { printf '    \033[33m! %s\033[0m\n' "$*"; }
 
 usage() {
-  sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'
   exit 0
 }
 
@@ -45,8 +47,8 @@ while [[ $# -gt 0 ]]; do
     --token)     BOT_TOKEN="$2";  shift 2 ;;
     --user-id)   USER_ID="$2";    shift 2 ;;
     --groq-key)  GROQ_KEY="$2";   shift 2 ;;
-    --groq-key)  GROQ_KEY="$2";   shift 2 ;;
     --openai-key) OPENAI_KEY="$2"; shift 2 ;;   # включает семантическую память OpenViking
+    --claude-token) CLAUDE_TOKEN="$2"; shift 2 ;; # годовой токен из `claude setup-token`
     --user)      SERVICE_USER="$2"; shift 2 ;;
     --repo)      REPO_URL="$2";   shift 2 ;;
     --branch)    BRANCH="$2";     shift 2 ;;   # main (по умолчанию) | feature-ветка для staging
@@ -55,6 +57,10 @@ while [[ $# -gt 0 ]]; do
     *) die "неизвестный аргумент: $1 (--help для справки)" ;;
   esac
 done
+
+# Токен можно передать и через окружение — не светится в ps, в отличие от флага:
+#   CLAUDE_CODE_OAUTH_TOKEN=sk-ant-... sudo -E bash install-agent.sh ...
+CLAUDE_TOKEN="${CLAUDE_TOKEN:-${CLAUDE_CODE_OAUTH_TOKEN:-}}"
 
 [[ $EUID -eq 0 ]] || die "запускай под root: sudo bash $0"
 
@@ -683,29 +689,74 @@ else
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 9. Вход в Claude — единственное, что нельзя сделать за человека
+# 9. Вход в Claude — годовой токен, чтобы не перелогиниваться раз в месяц
 # ─────────────────────────────────────────────────────────────────────────────
-logged_in() { as_agent 'test -s ~/.claude/.credentials.json' 2>/dev/null; }
+# Обычный вход по ссылке живёт ~30 дней (refresh-токен) и протухает молча.
+# `claude setup-token` тем же жестом (ссылка в браузер + код) выдаёт токен на
+# ГОД; кладём его в channel.env — systemd передаёт его Claude через окружение
+# (CLAUDE_CODE_OAUTH_TOKEN), и диалога логина просто нет.
+logged_in()  { as_agent 'test -s ~/.claude/.credentials.json' 2>/dev/null; }
+have_token() { grep -q '^CLAUDE_CODE_OAUTH_TOKEN=sk-ant-' "$ENV_FILE" 2>/dev/null; }
+TOKEN_WRITTEN=0
+write_token() {
+  # Настоящий токен ~130-150 знаков; низкий порог принимал бы обрезок,
+  # если pty перенёс строку посреди токена — сервис бы молча не завёлся
+  [[ "$1" =~ ^sk-ant-[A-Za-z0-9_-]{100,}$ ]] || die "это не похоже на токен Claude (жду sk-ant-oat01-..., целиком)"
+  if grep -q '^CLAUDE_CODE_OAUTH_TOKEN=' "$ENV_FILE" 2>/dev/null; then
+    sed -i "s#^CLAUDE_CODE_OAUTH_TOKEN=.*#CLAUDE_CODE_OAUTH_TOKEN=$1#" "$ENV_FILE"
+  else
+    echo "CLAUDE_CODE_OAUTH_TOKEN=$1" >> "$ENV_FILE"
+  fi
+  TOKEN_WRITTEN=1
+  ok "годовой токен записан в $ENV_FILE"
+}
 
-if ! logged_in; then
+say "Вход в Claude (годовой токен)"
+if [[ -n "$CLAUDE_TOKEN" ]]; then
+  write_token "$CLAUDE_TOKEN"
+elif have_token; then
+  skip "годовой токен уже в конфиге"
+elif logged_in; then
+  warn "нашёл обычный вход — работает, но протухает ~раз в 30 дней."
+  warn "Годовой: su - $SERVICE_USER -c 'claude setup-token', затем повторный прогон с --claude-token TOKEN"
+elif [[ ! -r /dev/tty ]]; then
   cat <<EOF
 
 ──────────────────────────────────────────────────────────────
-  Осталось войти в Claude — руками, за тебя это никто не сделает.
+  Остался вход в Claude (терминала нет, сам не проведу).
 
-  1) su - $SERVICE_USER
-  2) claude
-  3) выбери «Claude account» (НЕ «API key»)
-  4) открой показанную ссылку в браузере, войди, скопируй код обратно
-  5) Ctrl+C, exit
-  6) снова: sudo bash $0 --name $AGENT_NAME
+  1) su - $SERVICE_USER -c 'claude setup-token'
+  2) открой ссылку в браузере, войди, вставь код обратно
+  3) скопируй напечатанный токен (sk-ant-oat01-...)
+  4) снова: sudo bash $0 --name $AGENT_NAME --claude-token ТОКЕН
 
-  Шестой пункт доделает остальное — повторный запуск ничего не сломает.
+  Четвёртый пункт доделает остальное — повторный запуск ничего не сломает.
 ──────────────────────────────────────────────────────────────
 EOF
   exit 0
+else
+  cat <<EOF
+
+  Сейчас проведу вход в Claude (нужна подписка Pro/Max):
+    1) на экране появится ссылка — открой её в браузере на любом устройстве
+    2) войди в свой аккаунт Claude и разреши доступ
+    3) скопируй код со страницы и вставь обратно в этот терминал
+  Токен получается сразу на год — перелогиниваться раз в месяц не придётся.
+
+EOF
+  TOKEN_LOG="$(mktemp)"; chmod 600 "$TOKEN_LOG"
+  trap 'rm -f "${TOKEN_LOG:-}"' INT TERM EXIT   # в логе экрана лежит токен — не оставлять в /tmp
+  # script(1) даёт setup-token настоящий TTY и параллельно пишет экран в файл —
+  # оттуда сами выловим напечатанный токен, чтобы человек его не копировал.
+  script -qec "su - $SERVICE_USER -c 'claude setup-token'" "$TOKEN_LOG" </dev/tty >/dev/tty 2>&1 || true
+  CLAUDE_TOKEN="$(grep -aoE 'sk-ant-[A-Za-z0-9_-]{100,}' "$TOKEN_LOG" | tail -1 || true)"
+  rm -f "$TOKEN_LOG"; trap - INT TERM EXIT
+  if [[ -z "$CLAUDE_TOKEN" ]]; then
+    warn "не смог выловить токен с экрана"
+    ask CLAUDE_TOKEN "Вставь токен сюда (sk-ant-oat01-..., напечатан выше): "
+  fi
+  write_token "$CLAUDE_TOKEN"
 fi
-ok "вход в Claude выполнен"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 5c. Superpowers (навыки: планирование, отладка, ревью)
@@ -713,8 +764,9 @@ ok "вход в Claude выполнен"
 say "Superpowers"
 if as_agent 'test -d ~/.claude/plugins/marketplaces/superpowers-dev'; then
   skip "superpowers на месте"
-elif as_agent 'claude plugin marketplace add obra/superpowers >/dev/null 2>&1 &&
-               claude plugin install superpowers@superpowers-dev >/dev/null 2>&1'; then
+elif as_agent "set -a; . '$ENV_FILE' 2>/dev/null; set +a;
+               claude plugin marketplace add obra/superpowers >/dev/null 2>&1 &&
+               claude plugin install superpowers@superpowers-dev >/dev/null 2>&1"; then
   ok "superpowers установлены"
 else
   # Не критично: агент работает и без них, поэтому не роняем всю установку
@@ -835,6 +887,9 @@ fi
 # 10. Поднимаем
 # ─────────────────────────────────────────────────────────────────────────────
 say "Запуск"
+# Токен только что записан, а сервис уже крутился — перезапуск, чтобы Claude
+# подхватил CLAUDE_CODE_OAUTH_TOKEN из окружения
+[[ $TOKEN_WRITTEN -eq 1 ]] && systemctl try-restart "$UNIT" >/dev/null 2>&1 || true
 systemctl enable --now "$UNIT" >/dev/null 2>&1 || true
 sleep 8
 

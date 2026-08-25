@@ -6,7 +6,8 @@
 # паролем → раскладывает данные агента (память, характер, секреты, состояние,
 # channel.env, crontab, юнит) → передаёт системную часть установщику
 # (install-agent.sh идемпотентен: увидит восстановленные данные и не затрёт их,
-# доставит только систему/сервис/хуки) → остаётся войти в Claude.
+# доставит только систему/сервис/хуки). Вход в Claude обычно не нужен:
+# годовой токен (CLAUDE_CODE_OAUTH_TOKEN) приезжает внутри channel.env из бэкапа.
 #
 # Пример:
 #   sudo bash restore-agent.sh --name myagent \
@@ -126,4 +127,8 @@ bash "$SCRIPT_DIR/install-agent.sh" --name "$AGENT_NAME" --user "$SERVICE_USER" 
 
 say "Готово"
 ok "агент $AGENT_NAME восстановлен из бэкапа"
-echo "    Остался вход в Claude: su - $SERVICE_USER, затем claude (или /relogin из чата)."
+if grep -q '^CLAUDE_CODE_OAUTH_TOKEN=sk-ant-' "/etc/dashi-plugin/$AGENT_NAME/channel.env" 2>/dev/null; then
+  echo "    Вход в Claude не нужен: годовой токен приехал из бэкапа вместе с channel.env."
+else
+  echo "    Остался вход в Claude: sudo bash $SCRIPT_DIR/install-agent.sh --name $AGENT_NAME — он проведёт по шагам."
+fi

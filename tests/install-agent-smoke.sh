@@ -25,8 +25,14 @@ grep -q 'User=\$SERVICE_USER'          "$S" || fail "юнит крутится �
 grep -q 'PLUGIN_DIR="\$CLAUDE_DIR/dashi-plugin-claude-code/plugin"' "$S" \
   || fail "плагин кладётся мимо workspace"
 
-# Секреты закрыты, и restart не «always» — иначе welcome-промт зациклит сервис
-grep -q 'chmod 640 "\$ENV_FILE"' "$S" || fail "конфиг с секретами не закрыт"
-grep -q 'Restart=on-failure'      "$S" || fail "Restart должен быть on-failure"
+# Секреты закрыты от посторонних (660 root:agent — агент правит конфиг сам)
+grep -q 'chmod 660 "\$ENV_FILE"' "$S" || fail "конфиг с секретами не закрыт"
+# Restart=always безопасен с тех пор, как диалоги жмёт dashi-press-dialogs
+grep -q 'Restart=always'          "$S" || fail "сервис должен подниматься сам (Restart=always)"
+
+# Годовой токен вместо 30-дневного логина: setup-token + запись в channel.env
+grep -q 'claude setup-token'          "$S" || fail "нет входа через setup-token (годовой токен)"
+grep -q 'CLAUDE_CODE_OAUTH_TOKEN='    "$S" || fail "токен не пишется в channel.env"
+grep -q -- '--claude-token'           "$S" || fail "нет флага --claude-token для готового токена"
 
 echo "✓ install-agent smoke ok"
