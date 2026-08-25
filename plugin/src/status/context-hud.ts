@@ -24,9 +24,16 @@
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { resolveContextWindowForModel } from '../config.js'
+import { buildAutonomyHudLine, loadAutonomyState } from '../autonomy/store.js'
 import { classifyEditError } from '../safety/telegram-edit-classifier.js'
-import { readContextUsage as realReadContextUsage, type ContextUsage } from './context-usage.js'
+import {
+  formatWindowTokens,
+  readContextUsage as realReadContextUsage,
+  type ContextUsage,
+} from './context-usage.js'
 import { applyTaskCreateToMap, applyTaskUpdateToMap } from './task-mirror.js'
+import { renderFreshnessHeader, type TaskFreshness } from './task-freshness.js'
 import type { TaskMirrorEvent } from '../hooks/claude-events.js'
 import type { TodoItem } from '../schemas.js'
 import type { EditOpts, InlineKeyboardLike, SendMessageOpts } from '../channel/tools.js'
@@ -75,6 +82,9 @@ export function buildHudKeyboard(): InlineKeyboardLike {
 export interface HudWorkView {
   todos: ReadonlyArray<TodoItem>
   permissionMode?: string
+  // M3 reality mirror: when present, the «Задачи» header carries a freshness
+  // indicator («сверено … / ДАННЫЕ УСТАРЕЛИ / НЕ СВЕРЕНО / сессия завершена»).
+  freshness?: TaskFreshness
 }
 
 // Caps for the tasks section. The HUD is a compact pinned card, not the full
@@ -113,7 +123,10 @@ function taskLine(todo: TodoItem): string {
  * Empty todos → empty string (the HUD omits the section entirely).
  * PURE — exported for unit tests.
  */
-export function renderStatusTasks(todos: ReadonlyArray<TodoItem>): string {
+export function renderStatusTasks(
+  todos: ReadonlyArray<TodoItem>,
+  freshness?: TaskFreshness,
+): string {
   if (todos.length === 0) return ''
   const inProgress = todos.filter((t) => t.status === 'in_progress')
   const pending = todos.filter((t) => t.status === 'pending')
@@ -124,33 +137,45 @@ export function renderStatusTasks(todos: ReadonlyArray<TodoItem>): string {
   const filled = Math.max(0, Math.min(BAR_SEGMENTS, Math.round((done / total) * BAR_SEGMENTS)))
   const bar = BAR_FILLED.repeat(filled) + BAR_EMPTY.repeat(BAR_SEGMENTS - filled)
 
-  const lines: string[] = [`<b>Задачи</b> ${bar} ${done}/${total}`]
-  for (const t of inProgress) lines.push(taskLine(t))
-  for (const t of pending.slice(0, TASKS_MAX_PENDING)) lines.push(taskLine(t))
+  // The header (bar + count) stays OUTSIDE the collapsible quote so progress is
+  // always visible when collapsed; the per-task detail goes INSIDE an
+  // <blockquote expandable>, so the pin reads «progress — tap to expand the list».
+  // M3: when a freshness indicator is supplied the bold «Задачи» label is
+  // replaced by the freshness label (+ optional subline), so the pin shows how
+  // recently the list was reconciled against the real pane.
+  const fh = freshness !== undefined ? renderFreshnessHeader(freshness) : { label: '<b>Задачи</b>' }
+  const header = `${fh.label} ${bar} ${done}/${total}`
+  const subLine = 'sub' in fh && fh.sub !== undefined ? `\n${fh.sub}` : ''
+
+  const detail: string[] = []
+  for (const t of inProgress) detail.push(taskLine(t))
+  for (const t of pending.slice(0, TASKS_MAX_PENDING)) detail.push(taskLine(t))
   if (pending.length > TASKS_MAX_PENDING) {
-    lines.push(`<i>+${pending.length - TASKS_MAX_PENDING} ещё…</i>`)
+    detail.push(`<i>+${pending.length - TASKS_MAX_PENDING} ещё…</i>`)
   }
   const visibleDone = completed.slice(-TASKS_MAX_DONE)
   const hiddenDone = completed.length - visibleDone.length
-  if (hiddenDone > 0) lines.push(`<i>+${hiddenDone} завершено ранее</i>`)
-  for (const t of visibleDone) lines.push(taskLine(t))
+  if (hiddenDone > 0) detail.push(`<i>+${hiddenDone} завершено ранее</i>`)
+  for (const t of visibleDone) detail.push(taskLine(t))
 
   // Total-budget pass: the per-category caps bound pending/completed but not
-  // in-progress, and escaping expands after the per-line cut. Keep the header
-  // always; drop overflowing lines and mark the cut with a tail.
+  // in-progress, and escaping expands after the per-line cut. The header is
+  // always kept (counted first); drop overflowing detail lines, mark the cut.
   const out: string[] = []
-  let used = 0
+  let used = header.length + subLine.length
   let dropped = 0
-  for (const line of lines) {
-    if (out.length === 0 || used + 1 + line.length <= TASKS_MAX_CHARS) {
+  for (const line of detail) {
+    if (used + 1 + line.length <= TASKS_MAX_CHARS) {
       out.push(line)
-      used += (out.length === 1 ? 0 : 1) + line.length
+      used += 1 + line.length
     } else {
       dropped++
     }
   }
   if (dropped > 0) out.push(`<i>+${dropped} строк скрыто</i>`)
-  return out.join('\n')
+
+  if (out.length === 0) return `${header}${subLine}`
+  return `${header}${subLine}\n<blockquote expandable>${out.join('\n')}</blockquote>`
 }
 
 // «план» is the only mode worth naming; every other Claude Code permission
@@ -179,6 +204,7 @@ export function renderHud(
   windowTokens: number,
   model?: string,
   work?: HudWorkView,
+  autonomyLine?: string,
 ): { text: string; keyboard: InlineKeyboardLike } {
   const keyboard = buildHudKeyboard()
   const modelLine = model !== undefined && model.length > 0 ? `\n<i>${escapeHtml(model)}</i>` : ''
@@ -186,15 +212,20 @@ export function renderHud(
     work?.permissionMode !== undefined && work.permissionMode.length > 0
       ? `\n<i>режим: ${modeLabel(work.permissionMode)}</i>`
       : ''
-  const tasksBlock = work !== undefined ? renderStatusTasks(work.todos) : ''
+  // Autonomy pin line (PR-1): one compact line when active mandates / open
+  // owner questions exist. Already HTML-escaped by buildAutonomyHudLine (the
+  // HUD passes escapeHtml), so it is safe under the card's HTML parse mode.
+  const autonomyBlock =
+    autonomyLine !== undefined && autonomyLine.length > 0 ? `\n${autonomyLine}` : ''
+  const tasksBlock = work !== undefined ? renderStatusTasks(work.todos, work.freshness) : ''
   const tasksSection = tasksBlock.length > 0 ? `\n\n${tasksBlock}` : ''
-  const tail = `${modelLine}${modeLine}${tasksSection}`
+  const tail = `${modelLine}${modeLine}${autonomyBlock}${tasksSection}`
 
   if (usage === null) {
     return { text: `🧠 <b>Контекст</b>: —${tail}`, keyboard }
   }
 
-  const windowK = Math.round(windowTokens / 1000)
+  const windowLabel = formatWindowTokens(windowTokens)
   const usedK = Math.round(usage.usedTokens / 1000)
   const rawPct = windowTokens > 0 ? (usage.usedTokens / windowTokens) * 100 : 0
   // Clamp to 0..100 for BOTH the bar and the displayed percentage so an
@@ -203,7 +234,7 @@ export function renderHud(
   const filled = Math.max(0, Math.min(BAR_SEGMENTS, Math.round(pct / 10)))
   const bar = BAR_FILLED.repeat(filled) + BAR_EMPTY.repeat(BAR_SEGMENTS - filled)
 
-  const text = `🧠 <b>Контекст</b>: ${bar} ${pct}% (${usedK}k / ${windowK}k)${tail}`
+  const text = `🧠 <b>Контекст</b>: ${bar} ${pct}% (${usedK}k / ${windowLabel})${tail}`
   return { text, keyboard }
 }
 
@@ -251,7 +282,21 @@ export interface ContextHudOptions {
   api: HudTelegramApi
   log: Logger
   sessionInfo: SessionInfoReader
+  // Fallback context window (tokens) used when the session model is unknown or
+  // absent — the model-unaware default (resolveContextWindowTokens).
   windowTokens: number
+  // Explicit operator override (config context_window_tokens / JARVIS_CONTEXT_WINDOW),
+  // or undefined when unset. When present it wins over per-model auto-detection
+  // (resolveContextWindowForModel); when absent the model table drives the
+  // window so a Fable-5 session reports its true 1M window. Optional so the many
+  // test literals that predate it keep compiling.
+  windowOverride?: number | undefined
+  // The `--model` flag of the hosting Claude Code process (readLaunchModelId,
+  // read once at boot). Some 1M variants report a BARE model id in the
+  // transcript (`claude-opus-5` under `--model claude-opus-5[1m]`); the launch
+  // flag is then the only proof the window is 1M and not the table's 200k.
+  // Optional — when absent the model table drives the window as before.
+  launchModel?: string | undefined
   // Owner chat(s) — the ONLY chats the HUD acts in. Stringified for comparison
   // against the hook payload's chatId.
   ownerChatIds: ReadonlyArray<string | number>
@@ -273,6 +318,8 @@ export class ContextHud {
   private readonly log: Logger
   private readonly sessionInfo: SessionInfoReader
   private readonly windowTokens: number
+  private readonly windowOverride?: number | undefined
+  private readonly launchModel?: string | undefined
   private readonly owner: ReadonlySet<string>
   private readonly stateDir: string
   private readonly enabled: boolean
@@ -284,9 +331,42 @@ export class ContextHud {
   // does not clear it, so the pinned card keeps showing «что сделали» until
   // the next task replaces the snapshot.
   private readonly work = new Map<string, { todos: ReadonlyArray<TodoItem>; taskMap: Map<string, TodoItem> }>()
+  // M3 reality mirror: the reconciled view (real pane-verified list + freshness)
+  // per chat. When present it SUPERSEDES the event-only `work` snapshot in the
+  // render — the pin then reflects the harness's real task list. Fed by
+  // TaskRealityMirror.applyReconciledView; the raw onTodoEvent path is bypassed
+  // when the reconciler is wired (server.ts), so the two never fight.
+  private readonly reconciled = new Map<string, { todos: ReadonlyArray<TodoItem>; freshness: TaskFreshness }>()
+  // Per-chat session id, tracked from SessionStart + task events. Used to decide
+  // when to CLEAR the task snapshot: a genuine session change clears it; a
+  // compact (same id) preserves it. SessionStart fires for startup / resume /
+  // clear / compact, so source alone can't tell «new session» from «compacted
+  // same session» — the id does. KEPT across SessionEnd (review 2026-07-09 #2):
+  // deleting it on end made the next startup's sessionChanged=false, so a
+  // brand-new session inherited the dead session's task snapshot.
+  private readonly sessionIds = new Map<string, string>()
+  // Per-chat tombstones of ENDED session ids (bounded). A late task event
+  // naming an ended session is dropped — pre-fix it cleared the active
+  // session's work and adopted the dead id. SessionStart with the same id
+  // (resume) un-tombstones. The reconciler's applyReconciledView is exempt:
+  // it manages its own lifecycle and must be able to deliver the frozen
+  // «сессия завершена» view right after SessionEnd.
+  private readonly endedSessions = new Map<string, Set<string>>()
+  // Dedup for reconciler-driven refreshes: hash of the last applied reconciled
+  // «Задачи» render per chat. The reconciler ticks every 20s; when neither the
+  // tasks nor the bucketed freshness label changed, skipping the refresh keeps
+  // editMessageText traffic at zero instead of a no-op edit per tick.
+  private readonly lastReconciledRender = new Map<string, string>()
+  // Chats whose persisted epoch state has been restored this process lifetime.
+  private readonly epochsRestored = new Set<string>()
   // bump() debounce per chat — a burst of inbound messages collapses to one
   // delete+resend (same rationale as TmuxMirror.BUMP_DEBOUNCE_MS).
   private readonly lastBumpAt = new Map<string, number>()
+  // M4 heartbeat: an ephemeral no-ping «работаю: …» suffix appended to the pin
+  // while the owner has heard nothing for >25 min. Set/cleared by the
+  // HeartbeatMonitor via setHeartbeatSuffix; rendered as a tail line so pin
+  // edits (which don't ping) keep the owner reassured without a message.
+  private readonly heartbeatSuffix = new Map<string, string>()
   // FIX-9 (both reviews): per-chat serialization. A concurrent SessionStart +
   // Stop (both firing before the first send persists an id) would each see an
   // empty cache and sendFresh → TWO pinned HUDs. Chaining every HUD operation
@@ -300,6 +380,8 @@ export class ContextHud {
     this.log = opts.log
     this.sessionInfo = opts.sessionInfo
     this.windowTokens = opts.windowTokens
+    this.windowOverride = opts.windowOverride
+    this.launchModel = opts.launchModel
     this.owner = new Set(opts.ownerChatIds.map((id) => String(id)))
     this.stateDir = opts.stateDir
     this.enabled = opts.enabled
@@ -337,8 +419,51 @@ export class ContextHud {
 
   // SessionStart: ensure the HUD message exists and is pinned, then refresh it.
   // The whole method is best-effort — it never throws. Serialized per chat.
-  onSessionStart(chatId: string): Promise<void> {
+  //
+  // Task snapshot handling: SessionStart fires for startup, resume, clear AND
+  // compact. A compact keeps the SAME session id, so clearing the task list on
+  // every SessionStart would wipe the milestones the warchief is watching every
+  // time the context is auto-compacted. We therefore clear ONLY on a genuine
+  // session change (new id) or an explicit `source === 'clear'`; a compact with
+  // the same id preserves the snapshot.
+  onSessionStart(chatId: string, opts: { sessionId?: string; source?: string } = {}): Promise<void> {
     if (!this.enabled || !this.isOwner(chatId)) return Promise.resolve()
+    const { sessionId, source } = opts
+    this.restoreEpochs(chatId)
+    const prev = this.sessionIds.get(chatId)
+    // Rollback guard (review 2026-07-10 #2): a SessionStart naming an ENDED id
+    // while a DIFFERENT session is tracked is a late/replayed straggler — it
+    // must NOT displace the active session or clear its snapshot. Resume of an
+    // ended id is valid only when no different session is tracked.
+    if (
+      sessionId !== undefined &&
+      prev !== undefined &&
+      prev !== sessionId &&
+      this.endedSessions.get(chatId)?.has(sessionId) === true
+    ) {
+      return Promise.resolve()
+    }
+    const sessionChanged = sessionId !== undefined && prev !== undefined && prev !== sessionId
+    if (source === 'clear' || sessionChanged) {
+      // Genuine reset: drop the prior snapshot so the pin never shows stale
+      // milestones (renderStatusTasks returns '' for an empty list → the
+      // section is omitted until fresh TodoWrite/TaskCreate events arrive).
+      this.work.delete(chatId)
+      // M3: also drop the reconciled view; TaskRealityMirror re-pushes a fresh
+      // «НЕ СВЕРЕНО» view for the new session immediately after.
+      this.reconciled.delete(chatId)
+      this.lastReconciledRender.delete(chatId)
+      // M4: a stale heartbeat suffix must not leak into the new session's pin.
+      this.heartbeatSuffix.delete(chatId)
+    }
+    // Compact / resume / first-ever start (same or unknown id) preserve the
+    // snapshot. Track the latest known id for the next comparison. A resume
+    // of an ENDED session legitimizes it again (drop the tombstone).
+    if (sessionId !== undefined) {
+      this.sessionIds.set(chatId, sessionId)
+      this.endedSessions.get(chatId)?.delete(sessionId)
+      this.persistEpoch(chatId)
+    }
     return this.runSerialized(chatId, async () => {
       try {
         const { text, keyboard } = await this.renderCurrent(chatId)
@@ -361,19 +486,71 @@ export class ContextHud {
     })
   }
 
-  // Stop / end-of-turn: refresh the percentage. No pin (that is SessionStart's
-  // job); updateNow self-heals a deleted message once.
+  // Stop / end-of-turn: refresh the percentage. Stop carries model /
+  // permission_mode for the pinned card but must NOT finalize task state. No
+  // pin (that is SessionStart's job); updateNow self-heals a deleted message.
   async onStop(chatId: string): Promise<void> {
+    await this.updateNow(chatId)
+  }
+
+  // SessionEnd (the REAL session end, unlike Stop): refresh the pinned card.
+  // We keep the last task snapshot visible (the next SessionStart with a new id
+  // clears it) and KEEP the tracked session id (review 2026-07-09 #2:
+  // forgetting it made the next startup's sessionChanged=false, so a brand-new
+  // session showed the dead session's tasks). The ended id is tombstoned so a
+  // late task event naming it is dropped instead of clearing the active state.
+  async onSessionEnd(chatId: string, opts: { sessionId?: string } = {}): Promise<void> {
+    if (!this.enabled || !this.isOwner(chatId)) return
+    this.restoreEpochs(chatId)
+    const { sessionId } = opts
+    const prev = this.sessionIds.get(chatId)
+    if (sessionId !== undefined) {
+      // Tombstone even a late end for a session we've moved past — its
+      // stragglers must be dropped too. Bound 64 oldest-first (review
+      // 2026-07-10 #2), persisted so tombstones survive a restart.
+      let set = this.endedSessions.get(chatId)
+      if (set === undefined) {
+        set = new Set()
+        this.endedSessions.set(chatId, set)
+      }
+      set.delete(sessionId)
+      set.add(sessionId)
+      while (set.size > 64) {
+        const oldest = set.values().next().value
+        if (oldest === undefined) break
+        set.delete(oldest)
+      }
+      this.persistEpoch(chatId)
+    }
+    // Ignore a late SessionEnd for a session we've already moved past.
+    if (sessionId !== undefined && prev !== undefined && prev !== sessionId) return
     await this.updateNow(chatId)
   }
 
   // Todo events (TodoWrite / TaskCreate / TaskUpdate, mapped by
   // toTodoWriteEvent in the webhook) — update the work view and refresh the
-  // card in place. `todo_session_stop` deliberately does NOT clear the view:
-  // the pinned card keeps the last milestones visible across turns.
+  // card in place. Session lifecycle events are handled by onSessionStart /
+  // onSessionEnd, not here; if one slips through it is ignored.
+  //
+  // A task event whose sessionId differs from the tracked one signals a new
+  // session (we may have missed SessionStart) — reset the stale snapshot and
+  // adopt the new id so the pin never blends two sessions' task lists.
   onTodoEvent(chatId: string, event: TaskMirrorEvent): Promise<void> {
     if (!this.enabled || !this.isOwner(chatId)) return Promise.resolve()
-    if (event.kind === 'todo_session_stop') return Promise.resolve()
+    if (event.kind === 'session_start' || event.kind === 'session_end') {
+      return Promise.resolve()
+    }
+    this.restoreEpochs(chatId)
+    // Drop late stragglers from an ENDED session — they must not clear the
+    // active session's snapshot or resurrect the dead id (review 2026-07-09 #2).
+    if (this.endedSessions.get(chatId)?.has(event.sessionId) === true) {
+      return Promise.resolve()
+    }
+    const prev = this.sessionIds.get(chatId)
+    if (prev !== undefined && prev !== event.sessionId) {
+      this.work.delete(chatId)
+    }
+    this.sessionIds.set(chatId, event.sessionId)
     let state = this.work.get(chatId)
     if (state === undefined) {
       state = { todos: [], taskMap: new Map<string, TodoItem>() }
@@ -396,6 +573,95 @@ export class ContextHud {
         break
     }
     return this.updateNow(chatId)
+  }
+
+  // M3 reality mirror: adopt the reconciled (pane-verified) task view + its
+  // freshness indicator and refresh the pin in place. This SUPERSEDES the
+  // event-only `work` snapshot in the render, so the pin reflects the harness's
+  // real task list even when the agent skipped the task tools. Best-effort +
+  // serialized like every other HUD op; gates on owner + enabled.
+  applyReconciledView(
+    chatId: string,
+    view: { sessionId: string; todos: ReadonlyArray<TodoItem>; freshness: TaskFreshness },
+  ): Promise<void> {
+    if (!this.enabled || !this.isOwner(chatId)) return Promise.resolve()
+    this.reconciled.set(chatId, { todos: view.todos, freshness: view.freshness })
+    // Keep the tracked session id coherent so a later onSessionStart correctly
+    // detects a genuine change.
+    this.sessionIds.set(chatId, view.sessionId)
+    // Reconciler-tick dedup: the mirror ticks every 20s and the freshness label
+    // is minute-bucketed, so most ticks change NOTHING in the rendered section.
+    // Skip the whole refresh when the rendered «Задачи» section is identical to
+    // the previously applied one — no editMessageText per tick.
+    const renderKey = `${view.sessionId}|${renderStatusTasks(view.todos, view.freshness)}`
+    if (this.lastReconciledRender.get(chatId) === renderKey) return Promise.resolve()
+    this.lastReconciledRender.set(chatId, renderKey)
+    return this.updateNow(chatId)
+  }
+
+  // M4 heartbeat pin suffix. Store (or clear with null) the ephemeral
+  // «работаю: <task> · HH:MM» line and refresh the pin IN PLACE. Pin edits do
+  // NOT ping, so this reassures the owner during long silent work without a
+  // message. Best-effort + serialized like every other HUD op; owner-gated.
+  //
+  // EDIT-ONLY (fix-loop-1 #6): the heartbeat may only EDIT an existing pin.
+  // When no pin message exists — or the edit reports message_gone — the
+  // heartbeat is SKIPPED entirely: it must never create (and thereby surface)
+  // a fresh message on its own, and it must never route through updateNow,
+  // whose self-heal would send one. Creation stays the exclusive job of the
+  // session-lifecycle paths (onSessionStart / updateNow / bump).
+  //
+  // Idempotent: an unchanged suffix short-circuits; the HeartbeatMonitor only
+  // re-sets the suffix when the minute (HH:MM) changes, so edits stay ~1/min.
+  setHeartbeatSuffix(chatId: string, suffix: string | null): Promise<void> {
+    if (!this.enabled || !this.isOwner(chatId)) return Promise.resolve()
+    // No pin to edit → skip (and drop any stale suffix so a later lifecycle
+    // render can't resurrect it).
+    if (this.messageIds.get(chatId) === undefined && this.loadPersisted(chatId) === undefined) {
+      this.heartbeatSuffix.delete(chatId)
+      return Promise.resolve()
+    }
+    if (suffix === null || suffix.length === 0) {
+      if (!this.heartbeatSuffix.has(chatId)) return Promise.resolve() // already clear — no churn
+      this.heartbeatSuffix.delete(chatId)
+    } else {
+      if (this.heartbeatSuffix.get(chatId) === suffix) return Promise.resolve() // unchanged — no churn
+      this.heartbeatSuffix.set(chatId, suffix)
+    }
+    return this.runSerialized(chatId, async () => {
+      try {
+        const id = this.messageIds.get(chatId) ?? this.loadPersisted(chatId)
+        if (id === undefined) return // raced away (bump deleted it) — skip
+        this.messageIds.set(chatId, id)
+        const { text, keyboard } = await this.renderCurrent(chatId)
+        try {
+          await this.api.editMessageText(chatId, id, text, {
+            parse_mode: 'HTML',
+            reply_markup: keyboard,
+          })
+        } catch (err) {
+          const cls = classifyEditError(err)
+          if (cls.kind === 'benign') return
+          if (cls.kind === 'message_gone') {
+            // The pin was deleted. Unlike edit()'s self-heal, the heartbeat
+            // path must NOT recreate — drop the stale ids and stand down.
+            this.messageIds.delete(chatId)
+            this.clearPersisted(chatId)
+            this.heartbeatSuffix.delete(chatId)
+            return
+          }
+          this.log.warn('context hud heartbeat edit failed (ignored)', {
+            chat_id: chatId,
+            kind: cls.kind,
+          })
+        }
+      } catch (err) {
+        this.log.warn('context hud setHeartbeatSuffix failed (ignored)', {
+          chat_id: chatId,
+          error: err instanceof Error ? err.message : String(err),
+        })
+      }
+    })
   }
 
   // Re-anchor the pinned card at the BOTTOM of the chat (just above the tmux
@@ -497,6 +763,11 @@ export class ContextHud {
     chatId: string,
   ): Promise<{ text: string; keyboard: InlineKeyboardLike }> {
     const info = this.sessionInfo.get(chatId)
+    // Read the transcript FIRST — it carries the true `message.model` id that
+    // Claude Code hook payloads do NOT (empirically verified 2026-07-10: no
+    // `model` key on SessionStart/Stop hooks). The window passed here only
+    // affects usage.pct, which renderHud recomputes from usedTokens and never
+    // consumes — so a provisional fallback window is safe.
     let usage: ContextUsage | null = null
     if (info.transcriptPath !== undefined && info.transcriptPath.length > 0) {
       try {
@@ -506,13 +777,58 @@ export class ContextHud {
         usage = null
       }
     }
-    const work: HudWorkView = {
-      todos: this.work.get(chatId)?.todos ?? [],
-      ...(info.permissionMode !== undefined && info.permissionMode.length > 0
+    // Model-aware window. Precedence: explicit operator override >
+    // transcript-derived model (message.model — per-turn FRESH and authoritative,
+    // it is the id the API actually served this turn) > hook-provided model
+    // (info.model, honored only as a fallback if a future harness adds one) >
+    // configured default. Transcript-first because (a) a hook model unknown to
+    // the table must not block a valid transcript model, and (b) SessionInfoStore
+    // MERGES hook facts, so a stale hook model would otherwise stick past a
+    // mid-session /model switch and beat the fresh transcript value. Empty-string
+    // guards defend against an alternative SessionInfoReader implementation.
+    // Recomputed each render so a mid-session model switch is picked up.
+    const transcriptModel = usage?.model
+    const hookModel = info.model
+    const model = (transcriptModel !== undefined && transcriptModel.length > 0
+      ? transcriptModel
+      : undefined)
+      ?? (hookModel !== undefined && hookModel.length > 0 ? hookModel : undefined)
+    const windowTokens = resolveContextWindowForModel(model, {
+      override: this.windowOverride,
+      fallback: this.windowTokens,
+      launchModel: this.launchModel,
+    })
+    // M3: the reconciled (pane-verified) view wins over the event-only snapshot.
+    const rv = this.reconciled.get(chatId)
+    const permissionMode =
+      info.permissionMode !== undefined && info.permissionMode.length > 0
         ? { permissionMode: info.permissionMode }
-        : {}),
+        : {}
+    const work: HudWorkView = rv !== undefined
+      ? { todos: rv.todos, freshness: rv.freshness, ...permissionMode }
+      : { todos: this.work.get(chatId)?.todos ?? [], ...permissionMode }
+    // Autonomy pin line (PR-1). Best-effort: a broken/missing registry must
+    // never break HUD rendering, so load + line-build are guarded and degrade
+    // to no line. Escaped via escapeHtml for the card's HTML parse mode.
+    let autonomyLine: string | undefined
+    try {
+      const state = loadAutonomyState({ root: this.stateDir }, chatId, this.log)
+      autonomyLine = buildAutonomyHudLine(state, Date.now(), { escape: escapeHtml })
+    } catch (err) {
+      this.log.warn('context hud autonomy line failed (ignored)', {
+        chat_id: chatId,
+        error: err instanceof Error ? err.message : String(err),
+      })
+      autonomyLine = undefined
     }
-    return renderHud(usage, this.windowTokens, info.model, work)
+    const rendered = renderHud(usage, windowTokens, model, work, autonomyLine)
+    // M4 heartbeat suffix (append last so it is always the final line). Escaped
+    // for the card's HTML parse mode — the task text is user/tool-supplied.
+    const suffix = this.heartbeatSuffix.get(chatId)
+    if (suffix !== undefined && suffix.length > 0) {
+      return { text: `${rendered.text}\n<i>${escapeHtml(suffix)}</i>`, keyboard: rendered.keyboard }
+    }
+    return rendered
   }
 
   // Resolve the HUD message id for a chat: in-memory cache → persisted file →
@@ -633,32 +949,87 @@ export class ContextHud {
     }
   }
 
-  private loadPersisted(chatId: string): number | undefined {
+  // Full persisted shape (schema-versioned; v2 adds the epoch block).
+  private loadPersistedFull(chatId: string): {
+    messageId?: number
+    epoch?: { active?: string; ended?: ReadonlyArray<string> }
+  } {
     try {
       const raw = readFileSync(this.persistPath(chatId), 'utf8')
       const parsed: unknown = JSON.parse(raw)
-      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-        const id = (parsed as { message_id?: unknown }).message_id
-        if (typeof id === 'number' && Number.isInteger(id) && id > 0) return id
+      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return {}
+      const obj = parsed as Record<string, unknown>
+      const out: { messageId?: number; epoch?: { active?: string; ended?: ReadonlyArray<string> } } = {}
+      const id = obj.message_id
+      if (typeof id === 'number' && Number.isInteger(id) && id > 0) out.messageId = id
+      if (typeof obj.epoch === 'object' && obj.epoch !== null && !Array.isArray(obj.epoch)) {
+        const e = obj.epoch as Record<string, unknown>
+        const active = typeof e.active === 'string' && e.active.length > 0 ? e.active : undefined
+        const ended = Array.isArray(e.ended)
+          ? e.ended.filter((s): s is string => typeof s === 'string' && s.length > 0).slice(-64)
+          : undefined
+        out.epoch = {
+          ...(active !== undefined ? { active } : {}),
+          ...(ended !== undefined ? { ended } : {}),
+        }
       }
+      return out
     } catch {
-      // Missing file / malformed JSON → treat as "no persisted id".
+      return {} // missing file / malformed JSON → nothing persisted
     }
-    return undefined
   }
 
-  private persist(chatId: string, messageId: number): void {
+  private loadPersisted(chatId: string): number | undefined {
+    return this.loadPersistedFull(chatId).messageId
+  }
+
+  // Restore persisted epoch state (tracked session + ended tombstones) ONCE
+  // per chat (review 2026-07-10 #2: HUD epoch state was runtime-only, so a
+  // restart forgot every tombstone and a dead session's stragglers could
+  // clear the active snapshot). Runtime state is never clobbered.
+  private restoreEpochs(chatId: string): void {
+    if (this.epochsRestored.has(chatId)) return
+    this.epochsRestored.add(chatId)
+    const epoch = this.loadPersistedFull(chatId).epoch
+    if (epoch === undefined) return
+    if (epoch.active !== undefined && !this.sessionIds.has(chatId)) {
+      this.sessionIds.set(chatId, epoch.active)
+    }
+    if (epoch.ended !== undefined && !this.endedSessions.has(chatId)) {
+      this.endedSessions.set(chatId, new Set(epoch.ended))
+    }
+  }
+
+  private writePersisted(chatId: string, messageId: number | undefined): void {
     try {
       mkdirSync(this.stateDir, { recursive: true, mode: 0o700 })
-      writeFileSync(this.persistPath(chatId), JSON.stringify({ message_id: messageId }), {
-        mode: 0o600,
-      })
+      const active = this.sessionIds.get(chatId)
+      const ended = this.endedSessions.get(chatId)
+      const body = {
+        v: 2,
+        ...(messageId !== undefined ? { message_id: messageId } : {}),
+        epoch: {
+          ...(active !== undefined ? { active } : {}),
+          ...(ended !== undefined && ended.size > 0 ? { ended: [...ended] } : {}),
+        },
+      }
+      writeFileSync(this.persistPath(chatId), JSON.stringify(body), { mode: 0o600 })
     } catch (err) {
       this.log.warn('context hud persist failed (ignored)', {
         chat_id: chatId,
         error: err instanceof Error ? err.message : String(err),
       })
     }
+  }
+
+  private persist(chatId: string, messageId: number): void {
+    this.writePersisted(chatId, messageId)
+  }
+
+  // Refresh ONLY the epoch block, preserving the persisted message id.
+  private persistEpoch(chatId: string): void {
+    const messageId = this.messageIds.get(chatId) ?? this.loadPersistedFull(chatId).messageId
+    this.writePersisted(chatId, messageId)
   }
 }
 

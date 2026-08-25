@@ -20,12 +20,15 @@ import { execSync } from 'child_process'
 import { homedir } from 'os'
 import { isAbsolute, join, resolve as resolvePath } from 'path'
 
+import pkg from '../package.json'
+
 import {
   RuntimeEnvSchema,
   getStatePaths,
   loadConfig,
   redactToken,
   resolveContextWindowTokens,
+  resolveContextWindowOverride,
   resolveGuestModeAllowedUserIds,
   resolveGuestModeEnabled,
   resolveHudEnabled,
@@ -34,7 +37,7 @@ import {
   type StatePaths,
 } from './config.js'
 import { createLogger } from './log.js'
-import { ensureStateDirs, migrateLegacyAllowlist } from './state/store.js'
+import { ensureStateDirs, migrateLegacyAllowlist, writeDeadLetter } from './state/store.js'
 import {
   callTool,
   createTelegramApi,
@@ -43,12 +46,19 @@ import {
 } from './channel/tools.js'
 import { createSafeTelegramApi } from './safety/safe-telegram-api.js'
 import { createRateLimitedTelegramApi } from './safety/rate-limited-telegram-api.js'
+import { createReliableTelegramApi } from './safety/reliable-telegram-api.js'
+import { OutboundActivityTracker } from './status/outbound-activity.js'
+import { HeartbeatMonitor } from './status/heartbeat-monitor.js'
+import { createRichLatch } from './safety/rich-latch.js'
 import { redactSecrets } from './safety/redact.js'
 import { StatusManager } from './status/status-manager.js'
 import { ProgressReporter } from './status/progress-reporter.js'
 import { TaskMirror } from './status/task-mirror.js'
-import { TmuxMirror, defaultTmuxExec } from './status/tmux-mirror.js'
+import { TmuxMirror } from './status/tmux-mirror.js'
+import { defaultTmuxExec } from './status/pane-capture.js'
+import { TaskRealityMirror } from './status/task-reality-mirror.js'
 import { SessionInfoStore } from './status/session-info.js'
+import { readLaunchModelId } from './status/launch-model.js'
 import {
   ContextHud,
   handleHudCallback,
@@ -88,6 +98,7 @@ import { registerOwnerScopedCommands } from './telegram/command-scope.js'
 import { startWebhookServer, type WebhookServerHandle } from './webhook/server.js'
 import {
   handleGuestMessage,
+  handleInboundAnimation,
   handleInboundAudio,
   handleInboundDocument,
   handleInboundPhoto,
@@ -424,33 +435,60 @@ if (!tokenLock.acquire(statePaths)) {
 // Telegram client + MCP server
 // ─────────────────────────────────────────────────────────────────────
 
+// TELEGRAM_API_ROOT: свой Bot API-сервер (tdlib --local), иначе облако.
 const bot = new Bot(env.TELEGRAM_BOT_TOKEN, {
   client: { apiRoot: env.TELEGRAM_API_ROOT ?? 'https://api.telegram.org' },
 })
-// Raw API talks to grammy. Safe wrapper sits in front of every downstream
-// consumer (StatusManager, oob, handlers, poller, webhook). The wrapper:
-//   1. redactSecrets(text, logSecrets) before delegating to raw API.
-//   2. validateTelegramHtml(text) when parse_mode=='HTML'; downgrade on
-//      invalid markup (strip parse_mode, ship escaped plain).
-// No call site can bypass — the raw `telegramApi` reference is shadowed
-// after this line. Anything that imports TelegramApi from channel/tools
-// receives the wrapped instance via toolDeps / handlerDeps / StatusManager.
+// Raw API talks to grammy. Every downstream consumer (StatusManager, oob,
+// handlers, poller, webhook) receives the fully layered instance built below.
+// Composition (fix-loop-1 #9 — this comment is the canonical map):
+//   caller → reliableTelegramApi (bounded retry + dead-letter + outbound clock)
+//          → safeTelegramApi     (redactSecrets + validateTelegramHtml downgrade)
+//          → rateLimitedTelegramApi (per-chat FIFO + token buckets + 429 retry)
+//          → rawTelegramApi      (grammY).
+// Sanitize runs before the queue so it holds already-redacted/validated
+// payloads (no secret leak if a queued op gets logged); the reliable layer is
+// OUTERMOST so its verdict reflects the final outcome of the whole stack.
+// No call site can bypass — the raw reference is shadowed below.
 const rawTelegramApi = createTelegramApi(bot, env.TELEGRAM_BOT_TOKEN)
-// Composition: caller → safeTelegramApi (sanitize) → rateLimitedTelegramApi
-// (queue + 429 retry) → rawTelegramApi (grammY). Sanitize runs FIRST so the
-// queue holds already-redacted/validated payloads (no secret leak if a
-// queued op gets logged; no time wasted enqueueing text that would later be
-// downgraded). A burst of replies now paces itself instead of surfacing as
-// a 429 to the agent.
 const rateLimitedTelegramApi = createRateLimitedTelegramApi(rawTelegramApi, log)
 // The bot token itself is included in extraSecrets so any code path that
 // accidentally tries to ship the token (e.g. error message including a
 // URL-with-token from grammy) gets it scrubbed before the bytes leave us.
 const apiSecrets: string[] = [...logSecrets, env.TELEGRAM_BOT_TOKEN]
-const telegramApi = createSafeTelegramApi(rateLimitedTelegramApi, log, apiSecrets)
+// M1 Rich Messages (2026-06-14): one process-scoped capability latch shared
+// between the safe wrapper (flips sendDisabled on a `capability` error) and
+// the reply tool (reads sendDisabled to skip rich attempts cheaply). A
+// restart re-probes capability, which is correct — Telegram may roll the
+// method out between restarts.
+const richLatch = createRichLatch()
+const safeTelegramApi = createSafeTelegramApi(rateLimitedTelegramApi, log, apiSecrets, richLatch)
+// M4 (2026-07-10): OUTERMOST reliability layer. Every caller send passes
+// through here first — it retries provably-undelivered transient failures
+// (pre_send; ambiguous ones dead-letter without retry — see the wrapper's
+// loss-vs-duplicate header), dead-letters non-retried/exhausted transients
+// under the `outbound` bucket, and stamps the outbound-activity clock on every
+// successful NEW-message send (unless the call opts out via skipOutboundStamp
+// — internal HUD/heartbeat sends). That clock is what the mechanical
+// heartbeat/dead-man read to know when the owner last heard from us.
+// editMessageText is retried but NOT stamped (pin edits don't ping).
+// The dead-letter error text is redacted (fix-loop-1 #7a) — a transport error
+// can embed the api.telegram.org/bot<token>/ URL, and the quarantine files,
+// while 0600, must never store the token.
+const outboundTracker = new OutboundActivityTracker()
+const telegramApi = createReliableTelegramApi(safeTelegramApi, log, {
+  deadLetter: (record) =>
+    writeDeadLetter(statePaths, 'outbound', {
+      ...record,
+      error: redactSecrets(record.error, apiSecrets),
+    }),
+  recordOutbound: (chatId, atMs) => outboundTracker.record(chatId, atMs),
+})
 
 const mcp = new Server(
-  { name: 'dashi-channel', version: '1.0.0' },
+  // Single version source: package.json (kept in lockstep with the repo-root
+  // .claude-plugin/plugin.json by tests/version-sync.test.ts).
+  { name: 'dashi-channel', version: pkg.version },
   {
     capabilities: {
       tools: {},
@@ -513,7 +551,11 @@ const sessionInfoStore = new SessionInfoStore()
 // DM pane.
 const hudOwnerChatIds: ReadonlyArray<number | string> = resolveOwnerChatIds(config)
 const hudApi: HudTelegramApi = {
-  sendMessage: (chatId, text, opts) => telegramApi.sendMessage(chatId, text, opts),
+  // skipOutboundStamp (fix-loop-1 #6): a HUD pin (re)creation is an INTERNAL
+  // surface, not a report to the owner — it must never reset the heartbeat
+  // silence window, or a pin self-heal would silently starve the heartbeat.
+  sendMessage: (chatId, text, opts) =>
+    telegramApi.sendMessage(chatId, text, { ...opts, skipOutboundStamp: true }),
   editMessageText: (chatId, messageId, text, opts) =>
     telegramApi.editMessageText(chatId, messageId, text, opts),
   pinChatMessage: (chatId, messageId, opts) =>
@@ -524,11 +566,19 @@ const hudApi: HudTelegramApi = {
   unpinChatMessage: (chatId, messageId) =>
     bot.api.unpinChatMessage(chatId, messageId).then(() => undefined),
 }
+// The hosting Claude Code process's `--model` flag, read ONCE at boot. It is
+// the only place the `[1m]` window marker survives for models the API reports
+// bare (e.g. `claude-opus-5` served by `--model claude-opus-5[1m]`), so both the
+// pinned HUD and /status need it to show a 1M window instead of the table's 200k.
+const launchModelId = readLaunchModelId()
+log.info('launch model detected', { launch_model: launchModelId ?? '(none)' })
 const contextHud = new ContextHud({
   api: hudApi,
   log,
   sessionInfo: sessionInfoStore,
   windowTokens: resolveContextWindowTokens(config),
+  windowOverride: resolveContextWindowOverride(config),
+  ...(launchModelId !== undefined ? { launchModel: launchModelId } : {}),
   ownerChatIds: hudOwnerChatIds,
   stateDir: statePaths.root,
   enabled: resolveHudEnabled(config),
@@ -549,16 +599,23 @@ const progressReporter = new ProgressReporter({ telegramApi, config, log })
 // showing Claude's TodoWrite milestones. Independent of the two surfaces
 // above; uses the same safe-wrapped telegramApi so every text/edit goes
 // through redact + HTML validation before leaving the process.
-const taskMirror = new TaskMirror({ telegramApi, config, log })
+const taskMirror = new TaskMirror({ telegramApi, config, log, stateDir: statePaths.root })
+
+// Default pane target when tmux_mirror.pane_target is unset. Overridable via
+// JARVIS_PANE_TARGET (review 2026-07-09 SHOULD-fix: the hardcoded
+// `channel-thrall:0.0` fallback breaks on any other host); the historical
+// value stays the default — the canonical session for this plugin on Thrall.
+function resolveDefaultPaneTarget(): string {
+  return (process.env.JARVIS_PANE_TARGET ?? '').trim() || 'channel-thrall:0.0'
+}
 
 // TmuxMirror (2026-05-20) — read-only mirror of the agent's terminal pane
 // into ONE rolling Telegram message. Default-OFF in config; the warchief
 // opts in explicitly. When enabled without an explicit pane_target we
-// fall back to `channel-thrall:0.0` — the canonical session for this
-// plugin on Thrall VPS.
+// fall back to resolveDefaultPaneTarget().
 let tmuxMirror: TmuxMirror | null = null
 if (config.tmux_mirror.enabled) {
-  const target = config.tmux_mirror.pane_target || 'channel-thrall:0.0'
+  const target = config.tmux_mirror.pane_target || resolveDefaultPaneTarget()
   const mirrorChatId = String(config.allowed_chat_ids[0] ?? '')
   if (mirrorChatId === '') {
     log.warn('tmux mirror enabled but no allowed_chat_ids configured — skipping')
@@ -600,6 +657,72 @@ if (config.tmux_mirror.enabled) {
     process.once('SIGINT', shutdownMirror)
     process.once('SIGTERM', shutdownMirror)
   }
+}
+
+// Env gate for the M3 reconciler (behaviour-changing surface, off by default).
+// Accepts `1` / `true` / `yes` / `on` (case-insensitive).
+function resolveTaskReconcilerEnabled(): boolean {
+  const v = (process.env.JARVIS_TASK_RECONCILER ?? '').trim().toLowerCase()
+  return v === '1' || v === 'true' || v === 'yes' || v === 'on'
+}
+
+// TaskRealityMirror (M3, 2026-07-09) — reconciles the tool-event stream with
+// the REAL task list Claude Code renders in the tmux pane, so the context HUD
+// «Задачи» section and the TaskMirror message reflect reality even when the
+// agent forgets to call the task tools. Default-OFF: opt in with
+// JARVIS_TASK_RECONCILER=1 (behaviour-changing surface, warchief-gated, like
+// tmux_mirror). Reuses the tmux_mirror pane target/socket (the agent's task
+// list renders in that same pane) and captures a wider window (200 lines) so a
+// long list is always in view. Owner-DM-gated; each sink also gates internally.
+let taskRealityMirror: TaskRealityMirror | undefined
+if (resolveTaskReconcilerEnabled()) {
+  const paneTarget = config.tmux_mirror.pane_target || resolveDefaultPaneTarget()
+  const ownerSet = new Set(hudOwnerChatIds.map(String))
+  // Owner DM only (positive numeric chat id in the owner set) — the pane is the
+  // single global DM session; a group chat must never be reconciled or nudged.
+  const isReconcilerOwnerChat = (chatId: string): boolean => {
+    if (!ownerSet.has(chatId)) return false
+    const n = Number(chatId)
+    return Number.isInteger(n) && n > 0
+  }
+  // M4 mechanical liveness. Runs inside the reality-mirror loop (fed pane
+  // captures for the dead-man, evaluated each ~20s tick for heartbeat +
+  // open-question reminders). Reads the outbound clock + the autonomy registry
+  // (open questions ONLY, read-only — never lease TTLs); sends via the reliable
+  // api and edits the context pin via the HUD's heartbeat suffix.
+  const heartbeatMonitor = new HeartbeatMonitor({
+    log,
+    // skipOutboundStamp (fix-loop-1 #6): a heartbeat nudge / dead-man alert /
+    // question reminder is not a real report — it must not reset the very
+    // silence window it measures (the monitor rate-limits itself instead).
+    send: (chatId: string, text: string): Promise<void> =>
+      telegramApi.sendMessage(chatId, text, { skipOutboundStamp: true }).then(() => undefined),
+    pinHeartbeat: (chatId: string, suffix: string | null): Promise<void> =>
+      contextHud.setHeartbeatSuffix(chatId, suffix),
+    autonomyPaths: { root: statePaths.root },
+    lastOutboundAt: (chatId: string): number | undefined =>
+      outboundTracker.lastOutboundAt(chatId),
+    isOwnerChat: isReconcilerOwnerChat,
+  })
+  taskRealityMirror = new TaskRealityMirror({
+    exec: defaultTmuxExec,
+    capture: {
+      paneTarget,
+      ...(config.tmux_mirror.socket_name ? { socketName: config.tmux_mirror.socket_name } : {}),
+      lineCount: 200,
+    },
+    log,
+    sinks: [contextHud, taskMirror],
+    // Session-epoch persistence (active + tombstones) — survives restarts so
+    // late lifecycle stragglers can't roll the epoch back (review r3 #1).
+    stateDir: statePaths.root,
+    isOwnerChat: isReconcilerOwnerChat,
+    liveness: heartbeatMonitor,
+  })
+  log.info('task reality mirror configured', { pane_target: paneTarget })
+  const shutdownReality = (): void => taskRealityMirror?.stop()
+  process.once('SIGINT', shutdownReality)
+  process.once('SIGTERM', shutdownReality)
 }
 
 // InboundWatcher (PR-A3, 2026-05-20) — auto-reply «Тралл занят» when the
@@ -725,6 +848,11 @@ const askUserQuestionUi: AskUserQuestionUi = createAskUserQuestionUi({
   log,
   telegramApi,
   relay: askUserQuestionRelay,
+  // Autonomy M2: the state root for the lease/question registry. An affirmative
+  // tap on a `[LEASE: …]` card mints a lease here (behind the owner allowlist);
+  // a timed-out question is auto-registered. StatePaths is structurally an
+  // AutonomyPaths (both expose `root`).
+  autonomyPaths: statePaths,
 })
 askUserQuestionUiRef = askUserQuestionUi
 // Permission gate (2026-06-09): interactive Allow/Deny confirm relay for the
@@ -1274,6 +1402,9 @@ const handlerDeps: HandlerDeps = {
   ...(tmuxKeysTarget !== undefined ? { tmuxKeys: { target: tmuxKeysTarget } } : {}),
   // Session facts (transcript_path + model) for /status context usage.
   sessionInfo: sessionInfoStore,
+  // Launch `--model` flag — lets /status resolve a 1M window for models the
+  // transcript reports bare (see readLaunchModelId).
+  ...(launchModelId !== undefined ? { launchModel: launchModelId } : {}),
   // Multichat router + policy. Both must be present for handlers.ts to
   // take the router path; passing one without the other is a wiring bug
   // (handlers.ts treats the pair atomically).
@@ -1318,6 +1449,12 @@ bot.on('message:text', async ctx => {
   return handleInboundText(ctx, handlerDeps)
 })
 bot.on('message:photo', ctx => handleInboundPhoto(ctx, handlerDeps))
+// Animation (GIF) MUST come BEFORE document: Telegram sets the `document`
+// field on animation messages for backward compatibility, and a non-next()
+// handler stops the middleware chain — so registering animation first is what
+// lets a GIF get its own `<media kind="animation">` descriptor instead of
+// being swallowed by the document handler.
+bot.on('message:animation', ctx => handleInboundAnimation(ctx, handlerDeps))
 bot.on('message:document', ctx => handleInboundDocument(ctx, handlerDeps))
 bot.on('message:voice', ctx => handleInboundVoice(ctx, handlerDeps))
 bot.on('message:audio', ctx => handleInboundAudio(ctx, handlerDeps))
@@ -1467,6 +1604,7 @@ try {
     contextHud,
     progressReporter,
     taskMirror,
+    ...(taskRealityMirror !== undefined ? { taskRealityMirror } : {}),
     watcher: inboundWatcher,
     ...(memoryWriter !== undefined ? { memoryWriter } : {}),
     // PRX-1 TASK-3 (2026-05-27): AskUserQuestion HTTP relay routes.

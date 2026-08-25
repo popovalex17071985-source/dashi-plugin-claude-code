@@ -34,6 +34,8 @@ import type {
   EditOpts,
   SendDocumentOpts,
   SendMessageOpts,
+  SendRichMessageOpts,
+  SendRichMessageResult,
   TelegramApi,
 } from '../channel/tools.js'
 
@@ -109,7 +111,7 @@ interface Grammy429 {
 // error) can't lock a chat's FIFO queue for minutes on end. The per-chat
 // tail-promise chain blocks all subsequent sends to the same chat until the
 // in-flight op finishes, so worst-case stall = maxRetries × MAX_RETRY_AFTER_S.
-// With defaults (8 × 60s) that's an 8-minute ceiling; if Telegram really
+// With defaults (3 × 60s) that's a 3-minute ceiling; if Telegram really
 // needs longer, the bounded retries exhaust and the caller sees the 429.
 const MAX_RETRY_AFTER_S = 60
 
@@ -136,12 +138,7 @@ export function createRateLimitedTelegramApi(
     perChatBurstCapacity: opts.perChatBurstCapacity ?? 3,
     globalRefillPerSec: opts.globalRefillPerSec ?? 25,
     globalBurstCapacity: opts.globalBurstCapacity ?? 25,
-    // 8 attempts × up to MAX_RETRY_AFTER_S(60s) each ≈ 8min of patience: enough
-    // to outlast Telegram's flood-control window (retry_after seen up to ~300s
-    // after a burst), so a reply/fallback EVENTUALLY lands instead of dropping
-    // at 3 attempts. Trade-off: a flooded chat's queue stalls longer (delivery
-    // over latency — for a low-volume DM that's the right call).
-    maxRetries: opts.maxRetries ?? 8,
+    maxRetries: opts.maxRetries ?? 3,
     jitterMaxMs: opts.jitterMaxMs ?? 150,
   }
   const now = opts.now ?? ((): number => Date.now())
@@ -242,6 +239,18 @@ export function createRateLimitedTelegramApi(
       sendOpts: SendMessageOpts,
     ): Promise<{ message_id: number }> {
       return enqueueSend(chatId, () => raw.sendMessage(chatId, text, sendOpts))
+    },
+
+    // Rich messages consume the same per-chat send budget as a normal
+    // sendMessage (one outbound bubble), so they route through the identical
+    // FIFO + token-bucket + 429-retry path. Ordering with sibling sends to
+    // the same chat is preserved.
+    async sendRichMessage(
+      chatId: string,
+      rawMarkdown: string,
+      richOpts: SendRichMessageOpts,
+    ): Promise<SendRichMessageResult> {
+      return enqueueSend(chatId, () => raw.sendRichMessage(chatId, rawMarkdown, richOpts))
     },
 
     async editMessageText(

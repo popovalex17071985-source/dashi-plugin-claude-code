@@ -48,7 +48,6 @@ import {
   type RecoveredAlbum,
 } from '../../src/telegram/album-persistence.js'
 import type { AppConfig, StatePaths } from '../../src/config.js'
-import { makeConfig as makeSharedConfig } from '../helpers/config.js'
 import { createLogger } from '../../src/log.js'
 import type { TelegramApi } from '../../src/channel/tools.js'
 import type { BotIdentity } from '../../src/prompt/build.js'
@@ -65,19 +64,51 @@ const silentLog = createLogger('test', {
 // Test scaffolding — mirrors handlers.test.ts patterns
 // ─────────────────────────────────────────────────────────────────────
 
-// Album suite uses a two-id allowlist, fast album flush (50ms), and the
-// status bubble + watcher OFF — local defaults baked over the shared fixture.
 function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
-  const base = makeSharedConfig()
   return {
-    ...base,
+    bot_id: 8507713167,
+    dm_only: true,
     allowed_user_ids: [164795011, 164795012],
     allowed_chat_ids: [164795011, 164795012],
-    status: { ...base.status, enabled: false },
+    status: {
+      enabled: false,
+      interval_ms: 700,
+      ttl_ms: 300_000,
+      delete_on_complete: true,
+      suppress_typing_bubble: false,
+    },
     album: { flush_ms: 50 },
-    watcher: { ...base.watcher, enabled: false },
+    voice: { provider: 'groq', language: 'ru', model: 'whisper-large-v3-turbo' },
+    webhook: { enabled: false, host: '127.0.0.1', port: 0 },
+    permission_relay: { enabled: true, allowed_user_ids: [164795011], bash_only_proof: true },
+    commands: { help: true, status: true, stop: true, reset: true, new: true },
+    memory: {
+      enabled: false,
+      source_tag: 'tg',
+      max_hot_bytes: 20480,
+      trim_keep_lines: 600,
+      buffer_ttl_ms: 5 * 60 * 1000,
+      buffer_max_entries: 100,
+    },
+    progress: {
+      enabled: true,
+      edit_throttle_ms: 3000,
+      recent_buffer: 10,
+      session_ttl_ms: 600000,
+    },
+    task_mirror: {
+      enabled: true,
+      edit_throttle_ms: 3000,
+      session_ttl_ms: 600000,
+      collapse_completed_after: 5,
+    },
+    watcher: {
+      enabled: false,
+      debounce_ms: 10_000,
+      busy_threshold_ms: 30_000,
+    },
     ...overrides,
-  }
+  } as unknown as AppConfig
 }
 
 function makeStatePaths(): StatePaths {
@@ -94,6 +125,7 @@ function makeStatePaths(): StatePaths {
     sessionIds: join(root, 'session-ids'),
     deadLetterUpdates: join(root, 'dead-letter', 'updates'),
     deadLetterWebhook: join(root, 'dead-letter', 'webhook'),
+    deadLetterOutbound: join(root, 'dead-letter', 'outbound'),
     logs: {
       server: join(root, 'logs', 'server.log'),
       telegram: join(root, 'logs', 'telegram.log'),
@@ -128,6 +160,7 @@ function makeTelegramApi(): TelegramApi {
   }
   return {
     sendMessage: noop as unknown as TelegramApi['sendMessage'],
+    sendRichMessage: noop as unknown as TelegramApi['sendRichMessage'],
     editMessageText: noop as unknown as TelegramApi['editMessageText'],
     setMessageReaction: async () => undefined,
     sendChatAction: async () => undefined,

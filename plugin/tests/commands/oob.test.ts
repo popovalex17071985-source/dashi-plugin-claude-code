@@ -5,8 +5,68 @@ import {
   parseOobCommand,
   type OobContext,
 } from '../../src/commands/oob.js'
+import type { AppConfig } from '../../src/config.js'
+import type { Logger } from '../../src/log.js'
 import type { TelegramApi } from '../../src/channel/tools.js'
-import { makeConfig, makeLogger } from '../helpers/config.js'
+
+function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
+  return {
+    bot_id: 8507713167,
+    dm_only: true,
+    allowed_user_ids: [164795011],
+    allowed_chat_ids: [164795011],
+    status: { enabled: true, interval_ms: 700, ttl_ms: 300_000, delete_on_complete: true, suppress_typing_bubble: false },
+    album: { flush_ms: 2000 },
+    voice: { provider: 'groq', language: 'ru', model: 'whisper-large-v3-turbo' },
+    webhook: { enabled: false, host: '127.0.0.1', port: 0 },
+    permission_relay: {
+      enabled: true,
+      allowed_user_ids: [164795011],
+      bash_only_proof: true,
+    },
+    commands: { help: true, status: true, stop: true, reset: true, new: true },
+    memory: {
+      enabled: false,
+      source_tag: 'tg',
+      max_hot_bytes: 20480,
+      trim_keep_lines: 600,
+      buffer_ttl_ms: 5 * 60 * 1000,
+      buffer_max_entries: 100,
+    },
+    progress: {
+      enabled: true,
+      edit_throttle_ms: 3000,
+      recent_buffer: 10,
+      session_ttl_ms: 600000,
+    },
+    task_mirror: {
+      enabled: true,
+      edit_throttle_ms: 3000,
+      session_ttl_ms: 600000,
+      collapse_completed_after: 5,
+    },
+    watcher: {
+      enabled: true,
+      debounce_ms: 10_000,
+      busy_threshold_ms: 30_000,
+    },
+    tmux_mirror: { enabled: false, pane_target: '', socket_name: '', poll_interval_ms: 5000, line_count: 50, hide_segments: ['boot_banner', 'inbound_warning', 'footer_hints', 'input_box'], mode: 'latest_inbound_only', max_lines: 14 },
+    multichat: { enabled: false },
+    ask_user_question: { enabled: false, timeout_ms: 300_000, max_preview_chars: 1000 },
+    permission_gate: { enabled: false, timeout_ms: 120_000 },
+    richMessages: { enabled: false, perChatOptOut: [] },
+    ...overrides,
+  }
+}
+
+function makeLogger(): Logger {
+  return {
+    debug: () => {},
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+  }
+}
 
 function makeTelegramApi(): TelegramApi {
   // /help and /status tests don't actually invoke handleOobCommand's side
@@ -20,6 +80,7 @@ function makeTelegramApi(): TelegramApi {
   }
   return {
     sendMessage: fail('sendMessage') as TelegramApi['sendMessage'],
+    sendRichMessage: fail('sendRichMessage') as unknown as TelegramApi['sendRichMessage'],
     editMessageText: fail('editMessageText') as TelegramApi['editMessageText'],
     setMessageReaction: fail(
       'setMessageReaction',
@@ -336,6 +397,69 @@ describe('/status context line', () => {
     const parsed = parseOobCommand('/status')!
     const result = await handleOobCommand(parsed, makeCtx())
     expect(result.replyToTelegram!.text).toContain('контекст: <code>—</code>')
+  })
+
+  // Parity with the pinned HUD: a Fable transcript resolves the 1M window
+  // model-aware, not the 200k default fallback carried in contextWindowTokens.
+  test('Fable transcript → model-aware 1M window (HUD parity)', async () => {
+    const { writeFileSync, mkdtempSync } = await import('node:fs')
+    const { join } = await import('node:path')
+    const { tmpdir } = await import('node:os')
+    const dir = mkdtempSync(join(tmpdir(), 'oob-status-fable-'))
+    const transcript = join(dir, 's.jsonl')
+    // input 100000 + cache_read 51000 = 151000 tokens, model claude-fable-5.
+    writeFileSync(
+      transcript,
+      JSON.stringify({
+        isSidechain: false,
+        message: {
+          role: 'assistant',
+          model: 'claude-fable-5',
+          usage: { input_tokens: 100000, cache_read_input_tokens: 51000 },
+        },
+      }) + '\n',
+    )
+    const parsed = parseOobCommand('/status')!
+    const result = await handleOobCommand(
+      parsed,
+      // contextWindowTokens = 200k default (no operator override) → the Fable
+      // model must lift the denominator to 1M, matching the HUD.
+      makeCtx({ transcriptPath: transcript, contextWindowTokens: 200000 }),
+    )
+    const text = result.replyToTelegram!.text
+    expect(text).toContain('151k / 1M (15%)')
+    expect(text).not.toContain('/ 200k')
+  })
+
+  // The explicit operator override still wins over the transcript model.
+  test('operator override wins over the transcript model', async () => {
+    const { writeFileSync, mkdtempSync } = await import('node:fs')
+    const { join } = await import('node:path')
+    const { tmpdir } = await import('node:os')
+    const dir = mkdtempSync(join(tmpdir(), 'oob-status-ovr-'))
+    const transcript = join(dir, 's.jsonl')
+    writeFileSync(
+      transcript,
+      JSON.stringify({
+        isSidechain: false,
+        message: {
+          role: 'assistant',
+          model: 'claude-fable-5',
+          usage: { input_tokens: 150000 },
+        },
+      }) + '\n',
+    )
+    const parsed = parseOobCommand('/status')!
+    const result = await handleOobCommand(
+      parsed,
+      makeCtx({
+        transcriptPath: transcript,
+        contextWindowTokens: 300000,
+        contextWindowOverride: 300000,
+      }),
+    )
+    const text = result.replyToTelegram!.text
+    expect(text).toContain('150k / 300k (50%)') // override 300k beats Fable 1M
   })
 })
 

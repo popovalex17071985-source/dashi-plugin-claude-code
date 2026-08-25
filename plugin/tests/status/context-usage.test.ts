@@ -6,15 +6,19 @@ import { describe, expect, test } from 'bun:test'
 import {
   computeContextUsage,
   formatContextUsage,
+  formatWindowTokens,
 } from '../../src/status/context-usage.js'
 
 // Build one transcript line. `isSidechain` defaults to false (main thread).
+// `model` (when set) lands on `message.model`, mirroring a real Claude Code
+// assistant line ("claude-fable-5" etc.).
 function assistantLine(
   usage: Record<string, number> | null,
-  opts: { isSidechain?: boolean } = {},
+  opts: { isSidechain?: boolean; model?: unknown } = {},
 ): string {
   const message: Record<string, unknown> = { role: 'assistant', content: [] }
   if (usage !== null) message.usage = usage
+  if ('model' in opts) message.model = opts.model
   return JSON.stringify({
     type: 'assistant',
     isSidechain: opts.isSidechain ?? false,
@@ -161,6 +165,97 @@ describe('computeContextUsage', () => {
     const lines = [assistantLine({ input_tokens: 0 }), assistantLine({ input_tokens: 0 })]
     expect(computeContextUsage(lines, 200000)).toBeNull()
   })
+
+  // Model capture: hook payloads carry no model, so the transcript is the HUD's
+  // only source of the true context window (Fable = 1M).
+  test('model comes from the last usable assistant line', () => {
+    const lines = [
+      assistantLine({ input_tokens: 10, cache_read_input_tokens: 50000 }, {
+        model: 'claude-fable-5',
+      }),
+    ]
+    const result = computeContextUsage(lines, 1_000_000)
+    expect(result).toEqual({
+      usedTokens: 50010,
+      pct: 50010 / 1_000_000,
+      model: 'claude-fable-5',
+    })
+  })
+
+  test('model absent → undefined (field never set)', () => {
+    const lines = [assistantLine({ input_tokens: 50000 })]
+    const result = computeContextUsage(lines, 200000)
+    expect(result).toEqual({ usedTokens: 50000, pct: 50000 / 200000 })
+    expect(result?.model).toBeUndefined()
+  })
+
+  test('model empty string → undefined', () => {
+    const lines = [assistantLine({ input_tokens: 50000 }, { model: '' })]
+    expect(computeContextUsage(lines, 200000)?.model).toBeUndefined()
+  })
+
+  test('model non-string (e.g. number) → undefined', () => {
+    const lines = [assistantLine({ input_tokens: 50000 }, { model: 42 })]
+    expect(computeContextUsage(lines, 200000)?.model).toBeUndefined()
+  })
+
+  test('model comes from the LATEST usable turn, not an earlier one', () => {
+    const lines = [
+      assistantLine({ input_tokens: 1, cache_read_input_tokens: 10000 }, { model: 'opus' }),
+      assistantLine({ input_tokens: 2, cache_read_input_tokens: 20000 }, {
+        model: 'claude-fable-5',
+      }),
+    ]
+    expect(computeContextUsage(lines, 200000)?.model).toBe('claude-fable-5')
+  })
+
+  test('sidechain line carrying a model is still skipped (no leak of subagent model)', () => {
+    const lines = [
+      assistantLine({ input_tokens: 5, cache_read_input_tokens: 40000 }, { model: 'opus' }), // main
+      assistantLine({ input_tokens: 900, cache_read_input_tokens: 900 }, {
+        isSidechain: true,
+        model: 'claude-fable-5',
+      }),
+    ]
+    const result = computeContextUsage(lines, 200000)
+    expect(result?.usedTokens).toBe(40005)
+    expect(result?.model).toBe('opus')
+  })
+
+  test('model is NOT scavenged from a different line when the usable turn lacks it', () => {
+    const lines = [
+      assistantLine({ input_tokens: 1, cache_read_input_tokens: 10000 }, {
+        model: 'claude-fable-5',
+      }), // earlier, has model
+      assistantLine({ input_tokens: 2, cache_read_input_tokens: 20000 }), // latest usable, NO model
+    ]
+    // The latest usable turn wins and it has no model — do not borrow from the
+    // earlier line.
+    expect(computeContextUsage(lines, 200000)?.model).toBeUndefined()
+  })
+
+  // Sanitization: a malformed line can carry a garbage model field. Trim it,
+  // cap the length, drop whitespace-only — never truncate-and-use a giant value.
+  test('whitespace-only model → undefined', () => {
+    const lines = [assistantLine({ input_tokens: 50000 }, { model: '   \t \n ' })]
+    expect(computeContextUsage(lines, 200000)?.model).toBeUndefined()
+  })
+
+  test('over-cap (>100-char) model → undefined (garbage line, not a model)', () => {
+    const lines = [assistantLine({ input_tokens: 50000 }, { model: 'x'.repeat(101) })]
+    expect(computeContextUsage(lines, 200000)?.model).toBeUndefined()
+  })
+
+  test('exactly-100-char model → kept (boundary)', () => {
+    const id = 'y'.repeat(100)
+    const lines = [assistantLine({ input_tokens: 50000 }, { model: id })]
+    expect(computeContextUsage(lines, 200000)?.model).toBe(id)
+  })
+
+  test('model with surrounding whitespace → trimmed value', () => {
+    const lines = [assistantLine({ input_tokens: 50000 }, { model: '  claude-fable-5 \n' })]
+    expect(computeContextUsage(lines, 200000)?.model).toBe('claude-fable-5')
+  })
 })
 
 // ─────────────────────────────────────────────────────────────────────
@@ -196,6 +291,41 @@ describe('readContextUsage (file tail)', () => {
     const { readContextUsage } = await import('../../src/status/context-usage.js')
     expect(await readContextUsage('/no/such/transcript.jsonl', 200000)).toBeNull()
   })
+
+  // Integration: exercise the full file-I/O path (not just computeContextUsage)
+  // with a realistic multi-line fixture — a malformed partial FIRST line the
+  // parser must skip, the true main-thread turn (usage + Fable model), a
+  // trailing zero-usage synthetic turn, and a sidechain line with a DIFFERENT
+  // model that must not leak. readContextUsage must return the Fable model and
+  // the main turn's usedTokens.
+  test('resolves the Fable model + used tokens through the real read path', async () => {
+    const { writeFileSync, mkdtempSync, rmSync } = await import('node:fs')
+    const { join } = await import('node:path')
+    const { tmpdir } = await import('node:os')
+    const { readContextUsage } = await import('../../src/status/context-usage.js')
+    const dir = mkdtempSync(join(tmpdir(), 'ctxusage-it-'))
+    try {
+      const p = join(dir, 's.jsonl')
+      const fixture = [
+        '{"type":"assistant","isSidechain":false,"message":{"role":"assist', // malformed partial first line
+        assistantLine(
+          { input_tokens: 120000, cache_read_input_tokens: 10000 },
+          { model: 'claude-fable-5' },
+        ), // the true main-thread turn
+        assistantLine({ input_tokens: 0 }, { model: 'claude-opus-4-8' }), // 0-sum synthetic → skipped
+        assistantLine(
+          { input_tokens: 5, cache_read_input_tokens: 99999 },
+          { isSidechain: true, model: 'claude-opus-4-8' },
+        ), // sidechain → skipped, model must not leak
+      ].join('\n')
+      writeFileSync(p, fixture + '\n')
+      const usage = await readContextUsage(p, 200000)
+      expect(usage?.usedTokens).toBe(130000)
+      expect(usage?.model).toBe('claude-fable-5')
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
 })
 
 describe('formatContextUsage', () => {
@@ -214,5 +344,25 @@ describe('formatContextUsage', () => {
 
   test('windowTokens <= 0 → 0%', () => {
     expect(formatContextUsage({ usedTokens: 50000 }, 0)).toBe('50k / 0k (0%)')
+  })
+
+  test('1M window renders «1M» denominator (not 1000k)', () => {
+    // 151k of a 1M window ≈ 15%.
+    expect(formatContextUsage({ usedTokens: 151000 }, 1_000_000)).toBe('151k / 1M (15%)')
+  })
+})
+
+describe('formatWindowTokens', () => {
+  test('historical 200k window stays «200k»', () => {
+    expect(formatWindowTokens(200_000)).toBe('200k')
+  })
+
+  test('whole millions render as «M»', () => {
+    expect(formatWindowTokens(1_000_000)).toBe('1M')
+    expect(formatWindowTokens(2_000_000)).toBe('2M')
+  })
+
+  test('non-whole-million large window falls back to «k»', () => {
+    expect(formatWindowTokens(1_500_000)).toBe('1500k')
   })
 })

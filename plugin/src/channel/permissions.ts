@@ -73,7 +73,15 @@ export function registerPermissionRelay(
 ): void {
   const { config, telegramApi, log } = deps
 
-  server.setNotificationHandler(PermissionRequestNotificationSchema, async ({ params }) => {
+  // TS2589 workaround (merge 2026-08-25): SDK 1.30's generic overload of
+  // setNotificationHandler × the grown AppConfig pushes zod inference past the
+  // depth cap. Pinning the concrete signature skips the generic instantiation;
+  // runtime behaviour is identical.
+  const register = server.setNotificationHandler.bind(server) as (
+    schema: typeof PermissionRequestNotificationSchema,
+    handler: (n: z.infer<typeof PermissionRequestNotificationSchema>) => Promise<void>,
+  ) => void
+  register(PermissionRequestNotificationSchema, async ({ params }) => {
     const { request_id, tool_name, description, input_preview } = params
     pending.set(request_id, {
       toolName: tool_name,

@@ -214,6 +214,7 @@ function makeTelegramApi(): TelegramApi {
   }
   return {
     sendMessage: fail('sendMessage') as TelegramApi['sendMessage'],
+    sendRichMessage: fail('sendRichMessage') as TelegramApi['sendRichMessage'],
     editMessageText: fail('editMessageText') as TelegramApi['editMessageText'],
     setMessageReaction: fail('setMessageReaction') as TelegramApi['setMessageReaction'],
     sendChatAction: fail('sendChatAction') as TelegramApi['sendChatAction'],

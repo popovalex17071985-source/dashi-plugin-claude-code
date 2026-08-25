@@ -5,13 +5,6 @@
       "args": [
         "./src/server.ts"
       ]
-    },
-    "edgelab-space": {
-      "type": "http",
-      "url": "https://mcp.edgelab.space/mcp",
-      "headers": {
-        "Authorization": "Bearer ${EDGELABSPACE_KEY}"
-      }
     }
   }
 }
