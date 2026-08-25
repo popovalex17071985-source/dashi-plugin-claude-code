@@ -17,6 +17,7 @@
 #   ... --openai-key sk-...                  # + семантическая память OpenViking (docker)
 #   ... --branch feature/x                   # staging-агент: обновляется с feature-ветки, не с main
 #   ... --claude-token sk-ant-oat01-...      # готовый годовой токен (claude setup-token на любой машине)
+#   ... --repair-token 123:BB...             # бот-ремонтник: страховка на случай «агент лёг и молчит»
 #
 set -euo pipefail
 
@@ -28,7 +29,7 @@ REPO_URL="${DASHI_REPO_URL:-https://github.com/popovalex17071985-source/dashi-pl
 BRANCH="${DASHI_BRANCH:-main}"
 SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
 
-AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; ASSUME_YES=0
+AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; REPAIR_TOKEN=""; ASSUME_YES=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
@@ -37,7 +38,7 @@ die()  { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 warn() { printf '    \033[33m! %s\033[0m\n' "$*"; }
 
 usage() {
-  sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
   exit 0
 }
 
@@ -49,6 +50,7 @@ while [[ $# -gt 0 ]]; do
     --groq-key)  GROQ_KEY="$2";   shift 2 ;;
     --openai-key) OPENAI_KEY="$2"; shift 2 ;;   # включает семантическую память OpenViking
     --claude-token) CLAUDE_TOKEN="$2"; shift 2 ;; # годовой токен из `claude setup-token`
+    --repair-token) REPAIR_TOKEN="$2"; shift 2 ;; # бот-ремонтник (страховка, ещё один /newbot)
     --user)      SERVICE_USER="$2"; shift 2 ;;
     --repo)      REPO_URL="$2";   shift 2 ;;
     --branch)    BRANCH="$2";     shift 2 ;;   # main (по умолчанию) | feature-ветка для staging
@@ -901,6 +903,83 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 # 10. Поднимаем
 # ─────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# 9b. Ремонтник — бот-страховка на случай «агент лёг и молчит» (опция)
+# ─────────────────────────────────────────────────────────────────────────────
+# Отдельный простой бот (pip claude-code-telegram) со СВОИМ токеном BotFather:
+# живёт отдельным процессом вне tmux-моста, поэтому переживает смерть агента.
+# Через него хозяин руками чинит сервер: «перезапусти агента», «покажи логи».
+# Права — те же, что у агента (sudo только на dashi-ctl-<имя>). Списан с живого
+# Томми/Richard (/opt/richard, claude-richard.service).
+say "Ремонтник (бот-страховка)"
+[[ -z "$REPAIR_TOKEN" || "$REPAIR_TOKEN" =~ ^[0-9]+:[A-Za-z0-9_-]+$ ]] \
+  || die "--repair-token не похож на токен бота (жду 123456:AA...)"
+if [[ -n "$REPAIR_TOKEN" && "$REPAIR_TOKEN" == "$BOT_TOKEN" ]]; then
+  die "ремонтнику нужен СВОЙ бот — два процесса на одном токене дерутся за поллинг"
+fi
+R_DIR="/opt/repair-$AGENT_NAME"
+R_UNIT="claude-repair-$AGENT_NAME"
+if [[ -z "$REPAIR_TOKEN" && ! -s "$R_DIR/.env" ]]; then
+  skip "без ремонтника (повторный прогон с --repair-token TOKEN включит; токен = ещё один /newbot)"
+else
+  if [[ ! -x "$R_DIR/venv/bin/claude-telegram-bot" ]]; then
+    apt-get install -y -qq python3-venv >/dev/null 2>&1 || true
+    python3 -m venv "$R_DIR/venv" \
+      && "$R_DIR/venv/bin/pip" install -q claude-code-telegram >/dev/null 2>&1 \
+      || die "не встал claude-code-telegram — проверь сеть и повтори"
+  fi
+  if [[ -n "$REPAIR_TOKEN" ]]; then
+    R_USERNAME="$(curl -sm 10 "https://api.telegram.org/bot$REPAIR_TOKEN/getMe" \
+      | grep -o '"username":"[^"]*"' | cut -d'"' -f4 || true)"
+    # Годовой токен Claude — тот же, что у агента: ремонтник тоже говорит с Claude
+    R_CLAUDE_TOKEN="$(sed -n 's/^CLAUDE_CODE_OAUTH_TOKEN=//p' "$ENV_FILE" | head -1)"
+    cat > "$R_DIR/.env" <<EOF
+# Ремонтник $AGENT_NAME — создан install-agent.sh (образец: Richard v3)
+TELEGRAM_BOT_TOKEN=$REPAIR_TOKEN
+TELEGRAM_BOT_USERNAME=$R_USERNAME
+USE_SDK=true
+CLAUDE_CLI_PATH=
+ALLOWED_USERS=$USER_ID
+APPROVED_DIRECTORY=/home/$SERVICE_USER
+CLAUDE_CODE_OAUTH_TOKEN=$R_CLAUDE_TOKEN
+ENVIRONMENT=production
+DEVELOPMENT_MODE=false
+DISABLE_TOOL_VALIDATION=false
+ENABLE_MCP=false
+CLAUDE_ALLOWED_TOOLS=Read,Write,Edit,Bash,Glob,Grep,LS,Task,WebFetch,WebSearch
+EOF
+    chown "$SERVICE_USER:$SERVICE_USER" "$R_DIR/.env"; chmod 600 "$R_DIR/.env"
+  fi
+  chown -R "$SERVICE_USER:$SERVICE_USER" "$R_DIR"
+  cat > "/etc/systemd/system/$R_UNIT.service" <<EOF
+[Unit]
+Description=Repair bot for $AGENT_NAME (safety net, claude-code-telegram)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=$SERVICE_USER
+Group=$SERVICE_USER
+WorkingDirectory=$R_DIR
+EnvironmentFile=$R_DIR/.env
+Environment=HOME=$HOME_DIR
+Environment=PATH=$HOME_DIR/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=$R_DIR/venv/bin/claude-telegram-bot
+Restart=on-failure
+RestartSec=10
+SyslogIdentifier=$R_UNIT
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  systemctl daemon-reload
+  systemctl enable --now "$R_UNIT" >/dev/null 2>&1 || true
+  systemctl is-active --quiet "$R_UNIT" \
+    && ok "ремонтник поднят (юнит $R_UNIT)" \
+    || warn "ремонтник не стартовал — journalctl -u $R_UNIT -n 30"
+fi
+
 say "Запуск"
 # Токен только что записан, а сервис уже крутился — перезапуск, чтобы Claude
 # подхватил CLAUDE_CODE_OAUTH_TOKEN из окружения
