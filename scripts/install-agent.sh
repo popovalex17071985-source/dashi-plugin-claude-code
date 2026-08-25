@@ -923,9 +923,16 @@ if [[ -z "$REPAIR_TOKEN" && ! -s "$R_DIR/.env" ]]; then
   skip "без ремонтника (повторный прогон с --repair-token TOKEN включит; токен = ещё один /newbot)"
 else
   if [[ ! -x "$R_DIR/venv/bin/claude-telegram-bot" ]]; then
-    apt-get install -y -qq python3-venv >/dev/null 2>&1 || true
-    python3 -m venv "$R_DIR/venv" \
-      && "$R_DIR/venv/bin/pip" install -q claude-code-telegram >/dev/null 2>&1 \
+    apt-get install -y -qq git >/dev/null 2>&1 || true
+    # Пакет живёт на GitHub (не в PyPI) и требует Python >=3.11, а на Ubuntu 22.04
+    # системный 3.10 — uv приносит свой CPython и не трогает системный
+    command -v uv >/dev/null 2>&1 \
+      || curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh >/dev/null 2>&1 \
+      || die "не встал uv — проверь сеть и повтори"
+    # Коммит запинен: ровно тот, что месяцами работает у живого Томми/Richard
+    uv venv "$R_DIR/venv" --python 3.12 >/dev/null 2>&1 \
+      && uv pip install --python "$R_DIR/venv/bin/python" -q \
+           'git+https://github.com/RichardAtCT/claude-code-telegram@4c63df52c5767f03c5031f8f9f956485a4d9eda5' \
       || die "не встал claude-code-telegram — проверь сеть и повтори"
   fi
   if [[ -n "$REPAIR_TOKEN" ]]; then
