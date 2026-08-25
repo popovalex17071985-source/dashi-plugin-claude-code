@@ -474,7 +474,9 @@ for _ in $(seq 1 40); do
     tmux send-keys -t "$SESSION" Down
     sleep 1
     tmux send-keys -t "$SESSION" Enter
-  elif grep -qE "development channels|Do you trust|Enter to confirm" <<<"$screen"; then
+  # Онбординг (выбор темы и пр.) раньше проходил человек при ручном логине;
+  # с годовым токеном логина нет — экраны всплывают при первом старте сервиса
+  elif grep -qE "development channels|Do you trust|Enter to confirm|Light mode|Dark mode|text style|Syntax theme" <<<"$screen"; then
     tmux send-keys -t "$SESSION" Enter
   elif grep -q "bypass permissions on" <<<"$screen"; then
     exit 0  # диалоги пройдены, Claude работает
