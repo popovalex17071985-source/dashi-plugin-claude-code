@@ -547,12 +547,20 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
   # Утренняя сводка открытых дел хозяину: секция = отдельное сообщение,
   # длинная режется по границам строк (Telegram рубит на 4096).
   DIGEST="0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
+  # Советник по обновлениям: сам сообщает, что вышло нового, и напоминает
+  # про /update. Без него агент молчит, пока хозяин не догадается спросить.
+  NOTIFY="10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
   if as_agent "crontab -l 2>/dev/null | grep -q promise-sweeper"; then
     skip "будильник по срокам уже в кроне"
   else
-    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST') | crontab -" \
-      && ok "будильник и сводка в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
+    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST'; echo '$NOTIFY') | crontab -" \
+      && ok "будильник, сводка и советник по обновлениям в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
       || warn "не смог прописать крон — поставь руками"
+  fi
+  # Догоняем агентов, поднятых до появления советника: сводка уже в кроне, а его нет.
+  if as_agent "crontab -l 2>/dev/null | grep -q update-notify"; then :; else
+    as_agent "(crontab -l 2>/dev/null; echo '$NOTIFY') | crontab -" \
+      && ok "советник по обновлениям добавлен в крон" || true
   fi
   ok "комплект разложен: конституция, гейты, реестры, помощники"
 else

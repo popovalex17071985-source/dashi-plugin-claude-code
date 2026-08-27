@@ -100,4 +100,28 @@ settings.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 print(f"  хуков зарегистрировано: {added} (уже стояло: {len(WIRING) - added})")
 PY
 
+# Советник по обновлениям в кроне. Установщик ставит его при первой установке;
+# здесь — чтобы он доехал и до агентов, поднятых раньше: этот скрипт гоняется
+# на каждом /update, а шаг установщика — нет. Час берём тот же, что у утренней
+# сводки (он уже посчитан по поясу хозяина), иначе 07:00 по серверу.
+# KIT_NO_CRON=1 — раскладка без правки крона (песочница, тесты): иначе прогон
+# теста переписал бы боевой крон пользователя.
+CRON_NOW="$(crontab -l 2>/dev/null || true)"
+[ -n "${KIT_NO_CRON:-}" ] && CRON_NOW="update-notify (пропущено: KIT_NO_CRON)"
+case "$CRON_NOW" in
+  *update-notify*) ;;
+  *)
+    H="$(printf '%s\n' "$CRON_NOW" | sed -n 's/^0 \([0-9]*\) .*open-threads-digest.*/\1/p' | head -1)"
+    case "$H" in ''|*[!0-9]*) H=7 ;; esac
+    CT_TMP="$(mktemp)"
+    printf '%s\n10 %s * * * /bin/bash %s/bin/update-notify.sh >> %s/logs/update-notify.log 2>&1\n' \
+      "$CRON_NOW" "$H" "$WORKSPACE" "$WORKSPACE" > "$CT_TMP"
+    if crontab "$CT_TMP"; then
+      echo "  советник по обновлениям в кроне (${H}:10 по серверу)"
+    else
+      echo "  крон советника прописать не смог — поставь руками"
+    fi
+    rm -f "$CT_TMP" ;;
+esac
+
 echo "  комплект разложен в $CLAUDE_DIR"
