@@ -98,8 +98,12 @@ if [[ ! -f "$ENV_FILE" ]]; then
   [[ "$BOT_TOKEN" =~ ^[0-9]+:[A-Za-z0-9_-]+$ ]] || die "токен не похож на настоящий (ожидаю 123456:AA...)"
   [[ -n "$USER_ID" ]] || ask USER_ID "Твой Telegram id от @userinfobot: "
   [[ "$USER_ID" =~ ^-?[0-9]+$ ]] || die "id должен быть числом: $USER_ID"
-  [[ -n "$GROQ_KEY" ]] || ask GROQ_KEY "Ключ Groq для голосовых (Enter — пропустить): " 0
-  [[ -n "$OPENAI_KEY" ]] || ask OPENAI_KEY "Ключ OpenAI для семантической памяти OpenViking (Enter — без неё): " 0
+  # При -y необязательные ключи не спрашиваем: в неинтерактивном прогоне
+  # (cloud-init, CI) /dev/tty нет, и ask() сыпал ошибками в лог
+  if [[ $ASSUME_YES -eq 0 ]]; then
+    [[ -n "$GROQ_KEY" ]] || ask GROQ_KEY "Ключ Groq для голосовых (Enter — пропустить): " 0
+    [[ -n "$OPENAI_KEY" ]] || ask OPENAI_KEY "Ключ OpenAI для семантической памяти OpenViking (Enter — без неё): " 0
+  fi
 else
   # Повторный прогон: id нужен ниже для хуков, берём из готового конфига,
   # иначе хуки встанут с пустым chat-id и прогресс-пузырёк уедет в никуда.
@@ -706,11 +710,28 @@ SHELL=/bin/bash
 EOF
   chmod 644 "/etc/cron.d/dashi-$AGENT_NAME-backup"
   ok "бэкап включён (ежедневно 03:40, локально в $WORKSPACE/backups)"
+  # rclone ставим ВСЕГДА: без него облачная копия невозможна в принципе, а
+  # хозяин узнавал об этом уже после смерти сервера (Саня 27.08.2026).
+  command -v rclone >/dev/null 2>&1 || apt-get install -y -qq rclone >/dev/null 2>&1 || true
   if as_agent "command -v rclone >/dev/null 2>&1 && rclone listremotes 2>/dev/null | grep -q ."; then
     ok "rclone-remote найден — копия уедет off-site автоматически"
   else
-    warn "off-site не настроен: бэкап пока ТОЛЬКО локальный (смерть VPS не переживёт)."
-    warn "Подключить облако: под юзером $SERVICE_USER выполнить 'rclone config' (remote 'gdrive')."
+    warn "off-site НЕ настроен: копия лежит на этом же сервере и умрёт вместе с ним."
+    cat <<EOF
+
+    Подключить Google Drive (10 минут, вход в гугл требует браузера):
+      1) на своём компьютере открой ВТОРОЙ терминал и зайди на сервер с пробросом:
+           ssh -L 53682:localhost:53682 root@<ip-сервера>
+      2) в нём выполни:
+           sudo -u $SERVICE_USER rclone authorize "drive"
+      3) появившуюся ссылку открой в браузере, разреши доступ — rclone напечатает
+         строку токена вида {"access_token":...}
+      4) подставь её сюда целиком, в кавычках:
+           sudo -u $SERVICE_USER rclone config create gdrive drive token '<строка>'
+      5) проверь: sudo -u $SERVICE_USER rclone lsd gdrive:
+    Дальше ночной бэкап сам начнёт уезжать в облако.
+
+EOF
   fi
 else
   skip "бэкап пропущен по выбору пользователя"
