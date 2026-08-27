@@ -726,7 +726,21 @@ fi
 logged_in()  { as_agent 'test -s ~/.claude/.credentials.json' 2>/dev/null; }
 have_token() { grep -q '^CLAUDE_CODE_OAUTH_TOKEN=sk-ant-' "$ENV_FILE" 2>/dev/null; }
 TOKEN_WRITTEN=0
+# Токен на экране pty переносится на две строки, и вставляют его тоже двумя —
+# поэтому склеиваем всё, что похоже на пробел, ПЕРЕД проверкой (27.08.2026:
+# установка встала на «это не похоже на токен», хотя токен был верный).
+strip_ws() { printf '%s' "${1//[[:space:]]/}"; }
+
+# Выкусываем токен из лога экрана: сначала блок между «valid for 1 year» и
+# «Store this token», потом склеиваем переносы, потом отрезаем прилипший хвост.
+extract_token() {
+  sed -n '/valid for .*year/,/Store this token/p' "$1" 2>/dev/null \
+    | tr -d ' \r\n' | sed 's/Storethis.*$//' \
+    | grep -aoE 'sk-ant-[A-Za-z0-9_-]{80,}' | tail -1
+}
+
 write_token() {
+  set -- "$(strip_ws "$1")"
   # Настоящий токен ~101 знак после sk-ant-; порог ниже реального ловит обрезок
   # (pty перенёс строку посреди токена — сервис бы молча не завёлся), но с запасом
   [[ "$1" =~ ^sk-ant-[A-Za-z0-9_-]{80,}$ ]] || die "это не похоже на токен Claude (жду sk-ant-oat01-..., целиком)"
@@ -777,11 +791,19 @@ EOF
   # script(1) даёт setup-token настоящий TTY и параллельно пишет экран в файл —
   # оттуда сами выловим напечатанный токен, чтобы человек его не копировал.
   script -qec "su - $SERVICE_USER -c 'claude setup-token'" "$TOKEN_LOG" </dev/tty >/dev/tty 2>&1 || true
-  CLAUDE_TOKEN="$(grep -aoE 'sk-ant-[A-Za-z0-9_-]{80,}' "$TOKEN_LOG" | tail -1 || true)"
+  CLAUDE_TOKEN="$(extract_token "$TOKEN_LOG" || true)"
   rm -f "$TOKEN_LOG"; trap - INT TERM EXIT
   if [[ -z "$CLAUDE_TOKEN" ]]; then
     warn "не смог выловить токен с экрана"
-    ask CLAUDE_TOKEN "Вставь токен сюда (sk-ant-oat01-..., напечатан выше): "
+    # Токен печатается в ДВЕ строки — вставка второй улетала в shell, а первая
+    # (обрезок) роняла установку. Собираем построчно, пока не наберётся целый.
+    warn "он напечатан выше в ДВЕ строки — вставь обе, каждую с Enter"
+    CLAUDE_TOKEN=""
+    for _ in 1 2 3 4; do
+      ask TOKEN_PART "Вставь токен (или его очередной кусок), Enter: "
+      CLAUDE_TOKEN="$(strip_ws "$CLAUDE_TOKEN$TOKEN_PART")"
+      [[ "$CLAUDE_TOKEN" =~ ^sk-ant-[A-Za-z0-9_-]{80,}$ ]] && break
+    done
   fi
   write_token "$CLAUDE_TOKEN"
 fi
