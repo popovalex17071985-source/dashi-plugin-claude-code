@@ -57,7 +57,8 @@ while [[ $# -gt 0 ]]; do
     --repair-token) REPAIR_TOKEN="$2"; shift 2 ;; # бот-ремонтник (страховка, ещё один /newbot)
     --user)      SERVICE_USER="$2"; shift 2 ;;
     --repo)      REPO_URL="$2";   shift 2 ;;
-    --branch)    BRANCH="$2";     shift 2 ;;   # main (по умолчанию) | feature-ветка для staging
+    --branch)    BRANCH="$2";     shift 2 ;;
+    --tz)        OWNER_TZ="$2";   shift 2 ;;   # пояс ХОЗЯИНА: сводка приходит в 09:00 по нему   # main (по умолчанию) | feature-ветка для staging
     --model)     MODEL="$2";      shift 2 ;;   # opus|sonnet|haiku|полный id; пусто = дефолт аккаунта
     --no-browser) SKIP_BROWSER=1; shift ;;   # не ставить Playwright/Chromium (экономия ~400 МБ)
     --yes|-y)    ASSUME_YES=1;    shift ;;
@@ -528,15 +529,28 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
       --settings ~/.claude/settings.json" || die "install-kit.sh упал"
   # Будильник по датам в леджере: без него обещание со сроком лежит молча,
   # и хозяин узнаёт о нём, только когда сам вспомнит.
-  SWEEP="30 7 * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
+  # Крон живёт по часам СЕРВЕРА, а сводку читает хозяин — считаем час так, чтобы
+  # у него было 09:00. Пояс: --tz, иначе пояс сервера.
+  OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
+  read -r DIG_H SWP_H <<<"$(OWNER_TZ="$OWNER_TZ" python3 - <<'PYTZ'
+import os, datetime as dt, zoneinfo
+srv = dt.datetime.now().astimezone().tzinfo
+own = zoneinfo.ZoneInfo(os.environ["OWNER_TZ"])
+# 09:00 в поясе хозяина -> который это час на сервере
+nine = dt.datetime.now(own).replace(hour=9, minute=0, second=0, microsecond=0)
+h = nine.astimezone(srv).hour
+print(h, (h if nine.astimezone(srv).minute == 0 else h))
+PYTZ
+)"
+  SWEEP="30 $SWP_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
   # Утренняя сводка открытых дел хозяину: секция = отдельное сообщение,
   # длинная режется по границам строк (Telegram рубит на 4096).
-  DIGEST="0 7 * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
+  DIGEST="0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
   if as_agent "crontab -l 2>/dev/null | grep -q promise-sweeper"; then
     skip "будильник по срокам уже в кроне"
   else
     as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST') | crontab -" \
-      && ok "будильник по срокам и утренняя сводка в кроне" \
+      && ok "будильник и сводка в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
       || warn "не смог прописать крон — поставь руками"
   fi
   ok "комплект разложен: конституция, гейты, реестры, помощники"
