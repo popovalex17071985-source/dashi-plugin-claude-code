@@ -336,6 +336,18 @@ sudo tar czf /var/backups/myagent-$(date +%Y%m%d-%H%M).tgz \
 
 ## Update плагина
 
+Уже поднятому агенту `git pull` приносит новые файлы, но НЕ раскладывает их:
+комплект дисциплины (`agent-kit/`) надо прогнать отдельно — он идемпотентен,
+личные правки в `core/rules.md` и накопленный леджер не трогает:
+
+```bash
+sudo -u agentctl bash /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code/agent-kit/install-kit.sh \
+  --claude-dir /home/agentctl/.claude-lab/myagent/.claude \
+  --chat-id <telegram id хозяина> --agent myagent
+```
+
+Дальше обычное обновление плагина:
+
 ```bash
 sudo systemctl stop channel-myagent
 cd /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code
