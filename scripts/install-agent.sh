@@ -19,6 +19,7 @@
 #   ... --model opus                         # модель Claude для агента (opus|sonnet|haiku|полный id); без флага — дефолт аккаунта
 #   ... --claude-token sk-ant-oat01-...      # готовый годовой токен (claude setup-token на любой машине)
 #   ... --repair-token 123:BB...             # бот-ремонтник: страховка на случай «агент лёг и молчит»
+#   ... --no-browser                         # без Playwright/Chromium (по умолчанию браузер ставится)
 #
 set -euo pipefail
 
@@ -32,6 +33,7 @@ SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
 
 AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; REPAIR_TOKEN=""; ASSUME_YES=0
 MODEL="${DASHI_MODEL:-}"
+SKIP_BROWSER=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
@@ -57,6 +59,7 @@ while [[ $# -gt 0 ]]; do
     --repo)      REPO_URL="$2";   shift 2 ;;
     --branch)    BRANCH="$2";     shift 2 ;;   # main (по умолчанию) | feature-ветка для staging
     --model)     MODEL="$2";      shift 2 ;;   # opus|sonnet|haiku|полный id; пусто = дефолт аккаунта
+    --no-browser) SKIP_BROWSER=1; shift ;;   # не ставить Playwright/Chromium (экономия ~400 МБ)
     --yes|-y)    ASSUME_YES=1;    shift ;;
     --help|-h)   usage ;;
     *) die "неизвестный аргумент: $1 (--help для справки)" ;;
@@ -235,6 +238,32 @@ fi
 say "Зависимости плагина"
 as_agent "cd '$PLUGIN_DIR' && ~/.bun/bin/bun install --silent" >/dev/null 2>&1 || die "bun install упал"
 ok "зависимости на месте"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4b. Браузер (Playwright) — агенту регулярно нужно ходить в веб-кабинеты,
+# где нет API. Ставим сразу: доставлять потом руками — это отдельный вечер.
+# ─────────────────────────────────────────────────────────────────────────────
+say "Браузер (Playwright)"
+if [[ $SKIP_BROWSER -eq 1 ]]; then
+  skip "браузер пропущен по флагу --no-browser"
+elif as_agent 'test -d ~/.cache/ms-playwright/chromium-*' 2>/dev/null; then
+  skip "Chromium уже стоит"
+else
+  as_agent "cd '$WORKSPACE' && test -f package.json || npm init -y >/dev/null 2>&1" || true
+  if as_agent "cd '$WORKSPACE' && npm install --silent --no-audit --no-fund playwright" >/dev/null 2>&1; then
+    # Системные библиотеки Chromium ставит root, сам браузер — уже агент,
+    # иначе кэш уляжется в /root и агент его не увидит.
+    as_agent "cd '$WORKSPACE' && npx playwright install-deps chromium" >/dev/null 2>&1 \
+      || npx --yes playwright install-deps chromium >/dev/null 2>&1 || true
+    if as_agent "cd '$WORKSPACE' && npx playwright install chromium" >/dev/null 2>&1; then
+      ok "Chromium готов — агент умеет ходить в веб-кабинеты"
+    else
+      warn "Chromium не скачался — агент попросит доставить: npx playwright install chromium"
+    fi
+  else
+    warn "playwright не встал (npm) — веб-кабинеты будут недоступны"
+  fi
+fi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 5. Характер агента
@@ -716,6 +745,40 @@ EOF
   command -v rclone >/dev/null 2>&1 || apt-get install -y -qq rclone >/dev/null 2>&1 || true
   if as_agent "command -v rclone >/dev/null 2>&1 && rclone listremotes 2>/dev/null | grep -q ."; then
     ok "rclone-remote найден — копия уедет off-site автоматически"
+  elif [[ $ASSUME_YES -eq 0 ]]; then
+    # Спрашиваем прямо здесь: облачная копия — единственное, что переживает
+    # смерть VPS, а «настрою потом» не наступает никогда (Саня 27.08.2026).
+    cat <<EOF
+
+    Подключаем Google Drive — это займёт 5 минут и делается один раз.
+    Вход в гугл требует браузера, поэтому сделай это на СВОЁМ компьютере
+    (в отдельном окне терминала, НЕ внутри ssh на сервер):
+      1) поставь rclone: mac — brew install rclone,
+         windows/linux — установщик со страницы rclone.org/downloads
+      2) выполни:  rclone authorize "drive"
+      3) войди в гугл, разреши доступ — в терминале появится строка
+         вида {"access_token":...}
+    Скопируй эту строку целиком и вставь сюда. Пропустить — просто Enter
+    (тогда бэкап останется только на этом сервере).
+
+EOF
+    ask GDRIVE_TOKEN "    Строка токена: " 0
+    if [[ -n "${GDRIVE_TOKEN:-}" ]]; then
+      TOKFILE="$(mktemp)"; printf '%s' "$GDRIVE_TOKEN" > "$TOKFILE"
+      chmod 600 "$TOKFILE"; chown "$SERVICE_USER:$SERVICE_USER" "$TOKFILE"
+      # Пишем секцию в конфиг руками: `rclone config create ... token` на старых
+      # версиях (1.53 в Ubuntu 22.04) игнорирует готовый токен и всё равно лезет
+      # в интерактивный OAuth — на сервере это тупик.
+      as_agent "mkdir -p ~/.config/rclone && umask 077 && { grep -q '^\[gdrive\]' ~/.config/rclone/rclone.conf 2>/dev/null || printf '[gdrive]\ntype = drive\nscope = drive\ntoken = %s\n' \"\$(cat '$TOKFILE')\" >> ~/.config/rclone/rclone.conf; }"
+      if as_agent "rclone lsd gdrive: --retries 1 --low-level-retries 1 --timeout 20s >/dev/null 2>&1"; then
+        ok "Google Drive подключён — ночная копия уедет в облако"
+      else
+        warn "токен не подошёл — подключи позже: rclone config create gdrive drive token '<строка>'"
+      fi
+      rm -f "$TOKFILE"
+    else
+      warn "off-site пропущен: копия лежит на этом же сервере и умрёт вместе с ним."
+    fi
   else
     warn "off-site НЕ настроен: копия лежит на этом же сервере и умрёт вместе с ним."
     cat <<EOF
