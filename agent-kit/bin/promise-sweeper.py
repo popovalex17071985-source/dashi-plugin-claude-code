@@ -3,7 +3,7 @@
 
 Runs daily from cron. Every open entry (`- [ ]`) whose due date (`→ пн 24.08`,
 `к 22.08`, `до 22.08`) is today (Asia/Yekaterinburg) is injected into the
-dashi-live tmux session as a task, so the agent acts on it without being poked.
+agent tmux session as a task, so the agent acts on it without being poked.
 # ponytail: date-only match, fires once per due date; overdue items stay in the
 # 09:00 digest to Sanya — add "overdue" sweep if promises start slipping past.
 """
