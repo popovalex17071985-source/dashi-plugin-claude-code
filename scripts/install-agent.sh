@@ -701,6 +701,14 @@ case "\${1:-}" in
                  rm -rf $REPO_DIR.bak; cp -a $REPO_DIR $REPO_DIR.bak
                  if g reset -q --hard FETCH_HEAD \\
                     && runuser -u $SERVICE_USER -- bash -lc "cd '$PLUGIN_DIR' && ~/.bun/bin/bun install --silent"; then
+                   # Комплект дисциплины лежит КОПИЯМИ в ~/.claude, а не читается из
+                   # репозитория — без этого прогона новые гейты и реестры доезжают
+                   # до кода, но не до агента. Скрипт идемпотентен и не трогает
+                   # правки хозяина, поэтому гоняем на каждом обновлении.
+                   KIT=$REPO_DIR/agent-kit/install-kit.sh
+                   [[ -x "\$KIT" ]] && runuser -u $SERVICE_USER -- bash "\$KIT" \\
+                     --claude-dir '$CLAUDE_DIR' --chat-id '$USER_ID' \\
+                     --agent '$AGENT_NAME' --settings '$CLAUDE_DIR/settings.json' >/dev/null 2>&1 || true
                    echo "UPDATED \$n \$(g rev-parse --short HEAD)"
                  else
                    rm -rf $REPO_DIR; mv $REPO_DIR.bak $REPO_DIR; echo ROLLBACK; exit 4
