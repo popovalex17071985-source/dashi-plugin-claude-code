@@ -468,7 +468,8 @@ as_agent "export PATH=\$HOME/.bun/bin:\$PATH; cd '$PLUGIN_DIR' && bash scripts/i
     --settings ~/.claude/settings.json \
     --chat-id '$USER_ID' \
     --webhook-url http://127.0.0.1:8089/hooks/agent \
-    --agent-id dashi-channel" >/dev/null || die "install-hooks.sh упал"
+    --agent-id dashi-channel \
+    --verbose-progress" >/dev/null || die "install-hooks.sh упал"
 ok "хуки актуализированы"
 
 # Сторож контекста: раз в сессию напоминает агенту сказать хозяину, что

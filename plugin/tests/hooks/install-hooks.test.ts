@@ -236,6 +236,23 @@ function existsSyncWrapper(p: string): boolean {
 }
 
 describe('applyPatch (pure)', () => {
+  test('verboseProgress adds the per-tool feeder on Pre/PostToolUse', () => {
+    const base = {
+      settingsPath: '/tmp/x',
+      chatId: '1',
+      webhookUrl: 'http://x',
+      helperPath: '/tmp/post-hook.ts',
+    }
+    const narrow = applyPatch({}, base) as Record<string, any>
+    // По умолчанию — узкий набор: PostToolUse только по задачам, PreToolUse пуст.
+    expect(narrow.hooks.PreToolUse ?? []).toHaveLength(0)
+    expect(narrow.hooks.PostToolUse[0].matcher).toBe('TaskCreate|TaskUpdate|TodoWrite')
+
+    const verbose = applyPatch({}, { ...base, verboseProgress: true }) as Record<string, any>
+    expect(verbose.hooks.PreToolUse[0].matcher).toBe('.*')
+    expect(verbose.hooks.PostToolUse[0].matcher).toBe('.*')
+  })
+
   test('handles missing hooks section', () => {
     const out = applyPatch(
       {},

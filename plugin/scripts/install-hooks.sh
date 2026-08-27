@@ -33,6 +33,7 @@ HELPER=""
 PERMISSION_GATE=""
 GATE_HELPER=""
 POLICY_PATH=""
+VERBOSE_PROGRESS=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -54,6 +55,9 @@ while [ $# -gt 0 ]; do
       GATE_HELPER="$2"; shift 2;;
     --policy-path)
       POLICY_PATH="$2"; shift 2;;
+    --verbose-progress)
+      # Карточка прогресса показывает сами команды (фидер на каждый инструмент)
+      VERBOSE_PROGRESS="1"; shift 1;;
     -h|--help)
       sed -n 's/^# \{0,1\}//p' "$0" | head -n 18
       exit 0;;
@@ -113,6 +117,10 @@ if [ -n "$PERMISSION_GATE" ] || [ -n "$GATE_HELPER" ]; then
   if [ -n "$POLICY_PATH" ]; then
     ARGS+=(--policy-path "$POLICY_PATH")
   fi
+fi
+
+if [ -n "$VERBOSE_PROGRESS" ]; then
+  ARGS+=(--verbose-progress)
 fi
 
 # Ensure the parent dir exists so `bun` can write the file atomically.

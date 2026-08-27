@@ -101,6 +101,11 @@ export interface PatchOptions {
    *  the autonomy registry the MCP tool writes. Defaulted by the CLI from
    *  env.TELEGRAM_STATE_DIR ?? ~/.claude/channels/dashi-telegram-canary. */
   readonly reminderStateDir?: string
+  /** Per-tool feeder: also fire on EVERY PreToolUse/PostToolUse so the Telegram
+   *  progress card lists the actual commands («Bash: git status»), not just the
+   *  turn boundaries. Costs one bun process per tool call — opt-in, and what the
+   *  operator means by «в пузырьке не видно, что он делает» (27.08.2026). */
+  readonly verboseProgress?: boolean
 }
 
 interface HookEntry {
@@ -132,12 +137,21 @@ function buildCommand(opts: PatchOptions): string {
   return `${envParts.join(' ')} bun '${opts.helperPath.replace(/'/g, "'\\''")}'`
 }
 
+function feederEventsFor(opts: PatchOptions): ReadonlySet<HookEvent> {
+  if (!opts.verboseProgress) return FEEDER_EVENTS
+  return new Set<HookEvent>([...FEEDER_EVENTS, 'PreToolUse', 'PostToolUse'])
+}
+
 function buildEntryFor(event: HookEvent, opts: PatchOptions): HookEntry {
   const entry: HookEntry = {
     marker: MARKER,
     hooks: [{ type: 'command', command: buildCommand(opts) }],
   }
-  const matcher = MATCHER_BY_EVENT[event]
+  // В verbose-режиме фидер слушает ВСЕ инструменты — узкий matcher по задачам
+  // как раз и прятал команды из карточки.
+  const matcher = opts.verboseProgress
+    ? (event === 'PreToolUse' || event === 'PostToolUse' ? '.*' : MATCHER_BY_EVENT[event])
+    : MATCHER_BY_EVENT[event]
   if (matcher !== undefined) entry.matcher = matcher
   return entry
 }
@@ -237,7 +251,7 @@ export function applyPatch(settings: SettingsShape, opts: PatchOptions): Setting
     const rebuilt = [...filtered]
     // The notification feeder is added ONLY for the narrow FEEDER_EVENTS set.
     // PreToolUse is iterated (for the gate below) but no longer gets a feeder.
-    if (FEEDER_EVENTS.has(event)) {
+    if (feederEventsFor(opts).has(event)) {
       rebuilt.push(buildEntryFor(event, opts))
     }
     // The gate hook lives on PreToolUse only, and is registered FIRST so its
@@ -272,6 +286,7 @@ function parseArgs(argv: ReadonlyArray<string>): PatchOptions {
   let policyPath: string | undefined
   let reminderHelperPath: string | undefined
   let noReminder = false
+  let verboseProgress = false
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     const next = argv[i + 1]
@@ -284,6 +299,7 @@ function parseArgs(argv: ReadonlyArray<string>): PatchOptions {
     if (a === '--policy-path' && next) { policyPath = next; i++; continue }
     if (a === '--reminder-helper' && next) { reminderHelperPath = next; i++; continue }
     if (a === '--no-reminder') { noReminder = true; continue }
+    if (a === '--verbose-progress') { verboseProgress = true; continue }
   }
   if (!settingsPath || !chatId || !webhookUrl) {
     process.stderr.write(
@@ -319,6 +335,7 @@ function parseArgs(argv: ReadonlyArray<string>): PatchOptions {
     ...(permissionGateHelperPath ? { permissionGateHelperPath } : {}),
     ...(policyPath ? { policyPath } : {}),
     ...(reminderHelperPath ? { reminderHelperPath, reminderStateDir } : {}),
+    ...(verboseProgress ? { verboseProgress } : {}),
   }
   return opts
 }
