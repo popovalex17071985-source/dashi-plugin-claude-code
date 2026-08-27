@@ -532,16 +532,10 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
   # Крон живёт по часам СЕРВЕРА, а сводку читает хозяин — считаем час так, чтобы
   # у него было 09:00. Пояс: --tz, иначе пояс сервера.
   OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
-  read -r DIG_H SWP_H <<<"$(OWNER_TZ="$OWNER_TZ" python3 - <<'PYTZ'
-import os, datetime as dt, zoneinfo
-srv = dt.datetime.now().astimezone().tzinfo
-own = zoneinfo.ZoneInfo(os.environ["OWNER_TZ"])
-# 09:00 в поясе хозяина -> который это час на сервере
-nine = dt.datetime.now(own).replace(hour=9, minute=0, second=0, microsecond=0)
-h = nine.astimezone(srv).hour
-print(h, (h if nine.astimezone(srv).minute == 0 else h))
-PYTZ
-)"
+  # python3 -c, не heredoc: вложенный heredoc внутри $( ) оставлял python
+  # висеть на stdin — установка молча замирала на 13 минут (поймано e2e 27.08).
+  DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own=zoneinfo.ZoneInfo(os.environ["OWNER_TZ"]); srv=dt.datetime.now().astimezone().tzinfo; print(dt.datetime.now(own).replace(hour=9,minute=0,second=0,microsecond=0).astimezone(srv).hour)' 2>/dev/null || echo 7)"
+  SWP_H="$DIG_H"
   SWEEP="30 $SWP_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
   # Утренняя сводка открытых дел хозяину: секция = отдельное сообщение,
   # длинная режется по границам строк (Telegram рубит на 4096).
