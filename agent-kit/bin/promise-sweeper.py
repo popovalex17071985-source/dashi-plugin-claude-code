@@ -26,7 +26,9 @@ TZ = ZoneInfo("Asia/Yekaterinburg")
 # Two shapes now match: a weekday+date (marker optional), or a marker+date.
 DUE_RE = re.compile(
     r"(?:(?:→|\bк|\bдо|\bв|\bна)\s*)?(?:пн|вт|ср|чт|пт|сб|вс)\s*(\d{1,2})\.(\d{2})"
-    r"|(?:→|\bк|\bдо|\bв|\bна)\s+(\d{1,2})\.(\d{2})",
+    r"|(?:→|\bк|\bдо|\bв|\bна)\s+(\d{1,2})\.(\d{2})"
+    # a bare date opening the item: «- [ ] 01.09: собрать лист»
+    r"|^- \[ \]\s*(\d{1,2})\.(\d{2})",
     re.IGNORECASE,
 )
 WEEKDAYS = ("пн", "вт", "ср", "чт", "пт", "сб", "вс")
@@ -40,7 +42,8 @@ def due_today(lines: list[str], today: datetime) -> list[str]:
         if not line.startswith("- [ ]"):
             continue
         for groups in DUE_RE.findall(line):
-            day, month = (groups[0], groups[1]) if groups[0] else (groups[2], groups[3])
+            pairs = [(groups[i], groups[i + 1]) for i in (0, 2, 4)]
+            day, month = next(p for p in pairs if p[0])
             if int(day) == today.day and int(month) == today.month:
                 hits.append(line.strip())
                 break
@@ -84,7 +87,7 @@ def main() -> int:
     body = "\n".join(f"• {h}" for h in hits)
     prompt = (
         f"[ОБЕЩАНИЯ НА СЕГОДНЯ {today:%d.%m}] В core/open-threads.md есть треды со "
-        f"сроком сегодня. Выполни каждый и отчитайся оператору в чат {CHAT_ID} одним "
+        f"сроком сегодня. Выполни каждый и отчитайся оператор в чат {CHAT_ID} одним "
         f"сообщением на тред; закрыть [ ]→[x]. Не спрашивай, делай:\n{body}"
     )
     inject(prompt)
@@ -95,7 +98,7 @@ def main() -> int:
 def _selfcheck() -> None:
     t = datetime(2026, 8, 22, tzinfo=TZ)
     lines = [
-        "- [ ] 2026-08-21 цифру оператору к 22.08 по токенам",
+        "- [ ] 2026-08-21 цифру оператор к 22.08 по токенам",
         "- [ ] 2026-08-21 → пт 28.08: итог пилота",
         "- [x] 2026-08-21 → сб 22.08: уже закрыт",
         "- [ ] 2026-08-21 → пн 24.08 (обзор): перемерить; к 22.08 тоже",
@@ -105,9 +108,11 @@ def _selfcheck() -> None:
 
     # the 2026-08-27 miss: a bare «в ЧТ 28.08» with no →/к/до marker
     t28 = datetime(2026, 8, 28, tzinfo=TZ)
-    assert due_today(["- [ ] показать оператору в ЧТ 28.08"], t28), "bare weekday form missed"
+    assert due_today(["- [ ] показать оператор в ЧТ 28.08"], t28), "bare weekday form missed"
     assert due_today(["- [ ] пт 28.08: витрина"], t28), "leading weekday form missed"
     assert not due_today(["- [ ] пт 28.08: витрина"], t), "fired on the wrong day"
+    t19 = datetime(2026, 9, 1, tzinfo=TZ)
+    assert due_today(["- [ ] 01.09: собрать лист продаж"], t19), "bare leading date missed"
 
     # 28.08.2026 is a Friday, so «чт 28.08» is a typo the sweeper should flag
     assert weekday_mismatch(["- [ ] показать в ЧТ 28.08"], 2026), "mismatch not caught"
