@@ -11,7 +11,7 @@ Rules:
   in the SAME turn it was made. The capture hook is a backup, not the plan.
 - Check the ledger when returning to a topic; close threads as they finish.
 
-## Ждут оператора
+## Ждут хозяина
 
 ## На мне
 - [ ] Пример строки: пройти задание из `docs/agent-self-audit.md` и построить

@@ -529,12 +529,15 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
   # Будильник по датам в леджере: без него обещание со сроком лежит молча,
   # и хозяин узнаёт о нём, только когда сам вспомнит.
   SWEEP="30 7 * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
+  # Утренняя сводка открытых дел хозяину: секция = отдельное сообщение,
+  # длинная режется по границам строк (Telegram рубит на 4096).
+  DIGEST="0 7 * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
   if as_agent "crontab -l 2>/dev/null | grep -q promise-sweeper"; then
     skip "будильник по срокам уже в кроне"
   else
-    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP') | crontab -" \
-      && ok "будильник по срокам в кроне (09:30 по часам сервера)" \
-      || warn "не смог прописать будильник в крон — поставь руками"
+    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST') | crontab -" \
+      && ok "будильник по срокам и утренняя сводка в кроне" \
+      || warn "не смог прописать крон — поставь руками"
   fi
   ok "комплект разложен: конституция, гейты, реестры, помощники"
 else

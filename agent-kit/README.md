@@ -19,7 +19,9 @@ Laid down by `install-kit.sh` (called automatically from `install-agent.sh`, ste
 | `stop-closeout-gate.py` | Stop | work finished in the terminal and never reported to the owner |
 | `stop-blocker-gate.py` | Stop | handing the task back ("no access", "waiting on you") without an enumeration |
 | `bin/bg.sh` | wrapper | a long run whose failure is never reported — silence read as success |
-| `bin/promise-sweeper.py` | cron 09:30 | a dated promise sitting in the ledger with nothing to wake the agent |
+| `bin/promise-sweeper.py` | cron, morning | a dated promise sitting in the ledger with nothing to wake the agent |
+| `bin/open-threads-digest.py` | cron, morning | the owner not seeing what is open — one message per section, numbered, chunked under the Telegram limit |
+| `bin/tg-send.py` | helper | cron and hooks having no way to reach the owner without the plugin runtime |
 | `core/SOURCES.md` | registry | not knowing a primary source exists, so a cache becomes the verdict |
 | `core/open-threads.md` | ledger | the single board: promises, projects, next steps |
 | `agents/{proxy-skeptic,reviewer,parser}.md` | subagents | shipping a number or a diagnosis with no independent check |
