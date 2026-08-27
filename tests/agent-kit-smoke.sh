@@ -9,6 +9,7 @@ fail() { echo "✗ $1" >&2; exit 1; }
 
 bash -n "$KIT/install-kit.sh" || fail "синтаксис install-kit.sh"
 grep -q "install-kit.sh" "$INSTALLER" || fail "установщик не зовёт комплект"
+grep -q "update-notify" "$INSTALLER" || fail "установщик не ставит советника по обновлениям"
 grep -q "open-threads-digest.py --send" "$INSTALLER" || fail "утренняя сводка не в кроне"
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
@@ -16,7 +17,7 @@ mkdir -p "$T/.claude/core"
 printf '# Агент\n\n@core/rules.md\n' > "$T/.claude/CLAUDE.md"
 printf '# Правила и правки\n- правка хозяина\n' > "$T/.claude/core/rules.md"
 
-bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null \
+KIT_NO_CRON=1 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null \
   || fail "install-kit упал"
 
 # Личные правки хозяина комплект не трогает
@@ -68,7 +69,7 @@ python3 "$T/bin/promise-sweeper.py" --selfcheck >/dev/null || fail "будиль
 python3 "$T/bin/open-threads-digest.py" --selfcheck >/dev/null || fail "утренняя сводка"
 
 # Повторный прогон ничего не задваивает
-bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null
+KIT_NO_CRON=1 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null
 n2=$(python3 -c "
 import json;d=json.load(open('$T/.claude/settings.json'))
 print(sum(len(e['hooks']) for a in d['hooks'].values() for e in a))")
