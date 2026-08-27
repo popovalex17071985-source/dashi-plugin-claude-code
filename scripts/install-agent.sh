@@ -811,8 +811,10 @@ fi
 # Без пройденного онбординга интерактивный Claude рисует «Select login method»
 # даже при валидном токене в окружении (проверено живым e2e на v2.1.245) —
 # помечаем онбординг пройденным, входа по ссылке всё равно не будет
-as_agent 'test -s ~/.claude.json' \
-  || as_agent 'printf "%s" "{\"hasCompletedOnboarding\": true, \"theme\": \"dark\"}" > ~/.claude.json'
+# Смотрим на САМ ФЛАГ, а не на наличие файла: от прошлой попытки мог остаться
+# ~/.claude.json без него — и выбор логина рисовался снова (27.08.2026).
+as_agent 'grep -qs hasCompletedOnboarding ~/.claude.json' \
+  || as_agent 'cp -f ~/.claude.json ~/.claude.json.bak 2>/dev/null; printf "%s" "{\"hasCompletedOnboarding\": true, \"theme\": \"dark\"}" > ~/.claude.json'
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 5c. Superpowers (навыки: планирование, отладка, ревью)
