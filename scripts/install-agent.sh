@@ -576,6 +576,53 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
     as_agent "(crontab -l 2>/dev/null; echo '$NOTIFY') | crontab -" \
       && ok "советник по обновлениям добавлен в крон" || true
   fi
+  # ── Канарейка планировщика ────────────────────────────────────────────────
+  # Крон умеет МОЛЧА перестать выполнять задачи пользователя: одна лишняя жёсткая
+  # ссылка на файле расписания — и он его не грузит (Саня, 27.08.2026: шесть часов
+  # простоя, встали все ночные задачи разом, и заметить это было неоткуда).
+  # Сторож живёт в systemd, а не в кроне — иначе он умрёт вместе с тем, что сторожит.
+  CANARY="* * * * * /usr/bin/touch $WORKSPACE/data/cron-heartbeat"
+  as_agent "mkdir -p '$WORKSPACE/data'"
+  if as_agent "crontab -l 2>/dev/null | grep -q cron-heartbeat"; then
+    skip "канарейка крона уже стоит"
+  else
+    as_agent "(crontab -l 2>/dev/null; echo '$CANARY') | crontab -" \
+      && ok "канарейка крона в расписании" || warn "не смог прописать канарейку"
+  fi
+  cat > "/usr/local/bin/cron-canary-$AGENT_NAME" <<CANEOF
+#!/bin/bash
+# Канарейка протухла -> крон не выполняет задачи агента. Пишем хозяину.
+f="$WORKSPACE/data/cron-heartbeat"
+[ -f "\$f" ] || exit 0
+age=\$(( ( \$(date +%s) - \$(stat -c %Y "\$f") ) / 60 ))
+[ "\$age" -gt 10 ] || exit 0
+. "$ENV_FILE"
+curl -s -m 20 -X POST "https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage" \\
+  -d chat_id="\${TELEGRAM_ALLOWED_USER_IDS%%,*}" \\
+  -d text="Планировщик задач не работает: минутная задача молчит \$age мин. Ночные задачи агента $AGENT_NAME сейчас НЕ выполняются." >/dev/null
+CANEOF
+  chmod 755 "/usr/local/bin/cron-canary-$AGENT_NAME"
+  cat > "/etc/systemd/system/cron-canary-$AGENT_NAME.service" <<CANEOF
+[Unit]
+Description=Канарейка крона для агента $AGENT_NAME
+[Service]
+Type=oneshot
+User=$SERVICE_USER
+ExecStart=/usr/local/bin/cron-canary-$AGENT_NAME
+CANEOF
+  cat > "/etc/systemd/system/cron-canary-$AGENT_NAME.timer" <<CANEOF
+[Unit]
+Description=Проверка канарейки крона каждые 15 минут
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=15min
+[Install]
+WantedBy=timers.target
+CANEOF
+  systemctl daemon-reload
+  systemctl enable --now "cron-canary-$AGENT_NAME.timer" >/dev/null 2>&1 \
+    && ok "сторож канарейки поднят (systemd-таймер, от крона не зависит)" \
+    || warn "не смог поднять сторож канарейки"
   ok "комплект разложен: конституция, гейты, реестры, помощники"
 else
   warn "agent-kit не найден ($KIT_DIR) — агент встанет без гейтов и реестров"
