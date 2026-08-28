@@ -568,10 +568,14 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
   # хозяину ТОЛЬКО подозрения. Без неё агент молча ломается и об этом узнаёт
   # только хозяин, случайно (27.08.2026: крон 6 часов не выполнял задачи).
   AUDIT="20 $DIG_H * * * /bin/bash $WORKSPACE/bin/self-audit-morning.sh >> $WORKSPACE/logs/self-audit.log 2>&1"
+  # Отчёт о состоянии сервера: диск, память, процессор, сервисы агента, вход в
+  # Claude, планировщик, бэкап. Шлётся КАЖДОЕ утро, даже когда всё зелено —
+  # хозяину нужна одна строчка «сервер жив», а не тишина непонятной природы.
+  HEALTH="30 $DIG_H * * * /bin/bash $WORKSPACE/bin/health-daily.sh >> $WORKSPACE/logs/health-daily.log 2>&1"
   if as_agent "crontab -l 2>/dev/null | grep -q promise-sweeper"; then
     skip "будильник по срокам уже в кроне"
   else
-    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST'; echo '$NOTIFY'; echo '$AUDIT') | crontab -" \
+    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST'; echo '$NOTIFY'; echo '$AUDIT'; echo '$HEALTH') | crontab -" \
       && ok "будильник, сводка и советник по обновлениям в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
       || warn "не смог прописать крон — поставь руками"
   fi
@@ -584,6 +588,10 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
   if as_agent "crontab -l 2>/dev/null | grep -q self-audit-morning"; then :; else
     as_agent "(crontab -l 2>/dev/null; echo '$AUDIT') | crontab -" \
       && ok "утренняя самопроверка добавлена в крон" || true
+  fi
+  if as_agent "crontab -l 2>/dev/null | grep -q health-daily"; then :; else
+    as_agent "(crontab -l 2>/dev/null; echo '$HEALTH') | crontab -" \
+      && ok "утренний отчёт о состоянии сервера добавлен в крон" || true
   fi
   # ── Канарейка планировщика ────────────────────────────────────────────────
   # Крон умеет МОЛЧА перестать выполнять задачи пользователя: одна лишняя жёсткая
