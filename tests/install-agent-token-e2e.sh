@@ -27,9 +27,23 @@ ok "плагин внесён"
 
 # 2. ГЛАВНОЕ: установка одним прогоном, без tty, с готовым годовым токеном.
 echo "--- install-agent.sh (несколько минут: node/bun/claude) ---"
+# EXTRAS=1 — тот же прогон плюс ремонтник и семантическая память. Ключи фейковые:
+# проверяем, что установщик их РАСКЛАДЫВАЕТ (юнит, ov.conf, контейнер), живой
+# ответ OpenAI тут не критерий. Дороже на docker-in-docker и образ ~400 МБ.
+EXTRA=()
+if [[ -n "${EXTRAS:-}" ]]; then
+  # docker-in-docker: overlayfs внутри контейнера не умеет whiteout-файлы
+  # ("failed to convert whiteout file ... operation not permitted") — образ памяти
+  # не распаковывается. На живом VPS этого нет. vfs медленнее, но распакует.
+  # Кладём ДО установки docker: демон прочитает при первом старте.
+  docker exec "$C" mkdir -p /etc/docker
+  echo '{"storage-driver":"vfs"}' | docker exec -i "$C" tee /etc/docker/daemon.json >/dev/null
+  EXTRA=(--repair-token "654321:AAFakeRepairTokenForE2EOnly_xyzABC"
+         --openai-key "sk-fake-e2e-key-not-a-real-one")
+fi
 docker exec "$C" bash /opt/plugin/scripts/install-agent.sh \
   --name "$AGENT" --token "123456:AAFakeTokenForE2ETestOnly_abcDEF" --user-id 140141496 \
-  --claude-token "$FAKE_TOKEN" \
+  --claude-token "$FAKE_TOKEN" "${EXTRA[@]}" \
   --repo /opt/plugin --branch "$(cd "$PLUGIN" && git branch --show-current)" --yes 2>&1 | tail -30
 rc=${PIPESTATUS[0]}
 
@@ -56,6 +70,18 @@ if docker exec "$C" su - agent -c "tmux has-session -t channel-$AGENT" 2>/dev/nu
   docker exec "$C" bash -c "tr '\0' '\n' < /proc/\$(pgrep -u agent -f 'claude' | head -1)/environ 2>/dev/null | grep -q '^CLAUDE_CODE_OAUTH_TOKEN='" \
     && ok "токен виден в окружении процесса Claude" \
     || echo "· окружение процесса не проверить (claude ещё не поднялся) — не критерий"
+fi
+
+if [[ -n "${EXTRAS:-}" ]]; then
+  docker exec "$C" test -f "/etc/systemd/system/claude-repair-$AGENT.service" \
+    || fail "юнит ремонтника не создан"
+  docker exec "$C" systemctl is-enabled --quiet "claude-repair-$AGENT" \
+    || fail "ремонтник не включён в автозапуск"
+  ok "ремонтник поставлен и включён"
+  docker exec "$C" test -s /home/agent/.openviking/ov.conf || fail "ov.conf не записан"
+  docker exec "$C" grep -q OPENVIKING_CONFIG_FILE /home/agent/.claude/settings.json \
+    || fail "OpenViking не прописан в settings.json"
+  ok "семантическая память разложена (ov.conf + settings.json)"
 fi
 
 docker rm -f "$C" >/dev/null 2>&1

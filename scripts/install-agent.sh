@@ -576,6 +576,53 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
     as_agent "(crontab -l 2>/dev/null; echo '$NOTIFY') | crontab -" \
       && ok "советник по обновлениям добавлен в крон" || true
   fi
+  # ── Канарейка планировщика ────────────────────────────────────────────────
+  # Крон умеет МОЛЧА перестать выполнять задачи пользователя: одна лишняя жёсткая
+  # ссылка на файле расписания — и он его не грузит (Саня, 27.08.2026: шесть часов
+  # простоя, встали все ночные задачи разом, и заметить это было неоткуда).
+  # Сторож живёт в systemd, а не в кроне — иначе он умрёт вместе с тем, что сторожит.
+  CANARY="* * * * * /usr/bin/touch $WORKSPACE/data/cron-heartbeat"
+  as_agent "mkdir -p '$WORKSPACE/data'"
+  if as_agent "crontab -l 2>/dev/null | grep -q cron-heartbeat"; then
+    skip "канарейка крона уже стоит"
+  else
+    as_agent "(crontab -l 2>/dev/null; echo '$CANARY') | crontab -" \
+      && ok "канарейка крона в расписании" || warn "не смог прописать канарейку"
+  fi
+  cat > "/usr/local/bin/cron-canary-$AGENT_NAME" <<CANEOF
+#!/bin/bash
+# Канарейка протухла -> крон не выполняет задачи агента. Пишем хозяину.
+f="$WORKSPACE/data/cron-heartbeat"
+[ -f "\$f" ] || exit 0
+age=\$(( ( \$(date +%s) - \$(stat -c %Y "\$f") ) / 60 ))
+[ "\$age" -gt 10 ] || exit 0
+. "$ENV_FILE"
+curl -s -m 20 -X POST "https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage" \\
+  -d chat_id="\${TELEGRAM_ALLOWED_USER_IDS%%,*}" \\
+  -d text="Планировщик задач не работает: минутная задача молчит \$age мин. Ночные задачи агента $AGENT_NAME сейчас НЕ выполняются." >/dev/null
+CANEOF
+  chmod 755 "/usr/local/bin/cron-canary-$AGENT_NAME"
+  cat > "/etc/systemd/system/cron-canary-$AGENT_NAME.service" <<CANEOF
+[Unit]
+Description=Канарейка крона для агента $AGENT_NAME
+[Service]
+Type=oneshot
+User=$SERVICE_USER
+ExecStart=/usr/local/bin/cron-canary-$AGENT_NAME
+CANEOF
+  cat > "/etc/systemd/system/cron-canary-$AGENT_NAME.timer" <<CANEOF
+[Unit]
+Description=Проверка канарейки крона каждые 15 минут
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=15min
+[Install]
+WantedBy=timers.target
+CANEOF
+  systemctl daemon-reload
+  systemctl enable --now "cron-canary-$AGENT_NAME.timer" >/dev/null 2>&1 \
+    && ok "сторож канарейки поднят (systemd-таймер, от крона не зависит)" \
+    || warn "не смог поднять сторож канарейки"
   ok "комплект разложен: конституция, гейты, реестры, помощники"
 else
   warn "agent-kit не найден ($KIT_DIR) — агент встанет без гейтов и реестров"
@@ -1155,6 +1202,14 @@ else
       && uv pip install --python "$R_DIR/venv/bin/python" -q \
            'git+https://github.com/RichardAtCT/claude-code-telegram@4c63df52c5767f03c5031f8f9f956485a4d9eda5' \
       || die "не встал claude-code-telegram — проверь сеть и повтори"
+  fi
+  # httpx логирует ПОЛНЫЙ url запроса на INFO, а Telegram держит токен бота прямо
+  # в пути url — токен ремонтника уходил в системный журнал открытым текстом
+  # каждые 10 секунд (Саня, 28.08.2026). Гасим болтовню транспорта, логи бота живы.
+  R_MAIN="$(ls -d "$R_DIR"/venv/lib/python3.*/site-packages/src/main.py 2>/dev/null | head -1)"
+  if [[ -n "$R_MAIN" ]] && ! grep -q _noisy "$R_MAIN"; then
+    python3 -c 'import sys,pathlib;p=pathlib.Path(sys.argv[1]);s=p.read_text();a="        stream=sys.stdout,\n    )\n";x=a+"\n    for _noisy in (\"httpx\",\"httpcore\"):\n        logging.getLogger(_noisy).setLevel(logging.WARNING)\n";p.write_text(s.replace(a,x,1)) if a in s else None' "$R_MAIN" \
+      && ok "ремонтник не пишет свой токен в системный журнал"
   fi
   if [[ -n "$REPAIR_TOKEN" ]]; then
     R_USERNAME="$(curl -sm 10 "https://api.telegram.org/bot$REPAIR_TOKEN/getMe" \
