@@ -1203,6 +1203,14 @@ else
            'git+https://github.com/RichardAtCT/claude-code-telegram@4c63df52c5767f03c5031f8f9f956485a4d9eda5' \
       || die "не встал claude-code-telegram — проверь сеть и повтори"
   fi
+  # httpx логирует ПОЛНЫЙ url запроса на INFO, а Telegram держит токен бота прямо
+  # в пути url — токен ремонтника уходил в системный журнал открытым текстом
+  # каждые 10 секунд (Саня, 28.08.2026). Гасим болтовню транспорта, логи бота живы.
+  R_MAIN="$(ls -d "$R_DIR"/venv/lib/python3.*/site-packages/src/main.py 2>/dev/null | head -1)"
+  if [[ -n "$R_MAIN" ]] && ! grep -q _noisy "$R_MAIN"; then
+    python3 -c 'import sys,pathlib;p=pathlib.Path(sys.argv[1]);s=p.read_text();a="        stream=sys.stdout,\n    )\n";x=a+"\n    for _noisy in (\"httpx\",\"httpcore\"):\n        logging.getLogger(_noisy).setLevel(logging.WARNING)\n";p.write_text(s.replace(a,x,1)) if a in s else None' "$R_MAIN" \
+      && ok "ремонтник не пишет свой токен в системный журнал"
+  fi
   if [[ -n "$REPAIR_TOKEN" ]]; then
     R_USERNAME="$(curl -sm 10 "https://api.telegram.org/bot$REPAIR_TOKEN/getMe" \
       | grep -o '"username":"[^"]*"' | cut -d'"' -f4 || true)"
