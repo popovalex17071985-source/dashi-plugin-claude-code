@@ -564,10 +564,14 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
   # Советник по обновлениям: сам сообщает, что вышло нового, и напоминает
   # про /update. Без него агент молчит, пока хозяин не догадается спросить.
   NOTIFY="10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
+  # Утренняя самопроверка: хуки, крон, канарейка, модель, ссылки памяти. Шлёт
+  # хозяину ТОЛЬКО подозрения. Без неё агент молча ломается и об этом узнаёт
+  # только хозяин, случайно (27.08.2026: крон 6 часов не выполнял задачи).
+  AUDIT="20 $DIG_H * * * /bin/bash $WORKSPACE/bin/self-audit-morning.sh >> $WORKSPACE/logs/self-audit.log 2>&1"
   if as_agent "crontab -l 2>/dev/null | grep -q promise-sweeper"; then
     skip "будильник по срокам уже в кроне"
   else
-    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST'; echo '$NOTIFY') | crontab -" \
+    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST'; echo '$NOTIFY'; echo '$AUDIT') | crontab -" \
       && ok "будильник, сводка и советник по обновлениям в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
       || warn "не смог прописать крон — поставь руками"
   fi
@@ -575,6 +579,11 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
   if as_agent "crontab -l 2>/dev/null | grep -q update-notify"; then :; else
     as_agent "(crontab -l 2>/dev/null; echo '$NOTIFY') | crontab -" \
       && ok "советник по обновлениям добавлен в крон" || true
+  fi
+  # Догоняем агентов, поднятых до появления самопроверки.
+  if as_agent "crontab -l 2>/dev/null | grep -q self-audit-morning"; then :; else
+    as_agent "(crontab -l 2>/dev/null; echo '$AUDIT') | crontab -" \
+      && ok "утренняя самопроверка добавлена в крон" || true
   fi
   # ── Канарейка планировщика ────────────────────────────────────────────────
   # Крон умеет МОЛЧА перестать выполнять задачи пользователя: одна лишняя жёсткая
