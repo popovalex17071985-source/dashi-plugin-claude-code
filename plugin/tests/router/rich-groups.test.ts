@@ -12,7 +12,7 @@
 
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { mkdtempSync, rmSync } from 'node:fs'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -314,5 +314,69 @@ describe('multichat router — rich group delivery (wave 3)', () => {
     await drain(spy.api, { text: `итог:\n\n${TABLE}`, format: 'auto' })
     expect(spy.richSends.length).toBe(0)
     expect(spy.sends.length).toBe(1)
+  }, 5_000)
+
+  // Fable review 2026-08-30, HIGH #1. The safe wrapper RETHROWS a transient
+  // failure (network / 5xx) and the rich layer does not retry it. While the
+  // rich send sat outside deliverClaim's try/catch that throw escaped the
+  // method entirely: the claim stayed in `outbox/processing/` — which
+  // pollOutboxOnce skips on every later pass — and the drain loop abandoned
+  // every remaining claim of the same batch. Both halves are pinned here.
+  test('a transient rich failure dead-letters the claim and does NOT strand the queue', async () => {
+    const spy = spyRichApi(async () => {
+      throw new Error('ETIMEDOUT')
+    })
+    const router = new MultichatRouter({
+      policy: policyForGroup(),
+      pool: fx.pool as unknown as TmuxSessionPool,
+      stateDir: fx.stateDir,
+      workspaceDir: fx.workspaceDir,
+      telegramApi: spy.api,
+      logger: fx.loggerState.logger,
+    })
+    // Claims drain in filename order: the table (which goes rich and blows
+    // up) first, ordinary prose second.
+    await seedOutboxFile(fx.stateDir, groupChat, '0001-w3.json', {
+      chat_id: groupChat,
+      timestamp: '2026-08-30T00:00:00Z',
+      text: `итог:\n\n${TABLE}`,
+      format: 'auto',
+    })
+    await seedOutboxFile(fx.stateDir, groupChat, '0002-w3.json', {
+      chat_id: groupChat,
+      timestamp: '2026-08-30T00:00:01Z',
+      text: 'обычный ответ следом',
+      format: 'auto',
+    })
+    await router.start()
+    await new Promise((r) => setTimeout(r, 600))
+    await router.stop()
+
+    const outboxDir = join(fx.stateDir, 'chats', groupChat, 'outbox')
+    const processing = await readdir(join(outboxDir, 'processing'))
+    const deadLetter = await readdir(join(outboxDir, 'dead-letter'))
+
+    expect(spy.richSends.length).toBe(1)
+    // Nothing left behind: the failed claim is a dead letter an operator
+    // can retry, not a file rotting in processing/.
+    expect(processing.length).toBe(0)
+    expect(deadLetter.some((name) => name.endsWith('0001-w3.json'))).toBe(true)
+    // And the queue kept moving — the second claim still reached Telegram.
+    expect(spy.sends.length).toBe(1)
+    expect(spy.sends[0]?.text).toContain('обычный ответ следом')
+
+    // Codex review 2026-08-30: a transient may be AMBIGUOUS — Telegram can
+    // accept the send and die answering. The dead letter is a quarantine
+    // record, so its sidecar must warn against a blind redrive.
+    const sidecarName = deadLetter.find((name) => name.endsWith('.fail.json'))
+    expect(sidecarName).toBeDefined()
+    const sidecar = JSON.parse(
+      await readFile(join(outboxDir, 'dead-letter', sidecarName as string), 'utf8'),
+    ) as { reason: string }
+    expect(sidecar.reason).toContain('AMBIGUOUS DELIVERY')
+    expect(sidecar.reason).toContain('ETIMEDOUT')
+    expect(
+      fx.loggerState.logs.some((l) => l.msg === 'router.outbox.rich_ambiguous'),
+    ).toBe(true)
   }, 5_000)
 })

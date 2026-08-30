@@ -884,38 +884,71 @@ export class MultichatRouter {
       // math earns the rich endpoint, and the two client shields veto it.
       // A rich send is ONE message, so the partial-delivery policy below
       // simply does not apply to it — there are no later chunks to strand.
-      let richSent = false
-      if (message.format === 'auto' && this.telegramApi.sendRichMessage) {
-        const richBody = hardenSoftBreaks(body)
-        if (
-          needsRichRendering(richBody) &&
-          !hasDetailsMathCrashShape(richBody) &&
-          !hasCjkGarbleShape(richBody) &&
-          contentFitsRichLimits(richBody)
-        ) {
-          const richOpts: SendRichMessageOpts = {}
-          if (opts.reply_to_message_id !== undefined) {
-            richOpts.reply_to_message_id = opts.reply_to_message_id
-          }
-          // The safe wrapper reports { fallback: true } for every non-
-          // transient refusal; a transient throws and is handled by the
-          // existing catch below exactly like a failed sendMessage.
-          const res = await this.telegramApi.sendRichMessage(chatId, richBody, richOpts)
-          if ('message_id' in res) {
-            this.logger.info('router.outbox.rich_sent', {
-              chat_id: chatId,
-              bytes: Buffer.byteLength(richBody, 'utf8'),
-            })
-            // Flag, NOT an early return: attachments and the claim
-            // confirmation still have to run below. Returning here would
-            // strand the claim in processing/ and drop any files.
-            richSent = true
-          }
-        }
-      }
-
       let sentChunks = 0
       try {
+        // The rich send lives INSIDE this try on purpose (Fable review
+        // 2026-08-30, HIGH #1). The safe wrapper reports { fallback: true }
+        // for every non-transient refusal but RETHROWS a transient one, and
+        // the rich layer deliberately does not retry. Outside the try that
+        // throw escaped `deliverClaim` entirely: the claim stayed in
+        // `outbox/processing/` forever (pollOutboxOnce skips that subdir, so
+        // nothing ever picks it up again) and the `for` loop in drainOutbox
+        // stranded every remaining claim of the same pass. Inside the try
+        // `sentChunks` is still 0, so a failed rich send takes the same
+        // chunk-0 path as a failed sendMessage: reject → dead-letter.
+        //
+        // That dead letter is a QUARANTINE RECORD, not a retry queue (Codex
+        // review 2026-08-30). By the time a transient reaches us the reliable
+        // layer has already classified it: a pre-send failure never touched
+        // Telegram, but an ambiguous one (ECONNRESET / ETIMEDOUT / 5xx) may
+        // have been processed before the answer died. The fleet policy is a
+        // loud possible-loss over a silent duplicate, so we say so in the
+        // reason the sidecar carries — an operator must eyeball the chat
+        // before any redrive.
+        let richSent = false
+        if (message.format === 'auto' && this.telegramApi.sendRichMessage) {
+          const richBody = hardenSoftBreaks(body)
+          if (
+            needsRichRendering(richBody) &&
+            !hasDetailsMathCrashShape(richBody) &&
+            !hasCjkGarbleShape(richBody) &&
+            contentFitsRichLimits(richBody)
+          ) {
+            const richOpts: SendRichMessageOpts = {}
+            if (opts.reply_to_message_id !== undefined) {
+              richOpts.reply_to_message_id = opts.reply_to_message_id
+            }
+            let res
+            try {
+              res = await this.telegramApi.sendRichMessage(chatId, richBody, richOpts)
+            } catch (richErr) {
+              const reason =
+                richErr instanceof Error ? richErr.message : String(richErr)
+              this.logger.error('router.outbox.rich_ambiguous', {
+                chat_id: chatId,
+                original: claim.originalName,
+                error: reason,
+              })
+              // Rethrow so the delivery catch below dead-letters the claim
+              // (sentChunks is still 0), but carry the warning into the
+              // sidecar so nobody redrives a message that may be on screen.
+              throw new Error(
+                `rich send failed — AMBIGUOUS DELIVERY, the message may already be visible; verify the chat before any redrive: ${reason}`,
+              )
+            }
+            if ('message_id' in res) {
+              this.logger.info('router.outbox.rich_sent', {
+                chat_id: chatId,
+                bytes: Buffer.byteLength(richBody, 'utf8'),
+              })
+              // Flag, NOT an early return: attachments and the claim
+              // confirmation still have to run below. Returning here would
+              // strand the claim in processing/ and drop any files.
+              richSent = true
+            }
+          }
+        }
+
         // Rich already shipped the whole body as ONE message — exactly one
         // path sends, so the answer is never duplicated.
         const chunks = richSent
