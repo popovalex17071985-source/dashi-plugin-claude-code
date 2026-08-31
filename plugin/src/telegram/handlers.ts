@@ -50,7 +50,7 @@ import {
 import {
   buildAnimationDescriptor,
   buildAudioDescriptor,
-  buildDocumentDescriptor,
+  buildDocumentDescriptorEager,
   buildOwnMediaDescriptors,
   buildPhotoDescriptor,
   buildReplyMediaDescriptors,
@@ -1489,7 +1489,7 @@ export async function handleInboundDocument(ctx: Context, deps: HandlerDeps): Pr
   maybeTriggerWatcher(ctx, deps)
   maybeBumpMirror(ctx, deps)
   const buildDoc = async (): Promise<MediaDescriptor[]> =>
-    buildDocumentDescriptor(ctx.message?.document)
+    buildDocumentDescriptorEager(ctx.message?.document, photoDownloadDeps(deps))
   if (await tryRouteToAlbumBuffer(ctx, deps, buildDoc, 'document')) return
   await gateAndNotify(ctx, deps, () => ctx.message?.caption ?? '', buildDoc, 'document')
 }
