@@ -343,8 +343,12 @@ sudo tar czf /var/backups/myagent-$(date +%Y%m%d-%H%M).tgz \
 ```bash
 sudo -u agentctl bash /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code/agent-kit/install-kit.sh \
   --claude-dir /home/agentctl/.claude-lab/myagent/.claude \
-  --chat-id <telegram id хозяина> --agent myagent
+  --chat-id <telegram id хозяина> --agent myagent \
+  --tz Asia/Yekaterinburg
 ```
+
+`--tz` — пояс хозяина: кит ставит в крон будильник по срокам и утреннюю
+сводку леджера на 09:00 по этому поясу (без флага возьмёт пояс сервера).
 
 Дальше обычное обновление плагина:
 

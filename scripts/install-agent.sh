@@ -528,32 +528,16 @@ fi
 say "Дисциплина (конституция, гейты, помощники)"
 KIT_DIR="$CLAUDE_DIR/dashi-plugin-claude-code/agent-kit"
 if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
+  # Кроны будильника и утренней сводки теперь ставит сам kit (--tz): так их
+  # получает и агент, обновлённый по гайду «Update плагина», а не только свежая
+  # установка (леджер молчал у обновлённых — Саня 31.08).
   as_agent "bash '$KIT_DIR/install-kit.sh' \
       --claude-dir '$CLAUDE_DIR' \
       --chat-id '$USER_ID' \
       --agent '$AGENT_NAME' \
-      --settings ~/.claude/settings.json" || die "install-kit.sh упал"
-  # Будильник по датам в леджере: без него обещание со сроком лежит молча,
-  # и хозяин узнаёт о нём, только когда сам вспомнит.
-  # Крон живёт по часам СЕРВЕРА, а сводку читает хозяин — считаем час так, чтобы
-  # у него было 09:00. Пояс: --tz, иначе пояс сервера.
-  OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
-  # python3 -c, не heredoc: вложенный heredoc внутри $( ) оставлял python
-  # висеть на stdin — установка молча замирала на 13 минут (поймано e2e 27.08).
-  DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own=zoneinfo.ZoneInfo(os.environ["OWNER_TZ"]); srv=dt.datetime.now().astimezone().tzinfo; print(dt.datetime.now(own).replace(hour=9,minute=0,second=0,microsecond=0).astimezone(srv).hour)' 2>/dev/null || true)"
-  [[ -n "$DIG_H" ]] || { DIG_H=7; warn "не смог посчитать пояс ($OWNER_TZ, нет tzdata?) — сводка в 07:00 по серверу"; }
-  SWP_H="$DIG_H"
-  SWEEP="30 $SWP_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
-  # Утренняя сводка открытых дел хозяину: секция = отдельное сообщение,
-  # длинная режется по границам строк (Telegram рубит на 4096).
-  DIGEST="0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
-  if as_agent "crontab -l 2>/dev/null | grep -q promise-sweeper"; then
-    skip "будильник по срокам уже в кроне"
-  else
-    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST') | crontab -" \
-      && ok "будильник и сводка в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
-      || warn "не смог прописать крон — поставь руками"
-  fi
+      --settings ~/.claude/settings.json \
+      --tz '${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}'" \
+    || die "install-kit.sh упал"
   ok "комплект разложен: конституция, гейты, реестры, помощники"
 else
   warn "agent-kit не найден ($KIT_DIR) — агент встанет без гейтов и реестров"

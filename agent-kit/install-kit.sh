@@ -8,11 +8,11 @@
 #
 # Idempotent: re-running replaces files and never double-registers a hook.
 #
-# Usage: install-kit.sh --claude-dir DIR [--chat-id ID] [--agent NAME] [--settings FILE]
+# Usage: install-kit.sh --claude-dir DIR [--chat-id ID] [--agent NAME] [--settings FILE] [--tz TZ]
 set -euo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAUDE_DIR=""; CHAT_ID=""; AGENT=""; SETTINGS=""
+CLAUDE_DIR=""; CHAT_ID=""; AGENT=""; SETTINGS=""; OWNER_TZ=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -20,6 +20,7 @@ while [[ $# -gt 0 ]]; do
     --chat-id)    CHAT_ID="$2";    shift 2 ;;
     --agent)      AGENT="$2";      shift 2 ;;
     --settings)   SETTINGS="$2";   shift 2 ;;
+    --tz)         OWNER_TZ="$2";   shift 2 ;;   # пояс ХОЗЯИНА: сводка в 09:00 по нему
     *) echo "unknown arg: $1" >&2; exit 2 ;;
   esac
 done
@@ -99,5 +100,23 @@ for event, matcher, name, timeout in WIRING:
 settings.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 print(f"  хуков зарегистрировано: {added} (уже стояло: {len(WIRING) - added})")
 PY
+
+# Будильник по срокам + утренняя сводка леджера. Раньше эти кроны ставил только
+# полный install-agent.sh — агент, обновлённый по гайду «Update плагина», получал
+# леджер-файлы, но сводка ему молчала (Саня 31.08). Теперь кроны — часть комплекта.
+# Крон живёт по часам СЕРВЕРА, сводку читает хозяин — считаем час под его 09:00.
+OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
+# python3 -c, не heredoc: вложенный heredoc внутри $( ) вешал установку на stdin.
+DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own=zoneinfo.ZoneInfo(os.environ["OWNER_TZ"]); srv=dt.datetime.now().astimezone().tzinfo; print(dt.datetime.now(own).replace(hour=9,minute=0,second=0,microsecond=0).astimezone(srv).hour)' 2>/dev/null || true)"
+[[ -n "$DIG_H" ]] || { DIG_H=7; echo "  ! не смог посчитать пояс ($OWNER_TZ, нет tzdata?) — сводка в 07:00 по серверу"; }
+SWEEP="30 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
+DIGEST="0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
+if crontab -l 2>/dev/null | grep -q promise-sweeper; then
+  echo "  будильник и сводка уже в кроне"
+else
+  (crontab -l 2>/dev/null; echo "$SWEEP"; echo "$DIGEST") | crontab - \
+    && echo "  будильник и сводка в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
+    || echo "  ! не смог прописать крон — поставь руками"
+fi
 
 echo "  комплект разложен в $CLAUDE_DIR"
