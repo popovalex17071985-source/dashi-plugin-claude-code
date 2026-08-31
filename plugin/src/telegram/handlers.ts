@@ -32,7 +32,9 @@ import type { MultichatPolicy } from '../chats/policy-loader.js'
 import type { MultichatRouter } from '../router/multichat-router.js'
 import type { InboundMessage } from '../router/inbox-bridge.js'
 import { sendChannelNotification, type ChannelEvent } from '../channel/notify.js'
-import { gateTelegramMessage, type GateInput } from './gate.js'
+import { appendFileSync, mkdirSync } from 'node:fs'
+import { dirname } from 'node:path'
+import { gateTelegramMessage, type GateInput, type GateDecision } from './gate.js'
 import { isAddressedToBot } from './addressing.js'
 import { textWithEntities } from './entities.js'
 import {
@@ -440,6 +442,35 @@ function buildMeta(
   return meta
 }
 
+// Journal a gate-dropped inbound to logs/rejected-inbound.jsonl. The debug
+// log line disappears at default LOG_LEVEL, so this file is the owner's only
+// record of who knocked and was turned away. Must never break inbound
+// handling — swallow all fs errors.
+function journalRejectedInbound(
+  deps: HandlerDeps,
+  input: GateInput,
+  decision: Extract<GateDecision, { kind: 'drop' }>,
+  kind: string,
+): void {
+  try {
+    const p = deps.statePaths.logs.rejected_inbound
+    mkdirSync(dirname(p), { recursive: true })
+    appendFileSync(
+      p,
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        reason: decision.reason,
+        chat_id: input.chatId,
+        chat_type: input.chatType,
+        sender_id: input.senderId,
+        kind,
+      }) + '\n',
+    )
+  } catch {
+    /* journal is best-effort */
+  }
+}
+
 // Common gate+notify body. Each per-kind handler computes its primary text
 // and (in T8+) a list of MediaDescriptors via buildMedia. We render the
 // descriptors and feed them to buildChannelContent so the agent sees
@@ -464,6 +495,7 @@ async function gateAndNotify(
       sender_id: input.senderId,
       chat_id: input.chatId,
     })
+    journalRejectedInbound(deps, input, decision, kind)
     return
   }
 

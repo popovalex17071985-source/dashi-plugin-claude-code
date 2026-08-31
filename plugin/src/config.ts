@@ -706,6 +706,7 @@ export type StatePaths = {
      * `request_created`, `request_resolved`. Written by the webhook route.
      */
     permission_gate: string
+    rejected_inbound: string
   }
 }
 
@@ -737,6 +738,10 @@ export function getStatePaths(_config: AppConfig, env: RuntimeEnv): StatePaths {
       webhook: join(root, 'logs', 'webhook.log'),
       ask_user_question: join(root, 'logs', 'ask-user-question.jsonl'),
       permission_gate: join(root, 'logs', 'permission-gate.jsonl'),
+      // Journal of inbound messages dropped by the gate (foreign chats/senders).
+      // Owner-facing "who knocked and was turned away": debug logs vanish at
+      // default LOG_LEVEL, so rejected traffic was invisible before this.
+      rejected_inbound: join(root, 'logs', 'rejected-inbound.jsonl'),
     },
   }
 }

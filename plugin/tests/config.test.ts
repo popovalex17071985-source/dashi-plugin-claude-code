@@ -464,6 +464,16 @@ describe('loadConfig', () => {
     const paths = getStatePaths(cfg, parsedEnv)
     expect(paths.logs.ask_user_question).toBe(join(stateDir, 'logs', 'ask-user-question.jsonl'))
   })
+
+  test('paths.logs.rejected_inbound resolves to ${state_dir}/logs/rejected-inbound.jsonl', () => {
+    const cfg = loadConfig(env())
+    const parsedEnv = RuntimeEnvSchema.parse({
+      TELEGRAM_BOT_TOKEN: FAKE_TOKEN,
+      TELEGRAM_STATE_DIR: stateDir,
+    })
+    const paths = getStatePaths(cfg, parsedEnv)
+    expect(paths.logs.rejected_inbound).toBe(join(stateDir, 'logs', 'rejected-inbound.jsonl'))
+  })
 })
 
 describe('richMessages config (M1, 2026-06-14)', () => {
