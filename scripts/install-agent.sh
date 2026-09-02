@@ -629,8 +629,9 @@ say "Прожиматель стартовых диалогов"
 cat > /usr/local/bin/dashi-press-dialogs <<'EOF'
 #!/usr/bin/env bash
 # Bypass Permissions -> Down+Enter (дефолт «No, exit»), остальные диалоги
-# (dev channels, trust, внешние импорты) -> Enter. Всегда exit 0 — это
-# ExecStartPost, падать ему нельзя.
+# (dev channels, trust, внешние импорты) -> Enter. Всегда exit 0: зовётся
+# фоном из dashi-run, его код возврата никого не интересует, а падение
+# с ошибкой только засоряет журнал.
 set -u
 SESSION="${1:?usage: dashi-press-dialogs <tmux-session>}"
 # 40×3с = 2 мин: на слабом VPS (1 ГБ + своп) Claude грузится дольше 45 секунд
