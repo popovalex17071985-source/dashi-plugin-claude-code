@@ -20,6 +20,12 @@
 #   ... --claude-token sk-ant-oat01-...      # готовый годовой токен (claude setup-token на любой машине)
 #   ... --repair-token 123:BB...             # бот-ремонтник: страховка на случай «агент лёг и молчит»
 #   ... --no-browser                         # без Playwright/Chromium (по умолчанию браузер ставится)
+#   ... --groq-key gsk_...                   # голосовые сообщения через Groq (Whisper)
+#   ... --tz Asia/Yekaterinburg              # пояс ХОЗЯИНА: утренняя сводка в 09:00 по нему (по умолчанию пояс сервера)
+#   ... --user agent                         # системный пользователь агента (по умолчанию agent)
+#   ... --webhook-port 8089                  # порт приёмника хуков; второму агенту на хосте — свой (+ свой --user)
+#   ... --repo URL                           # откуда клонировать плагин (по умолчанию GitHub)
+#   ... --yes                                # без вопросов (cloud-init, CI): необязательное пропускается
 #
 set -euo pipefail
 
@@ -54,7 +60,8 @@ warn() { printf '    \033[33m! %s\033[0m\n' "$*"; }
 have_tty() { { : </dev/tty; } 2>/dev/null; }
 
 usage() {
-  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+  # Шапка файла до set -euo — целиком, чтобы новый флаг не выпадал из справки
+  awk 'NR >= 2 && /^set -euo pipefail/ { exit } NR >= 2 { print }' "$0" | sed 's/^# \{0,1\}//'
   exit 0
 }
 
@@ -70,8 +77,8 @@ while [[ $# -gt 0 ]]; do
     --user)      SERVICE_USER="$2"; USER_GIVEN=1; shift 2 ;;
     --webhook-port) WEBHOOK_PORT="$2"; PORT_GIVEN=1; shift 2 ;;   # порт приёмника хуков (по умолчанию 8089)
     --repo)      REPO_URL="$2";   shift 2 ;;
-    --branch)    BRANCH="$2";     shift 2 ;;
-    --tz)        OWNER_TZ="$2";   shift 2 ;;   # пояс ХОЗЯИНА: сводка приходит в 09:00 по нему   # main (по умолчанию) | feature-ветка для staging
+    --branch)    BRANCH="$2";     shift 2 ;;   # main (по умолчанию) | feature-ветка для staging
+    --tz)        OWNER_TZ="$2";   shift 2 ;;   # пояс ХОЗЯИНА: сводка приходит в 09:00 по нему
     --model)     MODEL="$2";      shift 2 ;;   # opus|sonnet|haiku|полный id; пусто = дефолт аккаунта
     --no-browser) SKIP_BROWSER=1; shift ;;   # не ставить Playwright/Chromium (экономия ~400 МБ)
     --yes|-y)    ASSUME_YES=1;    shift ;;
