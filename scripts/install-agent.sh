@@ -1122,15 +1122,6 @@ fi
 as_agent 'grep -qs hasCompletedOnboarding ~/.claude.json' \
   || as_agent 'cp -f ~/.claude.json ~/.claude.json.bak 2>/dev/null; printf "%s" "{\"hasCompletedOnboarding\": true, \"theme\": \"dark\"}" > ~/.claude.json'
 
-# 02.09.2026, живой прогон на Смите: Claude Code 2.1.258 молча НЕ читал plugin/.mcp.json —
-# Claude работал, а мост в Telegram не стартовал («No MCP servers configured»). Регистрируем
-# мост на уровне пользователя: не зависит от доверия к папке и одобрения проектных серверов.
-if as_agent "cd '$PLUGIN_DIR' && { claude mcp get dashi-channel >/dev/null 2>&1 || claude mcp add -s user dashi-channel -- bun ./src/server.ts >/dev/null 2>&1; }"; then
-  ok "мост dashi-channel зарегистрирован в Claude (user-scope)"
-else
-  warn "не смог зарегистрировать мост: su - $SERVICE_USER -c 'cd $PLUGIN_DIR && claude mcp add -s user dashi-channel -- bun ./src/server.ts'"
-fi
-
 # ─────────────────────────────────────────────────────────────────────────────
 # 5c. Superpowers (навыки: планирование, отладка, ревью)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1383,7 +1374,17 @@ if systemctl is-active --quiet "$UNIT"; then
   warn "агент $AGENT_NAME сейчас работает — перезапускаю, чтобы он подхватил новые хуки и плагин:"
   warn "связь моргнёт, текущий ход агента (если он что-то делал) оборвётся; после старта он снова на связи"
 fi
-systemctl try-restart "$UNIT" >/dev/null 2>&1 || true
+systemctl stop "$UNIT" >/dev/null 2>&1 || true
+# Регистрация моста — ТОЛЬКО при остановленном агенте: живой Claude при выходе переписывает
+# ~/.claude.json своей копией и стирает всё, что дописали снаружи (Смит 02.09, второй прогон).
+# 02.09.2026, живой прогон на Смите: Claude Code 2.1.258 молча НЕ читал plugin/.mcp.json —
+# Claude работал, а мост в Telegram не стартовал («No MCP servers configured»). Регистрируем
+# мост на уровне пользователя: не зависит от доверия к папке и одобрения проектных серверов.
+if as_agent "cd '$PLUGIN_DIR' && { claude mcp get dashi-channel >/dev/null 2>&1 || claude mcp add -s user dashi-channel -- bun ./src/server.ts >/dev/null 2>&1; }"; then
+  ok "мост dashi-channel зарегистрирован в Claude (user-scope)"
+else
+  warn "не смог зарегистрировать мост: su - $SERVICE_USER -c 'cd $PLUGIN_DIR && claude mcp add -s user dashi-channel -- bun ./src/server.ts'"
+fi
 systemctl enable --now "$UNIT" >/dev/null 2>&1 || true
 sleep 8
 
