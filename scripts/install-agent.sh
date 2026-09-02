@@ -43,6 +43,9 @@ ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
 skip() { printf '    \033[2m· %s (уже сделано)\033[0m\n' "$*"; }
 die()  { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 warn() { printf '    \033[33m! %s\033[0m\n' "$*"; }
+# Есть ли настоящий терминал. `-r /dev/tty` врёт: файл читаем всегда, а открыть
+# его без управляющего терминала (docker exec, CI, cloud-init) нельзя.
+have_tty() { { : </dev/tty; } 2>/dev/null; }
 
 usage() {
   sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
@@ -85,7 +88,7 @@ ask() {  # ask VAR "приглашение" [обязательность]
     # Без терминала (docker exec, CI, вложенный su) read падает мгновенно —
     # со старым `|| true` цикл крутился вечно, жрал CPU и МОЛЧАЛ. Теперь
     # установка честно останавливается с понятной причиной. (e2e 27.08.)
-    if ! read -r -p "$__prompt" __val </dev/tty 2>/dev/null; then
+    if ! have_tty || ! read -r -p "$__prompt" __val </dev/tty 2>/dev/null; then
       [[ "$__required" -eq 0 ]] && break
       die "нужен ответ на «$__prompt», но терминала нет — запусти установщик интерактивно или передай значение флагом"
     fi
@@ -898,7 +901,7 @@ elif have_token; then
 elif logged_in; then
   warn "нашёл обычный вход — работает, но протухает ~раз в 30 дней."
   warn "Годовой: su - $SERVICE_USER -c 'claude setup-token', затем повторный прогон с --claude-token TOKEN"
-elif [[ ! -r /dev/tty ]]; then
+elif ! have_tty; then
   cat <<EOF
 
 ──────────────────────────────────────────────────────────────
