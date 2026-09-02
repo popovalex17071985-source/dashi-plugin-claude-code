@@ -206,10 +206,21 @@ apt-get install -y -qq git unzip tmux curl jq python3
 # Ставим своп — дешевле, чем объяснять человеку OOM.
 mem_kb=$(awk '/MemTotal/{print $2}' /proc/meminfo)
 if (( mem_kb < 1800000 )) && ! swapon --show --noheadings | grep -q .; then
-  fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none
-  chmod 600 /swapfile && mkswap -q /swapfile && swapon /swapfile
-  grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
-  ok "своп 2 ГБ (памяти всего $(( mem_kb / 1024 )) МБ)"
+  make_swap() {  # make_swap fallocate|dd — файл, права, mkswap, swapon; любой сбой = false
+    rm -f /swapfile
+    if [[ "$1" == fallocate ]]; then fallocate -l 2G /swapfile 2>/dev/null
+    else dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none 2>/dev/null; fi \
+      && chmod 600 /swapfile && mkswap -q /swapfile 2>/dev/null && swapon /swapfile 2>/dev/null
+  }
+  # На btrfs/zfs fallocate проходит, а swapon отказывает («дырявый» файл) —
+  # раньше set -e ронял всю установку; пробуем dd, не вышло — идём без свопа.
+  if make_swap fallocate || make_swap dd; then
+    grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    ok "своп 2 ГБ (памяти всего $(( mem_kb / 1024 )) МБ)"
+  else
+    rm -f /swapfile
+    warn "своп не поднялся (btrfs/zfs/контейнер?) — продолжаю без него; памяти $(( mem_kb / 1024 )) МБ, Claude может падать по OOM"
+  fi
 fi
 
 # Журнал systemd без потолка за месяцы съедает гигабайты на маленьком VPS
