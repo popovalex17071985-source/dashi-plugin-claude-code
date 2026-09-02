@@ -9,7 +9,9 @@ fail() { echo "✗ $1" >&2; exit 1; }
 
 bash -n "$KIT/install-kit.sh" || fail "синтаксис install-kit.sh"
 grep -q "install-kit.sh" "$INSTALLER" || fail "установщик не зовёт комплект"
-grep -q "open-threads-digest.py --send" "$INSTALLER" || fail "утренняя сводка не в кроне"
+# Кроны сводки и будильника ставит сам комплект (f7e3907), не установщик
+grep -q "open-threads-digest.py --send" "$KIT/install-kit.sh" || fail "утренняя сводка не в кроне"
+grep -q "promise-sweeper.py" "$KIT/install-kit.sh" || fail "будильник по срокам не в кроне"
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 mkdir -p "$T/.claude/core"
