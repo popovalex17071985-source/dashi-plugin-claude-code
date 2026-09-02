@@ -110,7 +110,7 @@ ask() {  # ask VAR "приглашение" [обязательность]
     # Без терминала (docker exec, CI, вложенный su) read падает мгновенно —
     # со старым `|| true` цикл крутился вечно, жрал CPU и МОЛЧАЛ. Теперь
     # установка честно останавливается с понятной причиной. (e2e 27.08.)
-    if ! have_tty || ! read -r -p "$__prompt" __val </dev/tty 2>/dev/null; then
+    if ! have_tty || ! read -r -p "$__prompt" __val </dev/tty; then
       [[ "$__required" -eq 0 ]] && break
       die "нужен ответ на «$__prompt», но терминала нет — запусти установщик интерактивно или передай значение флагом"
     fi
@@ -726,7 +726,14 @@ SESSION="${1:?usage: dashi-press-dialogs <tmux-session>}"
 for _ in $(seq 1 40); do
   sleep 3
   screen="$(tmux capture-pane -pt "$SESSION" 2>/dev/null)" || exit 0
-  if grep -q "Bypass Permissions" <<<"$screen"; then
+  # 02.09.2026: Claude Code 2.1.25x спрашивает «Do you trust this folder?» с курсором на
+  # «No, exit» — слепой Enter ВЫХОДИЛ из Claude, сервис крутился в рестартах (живой прогон
+  # на Смите). Любой диалог, где выделено «No, exit», — сначала Down, потом Enter.
+  if grep -qE "❯ *No, exit" <<<"$screen"; then
+    tmux send-keys -t "$SESSION" Down
+    sleep 1
+    tmux send-keys -t "$SESSION" Enter
+  elif grep -q "Bypass Permissions" <<<"$screen"; then
     tmux send-keys -t "$SESSION" Down
     sleep 1
     tmux send-keys -t "$SESSION" Enter
@@ -980,10 +987,15 @@ EOF
       # версиях (1.53 в Ubuntu 22.04) игнорирует готовый токен и всё равно лезет
       # в интерактивный OAuth — на сервере это тупик.
       as_agent "mkdir -p ~/.config/rclone && umask 077 && { grep -q '^\[gdrive\]' ~/.config/rclone/rclone.conf 2>/dev/null || printf '[gdrive]\ntype = drive\nscope = drive\ntoken = %s\n' \"\$(cat '$TOKFILE')\" >> ~/.config/rclone/rclone.conf; }"
-      if as_agent "rclone lsd gdrive: --retries 1 --low-level-retries 1 --timeout 20s >/dev/null 2>&1"; then
+      # Причину показываем словами rclone: «403 quota» — это не битый токен, а лимит Google
+      # на минуту, конфиг уже записан и ночью заработает сам (живой прогон 02.09).
+      rc_err="$(as_agent "rclone lsd gdrive: --retries 1 --low-level-retries 1 --timeout 20s 2>&1 >/dev/null" | tail -1 | cut -c1-160)"
+      if [[ -z "$rc_err" ]]; then
         ok "Google Drive подключён — ночная копия уедет в облако"
+      elif grep -qiE "quota|rate ?limit|403" <<<"$rc_err"; then
+        warn "Google ответил лимитом (${rc_err#*: }) — токен записан, копия уедет ночью; проверить: rclone lsd gdrive:"
       else
-        warn "токен не подошёл — подключи позже: rclone config create gdrive drive token '<строка>'"
+        warn "Drive не подключился: ${rc_err} — проверь строку токена: rclone config create gdrive drive token '<строка>'"
       fi
       rm -f "$TOKFILE"
     else
@@ -1362,7 +1374,24 @@ if systemctl is-active --quiet "$UNIT"; then
   warn "агент $AGENT_NAME сейчас работает — перезапускаю, чтобы он подхватил новые хуки и плагин:"
   warn "связь моргнёт, текущий ход агента (если он что-то делал) оборвётся; после старта он снова на связи"
 fi
-systemctl try-restart "$UNIT" >/dev/null 2>&1 || true
+systemctl stop "$UNIT" >/dev/null 2>&1 || true
+# stop возвращается раньше, чем Claude внутри tmux допишет ~/.claude.json при выходе —
+# ждём, пока процесс claude агента исчезнет (до 20 с), иначе регистрация ниже стирается.
+for _ in $(seq 1 20); do pgrep -u "$SERVICE_USER" -x claude >/dev/null 2>&1 || break; sleep 1; done
+sleep 1
+# Регистрация моста — ТОЛЬКО при остановленном агенте: живой Claude при выходе переписывает
+# ~/.claude.json своей копией и стирает всё, что дописали снаружи (Смит 02.09, второй прогон).
+# 02.09.2026, живой прогон на Смите: Claude Code 2.1.258 молча НЕ читал plugin/.mcp.json —
+# Claude работал, а мост в Telegram не стартовал («No MCP servers configured»). Регистрируем
+# мост на уровне пользователя: не зависит от доверия к папке и одобрения проектных серверов.
+# Не проверять через `claude mcp get`: он видит запись из plugin/.mcp.json и отвечает «есть»,
+# хотя в user-scope пусто — регистрация молча пропускалась (Смит 02.09, три прогона подряд).
+# Всегда снять и поставить заново — идемпотентно.
+if as_agent "cd '$PLUGIN_DIR' && { claude mcp remove -s user dashi-channel >/dev/null 2>&1 || true; } && claude mcp add -s user dashi-channel -- bun ./src/server.ts >/dev/null 2>&1"; then
+  ok "мост dashi-channel зарегистрирован в Claude (user-scope)"
+else
+  warn "не смог зарегистрировать мост: su - $SERVICE_USER -c 'cd $PLUGIN_DIR && claude mcp add -s user dashi-channel -- bun ./src/server.ts'"
+fi
 systemctl enable --now "$UNIT" >/dev/null 2>&1 || true
 sleep 8
 
