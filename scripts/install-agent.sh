@@ -208,7 +208,7 @@ EOF
     ask __tz_in "Твой город или пояс [Enter -- как на сервере, $SERVER_TZ]: " 0
     if [[ -z "$__tz_in" ]]; then OWNER_TZ="$SERVER_TZ"; break; fi
     __tz_try="$(tz_from_city "$__tz_in")"
-    if [[ -f "/usr/share/zoneinfo/$__tz_try" ]]; then
+    if [[ ! -d /usr/share/zoneinfo || -f "/usr/share/zoneinfo/$__tz_try" ]]; then
       OWNER_TZ="$__tz_try"
       echo "    -> $OWNER_TZ, сейчас там $(TZ="$OWNER_TZ" date '+%H:%M')"
       break
@@ -218,7 +218,12 @@ EOF
 fi
 OWNER_TZ="${OWNER_TZ:-$SERVER_TZ}"
 OWNER_TZ="$(tz_from_city "$OWNER_TZ")"
-[[ -f "/usr/share/zoneinfo/$OWNER_TZ" ]] || die "неизвестный часовой пояс: $OWNER_TZ (пример правильного: Asia/Yekaterinburg)"
+# Проверяем по справочнику tzdata, но ТОЛЬКО если он на машине есть: на голой
+# ubuntu:22.04 его ещё нет (ставится ниже вместе с системой), и жёсткая
+# проверка роняла установку на первом же шаге — e2e поймал 02.09.
+if [[ -d /usr/share/zoneinfo ]] && [[ ! -f "/usr/share/zoneinfo/$OWNER_TZ" ]]; then
+  die "неизвестный часовой пояс: $OWNER_TZ (пример правильного: Asia/Yekaterinburg)"
+fi
 ok "пояс хозяина: $OWNER_TZ (сейчас там $(TZ="$OWNER_TZ" date '+%H:%M'), утренняя сводка в 09:00 по нему)"
 
 # Часы САМОГО сервера тоже переводим на пояс хозяина — но только на ПЕРВОЙ
