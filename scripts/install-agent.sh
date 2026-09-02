@@ -120,6 +120,25 @@ ask() {  # ask VAR "приглашение" [обязательность]
   printf -v "$__var" '%s' "$__val"
 }
 
+# Город хозяина -> код часового пояса. Спрашивать у человека IANA-код
+# бессмысленно: он знает свой город, а не «Asia/Yekaterinburg». Незнакомое
+# значение возвращаем как есть — ниже оно проверяется по /usr/share/zoneinfo.
+tz_from_city() {
+  case "$1" in
+    [Мм]осква|[Мм]оскве|[Пп]итер|[Сс]анкт*|[Кк]азань|[Сс]очи|[Рр]остов*|[Вв]оронеж|[Нн]ижний*|moscow|Moscow|MSK|msk|spb) echo Europe/Moscow ;;
+    [Кк]алининград*)                                       echo Europe/Kaliningrad ;;
+    [Сс]амара|[Сс]амаре|[Ии]жевск|[Сс]аратов)              echo Europe/Samara ;;
+    [Пп]ермь|[Пп]ерми|[Ее]катеринбург*|[Ее]кб|[Уу]фа|[Чч]елябинск|[Тт]юмень|perm|Perm|ekb|EKB) echo Asia/Yekaterinburg ;;
+    [Оо]мск|[Оо]мске)                                      echo Asia/Omsk ;;
+    [Нн]овосибирск*|[Нн]овосиб|[Бб]арнаул|[Тт]омск|[Кк]емерово) echo Asia/Novosibirsk ;;
+    [Кк]расноярск*|[Аа]бакан)                              echo Asia/Krasnoyarsk ;;
+    [Ии]ркутск*|[Уу]лан-[Уу]дэ)                            echo Asia/Irkutsk ;;
+    [Яя]кутск*|[Чч]ита)                                    echo Asia/Yakutsk ;;
+    [Вв]ладивосток*|[Хх]абаровск)                          echo Asia/Vladivostok ;;
+    *) echo "$1" ;;
+  esac
+}
+
 say "Кого разворачиваем"
 [[ -n "$AGENT_NAME" ]] || ask AGENT_NAME "Имя агента (латиницей, напр. jarvis): "
 [[ "$AGENT_NAME" =~ ^[a-z][a-z0-9_-]*$ ]] || die "имя только латиницей в нижнем регистре: $AGENT_NAME"
@@ -162,11 +181,45 @@ ok "порт вебхука: $WEBHOOK_PORT"
 # Пояс хозяина: флаг --tz → то, что уже записано в channel.env → пояс сервера.
 # Помним его в конфиге, иначе повторный прогон и /update без --tz молча
 # сдвинули бы утреннюю сводку на час сервера.
+SERVER_TZ="$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)"
 if [[ -z "$OWNER_TZ" && -f "$ENV_FILE" ]]; then
   OWNER_TZ="$(sed -n 's/^DASHI_OWNER_TZ=//p' "$ENV_FILE" | head -1)"
 fi
-OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
-ok "пояс хозяина: $OWNER_TZ (утренняя сводка в 09:00 по нему)"
+# Первая установка без --tz: СПРАШИВАЕМ. Сервер почти всегда в UTC или MSK, а
+# хозяин живёт в другом поясе — молчаливый дефолт уводил утреннюю сводку и все
+# расписания на часы, и человек об этом узнавал через неделю.
+if [[ -z "$OWNER_TZ" && $ASSUME_YES -eq 0 ]] && have_tty; then
+  cat <<EOF
+
+  ЧАСОВОЙ ПОЯС ХОЗЯИНА. По нему агент считает всё время: утренняя сводка в
+  09:00, ночные задачи, любое «во сколько». Сейчас на сервере $SERVER_TZ
+  ($(TZ="$SERVER_TZ" date '+%H:%M')).
+
+  Введи свой ГОРОД (или сразу код пояса):
+    Москва, Питер, Казань, Сочи                  -> Europe/Moscow
+    Пермь, Екатеринбург, Уфа, Челябинск, Тюмень  -> Asia/Yekaterinburg
+    Самара, Ижевск -> Europe/Samara    Калининград -> Europe/Kaliningrad
+    Омск -> Asia/Omsk                  Новосибирск, Томск -> Asia/Novosibirsk
+    Красноярск -> Asia/Krasnoyarsk     Иркутск -> Asia/Irkutsk
+    Якутск -> Asia/Yakutsk             Владивосток, Хабаровск -> Asia/Vladivostok
+
+EOF
+  while :; do
+    ask __tz_in "Твой город или пояс [Enter -- как на сервере, $SERVER_TZ]: " 0
+    if [[ -z "$__tz_in" ]]; then OWNER_TZ="$SERVER_TZ"; break; fi
+    __tz_try="$(tz_from_city "$__tz_in")"
+    if [[ -f "/usr/share/zoneinfo/$__tz_try" ]]; then
+      OWNER_TZ="$__tz_try"
+      echo "    -> $OWNER_TZ, сейчас там $(TZ="$OWNER_TZ" date '+%H:%M')"
+      break
+    fi
+    echo "    не знаю такого места: $__tz_in — введи город из списка выше или код вида Asia/Yekaterinburg"
+  done
+fi
+OWNER_TZ="${OWNER_TZ:-$SERVER_TZ}"
+OWNER_TZ="$(tz_from_city "$OWNER_TZ")"
+[[ -f "/usr/share/zoneinfo/$OWNER_TZ" ]] || die "неизвестный часовой пояс: $OWNER_TZ (пример правильного: Asia/Yekaterinburg)"
+ok "пояс хозяина: $OWNER_TZ (сейчас там $(TZ="$OWNER_TZ" date '+%H:%M'), утренняя сводка в 09:00 по нему)"
 
 # Токен и id спрашиваем, только если конфига ещё нет — на повторном прогоне не дёргаем.
 if [[ ! -f "$ENV_FILE" ]]; then

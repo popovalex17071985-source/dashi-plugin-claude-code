@@ -56,3 +56,13 @@ grep -q 'grep -qE "❯ \*No, exit"' "$S" || fail "dashi-press-dialogs: нет о
 
 # 02.09.2026: Claude Code 2.1.258 не читал plugin/.mcp.json на живом прогоне — мост регистрируется в user-scope.
 grep -q 'claude mcp add -s user dashi-channel -- bun ./src/server.ts' "$S" || fail "нет регистрации моста через claude mcp add -s user"
+
+# 02.09.2026: пояс хозяина спрашивается на первой установке (сервер почти всегда
+# UTC/MSK) и принимается ГОРОДОМ, а не только IANA-кодом.
+grep -q 'ЧАСОВОЙ ПОЯС ХОЗЯИНА' "$S" || fail "установщик не спрашивает часовой пояс"
+tzfn="$(mktemp)"; sed -n '/^tz_from_city() {/,/^}/p' "$S" > "$tzfn"; source "$tzfn"; rm -f "$tzfn"
+[[ "$(tz_from_city Пермь)"   == Asia/Yekaterinburg ]] || fail "город Пермь не переводится в пояс"
+[[ "$(tz_from_city москва)"  == Europe/Moscow      ]] || fail "город москва не переводится в пояс"
+[[ "$(tz_from_city Asia/Omsk)" == Asia/Omsk        ]] || fail "готовый код пояса не должен переписываться"
+[[ "$(tz_from_city Нарния)"  == Нарния             ]] || fail "незнакомое значение должно возвращаться как есть"
+echo "✓ пояс хозяина: вопрос + перевод города в код"
