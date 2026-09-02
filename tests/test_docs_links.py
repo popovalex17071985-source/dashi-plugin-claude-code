@@ -55,9 +55,15 @@ OLD_REPO_NAME = "qwwiwi-channel-telegram-Claude-code"
 
 # Matches `[label](target)` markdown links. Captures the target only.
 MD_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
+# Fenced blocks and inline code spans hold *examples* (README §9 mentions a
+# literal `[text](url)`), not links — drop them before extracting targets.
+FENCED_CODE_RE = re.compile(r"```.*?```", re.DOTALL)
+INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 
 
 def _extract_link_targets(text: str) -> list[str]:
+    text = FENCED_CODE_RE.sub("", text)
+    text = INLINE_CODE_RE.sub("", text)
     return MD_LINK_RE.findall(text)
 
 
