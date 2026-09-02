@@ -1384,7 +1384,10 @@ sleep 1
 # 02.09.2026, живой прогон на Смите: Claude Code 2.1.258 молча НЕ читал plugin/.mcp.json —
 # Claude работал, а мост в Telegram не стартовал («No MCP servers configured»). Регистрируем
 # мост на уровне пользователя: не зависит от доверия к папке и одобрения проектных серверов.
-if as_agent "cd '$PLUGIN_DIR' && { claude mcp get dashi-channel >/dev/null 2>&1 || claude mcp add -s user dashi-channel -- bun ./src/server.ts >/dev/null 2>&1; }"; then
+# Не проверять через `claude mcp get`: он видит запись из plugin/.mcp.json и отвечает «есть»,
+# хотя в user-scope пусто — регистрация молча пропускалась (Смит 02.09, три прогона подряд).
+# Всегда снять и поставить заново — идемпотентно.
+if as_agent "cd '$PLUGIN_DIR' && { claude mcp remove -s user dashi-channel >/dev/null 2>&1 || true; } && claude mcp add -s user dashi-channel -- bun ./src/server.ts >/dev/null 2>&1"; then
   ok "мост dashi-channel зарегистрирован в Claude (user-scope)"
 else
   warn "не смог зарегистрировать мост: su - $SERVICE_USER -c 'cd $PLUGIN_DIR && claude mcp add -s user dashi-channel -- bun ./src/server.ts'"
