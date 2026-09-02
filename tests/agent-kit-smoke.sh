@@ -97,8 +97,12 @@ python3 "$T/bin/open-threads-digest.py" --selfcheck >/dev/null || fail "утре
 [[ "$(grep -c "$T/bin/open-threads-digest.py --send" "$CRONTAB_FILE")" == 1 ]] || fail "сводка не в кроне"
 grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "затёр чужую строку крона"
 
-# Повторный прогон ничего не задваивает
-bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null
+# Повторный прогон ничего не задваивает, а локально правленный файл — сначала в бэкап
+echo "# local tweak" >> "$H/block-dangerous.sh"
+out="$(bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke)"
+grep -q "сохранил 1 старых файлов" <<<"$out" || fail "перезапись без бэкапа: $out"
+grep -rq "local tweak" "$T/.kit-backup/"*/.claude/hooks/block-dangerous.sh || fail "бэкап не содержит старую версию"
+grep -q "local tweak" "$H/block-dangerous.sh" && fail "хук не обновлён комплектом"
 n2=$(python3 -c "
 import json;d=json.load(open('$T/.claude/settings.json'))
 print(sum(len(e['hooks']) for a in d['hooks'].values() for e in a))")

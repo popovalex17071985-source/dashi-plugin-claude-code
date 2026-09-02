@@ -33,11 +33,24 @@ WORKSPACE="$(dirname "$CLAUDE_DIR")"
 mkdir -p "$CLAUDE_DIR"/{hooks,core,agents} "$WORKSPACE/bin" "$WORKSPACE/logs"
 
 # Placeholders are substituted on copy — the kit itself stays host-agnostic.
+# A file that already exists AND differs is copied to .kit-backup/<stamp>/<same
+# relative path> first: the kit refreshes hooks/bin/agents/constitution on a
+# living agent, and a local tweak lost without a copy is a silent regression.
+BACKUP_DIR="$WORKSPACE/.kit-backup/$(date +%Y%m%d-%H%M)"
+BACKED=0
 render() {
+  local tmp; tmp="$(mktemp)"
   sed -e "s|__CLAUDE_DIR__|$CLAUDE_DIR|g" \
       -e "s|__WORKSPACE__|$WORKSPACE|g" \
       -e "s|__CHAT_ID__|$CHAT_ID|g" \
-      -e "s|__AGENT__|$AGENT|g" "$1" > "$2"
+      -e "s|__AGENT__|$AGENT|g" "$1" > "$tmp"
+  if [[ -f "$2" ]] && ! cmp -s "$tmp" "$2"; then
+    local rel="${2#"$WORKSPACE"/}"
+    mkdir -p "$BACKUP_DIR/$(dirname "$rel")"
+    cp -p "$2" "$BACKUP_DIR/$rel"
+    BACKED=$((BACKED + 1))
+  fi
+  cat "$tmp" > "$2"; rm -f "$tmp"
 }
 
 for f in "$KIT"/hooks/*; do render "$f" "$CLAUDE_DIR/hooks/$(basename "$f")"; done
@@ -62,6 +75,7 @@ for f in SOURCES.md open-threads.md; do
 done
 mkdir -p "$CLAUDE_DIR/docs"
 render "$KIT/docs/agent-self-audit.md" "$CLAUDE_DIR/docs/agent-self-audit.md"
+(( BACKED == 0 )) || echo "  сохранил $BACKED старых файлов в $BACKUP_DIR"
 
 # Hook registration. Matchers mirror what the gates actually intercept.
 python3 - "$SETTINGS" "$CLAUDE_DIR" <<'PY'
