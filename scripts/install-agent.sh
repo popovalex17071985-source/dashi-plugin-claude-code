@@ -822,7 +822,8 @@ if [[ $setup_backup -eq 1 ]]; then
   PASS_FILE="$WORKSPACE/secrets/backup.pass"
   if ! as_agent "test -s '$PASS_FILE'"; then
     BK_PASS="$(head -c 24 /dev/urandom | base64 | tr -d '/+=' | head -c 24)"
-    as_agent "umask 077; printf '%s\n' '$BK_PASS' > '$PASS_FILE'"
+    # Пароль через stdin, не в командной строке su — иначе он виден в ps любому
+    printf '%s\n' "$BK_PASS" | su - "$SERVICE_USER" -c "umask 077; cat > '$PASS_FILE'"
     printf '\n    \033[1;33mПАРОЛЬ ОТ БЭКАПА (сохрани отдельно от сервера!):\033[0m %s\n\n' "$BK_PASS"
     [[ $ASSUME_YES -eq 0 ]] && read -r -p "    Сохранил пароль? Enter для продолжения " _ </dev/tty || true
   else
@@ -1175,7 +1176,9 @@ else
       || die "не встал claude-code-telegram — проверь сеть и повтори"
   fi
   if [[ -n "$REPAIR_TOKEN" ]]; then
-    R_USERNAME="$(curl -sm 10 "https://api.telegram.org/bot$REPAIR_TOKEN/getMe" \
+    # URL с токеном — через --config со stdin, чтобы токен не светился в ps
+    R_USERNAME="$(printf 'url = "https://api.telegram.org/bot%s/getMe"\n' "$REPAIR_TOKEN" \
+      | curl -sm 10 --config - \
       | grep -o '"username":"[^"]*"' | cut -d'"' -f4 || true)"
     # Годовой токен Claude — тот же, что у агента: ремонтник тоже говорит с Claude
     R_CLAUDE_TOKEN="$(sed -n 's/^CLAUDE_CODE_OAUTH_TOKEN=//p' "$ENV_FILE" | head -1)"
