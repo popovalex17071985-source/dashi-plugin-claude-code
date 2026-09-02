@@ -142,7 +142,9 @@ ok "ветка обновлений: $BRANCH ($BRANCH_SRC)"
 # Второй агент на том же хосте: ему нужны СВОЙ пользователь (иначе хуки обоих
 # пишутся в один ~/.claude/settings.json) и СВОЙ порт вебхука (иначе оба
 # стучатся в 8089). Без обоих флагов честно останавливаемся.
-OTHER_AGENTS="$(ls -1 /etc/dashi-plugin 2>/dev/null | grep -vx "$AGENT_NAME" | tr '\n' ' ')"
+# `|| true` обязателен: на чистом сервере /etc/dashi-plugin нет, ls падает, и
+# set -e с pipefail молча ронял установку прямо здесь (e2e 02.09).
+OTHER_AGENTS="$(ls -1 /etc/dashi-plugin 2>/dev/null | grep -vx "$AGENT_NAME" | tr '\n' ' ' || true)"
 if [[ -f "$ENV_FILE" ]]; then
   # Повторный прогон: порт и пользователь — те, что у агента уже есть
   [[ $PORT_GIVEN -eq 1 ]] || WEBHOOK_PORT="$(sed -n 's/^TELEGRAM_WEBHOOK_PORT=//p' "$ENV_FILE" | head -1)"
