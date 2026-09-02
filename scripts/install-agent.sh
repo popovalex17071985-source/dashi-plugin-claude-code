@@ -55,6 +55,7 @@ USER_GIVEN=0; PORT_GIVEN=0
 
 AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; REPAIR_TOKEN=""; ASSUME_YES=0
 MODEL="${DASHI_MODEL:-}"
+OWNER_TZ="${DASHI_OWNER_TZ:-}"
 SKIP_BROWSER=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
@@ -158,6 +159,15 @@ fi
 [[ "$WEBHOOK_PORT" =~ ^[0-9]{2,5}$ ]] || die "порт вебхука должен быть числом: $WEBHOOK_PORT"
 ok "порт вебхука: $WEBHOOK_PORT"
 
+# Пояс хозяина: флаг --tz → то, что уже записано в channel.env → пояс сервера.
+# Помним его в конфиге, иначе повторный прогон и /update без --tz молча
+# сдвинули бы утреннюю сводку на час сервера.
+if [[ -z "$OWNER_TZ" && -f "$ENV_FILE" ]]; then
+  OWNER_TZ="$(sed -n 's/^DASHI_OWNER_TZ=//p' "$ENV_FILE" | head -1)"
+fi
+OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
+ok "пояс хозяина: $OWNER_TZ (утренняя сводка в 09:00 по нему)"
+
 # Токен и id спрашиваем, только если конфига ещё нет — на повторном прогоне не дёргаем.
 if [[ ! -f "$ENV_FILE" ]]; then
   [[ -n "$BOT_TOKEN" ]] || ask BOT_TOKEN "Токен бота от @BotFather: "
@@ -242,6 +252,20 @@ if ! command -v claude >/dev/null; then
   ok "Claude Code $(claude --version 2>/dev/null || echo установлен)"
 else
   skip "Claude Code $(claude --version 2>/dev/null || true)"
+fi
+
+# Google Workspace CLI: через него агент работает с Таблицами, Документами,
+# Почтой и Календарём. Ставим сразу — доставлять npm-пакет на живой сервер
+# потом дороже. Вход владельца настраивается отдельно (gws auth setup/login),
+# без него команда просто лежит и не мешает.
+if ! command -v gws >/dev/null 2>&1; then
+  if npm install -g @googleworkspace/cli >/dev/null 2>&1; then
+    ok "Google-инструмент (таблицы, документы, почта) поставлен — вход настраивается отдельно"
+  else
+    warn "не поставился @googleworkspace/cli — Google-таблицы будут недоступны, поставь позже"
+  fi
+else
+  skip "Google-инструмент уже стоит"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -529,6 +553,9 @@ if [[ -f "$ENV_FILE" ]]; then
   # Ветка обновлений: старые конфиги без строки → дописать; --branch меняет.
   if grep -q "^DASHI_BRANCH=" "$ENV_FILE"; then sed -i "s#^DASHI_BRANCH=.*#DASHI_BRANCH=$BRANCH#" "$ENV_FILE"
   else echo "DASHI_BRANCH=$BRANCH" >> "$ENV_FILE"; fi
+  # Пояс хозяина: /update читает его отсюда, чтобы не сдвинуть сводку.
+  if grep -q "^DASHI_OWNER_TZ=" "$ENV_FILE"; then sed -i "s#^DASHI_OWNER_TZ=.*#DASHI_OWNER_TZ=$OWNER_TZ#" "$ENV_FILE"
+  else echo "DASHI_OWNER_TZ=$OWNER_TZ" >> "$ENV_FILE"; fi
   # Порт вебхука: --webhook-port меняет, без флага строка не трогается.
   if [[ $PORT_GIVEN -eq 1 ]]; then
     if grep -q "^TELEGRAM_WEBHOOK_PORT=" "$ENV_FILE"; then sed -i "s#^TELEGRAM_WEBHOOK_PORT=.*#TELEGRAM_WEBHOOK_PORT=$WEBHOOK_PORT#" "$ENV_FILE"
@@ -560,6 +587,8 @@ TELEGRAM_WEBHOOK_TOKEN=$(openssl rand -hex 16 2>/dev/null || head -c 16 /dev/ura
 AGENT_ID=$AGENT_NAME
 GROQ_API_KEY=$GROQ_KEY
 DASHI_BRANCH=$BRANCH
+# Пояс хозяина: утренние кроны комплекта встают на 09:00 по нему (--tz).
+DASHI_OWNER_TZ=$OWNER_TZ
 # Модель Claude (opus|sonnet|haiku|полный id). Пусто = дефолт аккаунта владельца.
 # Поменять: вписать сюда и systemctl restart dashi-<агент>.
 DASHI_MODEL=$MODEL
@@ -621,8 +650,58 @@ if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
       --chat-id '$USER_ID' \
       --agent '$AGENT_NAME' \
       --settings ~/.claude/settings.json \
-      --tz '${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}'" \
+      --tz '$OWNER_TZ'" \
     || die "install-kit.sh упал"
+  # Утренние кроны (сводка, будильник по срокам, советник по обновлениям,
+  # самопроверка, отчёт о состоянии сервера) ставит сам комплект — он же
+  # догоняет агентов, поднятых раньше, на каждом /update.
+  # ── Канарейка планировщика ────────────────────────────────────────────────
+  # Крон умеет МОЛЧА перестать выполнять задачи пользователя: одна лишняя жёсткая
+  # ссылка на файле расписания — и он его не грузит (Саня, 27.08.2026: шесть часов
+  # простоя, встали все ночные задачи разом, и заметить это было неоткуда).
+  # Сторож живёт в systemd, а не в кроне — иначе он умрёт вместе с тем, что сторожит.
+  CANARY="* * * * * /usr/bin/touch $WORKSPACE/data/cron-heartbeat"
+  as_agent "mkdir -p '$WORKSPACE/data'"
+  if as_agent "crontab -l 2>/dev/null | grep -q cron-heartbeat"; then
+    skip "канарейка крона уже стоит"
+  else
+    as_agent "(crontab -l 2>/dev/null; echo '$CANARY') | crontab -" \
+      && ok "канарейка крона в расписании" || warn "не смог прописать канарейку"
+  fi
+  cat > "/usr/local/bin/cron-canary-$AGENT_NAME" <<CANEOF
+#!/bin/bash
+# Канарейка протухла -> крон не выполняет задачи агента. Пишем хозяину.
+f="$WORKSPACE/data/cron-heartbeat"
+[ -f "\$f" ] || exit 0
+age=\$(( ( \$(date +%s) - \$(stat -c %Y "\$f") ) / 60 ))
+[ "\$age" -gt 10 ] || exit 0
+. "$ENV_FILE"
+curl -s -m 20 -X POST "https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage" \\
+  -d chat_id="\${TELEGRAM_ALLOWED_USER_IDS%%,*}" \\
+  -d text="Планировщик задач не работает: минутная задача молчит \$age мин. Ночные задачи агента $AGENT_NAME сейчас НЕ выполняются." >/dev/null
+CANEOF
+  chmod 755 "/usr/local/bin/cron-canary-$AGENT_NAME"
+  cat > "/etc/systemd/system/cron-canary-$AGENT_NAME.service" <<CANEOF
+[Unit]
+Description=Канарейка крона для агента $AGENT_NAME
+[Service]
+Type=oneshot
+User=$SERVICE_USER
+ExecStart=/usr/local/bin/cron-canary-$AGENT_NAME
+CANEOF
+  cat > "/etc/systemd/system/cron-canary-$AGENT_NAME.timer" <<CANEOF
+[Unit]
+Description=Проверка канарейки крона каждые 15 минут
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=15min
+[Install]
+WantedBy=timers.target
+CANEOF
+  systemctl daemon-reload
+  systemctl enable --now "cron-canary-$AGENT_NAME.timer" >/dev/null 2>&1 \
+    && ok "сторож канарейки поднят (systemd-таймер, от крона не зависит)" \
+    || warn "не смог поднять сторож канарейки"
   ok "комплект разложен: конституция, гейты, реестры, помощники"
 else
   warn "agent-kit не найден ($KIT_DIR) — агент встанет без гейтов и реестров"
@@ -773,6 +852,17 @@ case "\${1:-}" in
                  rm -rf $REPO_DIR.bak; cp -a $REPO_DIR $REPO_DIR.bak
                  if g reset -q --hard FETCH_HEAD \\
                     && runuser -u $SERVICE_USER -- bash -lc "cd '$PLUGIN_DIR' && ~/.bun/bin/bun install --silent"; then
+                   # Комплект дисциплины лежит КОПИЯМИ в ~/.claude, а не читается из
+                   # репозитория — без этого прогона новые гейты и реестры доезжают
+                   # до кода, но не до агента. Скрипт идемпотентен и не трогает
+                   # правки хозяина, поэтому гоняем на каждом обновлении.
+                   # Пояс хозяина и settings.json — те же, что у установщика: иначе
+                   # сводка съезжает на час сервера, а хуки регистрируются дважды.
+                   KIT=$REPO_DIR/agent-kit/install-kit.sh
+                   tz="\$(sed -n 's/^DASHI_OWNER_TZ=//p' $ENV_FILE | head -1)"
+                   [[ -x "\$KIT" ]] && runuser -u $SERVICE_USER -- bash "\$KIT" \\
+                     --claude-dir '$CLAUDE_DIR' --chat-id '$USER_ID' --agent '$AGENT_NAME' \\
+                     --settings '/home/$SERVICE_USER/.claude/settings.json' --tz "\$tz" >/dev/null 2>&1 || true
                    echo "UPDATED \$n \$(g rev-parse --short HEAD)"
                  else
                    rm -rf $REPO_DIR; mv $REPO_DIR.bak $REPO_DIR; echo ROLLBACK; exit 4
@@ -1198,6 +1288,14 @@ else
       && uv pip install --python "$R_DIR/venv/bin/python" -q \
            'git+https://github.com/RichardAtCT/claude-code-telegram@4c63df52c5767f03c5031f8f9f956485a4d9eda5' \
       || die "не встал claude-code-telegram — проверь сеть и повтори"
+  fi
+  # httpx логирует ПОЛНЫЙ url запроса на INFO, а Telegram держит токен бота прямо
+  # в пути url — токен ремонтника уходил в системный журнал открытым текстом
+  # каждые 10 секунд (Саня, 28.08.2026). Гасим болтовню транспорта, логи бота живы.
+  R_MAIN="$(ls -d "$R_DIR"/venv/lib/python3.*/site-packages/src/main.py 2>/dev/null | head -1)"
+  if [[ -n "$R_MAIN" ]] && ! grep -q _noisy "$R_MAIN"; then
+    python3 -c 'import sys,pathlib;p=pathlib.Path(sys.argv[1]);s=p.read_text();a="        stream=sys.stdout,\n    )\n";x=a+"\n    for _noisy in (\"httpx\",\"httpcore\"):\n        logging.getLogger(_noisy).setLevel(logging.WARNING)\n";p.write_text(s.replace(a,x,1)) if a in s else None' "$R_MAIN" \
+      && ok "ремонтник не пишет свой токен в системный журнал"
   fi
   if [[ -n "$REPAIR_TOKEN" ]]; then
     # URL с токеном — через --config со stdin, чтобы токен не светился в ps

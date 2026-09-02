@@ -9,9 +9,18 @@ fail() { echo "✗ $1" >&2; exit 1; }
 
 bash -n "$KIT/install-kit.sh" || fail "синтаксис install-kit.sh"
 grep -q "install-kit.sh" "$INSTALLER" || fail "установщик не зовёт комплект"
-# Кроны сводки и будильника ставит сам комплект (f7e3907), не установщик
-grep -q "open-threads-digest.py --send" "$KIT/install-kit.sh" || fail "утренняя сводка не в кроне"
-grep -q "promise-sweeper.py" "$KIT/install-kit.sh" || fail "будильник по срокам не в кроне"
+# Утренние кроны (сводка, будильник, советник, самопроверка, отчёт о сервере)
+# ставит сам комплект (f7e3907 + слияние с main 02.09), не установщик: так они
+# доезжают и через /update. Установщик ставит только канарейку планировщика.
+for s in "open-threads-digest.py --send" promise-sweeper.py update-notify.sh self-audit-morning.sh health-daily.sh; do
+  grep -q "$s" "$KIT/install-kit.sh" || fail "комплект не ставит крон: $s"
+done
+grep -q -- "--tz '\$OWNER_TZ'" "$INSTALLER" || fail "установщик не передаёт --tz комплекту"
+grep -q "DASHI_OWNER_TZ=" "$INSTALLER" || fail "пояс хозяина не пишется в channel.env"
+grep -q "cron-heartbeat" "$INSTALLER" || fail "установщик не ставит канарейку планировщика"
+# dashi-ctl update раскатывает комплект — с поясом хозяина и в тот же settings.json
+grep -q 'DASHI_OWNER_TZ=//p. \$ENV_FILE' "$INSTALLER" || fail "dashi-ctl update не читает пояс хозяина"
+grep -q "/home/\$SERVICE_USER/.claude/settings.json' --tz" "$INSTALLER" || fail "dashi-ctl update зовёт комплект не с тем settings.json/--tz"
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 mkdir -p "$T/.claude/core"
@@ -93,9 +102,15 @@ python3 "$T/bin/promise-sweeper.py" --selfcheck >/dev/null || fail "будиль
 python3 "$T/bin/open-threads-digest.py" --selfcheck >/dev/null || fail "утренняя сводка"
 
 # Кроны: свои строки поставлены, чужая цела
-[[ "$(grep -c "$T/bin/promise-sweeper.py" "$CRONTAB_FILE")" == 1 ]] || fail "будильник не в кроне"
-[[ "$(grep -c "$T/bin/open-threads-digest.py --send" "$CRONTAB_FILE")" == 1 ]] || fail "сводка не в кроне"
+for s in promise-sweeper.py "open-threads-digest.py --send" update-notify.sh self-audit-morning.sh health-daily.sh; do
+  [[ "$(grep -c "$T/bin/$s" "$CRONTAB_FILE")" == 1 ]] || fail "не в кроне: $s"
+done
 grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "затёр чужую строку крона"
+
+# KIT_NO_CRON=1 — крон не трогается вовсе (чужая песочница)
+cp "$CRONTAB_FILE" "$T/crontab.before"
+KIT_NO_CRON=1 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Europe/Moscow >/dev/null
+cmp -s "$CRONTAB_FILE" "$T/crontab.before" || fail "KIT_NO_CRON=1 всё равно переписал крон"
 
 # Повторный прогон ничего не задваивает, а локально правленный файл — сначала в бэкап
 echo "# local tweak" >> "$H/block-dangerous.sh"
@@ -108,7 +123,7 @@ import json;d=json.load(open('$T/.claude/settings.json'))
 print(sum(len(e['hooks']) for a in d['hooks'].values() for e in a))")
 [[ "$n2" == 9 ]] || fail "повторный прогон задвоил хуки: $n2"
 [[ "$(grep -c 'core/constitution.md' "$T/.claude/CLAUDE.md")" == 1 ]] || fail "задвоил @include"
-[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 2 ]] || fail "повторный прогон задвоил крон"
+[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 5 ]] || fail "повторный прогон задвоил крон"
 
 # Смена --tz переписывает СВОИ строки (час меняется), а не пропускает их
 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Asia/Yekaterinburg >/dev/null
@@ -116,7 +131,7 @@ h1="$(grep "$T/bin/open-threads-digest.py" "$CRONTAB_FILE" | awk '{print $2}')"
 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Europe/Moscow >/dev/null
 h2="$(grep "$T/bin/open-threads-digest.py" "$CRONTAB_FILE" | awk '{print $2}')"
 [[ "$h1" =~ ^[0-9]+$ && "$h2" =~ ^[0-9]+$ && "$h1" != "$h2" ]] || fail "смена --tz не переписала час крона ($h1 -> $h2)"
-[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 2 ]] || fail "смена --tz задвоила крон"
+[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 5 ]] || fail "смена --tz задвоила крон"
 grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "смена --tz затёрла чужую строку"
 
-echo "✓ agent-kit smoke ok (9 хуков, 6 гейтов сработали, идемпотентно)"
+echo "✓ agent-kit smoke ok (9 хуков, 6 гейтов сработали, 5 утренних кронов, идемпотентно)"

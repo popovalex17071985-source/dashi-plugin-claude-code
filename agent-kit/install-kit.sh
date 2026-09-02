@@ -115,28 +115,50 @@ settings.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 print(f"  хуков зарегистрировано: {added} (уже стояло: {len(WIRING) - added})")
 PY
 
-# Будильник по срокам + утренняя сводка леджера. Раньше эти кроны ставил только
-# полный install-agent.sh — агент, обновлённый по гайду «Update плагина», получал
-# леджер-файлы, но сводка ему молчала (Саня 31.08). Теперь кроны — часть комплекта.
+# Утренние задачи в кроне: будильник по срокам, сводка леджера, советник по
+# обновлениям, самопроверка, отчёт о состоянии сервера. Раньше их ставил только
+# полный install-agent.sh — агент, обновлённый по гайду «Update плагина» или
+# через /update, получал скрипты, но кроны ему молчали (Саня 31.08). Теперь
+# кроны — часть комплекта: этот скрипт гоняется и установщиком, и на каждом
+# /update (dashi-ctl update), так что доезжает и до агентов, поднятых раньше.
 # Крон живёт по часам СЕРВЕРА, сводку читает хозяин — считаем час под его 09:00.
+# KIT_NO_CRON=1 — раскладка без правки крона (песочница, чужой тест): иначе
+# прогон переписал бы боевой крон того, кто его гоняет.
 OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
 # python3 -c, не heredoc: вложенный heredoc внутри $( ) вешал установку на stdin.
 DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own=zoneinfo.ZoneInfo(os.environ["OWNER_TZ"]); srv=dt.datetime.now().astimezone().tzinfo; print(dt.datetime.now(own).replace(hour=9,minute=0,second=0,microsecond=0).astimezone(srv).hour)' 2>/dev/null || true)"
 [[ -n "$DIG_H" ]] || { DIG_H=7; echo "  ! не смог посчитать пояс ($OWNER_TZ, нет tzdata?) — сводка в 07:00 по серверу"; }
-SWEEP="30 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
-DIGEST="0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
-# Смотрим ТОЛЬКО на строки этого workspace: у второго агента под тем же
-# пользователем свои строки, чужие не трогаем. Час мог измениться (--tz) —
-# тогда свои строки переписываем, а не пропускаем.
-CUR="$(crontab -l 2>/dev/null || true)"
-if grep -qxF "$SWEEP" <<<"$CUR" && grep -qxF "$DIGEST" <<<"$CUR"; then
-  echo "  будильник и сводка уже в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)"
+# Порядок утра (минуты после часа сводки): 00 сводка, 10 советник по обновлениям
+# (что вышло нового + напоминание про /update), 20 самопроверка (хуки, крон,
+# канарейка, модель, память — шлёт ТОЛЬКО подозрения), 30 будильник по срокам
+# и отчёт о сервере (диск, память, сервисы, вход в Claude — шлётся всегда).
+CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh)
+CRON_LINES=(
+  "0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
+  "10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
+  "20 $DIG_H * * * /bin/bash $WORKSPACE/bin/self-audit-morning.sh >> $WORKSPACE/logs/self-audit.log 2>&1"
+  "30 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
+  "30 $DIG_H * * * /bin/bash $WORKSPACE/bin/health-daily.sh >> $WORKSPACE/logs/health-daily.log 2>&1"
+)
+if [[ -n "${KIT_NO_CRON:-}" ]]; then
+  echo "  крон не трогаю (KIT_NO_CRON)"
 else
-  if grep -qF "$WORKSPACE/bin/promise-sweeper.py" <<<"$CUR"; then verb="перенесены на"; else verb="в кроне:"; fi
-  { grep -vF -e "$WORKSPACE/bin/promise-sweeper.py" -e "$WORKSPACE/bin/open-threads-digest.py" <<<"$CUR" || true
-    echo "$SWEEP"; echo "$DIGEST"; } | crontab - \
-    && echo "  будильник и сводка $verb 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
-    || echo "  ! не смог прописать крон — поставь руками"
+  # Смотрим ТОЛЬКО на строки этого workspace: у второго агента под тем же
+  # пользователем свои строки, чужие не трогаем. Час мог измениться (--tz) или
+  # добавился новый скрипт — тогда свои строки переписываем, а не пропускаем.
+  CUR="$(crontab -l 2>/dev/null || true)"
+  MISSING=0
+  for line in "${CRON_LINES[@]}"; do grep -qxF "$line" <<<"$CUR" || MISSING=1; done
+  if (( MISSING == 0 )); then
+    echo "  утренние задачи уже в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)"
+  else
+    OWN=(); for s in "${CRON_SCRIPTS[@]}"; do OWN+=(-e "$WORKSPACE/bin/$s"); done
+    if grep -qF "${OWN[@]}" <<<"$CUR"; then verb="переставлены на"; else verb="в кроне:"; fi
+    { grep -vF "${OWN[@]}" <<<"$CUR" || true
+      printf '%s\n' "${CRON_LINES[@]}"; } | crontab - \
+      && echo "  утренние задачи (сводка, советник, самопроверка, будильник, отчёт о сервере) $verb 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
+      || echo "  ! не смог прописать крон — поставь руками"
+  fi
 fi
 
 echo "  комплект разложен в $CLAUDE_DIR"
