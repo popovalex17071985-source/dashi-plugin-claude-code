@@ -55,6 +55,15 @@ echo '{"tool_name":"Bash","tool_input":{"command":"rm -rf /var/data"}}' \
 # 2. запись секрета
 echo '{"tool_name":"Write","tool_input":{"file_path":"/tmp/x/api.key"}}' \
   | "$H/block-red-zone.sh" >/dev/null 2>&1 && fail "запись секрета прошла"
+# 2b. СВОЙ secrets/ — хранить ключи хозяина там агент обязан (болванка CLAUDE.md)
+echo "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$T/secrets/openai.token\"}}" \
+  | "$H/block-red-zone.sh" >/dev/null 2>&1 || fail "запись в свой secrets/ заблокирована"
+# ...но .env/.key внутри, чужой secrets/, вложенные пути и .ssh — по-прежнему нельзя
+for bad in "$T/secrets/.env" "$T/secrets/api.key" "/opt/other/secrets/x.token" \
+           "$T/secrets/../.ssh/id_rsa" "$T/secrets/sub/x.token" "$T/.ssh/config"; do
+  echo "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$bad\"}}" \
+    | "$H/block-red-zone.sh" >/dev/null 2>&1 && fail "прошла запись секрета: $bad"
+done
 # 3. ждун, матчащий сам себя
 echo '{"tool_name":"Bash","tool_input":{"command":"until pgrep -f job; do sleep 60; done"}}' \
   | "$H/block-selfmatching-pgrep.sh" | grep -q "\"permissionDecision\": \"deny\"" \
