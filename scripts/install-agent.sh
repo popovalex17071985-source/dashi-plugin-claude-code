@@ -726,7 +726,14 @@ SESSION="${1:?usage: dashi-press-dialogs <tmux-session>}"
 for _ in $(seq 1 40); do
   sleep 3
   screen="$(tmux capture-pane -pt "$SESSION" 2>/dev/null)" || exit 0
-  if grep -q "Bypass Permissions" <<<"$screen"; then
+  # 02.09.2026: Claude Code 2.1.25x спрашивает «Do you trust this folder?» с курсором на
+  # «No, exit» — слепой Enter ВЫХОДИЛ из Claude, сервис крутился в рестартах (живой прогон
+  # на Смите). Любой диалог, где выделено «No, exit», — сначала Down, потом Enter.
+  if grep -qE "❯ *No, exit" <<<"$screen"; then
+    tmux send-keys -t "$SESSION" Down
+    sleep 1
+    tmux send-keys -t "$SESSION" Enter
+  elif grep -q "Bypass Permissions" <<<"$screen"; then
     tmux send-keys -t "$SESSION" Down
     sleep 1
     tmux send-keys -t "$SESSION" Enter

@@ -50,3 +50,6 @@ echo "✓ install-agent smoke ok"
 # живой прогон на Смите молча висел на «Имя агента». Приглашение обязано доходить до экрана.
 grep -qE 'read -r -p "\$__prompt" __val </dev/tty 2>/dev/null' "$S" \
   && fail "ask(): stderr read'а уведён в /dev/null — приглашение не видно" || true
+
+# 02.09.2026: диалог «Do you trust this folder?» с курсором на «No, exit» — слепой Enter выходил из Claude.
+grep -q 'grep -qE "❯ \*No, exit"' "$S" || fail "dashi-press-dialogs: нет обработки диалога с выделенным «No, exit»"
