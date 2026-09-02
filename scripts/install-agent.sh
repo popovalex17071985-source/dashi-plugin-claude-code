@@ -303,7 +303,7 @@ if [[ -d "$CLAUDE_DIR/dashi-plugin-claude-code/.git" ]]; then
   # reset --hard стирает правки в отслеживаемых файлах — как dashi-ctl update,
   # при локальных правках не трогаем (untracked reset не задевает, их не считаем).
   REPO_DIRTY="$(as_agent "git -C '$CLAUDE_DIR/dashi-plugin-claude-code' status --porcelain --untracked-files=no" 2>/dev/null \
-    | awk '{print $NF}' | head -5 | tr '\n' ' ')"
+    | awk '{print $NF}' | head -5 | tr '\n' ' ' || true)"
   if [[ -n "$REPO_DIRTY" ]]; then
     warn "в плагине есть локальные правки ($REPO_DIRTY) — обновление до $BRANCH пропускаю, чтобы их не стереть"
     warn "закоммить или откати их (git -C $CLAUDE_DIR/dashi-plugin-claude-code status) и запусти снова"
