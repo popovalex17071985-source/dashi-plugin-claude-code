@@ -28,7 +28,10 @@ REPO_URL="${DASHI_REPO_URL:-https://github.com/popovalex17071985-source/dashi-pl
 # Ветка, с которой агент обновляется (/update, советник, повторный прогон).
 # main = проверенное, раскатывается всем после обсуждения; staging-агенты
 # (Smith) сидят на feature-ветке и видят изменения первыми.
-BRANCH="${DASHI_BRANCH:-main}"
+# Пусто = решаем ниже: --branch/DASHI_BRANCH → ветка из уже существующего
+# channel.env → main. Раньше повторный прогон без --branch молча пересаживал
+# staging-агента на main и стирал его локальные правки.
+BRANCH="${DASHI_BRANCH:-}"
 SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
 
 AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; REPAIR_TOKEN=""; ASSUME_YES=0
@@ -101,6 +104,16 @@ CLAUDE_DIR="$WORKSPACE/.claude"
 PLUGIN_DIR="$CLAUDE_DIR/dashi-plugin-claude-code/plugin"
 ENV_FILE="/etc/dashi-plugin/$AGENT_NAME/channel.env"
 UNIT="dashi-$AGENT_NAME"
+
+# Ветка обновлений: флаг → то, на чём агент уже сидит → main
+if [[ -n "$BRANCH" ]]; then
+  BRANCH_SRC="флаг --branch / DASHI_BRANCH"
+elif [[ -f "$ENV_FILE" ]] && BRANCH="$(sed -n 's/^DASHI_BRANCH=//p' "$ENV_FILE" | head -1)" && [[ -n "$BRANCH" ]]; then
+  BRANCH_SRC="из $ENV_FILE"
+else
+  BRANCH="main"; BRANCH_SRC="по умолчанию"
+fi
+ok "ветка обновлений: $BRANCH ($BRANCH_SRC)"
 
 # Токен и id спрашиваем, только если конфига ещё нет — на повторном прогоне не дёргаем.
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -233,9 +246,18 @@ fi
 if [[ -d "$CLAUDE_DIR/dashi-plugin-claude-code/.git" ]]; then
   # Повторный прогон = обновление плагина, иначе фиксы моста не доезжают.
   # set-url обязателен: старые установки смотрят origin'ом в чужое репо.
-  as_agent "cd '$CLAUDE_DIR/dashi-plugin-claude-code' && git remote set-url origin '$REPO_URL' && git fetch --depth 1 origin '$BRANCH' && git reset --hard FETCH_HEAD" >/dev/null 2>&1 \
-    && ok "плагин обновлён до свежего $BRANCH" \
-    || warn "не смог обновить плагин (нет сети до GitHub?) — работаю на том, что есть"
+  # reset --hard стирает правки в отслеживаемых файлах — как dashi-ctl update,
+  # при локальных правках не трогаем (untracked reset не задевает, их не считаем).
+  REPO_DIRTY="$(as_agent "git -C '$CLAUDE_DIR/dashi-plugin-claude-code' status --porcelain --untracked-files=no" 2>/dev/null \
+    | awk '{print $NF}' | head -5 | tr '\n' ' ')"
+  if [[ -n "$REPO_DIRTY" ]]; then
+    warn "в плагине есть локальные правки ($REPO_DIRTY) — обновление до $BRANCH пропускаю, чтобы их не стереть"
+    warn "закоммить или откати их (git -C $CLAUDE_DIR/dashi-plugin-claude-code status) и запусти снова"
+  else
+    as_agent "cd '$CLAUDE_DIR/dashi-plugin-claude-code' && git remote set-url origin '$REPO_URL' && git fetch --depth 1 origin '$BRANCH' && git reset --hard FETCH_HEAD" >/dev/null 2>&1 \
+      && ok "плагин обновлён до свежего $BRANCH" \
+      || warn "не смог обновить плагин (нет сети до GitHub?) — работаю на том, что есть"
+  fi
 else
   as_agent "git clone --depth 1 --branch '$BRANCH' '$REPO_URL' '$CLAUDE_DIR/dashi-plugin-claude-code'" >/dev/null 2>&1 \
     || die "не удалось склонировать $REPO_URL"
