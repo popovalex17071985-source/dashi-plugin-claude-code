@@ -987,10 +987,15 @@ EOF
       # версиях (1.53 в Ubuntu 22.04) игнорирует готовый токен и всё равно лезет
       # в интерактивный OAuth — на сервере это тупик.
       as_agent "mkdir -p ~/.config/rclone && umask 077 && { grep -q '^\[gdrive\]' ~/.config/rclone/rclone.conf 2>/dev/null || printf '[gdrive]\ntype = drive\nscope = drive\ntoken = %s\n' \"\$(cat '$TOKFILE')\" >> ~/.config/rclone/rclone.conf; }"
-      if as_agent "rclone lsd gdrive: --retries 1 --low-level-retries 1 --timeout 20s >/dev/null 2>&1"; then
+      # Причину показываем словами rclone: «403 quota» — это не битый токен, а лимит Google
+      # на минуту, конфиг уже записан и ночью заработает сам (живой прогон 02.09).
+      rc_err="$(as_agent "rclone lsd gdrive: --retries 1 --low-level-retries 1 --timeout 20s 2>&1 >/dev/null" | tail -1 | cut -c1-160)"
+      if [[ -z "$rc_err" ]]; then
         ok "Google Drive подключён — ночная копия уедет в облако"
+      elif grep -qiE "quota|rate ?limit|403" <<<"$rc_err"; then
+        warn "Google ответил лимитом (${rc_err#*: }) — токен записан, копия уедет ночью; проверить: rclone lsd gdrive:"
       else
-        warn "токен не подошёл — подключи позже: rclone config create gdrive drive token '<строка>'"
+        warn "Drive не подключился: ${rc_err} — проверь строку токена: rclone config create gdrive drive token '<строка>'"
       fi
       rm -f "$TOKFILE"
     else
@@ -1116,6 +1121,15 @@ fi
 # ~/.claude.json без него — и выбор логина рисовался снова (27.08.2026).
 as_agent 'grep -qs hasCompletedOnboarding ~/.claude.json' \
   || as_agent 'cp -f ~/.claude.json ~/.claude.json.bak 2>/dev/null; printf "%s" "{\"hasCompletedOnboarding\": true, \"theme\": \"dark\"}" > ~/.claude.json'
+
+# 02.09.2026, живой прогон на Смите: Claude Code 2.1.258 молча НЕ читал plugin/.mcp.json —
+# Claude работал, а мост в Telegram не стартовал («No MCP servers configured»). Регистрируем
+# мост на уровне пользователя: не зависит от доверия к папке и одобрения проектных серверов.
+if as_agent "cd '$PLUGIN_DIR' && { claude mcp get dashi-channel >/dev/null 2>&1 || claude mcp add -s user dashi-channel -- bun ./src/server.ts >/dev/null 2>&1; }"; then
+  ok "мост dashi-channel зарегистрирован в Claude (user-scope)"
+else
+  warn "не смог зарегистрировать мост: su - $SERVICE_USER -c 'cd $PLUGIN_DIR && claude mcp add -s user dashi-channel -- bun ./src/server.ts'"
+fi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 5c. Superpowers (навыки: планирование, отладка, ревью)

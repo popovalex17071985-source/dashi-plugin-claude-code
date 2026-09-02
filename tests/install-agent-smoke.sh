@@ -53,3 +53,6 @@ grep -qE 'read -r -p "\$__prompt" __val </dev/tty 2>/dev/null' "$S" \
 
 # 02.09.2026: диалог «Do you trust this folder?» с курсором на «No, exit» — слепой Enter выходил из Claude.
 grep -q 'grep -qE "❯ \*No, exit"' "$S" || fail "dashi-press-dialogs: нет обработки диалога с выделенным «No, exit»"
+
+# 02.09.2026: Claude Code 2.1.258 не читал plugin/.mcp.json на живом прогоне — мост регистрируется в user-scope.
+grep -q 'claude mcp add -s user dashi-channel -- bun ./src/server.ts' "$S" || fail "нет регистрации моста через claude mcp add -s user"
