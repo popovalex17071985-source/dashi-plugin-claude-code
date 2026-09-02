@@ -33,6 +33,12 @@ REPO_URL="${DASHI_REPO_URL:-https://github.com/popovalex17071985-source/dashi-pl
 # staging-агента на main и стирал его локальные правки.
 BRANCH="${DASHI_BRANCH:-}"
 SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
+# Порт приёмника событий от Claude (хуки → плагин). Второй агент на том же
+# хосте обязан получить свой порт, иначе оба стучатся в 8089.
+WEBHOOK_PORT="${DASHI_WEBHOOK_PORT:-8089}"
+USER_GIVEN=0; PORT_GIVEN=0
+[[ -n "${DASHI_SERVICE_USER:-}" ]] && USER_GIVEN=1
+[[ -n "${DASHI_WEBHOOK_PORT:-}" ]] && PORT_GIVEN=1
 
 AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; REPAIR_TOKEN=""; ASSUME_YES=0
 MODEL="${DASHI_MODEL:-}"
@@ -61,7 +67,8 @@ while [[ $# -gt 0 ]]; do
     --openai-key) OPENAI_KEY="$2"; shift 2 ;;   # включает семантическую память OpenViking
     --claude-token) CLAUDE_TOKEN="$2"; shift 2 ;; # годовой токен из `claude setup-token`
     --repair-token) REPAIR_TOKEN="$2"; shift 2 ;; # бот-ремонтник (страховка, ещё один /newbot)
-    --user)      SERVICE_USER="$2"; shift 2 ;;
+    --user)      SERVICE_USER="$2"; USER_GIVEN=1; shift 2 ;;
+    --webhook-port) WEBHOOK_PORT="$2"; PORT_GIVEN=1; shift 2 ;;   # порт приёмника хуков (по умолчанию 8089)
     --repo)      REPO_URL="$2";   shift 2 ;;
     --branch)    BRANCH="$2";     shift 2 ;;
     --tz)        OWNER_TZ="$2";   shift 2 ;;   # пояс ХОЗЯИНА: сводка приходит в 09:00 по нему   # main (по умолчанию) | feature-ветка для staging
@@ -117,6 +124,23 @@ else
   BRANCH="main"; BRANCH_SRC="по умолчанию"
 fi
 ok "ветка обновлений: $BRANCH ($BRANCH_SRC)"
+
+# Второй агент на том же хосте: ему нужны СВОЙ пользователь (иначе хуки обоих
+# пишутся в один ~/.claude/settings.json) и СВОЙ порт вебхука (иначе оба
+# стучатся в 8089). Без обоих флагов честно останавливаемся.
+OTHER_AGENTS="$(ls -1 /etc/dashi-plugin 2>/dev/null | grep -vx "$AGENT_NAME" | tr '\n' ' ')"
+if [[ -f "$ENV_FILE" ]]; then
+  # Повторный прогон: порт и пользователь — те, что у агента уже есть
+  [[ $PORT_GIVEN -eq 1 ]] || WEBHOOK_PORT="$(sed -n 's/^TELEGRAM_WEBHOOK_PORT=//p' "$ENV_FILE" | head -1)"
+  WEBHOOK_PORT="${WEBHOOK_PORT:-8089}"
+  ws_root="$(sed -n 's/^TELEGRAM_WORKSPACE_ROOT=//p' "$ENV_FILE" | head -1)"
+  [[ -z "$ws_root" || "$ws_root" == "/home/$SERVICE_USER/"* ]] \
+    || die "агент $AGENT_NAME живёт в $ws_root, а не под пользователем $SERVICE_USER — передай --user <его пользователь>"
+elif [[ -n "$OTHER_AGENTS" && ( $USER_GIVEN -eq 0 || $PORT_GIVEN -eq 0 ) ]]; then
+  die "на этом сервере уже есть агент: $OTHER_AGENTS— второму нужны свой пользователь и свой порт вебхука, передай ОБА флага: --user <имя> --webhook-port <порт, не 8089>"
+fi
+[[ "$WEBHOOK_PORT" =~ ^[0-9]{2,5}$ ]] || die "порт вебхука должен быть числом: $WEBHOOK_PORT"
+ok "порт вебхука: $WEBHOOK_PORT"
 
 # Токен и id спрашиваем, только если конфига ещё нет — на повторном прогоне не дёргаем.
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -475,6 +499,11 @@ if [[ -f "$ENV_FILE" ]]; then
   # Ветка обновлений: старые конфиги без строки → дописать; --branch меняет.
   if grep -q "^DASHI_BRANCH=" "$ENV_FILE"; then sed -i "s#^DASHI_BRANCH=.*#DASHI_BRANCH=$BRANCH#" "$ENV_FILE"
   else echo "DASHI_BRANCH=$BRANCH" >> "$ENV_FILE"; fi
+  # Порт вебхука: --webhook-port меняет, без флага строка не трогается.
+  if [[ $PORT_GIVEN -eq 1 ]]; then
+    if grep -q "^TELEGRAM_WEBHOOK_PORT=" "$ENV_FILE"; then sed -i "s#^TELEGRAM_WEBHOOK_PORT=.*#TELEGRAM_WEBHOOK_PORT=$WEBHOOK_PORT#" "$ENV_FILE"
+    else echo "TELEGRAM_WEBHOOK_PORT=$WEBHOOK_PORT" >> "$ENV_FILE"; fi
+  fi
   # Модель: --model меняет, без флага существующая строка не трогается.
   if [[ -n "$MODEL" ]]; then
     if grep -q "^DASHI_MODEL=" "$ENV_FILE"; then sed -i "s#^DASHI_MODEL=.*#DASHI_MODEL=$MODEL#" "$ENV_FILE"
@@ -492,9 +521,10 @@ TELEGRAM_ALLOWED_CHAT_IDS=$USER_ID
 TELEGRAM_WORKSPACE_ROOT=$CLAUDE_DIR
 TELEGRAM_STATE_DIR=$WORKSPACE/state/telegram
 # Приёмник событий от Claude. Без явного порта плагин берёт случайный, и хуки,
-# прописанные на 8089, стучатся в пустоту — карточка «работаю…» не появляется.
+# прописанные на этот порт, стучатся в пустоту — карточка «работаю…» не появляется.
+# Тот же порт читают хуки (install-hooks) и сторож моста в dashi-run.
 TELEGRAM_WEBHOOK_HOST=127.0.0.1
-TELEGRAM_WEBHOOK_PORT=8089
+TELEGRAM_WEBHOOK_PORT=$WEBHOOK_PORT
 # Хуки без токена молча ничего не отправляют — обе стороны читают эту строку.
 TELEGRAM_WEBHOOK_TOKEN=$(openssl rand -hex 16 2>/dev/null || head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')
 AGENT_ID=$AGENT_NAME
@@ -528,7 +558,7 @@ say "Hooks"
 as_agent "export PATH=\$HOME/.bun/bin:\$PATH; cd '$PLUGIN_DIR' && bash scripts/install-hooks.sh \
     --settings ~/.claude/settings.json \
     --chat-id '$USER_ID' \
-    --webhook-url http://127.0.0.1:8089/hooks/agent \
+    --webhook-url http://127.0.0.1:$WEBHOOK_PORT/hooks/agent \
     --agent-id dashi-channel \
     --verbose-progress" >/dev/null || die "install-hooks.sh упал"
 ok "хуки актуализированы"
@@ -615,10 +645,12 @@ cat > /usr/local/bin/dashi-run <<'EOF'
 # Иначе классика «tmux жив, мост сдох»: systemd доволен, бот молчит, ремонт
 # только терминалом. До первого подъёма моста порт не проверяем — на свежей
 # установке Claude может стоять на логине сколько угодно.
+# Порт: аргумент → TELEGRAM_WEBHOOK_PORT из channel.env (EnvironmentFile юнита)
+# → 8089. Второй агент на хосте живёт на своём порту — сторож обязан смотреть туда же.
 set -uo pipefail
 SESSION="${1:?usage: dashi-run <tmux-session> <plugin-dir> [webhook-port]}"
 PLUGIN="${2:?usage: dashi-run <tmux-session> <plugin-dir> [webhook-port]}"
-PORT="${3:-8089}"
+PORT="${3:-${TELEGRAM_WEBHOOK_PORT:-8089}}"
 tmux kill-session -t "$SESSION" 2>/dev/null || true
 tmux new-session -d -s "$SESSION" \
   "/bin/bash -lc 'cd $PLUGIN && exec claude ${DASHI_MODEL:+--model $DASHI_MODEL} --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'"
