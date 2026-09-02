@@ -20,19 +20,42 @@
 #   ... --claude-token sk-ant-oat01-...      # готовый годовой токен (claude setup-token на любой машине)
 #   ... --repair-token 123:BB...             # бот-ремонтник: страховка на случай «агент лёг и молчит»
 #   ... --no-browser                         # без Playwright/Chromium (по умолчанию браузер ставится)
+#   ... --groq-key gsk_...                   # голосовые сообщения через Groq (Whisper)
+#   ... --tz Asia/Yekaterinburg              # пояс ХОЗЯИНА: утренняя сводка в 09:00 по нему (по умолчанию пояс сервера)
+#   ... --user agent                         # системный пользователь агента (по умолчанию agent)
+#   ... --webhook-port 8089                  # порт приёмника хуков; второму агенту на хосте — свой (+ свой --user)
+#   ... --repo URL                           # откуда клонировать плагин (по умолчанию GitHub)
+#   ... --yes                                # без вопросов (cloud-init, CI): необязательное пропускается
 #
 set -euo pipefail
 
 NODE_MAJOR=22
+# Версии зашиты, чтобы «поставил вчера — работает, поставил сегодня — нет» не
+# случалось. Bun: та, что живёт у Jarvis (bun --version); OpenViking: digest
+# образа, который крутится у Jarvis (docker images --digests). nodesource и uv
+# НЕ запинены сознательно: nodesource сам держит мажор 22.x, а uv нужен только
+# ремонтнику как установщик Python — их поломки нам пока не встречались.
+BUN_VERSION="bun-v1.4.0"
+OPENVIKING_IMAGE="ghcr.io/volcengine/openviking@sha256:46f9e34cd37238c28cbd9535033773d179006bdf7f3e528dd1c46567abce7701"
 REPO_URL="${DASHI_REPO_URL:-https://github.com/popovalex17071985-source/dashi-plugin-claude-code.git}"
 # Ветка, с которой агент обновляется (/update, советник, повторный прогон).
 # main = проверенное, раскатывается всем после обсуждения; staging-агенты
 # (Smith) сидят на feature-ветке и видят изменения первыми.
-BRANCH="${DASHI_BRANCH:-main}"
+# Пусто = решаем ниже: --branch/DASHI_BRANCH → ветка из уже существующего
+# channel.env → main. Раньше повторный прогон без --branch молча пересаживал
+# staging-агента на main и стирал его локальные правки.
+BRANCH="${DASHI_BRANCH:-}"
 SERVICE_USER="${DASHI_SERVICE_USER:-agent}"
+# Порт приёмника событий от Claude (хуки → плагин). Второй агент на том же
+# хосте обязан получить свой порт, иначе оба стучатся в 8089.
+WEBHOOK_PORT="${DASHI_WEBHOOK_PORT:-8089}"
+USER_GIVEN=0; PORT_GIVEN=0
+[[ -n "${DASHI_SERVICE_USER:-}" ]] && USER_GIVEN=1
+[[ -n "${DASHI_WEBHOOK_PORT:-}" ]] && PORT_GIVEN=1
 
 AGENT_NAME=""; BOT_TOKEN=""; USER_ID=""; GROQ_KEY=""; OPENAI_KEY=""; CLAUDE_TOKEN=""; REPAIR_TOKEN=""; ASSUME_YES=0
 MODEL="${DASHI_MODEL:-}"
+OWNER_TZ="${DASHI_OWNER_TZ:-}"
 SKIP_BROWSER=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
@@ -40,9 +63,13 @@ ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
 skip() { printf '    \033[2m· %s (уже сделано)\033[0m\n' "$*"; }
 die()  { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 warn() { printf '    \033[33m! %s\033[0m\n' "$*"; }
+# Есть ли настоящий терминал. `-r /dev/tty` врёт: файл читаем всегда, а открыть
+# его без управляющего терминала (docker exec, CI, cloud-init) нельзя.
+have_tty() { { : </dev/tty; } 2>/dev/null; }
 
 usage() {
-  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+  # Шапка файла до set -euo — целиком, чтобы новый флаг не выпадал из справки
+  awk 'NR >= 2 && /^set -euo pipefail/ { exit } NR >= 2 { print }' "$0" | sed 's/^# \{0,1\}//'
   exit 0
 }
 
@@ -55,10 +82,11 @@ while [[ $# -gt 0 ]]; do
     --openai-key) OPENAI_KEY="$2"; shift 2 ;;   # включает семантическую память OpenViking
     --claude-token) CLAUDE_TOKEN="$2"; shift 2 ;; # годовой токен из `claude setup-token`
     --repair-token) REPAIR_TOKEN="$2"; shift 2 ;; # бот-ремонтник (страховка, ещё один /newbot)
-    --user)      SERVICE_USER="$2"; shift 2 ;;
+    --user)      SERVICE_USER="$2"; USER_GIVEN=1; shift 2 ;;
+    --webhook-port) WEBHOOK_PORT="$2"; PORT_GIVEN=1; shift 2 ;;   # порт приёмника хуков (по умолчанию 8089)
     --repo)      REPO_URL="$2";   shift 2 ;;
-    --branch)    BRANCH="$2";     shift 2 ;;
-    --tz)        OWNER_TZ="$2";   shift 2 ;;   # пояс ХОЗЯИНА: сводка приходит в 09:00 по нему   # main (по умолчанию) | feature-ветка для staging
+    --branch)    BRANCH="$2";     shift 2 ;;   # main (по умолчанию) | feature-ветка для staging
+    --tz)        OWNER_TZ="$2";   shift 2 ;;   # пояс ХОЗЯИНА: сводка приходит в 09:00 по нему
     --model)     MODEL="$2";      shift 2 ;;   # opus|sonnet|haiku|полный id; пусто = дефолт аккаунта
     --no-browser) SKIP_BROWSER=1; shift ;;   # не ставить Playwright/Chromium (экономия ~400 МБ)
     --yes|-y)    ASSUME_YES=1;    shift ;;
@@ -82,7 +110,7 @@ ask() {  # ask VAR "приглашение" [обязательность]
     # Без терминала (docker exec, CI, вложенный su) read падает мгновенно —
     # со старым `|| true` цикл крутился вечно, жрал CPU и МОЛЧАЛ. Теперь
     # установка честно останавливается с понятной причиной. (e2e 27.08.)
-    if ! read -r -p "$__prompt" __val </dev/tty 2>/dev/null; then
+    if ! have_tty || ! read -r -p "$__prompt" __val </dev/tty 2>/dev/null; then
       [[ "$__required" -eq 0 ]] && break
       die "нужен ответ на «$__prompt», но терминала нет — запусти установщик интерактивно или передай значение флагом"
     fi
@@ -101,6 +129,44 @@ CLAUDE_DIR="$WORKSPACE/.claude"
 PLUGIN_DIR="$CLAUDE_DIR/dashi-plugin-claude-code/plugin"
 ENV_FILE="/etc/dashi-plugin/$AGENT_NAME/channel.env"
 UNIT="dashi-$AGENT_NAME"
+
+# Ветка обновлений: флаг → то, на чём агент уже сидит → main
+if [[ -n "$BRANCH" ]]; then
+  BRANCH_SRC="флаг --branch / DASHI_BRANCH"
+elif [[ -f "$ENV_FILE" ]] && BRANCH="$(sed -n 's/^DASHI_BRANCH=//p' "$ENV_FILE" | head -1)" && [[ -n "$BRANCH" ]]; then
+  BRANCH_SRC="из $ENV_FILE"
+else
+  BRANCH="main"; BRANCH_SRC="по умолчанию"
+fi
+ok "ветка обновлений: $BRANCH ($BRANCH_SRC)"
+
+# Второй агент на том же хосте: ему нужны СВОЙ пользователь (иначе хуки обоих
+# пишутся в один ~/.claude/settings.json) и СВОЙ порт вебхука (иначе оба
+# стучатся в 8089). Без обоих флагов честно останавливаемся.
+# `|| true` обязателен: на чистом сервере /etc/dashi-plugin нет, ls падает, и
+# set -e с pipefail молча ронял установку прямо здесь (e2e 02.09).
+OTHER_AGENTS="$(ls -1 /etc/dashi-plugin 2>/dev/null | grep -vx "$AGENT_NAME" | tr '\n' ' ' || true)"
+if [[ -f "$ENV_FILE" ]]; then
+  # Повторный прогон: порт и пользователь — те, что у агента уже есть
+  [[ $PORT_GIVEN -eq 1 ]] || WEBHOOK_PORT="$(sed -n 's/^TELEGRAM_WEBHOOK_PORT=//p' "$ENV_FILE" | head -1)"
+  WEBHOOK_PORT="${WEBHOOK_PORT:-8089}"
+  ws_root="$(sed -n 's/^TELEGRAM_WORKSPACE_ROOT=//p' "$ENV_FILE" | head -1)"
+  [[ -z "$ws_root" || "$ws_root" == "/home/$SERVICE_USER/"* ]] \
+    || die "агент $AGENT_NAME живёт в $ws_root, а не под пользователем $SERVICE_USER — передай --user <его пользователь>"
+elif [[ -n "$OTHER_AGENTS" && ( $USER_GIVEN -eq 0 || $PORT_GIVEN -eq 0 ) ]]; then
+  die "на этом сервере уже есть агент: $OTHER_AGENTS— второму нужны свой пользователь и свой порт вебхука, передай ОБА флага: --user <имя> --webhook-port <порт, не 8089>"
+fi
+[[ "$WEBHOOK_PORT" =~ ^[0-9]{2,5}$ ]] || die "порт вебхука должен быть числом: $WEBHOOK_PORT"
+ok "порт вебхука: $WEBHOOK_PORT"
+
+# Пояс хозяина: флаг --tz → то, что уже записано в channel.env → пояс сервера.
+# Помним его в конфиге, иначе повторный прогон и /update без --tz молча
+# сдвинули бы утреннюю сводку на час сервера.
+if [[ -z "$OWNER_TZ" && -f "$ENV_FILE" ]]; then
+  OWNER_TZ="$(sed -n 's/^DASHI_OWNER_TZ=//p' "$ENV_FILE" | head -1)"
+fi
+OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
+ok "пояс хозяина: $OWNER_TZ (утренняя сводка в 09:00 по нему)"
 
 # Токен и id спрашиваем, только если конфига ещё нет — на повторном прогоне не дёргаем.
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -159,10 +225,21 @@ apt-get install -y -qq git unzip tmux curl jq python3
 # Ставим своп — дешевле, чем объяснять человеку OOM.
 mem_kb=$(awk '/MemTotal/{print $2}' /proc/meminfo)
 if (( mem_kb < 1800000 )) && ! swapon --show --noheadings | grep -q .; then
-  fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none
-  chmod 600 /swapfile && mkswap -q /swapfile && swapon /swapfile
-  grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
-  ok "своп 2 ГБ (памяти всего $(( mem_kb / 1024 )) МБ)"
+  make_swap() {  # make_swap fallocate|dd — файл, права, mkswap, swapon; любой сбой = false
+    rm -f /swapfile
+    if [[ "$1" == fallocate ]]; then fallocate -l 2G /swapfile 2>/dev/null
+    else dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none 2>/dev/null; fi \
+      && chmod 600 /swapfile && mkswap -q /swapfile 2>/dev/null && swapon /swapfile 2>/dev/null
+  }
+  # На btrfs/zfs fallocate проходит, а swapon отказывает («дырявый» файл) —
+  # раньше set -e ронял всю установку; пробуем dd, не вышло — идём без свопа.
+  if make_swap fallocate || make_swap dd; then
+    grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    ok "своп 2 ГБ (памяти всего $(( mem_kb / 1024 )) МБ)"
+  else
+    rm -f /swapfile
+    warn "своп не поднялся (btrfs/zfs/контейнер?) — продолжаю без него; памяти $(( mem_kb / 1024 )) МБ, Claude может падать по OOM"
+  fi
 fi
 
 # Журнал systemd без потолка за месяцы съедает гигабайты на маленьком VPS
@@ -217,7 +294,7 @@ say "Bun"
 if as_agent 'test -x ~/.bun/bin/bun'; then
   skip "bun $(as_agent '~/.bun/bin/bun --version')"
 else
-  as_agent 'curl -fsSL https://bun.sh/install | bash' >/dev/null
+  as_agent "curl -fsSL https://bun.sh/install | bash -s -- '$BUN_VERSION'" >/dev/null
   as_agent 'test -x ~/.bun/bin/bun' || die "bun не встал — проверь, что unzip на месте"
   ok "bun $(as_agent '~/.bun/bin/bun --version')"
 fi
@@ -247,9 +324,18 @@ fi
 if [[ -d "$CLAUDE_DIR/dashi-plugin-claude-code/.git" ]]; then
   # Повторный прогон = обновление плагина, иначе фиксы моста не доезжают.
   # set-url обязателен: старые установки смотрят origin'ом в чужое репо.
-  as_agent "cd '$CLAUDE_DIR/dashi-plugin-claude-code' && git remote set-url origin '$REPO_URL' && git fetch --depth 1 origin '$BRANCH' && git reset --hard FETCH_HEAD" >/dev/null 2>&1 \
-    && ok "плагин обновлён до свежего $BRANCH" \
-    || warn "не смог обновить плагин (нет сети до GitHub?) — работаю на том, что есть"
+  # reset --hard стирает правки в отслеживаемых файлах — как dashi-ctl update,
+  # при локальных правках не трогаем (untracked reset не задевает, их не считаем).
+  REPO_DIRTY="$(as_agent "git -C '$CLAUDE_DIR/dashi-plugin-claude-code' status --porcelain --untracked-files=no" 2>/dev/null \
+    | awk '{print $NF}' | head -5 | tr '\n' ' ' || true)"
+  if [[ -n "$REPO_DIRTY" ]]; then
+    warn "в плагине есть локальные правки ($REPO_DIRTY) — обновление до $BRANCH пропускаю, чтобы их не стереть"
+    warn "закоммить или откати их (git -C $CLAUDE_DIR/dashi-plugin-claude-code status) и запусти снова"
+  else
+    as_agent "cd '$CLAUDE_DIR/dashi-plugin-claude-code' && git remote set-url origin '$REPO_URL' && git fetch --depth 1 origin '$BRANCH' && git reset --hard FETCH_HEAD" >/dev/null 2>&1 \
+      && ok "плагин обновлён до свежего $BRANCH" \
+      || warn "не смог обновить плагин (нет сети до GitHub?) — работаю на том, что есть"
+  fi
 else
   as_agent "git clone --depth 1 --branch '$BRANCH' '$REPO_URL' '$CLAUDE_DIR/dashi-plugin-claude-code'" >/dev/null 2>&1 \
     || die "не удалось склонировать $REPO_URL"
@@ -326,7 +412,10 @@ reply — иначе человек не увидит ничего.
 ## Команды хозяина в Telegram
 /help — список команд, /status — как я себя чувствую, /stop — прервать работу,
 /compact — сжать разговор, /new — начать с чистого листа, /mirror — показать
-мой терминал, /keys — кнопки для ответа на диалоги, /cc — команды Claude Code.
+мой терминал, /keys — кнопки для ответа на диалоги, /cc — команды Claude Code,
+/relogin — обновить вход в Claude (пришлю ссылку, жду код), /restart —
+перезапустить мост (связь моргнёт), /update — обновить мост до свежей версии
+(бэкап, откат при сбое, рестарт).
 Спросят «что ты умеешь» — объясняю словами, а не выкладываю список.
 
 ## Контекст разговора
@@ -464,6 +553,14 @@ if [[ -f "$ENV_FILE" ]]; then
   # Ветка обновлений: старые конфиги без строки → дописать; --branch меняет.
   if grep -q "^DASHI_BRANCH=" "$ENV_FILE"; then sed -i "s#^DASHI_BRANCH=.*#DASHI_BRANCH=$BRANCH#" "$ENV_FILE"
   else echo "DASHI_BRANCH=$BRANCH" >> "$ENV_FILE"; fi
+  # Пояс хозяина: /update читает его отсюда, чтобы не сдвинуть сводку.
+  if grep -q "^DASHI_OWNER_TZ=" "$ENV_FILE"; then sed -i "s#^DASHI_OWNER_TZ=.*#DASHI_OWNER_TZ=$OWNER_TZ#" "$ENV_FILE"
+  else echo "DASHI_OWNER_TZ=$OWNER_TZ" >> "$ENV_FILE"; fi
+  # Порт вебхука: --webhook-port меняет, без флага строка не трогается.
+  if [[ $PORT_GIVEN -eq 1 ]]; then
+    if grep -q "^TELEGRAM_WEBHOOK_PORT=" "$ENV_FILE"; then sed -i "s#^TELEGRAM_WEBHOOK_PORT=.*#TELEGRAM_WEBHOOK_PORT=$WEBHOOK_PORT#" "$ENV_FILE"
+    else echo "TELEGRAM_WEBHOOK_PORT=$WEBHOOK_PORT" >> "$ENV_FILE"; fi
+  fi
   # Модель: --model меняет, без флага существующая строка не трогается.
   if [[ -n "$MODEL" ]]; then
     if grep -q "^DASHI_MODEL=" "$ENV_FILE"; then sed -i "s#^DASHI_MODEL=.*#DASHI_MODEL=$MODEL#" "$ENV_FILE"
@@ -481,14 +578,17 @@ TELEGRAM_ALLOWED_CHAT_IDS=$USER_ID
 TELEGRAM_WORKSPACE_ROOT=$CLAUDE_DIR
 TELEGRAM_STATE_DIR=$WORKSPACE/state/telegram
 # Приёмник событий от Claude. Без явного порта плагин берёт случайный, и хуки,
-# прописанные на 8089, стучатся в пустоту — карточка «работаю…» не появляется.
+# прописанные на этот порт, стучатся в пустоту — карточка «работаю…» не появляется.
+# Тот же порт читают хуки (install-hooks) и сторож моста в dashi-run.
 TELEGRAM_WEBHOOK_HOST=127.0.0.1
-TELEGRAM_WEBHOOK_PORT=8089
+TELEGRAM_WEBHOOK_PORT=$WEBHOOK_PORT
 # Хуки без токена молча ничего не отправляют — обе стороны читают эту строку.
 TELEGRAM_WEBHOOK_TOKEN=$(openssl rand -hex 16 2>/dev/null || head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')
 AGENT_ID=$AGENT_NAME
 GROQ_API_KEY=$GROQ_KEY
 DASHI_BRANCH=$BRANCH
+# Пояс хозяина: утренние кроны комплекта встают на 09:00 по нему (--tz).
+DASHI_OWNER_TZ=$OWNER_TZ
 # Модель Claude (opus|sonnet|haiku|полный id). Пусто = дефолт аккаунта владельца.
 # Поменять: вписать сюда и systemctl restart dashi-<агент>.
 DASHI_MODEL=$MODEL
@@ -517,7 +617,7 @@ say "Hooks"
 as_agent "export PATH=\$HOME/.bun/bin:\$PATH; cd '$PLUGIN_DIR' && bash scripts/install-hooks.sh \
     --settings ~/.claude/settings.json \
     --chat-id '$USER_ID' \
-    --webhook-url http://127.0.0.1:8089/hooks/agent \
+    --webhook-url http://127.0.0.1:$WEBHOOK_PORT/hooks/agent \
     --agent-id dashi-channel \
     --verbose-progress" >/dev/null || die "install-hooks.sh упал"
 ok "хуки актуализированы"
@@ -542,57 +642,19 @@ fi
 say "Дисциплина (конституция, гейты, помощники)"
 KIT_DIR="$CLAUDE_DIR/dashi-plugin-claude-code/agent-kit"
 if [[ -x "$KIT_DIR/install-kit.sh" ]]; then
+  # Кроны будильника и утренней сводки теперь ставит сам kit (--tz): так их
+  # получает и агент, обновлённый по гайду «Update плагина», а не только свежая
+  # установка (леджер молчал у обновлённых — Саня 31.08).
   as_agent "bash '$KIT_DIR/install-kit.sh' \
       --claude-dir '$CLAUDE_DIR' \
       --chat-id '$USER_ID' \
       --agent '$AGENT_NAME' \
-      --settings ~/.claude/settings.json" || die "install-kit.sh упал"
-  # Будильник по датам в леджере: без него обещание со сроком лежит молча,
-  # и хозяин узнаёт о нём, только когда сам вспомнит.
-  # Крон живёт по часам СЕРВЕРА, а сводку читает хозяин — считаем час так, чтобы
-  # у него было 09:00. Пояс: --tz, иначе пояс сервера.
-  OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
-  # python3 -c, не heredoc: вложенный heredoc внутри $( ) оставлял python
-  # висеть на stdin — установка молча замирала на 13 минут (поймано e2e 27.08).
-  DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own=zoneinfo.ZoneInfo(os.environ["OWNER_TZ"]); srv=dt.datetime.now().astimezone().tzinfo; print(dt.datetime.now(own).replace(hour=9,minute=0,second=0,microsecond=0).astimezone(srv).hour)' 2>/dev/null || true)"
-  [[ -n "$DIG_H" ]] || { DIG_H=7; warn "не смог посчитать пояс ($OWNER_TZ, нет tzdata?) — сводка в 07:00 по серверу"; }
-  SWP_H="$DIG_H"
-  SWEEP="30 $SWP_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
-  # Утренняя сводка открытых дел хозяину: секция = отдельное сообщение,
-  # длинная режется по границам строк (Telegram рубит на 4096).
-  DIGEST="0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
-  # Советник по обновлениям: сам сообщает, что вышло нового, и напоминает
-  # про /update. Без него агент молчит, пока хозяин не догадается спросить.
-  NOTIFY="10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
-  # Утренняя самопроверка: хуки, крон, канарейка, модель, ссылки памяти. Шлёт
-  # хозяину ТОЛЬКО подозрения. Без неё агент молча ломается и об этом узнаёт
-  # только хозяин, случайно (27.08.2026: крон 6 часов не выполнял задачи).
-  AUDIT="20 $DIG_H * * * /bin/bash $WORKSPACE/bin/self-audit-morning.sh >> $WORKSPACE/logs/self-audit.log 2>&1"
-  # Отчёт о состоянии сервера: диск, память, процессор, сервисы агента, вход в
-  # Claude, планировщик, бэкап. Шлётся КАЖДОЕ утро, даже когда всё зелено —
-  # хозяину нужна одна строчка «сервер жив», а не тишина непонятной природы.
-  HEALTH="30 $DIG_H * * * /bin/bash $WORKSPACE/bin/health-daily.sh >> $WORKSPACE/logs/health-daily.log 2>&1"
-  if as_agent "crontab -l 2>/dev/null | grep -q promise-sweeper"; then
-    skip "будильник по срокам уже в кроне"
-  else
-    as_agent "(crontab -l 2>/dev/null; echo '$SWEEP'; echo '$DIGEST'; echo '$NOTIFY'; echo '$AUDIT'; echo '$HEALTH') | crontab -" \
-      && ok "будильник, сводка и советник по обновлениям в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
-      || warn "не смог прописать крон — поставь руками"
-  fi
-  # Догоняем агентов, поднятых до появления советника: сводка уже в кроне, а его нет.
-  if as_agent "crontab -l 2>/dev/null | grep -q update-notify"; then :; else
-    as_agent "(crontab -l 2>/dev/null; echo '$NOTIFY') | crontab -" \
-      && ok "советник по обновлениям добавлен в крон" || true
-  fi
-  # Догоняем агентов, поднятых до появления самопроверки.
-  if as_agent "crontab -l 2>/dev/null | grep -q self-audit-morning"; then :; else
-    as_agent "(crontab -l 2>/dev/null; echo '$AUDIT') | crontab -" \
-      && ok "утренняя самопроверка добавлена в крон" || true
-  fi
-  if as_agent "crontab -l 2>/dev/null | grep -q health-daily"; then :; else
-    as_agent "(crontab -l 2>/dev/null; echo '$HEALTH') | crontab -" \
-      && ok "утренний отчёт о состоянии сервера добавлен в крон" || true
-  fi
+      --settings ~/.claude/settings.json \
+      --tz '$OWNER_TZ'" \
+    || die "install-kit.sh упал"
+  # Утренние кроны (сводка, будильник по срокам, советник по обновлениям,
+  # самопроверка, отчёт о состоянии сервера) ставит сам комплект — он же
+  # догоняет агентов, поднятых раньше, на каждом /update.
   # ── Канарейка планировщика ────────────────────────────────────────────────
   # Крон умеет МОЛЧА перестать выполнять задачи пользователя: одна лишняя жёсткая
   # ссылка на файле расписания — и он его не грузит (Саня, 27.08.2026: шесть часов
@@ -655,8 +717,9 @@ say "Прожиматель стартовых диалогов"
 cat > /usr/local/bin/dashi-press-dialogs <<'EOF'
 #!/usr/bin/env bash
 # Bypass Permissions -> Down+Enter (дефолт «No, exit»), остальные диалоги
-# (dev channels, trust, внешние импорты) -> Enter. Всегда exit 0 — это
-# ExecStartPost, падать ему нельзя.
+# (dev channels, trust, внешние импорты) -> Enter. Всегда exit 0: зовётся
+# фоном из dashi-run, его код возврата никого не интересует, а падение
+# с ошибкой только засоряет журнал.
 set -u
 SESSION="${1:?usage: dashi-press-dialogs <tmux-session>}"
 # 40×3с = 2 мин: на слабом VPS (1 ГБ + своп) Claude грузится дольше 45 секунд
@@ -692,10 +755,12 @@ cat > /usr/local/bin/dashi-run <<'EOF'
 # Иначе классика «tmux жив, мост сдох»: systemd доволен, бот молчит, ремонт
 # только терминалом. До первого подъёма моста порт не проверяем — на свежей
 # установке Claude может стоять на логине сколько угодно.
+# Порт: аргумент → TELEGRAM_WEBHOOK_PORT из channel.env (EnvironmentFile юнита)
+# → 8089. Второй агент на хосте живёт на своём порту — сторож обязан смотреть туда же.
 set -uo pipefail
 SESSION="${1:?usage: dashi-run <tmux-session> <plugin-dir> [webhook-port]}"
 PLUGIN="${2:?usage: dashi-run <tmux-session> <plugin-dir> [webhook-port]}"
-PORT="${3:-8089}"
+PORT="${3:-${TELEGRAM_WEBHOOK_PORT:-8089}}"
 tmux kill-session -t "$SESSION" 2>/dev/null || true
 tmux new-session -d -s "$SESSION" \
   "/bin/bash -lc 'cd $PLUGIN && exec claude ${DASHI_MODEL:+--model $DASHI_MODEL} --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'"
@@ -791,10 +856,13 @@ case "\${1:-}" in
                    # репозитория — без этого прогона новые гейты и реестры доезжают
                    # до кода, но не до агента. Скрипт идемпотентен и не трогает
                    # правки хозяина, поэтому гоняем на каждом обновлении.
+                   # Пояс хозяина и settings.json — те же, что у установщика: иначе
+                   # сводка съезжает на час сервера, а хуки регистрируются дважды.
                    KIT=$REPO_DIR/agent-kit/install-kit.sh
+                   tz="\$(sed -n 's/^DASHI_OWNER_TZ=//p' $ENV_FILE | head -1)"
                    [[ -x "\$KIT" ]] && runuser -u $SERVICE_USER -- bash "\$KIT" \\
-                     --claude-dir '$CLAUDE_DIR' --chat-id '$USER_ID' \\
-                     --agent '$AGENT_NAME' --settings '$CLAUDE_DIR/settings.json' >/dev/null 2>&1 || true
+                     --claude-dir '$CLAUDE_DIR' --chat-id '$USER_ID' --agent '$AGENT_NAME' \\
+                     --settings '/home/$SERVICE_USER/.claude/settings.json' --tz "\$tz" >/dev/null 2>&1 || true
                    echo "UPDATED \$n \$(g rev-parse --short HEAD)"
                  else
                    rm -rf $REPO_DIR; mv $REPO_DIR.bak $REPO_DIR; echo ROLLBACK; exit 4
@@ -868,7 +936,8 @@ if [[ $setup_backup -eq 1 ]]; then
   PASS_FILE="$WORKSPACE/secrets/backup.pass"
   if ! as_agent "test -s '$PASS_FILE'"; then
     BK_PASS="$(head -c 24 /dev/urandom | base64 | tr -d '/+=' | head -c 24)"
-    as_agent "umask 077; printf '%s\n' '$BK_PASS' > '$PASS_FILE'"
+    # Пароль через stdin, не в командной строке su — иначе он виден в ps любому
+    printf '%s\n' "$BK_PASS" | su - "$SERVICE_USER" -c "umask 077; cat > '$PASS_FILE'"
     printf '\n    \033[1;33mПАРОЛЬ ОТ БЭКАПА (сохрани отдельно от сервера!):\033[0m %s\n\n' "$BK_PASS"
     [[ $ASSUME_YES -eq 0 ]] && read -r -p "    Сохранил пароль? Enter для продолжения " _ </dev/tty || true
   else
@@ -986,7 +1055,7 @@ elif have_token; then
 elif logged_in; then
   warn "нашёл обычный вход — работает, но протухает ~раз в 30 дней."
   warn "Годовой: su - $SERVICE_USER -c 'claude setup-token', затем повторный прогон с --claude-token TOKEN"
-elif [[ ! -r /dev/tty ]]; then
+elif ! have_tty; then
   cat <<EOF
 
 ──────────────────────────────────────────────────────────────
@@ -1122,7 +1191,7 @@ EOF
     docker run -d --name openviking --network host --restart unless-stopped \
       -v "$OV_DIR:/app/.openviking" -e OPENVIKING_CONFIG_FILE=/app/.openviking/ov.conf \
       -e OPENVIKING_SERVER_HOST=127.0.0.1 \
-      ghcr.io/volcengine/openviking:latest >/dev/null 2>&1 || die "контейнер openviking не запустился (docker logs openviking)"
+      "$OPENVIKING_IMAGE" >/dev/null 2>&1 || die "контейнер openviking не запустился (docker logs openviking)"
     ok "контейнер openviking запущен"
   fi
   for _ in $(seq 1 45); do
@@ -1229,7 +1298,9 @@ else
       && ok "ремонтник не пишет свой токен в системный журнал"
   fi
   if [[ -n "$REPAIR_TOKEN" ]]; then
-    R_USERNAME="$(curl -sm 10 "https://api.telegram.org/bot$REPAIR_TOKEN/getMe" \
+    # URL с токеном — через --config со stdin, чтобы токен не светился в ps
+    R_USERNAME="$(printf 'url = "https://api.telegram.org/bot%s/getMe"\n' "$REPAIR_TOKEN" \
+      | curl -sm 10 --config - \
       | grep -o '"username":"[^"]*"' | cut -d'"' -f4 || true)"
     # Годовой токен Claude — тот же, что у агента: ремонтник тоже говорит с Claude
     R_CLAUDE_TOKEN="$(sed -n 's/^CLAUDE_CODE_OAUTH_TOKEN=//p' "$ENV_FILE" | head -1)"
@@ -1287,6 +1358,10 @@ say "Запуск"
 # один раз при старте сессии, и повторный прогон «всё сделал», но живой агент
 # продолжал крутиться со старыми хуками — карточка прогресса так и оставалась
 # пустой (Саня 27.08.2026).
+if systemctl is-active --quiet "$UNIT"; then
+  warn "агент $AGENT_NAME сейчас работает — перезапускаю, чтобы он подхватил новые хуки и плагин:"
+  warn "связь моргнёт, текущий ход агента (если он что-то делал) оборвётся; после старта он снова на связи"
+fi
 systemctl try-restart "$UNIT" >/dev/null 2>&1 || true
 systemctl enable --now "$UNIT" >/dev/null 2>&1 || true
 sleep 8

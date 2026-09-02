@@ -23,3 +23,5 @@ bun.lock
 __pycache__/
 *.pyc
 *.bak.*
+# Локальный кэш bun (plugin/bun/), появляется при запуске bun из папки плагина — не код
+bun/

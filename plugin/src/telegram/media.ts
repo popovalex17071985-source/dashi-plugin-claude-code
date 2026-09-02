@@ -43,6 +43,7 @@ export type MediaDescriptor =
       name?: string
       mime?: string
       size?: number
+      localPath?: string
     }
   | {
       kind: 'voice'
@@ -435,6 +436,10 @@ export interface DownloadPhotoDeps {
   writeFile?: (path: string, data: Uint8Array) => Promise<void>
   mkdir?: (path: string) => Promise<void>
   now?: () => number
+  // Extension to use when Telegram's file_path carries none. Photos keep
+  // the historical 'jpg'; documents pass their own (csv, pdf, …) so the
+  // saved file stays openable by name.
+  fallbackExt?: string
 }
 
 export async function downloadPhotoToInbox(
@@ -457,8 +462,11 @@ export async function downloadPhotoToInbox(
     const buf = await fetchTelegramFile(file.file_path, token, fetchFn)
     if (!buf) return undefined
 
-    const rawExt = file.file_path.includes('.') ? (file.file_path.split('.').pop() ?? 'jpg') : 'jpg'
-    const ext = rawExt.replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
+    const fallbackExt = (deps.fallbackExt ?? 'jpg').replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
+    const rawExt = file.file_path.includes('.')
+      ? (file.file_path.split('.').pop() ?? fallbackExt)
+      : fallbackExt
+    const ext = rawExt.replace(/[^a-zA-Z0-9]/g, '') || fallbackExt
     const uniqueId = (file.file_unique_id ?? '').replace(/[^a-zA-Z0-9_-]/g, '') || 'photo'
     const ts = deps.now ? deps.now() : Date.now()
     const path = `${inboxDir}/${ts}-${uniqueId}.${ext}`

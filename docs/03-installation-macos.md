@@ -482,6 +482,40 @@ launchctl kickstart gui/$(id -u)/com.dashi-plugin.channel-myagent
 
 ---
 
+## Комплект дисциплины (agent-kit) на macOS
+
+Установщик `scripts/install-agent.sh` — **только Linux** (apt, systemd, adduser,
+`/etc/cron.d`, `timedatectl`); на macOS его не запустить. Сам комплект
+`agent-kit/install-kit.sh` (конституция, гейт-хуки, помощники, утренняя сводка
+леджера и будильник по срокам — см. `agent-kit/README.md`) написан на bash +
+python3 и на Linux-специфичное почти не опирается, но **на живом маке не
+проверялся**. Если хотите попробовать:
+
+- нужны `jq` (`brew install jq`; его зовут хуки) и `python3` 3.9+ с модулем
+  `zoneinfo` — подойдёт python3 из Xcode Command Line Tools; в крон и в хуки
+  кит прописывает `/usr/bin/python3` жёстко, так что именно он и должен быть;
+- **обязательно передайте `--tz`**: пояс хозяина кит берёт из `timedatectl`,
+  которого на macOS нет, и без флага молча возьмёт UTC;
+- сводку и будильник он ставит через `crontab -e` пользователя — на macOS cron
+  работает, но процессу `cron` может понадобиться Full Disk Access
+  (System Settings → Privacy & Security), иначе скрипты в `~/.claude-lab/`
+  не прочитаются;
+- запускать под тем же пользователем, под которым идёт launchd-агент:
+
+```bash
+bash ~/.claude-lab/myagent/.claude/dashi-plugin-claude-code/agent-kit/install-kit.sh \
+  --claude-dir ~/.claude-lab/myagent/.claude \
+  --chat-id <telegram id хозяина> --agent myagent \
+  --settings ~/.claude/settings.json \
+  --tz Asia/Yekaterinburg
+```
+
+Повторный прогон обновляет файлы комплекта, а изменённые вами версии сначала
+копирует в `~/.claude-lab/myagent/.kit-backup/<дата>/`. После прогона —
+`launchctl kickstart -k ...`, хуки читаются на старте сессии.
+
+---
+
 ## Готово
 
 Дальше — [05-troubleshooting.md](05-troubleshooting.md) когда что-то сломается, и [04-migration-from-gateway.md](04-migration-from-gateway.md) если переезжаете со старого `claude -p` gateway.

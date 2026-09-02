@@ -9,15 +9,39 @@ fail() { echo "✗ $1" >&2; exit 1; }
 
 bash -n "$KIT/install-kit.sh" || fail "синтаксис install-kit.sh"
 grep -q "install-kit.sh" "$INSTALLER" || fail "установщик не зовёт комплект"
-grep -q "update-notify" "$INSTALLER" || fail "установщик не ставит советника по обновлениям"
-grep -q "open-threads-digest.py --send" "$INSTALLER" || fail "утренняя сводка не в кроне"
+# Утренние кроны (сводка, будильник, советник, самопроверка, отчёт о сервере)
+# ставит сам комплект (f7e3907 + слияние с main 02.09), не установщик: так они
+# доезжают и через /update. Установщик ставит только канарейку планировщика.
+for s in "open-threads-digest.py --send" promise-sweeper.py update-notify.sh self-audit-morning.sh health-daily.sh; do
+  grep -q "$s" "$KIT/install-kit.sh" || fail "комплект не ставит крон: $s"
+done
+grep -q -- "--tz '\$OWNER_TZ'" "$INSTALLER" || fail "установщик не передаёт --tz комплекту"
+grep -q "DASHI_OWNER_TZ=" "$INSTALLER" || fail "пояс хозяина не пишется в channel.env"
+grep -q "cron-heartbeat" "$INSTALLER" || fail "установщик не ставит канарейку планировщика"
+# dashi-ctl update раскатывает комплект — с поясом хозяина и в тот же settings.json
+grep -q 'DASHI_OWNER_TZ=//p. \$ENV_FILE' "$INSTALLER" || fail "dashi-ctl update не читает пояс хозяина"
+grep -q "/home/\$SERVICE_USER/.claude/settings.json' --tz" "$INSTALLER" || fail "dashi-ctl update зовёт комплект не с тем settings.json/--tz"
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 mkdir -p "$T/.claude/core"
+# crontab — подменный: комплект пишет в крон, а тест не должен трогать живой
+# крон того, кто его гоняет (раньше спасало только то, что строки уже стояли)
+mkdir -p "$T/shim"; export CRONTAB_FILE="$T/crontab.txt"
+cat > "$T/shim/crontab" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  -l) cat "$CRONTAB_FILE" 2>/dev/null ;;
+  -)  cat > "$CRONTAB_FILE" ;;
+  *)  echo "shim: unsupported $*" >&2; exit 1 ;;
+esac
+SH
+chmod +x "$T/shim/crontab"; export PATH="$T/shim:$PATH"
+# Чужая строка в кроне (другой агент) — комплект обязан её не трогать
+echo "30 7 * * * /usr/bin/python3 /srv/other/bin/promise-sweeper.py" > "$CRONTAB_FILE"
 printf '# Агент\n\n@core/rules.md\n' > "$T/.claude/CLAUDE.md"
 printf '# Правила и правки\n- правка хозяина\n' > "$T/.claude/core/rules.md"
 
-KIT_NO_CRON=1 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null \
+bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null \
   || fail "install-kit упал"
 
 # Личные правки хозяина комплект не трогает
@@ -40,6 +64,15 @@ echo '{"tool_name":"Bash","tool_input":{"command":"rm -rf /var/data"}}' \
 # 2. запись секрета
 echo '{"tool_name":"Write","tool_input":{"file_path":"/tmp/x/api.key"}}' \
   | "$H/block-red-zone.sh" >/dev/null 2>&1 && fail "запись секрета прошла"
+# 2b. СВОЙ secrets/ — хранить ключи хозяина там агент обязан (болванка CLAUDE.md)
+echo "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$T/secrets/openai.token\"}}" \
+  | "$H/block-red-zone.sh" >/dev/null 2>&1 || fail "запись в свой secrets/ заблокирована"
+# ...но .env/.key внутри, чужой secrets/, вложенные пути и .ssh — по-прежнему нельзя
+for bad in "$T/secrets/.env" "$T/secrets/api.key" "/opt/other/secrets/x.token" \
+           "$T/secrets/../.ssh/id_rsa" "$T/secrets/sub/x.token" "$T/.ssh/config"; do
+  echo "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$bad\"}}" \
+    | "$H/block-red-zone.sh" >/dev/null 2>&1 && fail "прошла запись секрета: $bad"
+done
 # 3. ждун, матчащий сам себя
 echo '{"tool_name":"Bash","tool_input":{"command":"until pgrep -f job; do sleep 60; done"}}' \
   | "$H/block-selfmatching-pgrep.sh" | grep -q "\"permissionDecision\": \"deny\"" \
@@ -68,12 +101,37 @@ echo "{\"transcript_path\":\"$J\",\"session_id\":\"s\"}" \
 python3 "$T/bin/promise-sweeper.py" --selfcheck >/dev/null || fail "будильник по срокам"
 python3 "$T/bin/open-threads-digest.py" --selfcheck >/dev/null || fail "утренняя сводка"
 
-# Повторный прогон ничего не задваивает
-KIT_NO_CRON=1 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null
+# Кроны: свои строки поставлены, чужая цела
+for s in promise-sweeper.py "open-threads-digest.py --send" update-notify.sh self-audit-morning.sh health-daily.sh; do
+  [[ "$(grep -c "$T/bin/$s" "$CRONTAB_FILE")" == 1 ]] || fail "не в кроне: $s"
+done
+grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "затёр чужую строку крона"
+
+# KIT_NO_CRON=1 — крон не трогается вовсе (чужая песочница)
+cp "$CRONTAB_FILE" "$T/crontab.before"
+KIT_NO_CRON=1 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Europe/Moscow >/dev/null
+cmp -s "$CRONTAB_FILE" "$T/crontab.before" || fail "KIT_NO_CRON=1 всё равно переписал крон"
+
+# Повторный прогон ничего не задваивает, а локально правленный файл — сначала в бэкап
+echo "# local tweak" >> "$H/block-dangerous.sh"
+out="$(bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke)"
+grep -q "сохранил 1 старых файлов" <<<"$out" || fail "перезапись без бэкапа: $out"
+grep -rq "local tweak" "$T/.kit-backup/"*/.claude/hooks/block-dangerous.sh || fail "бэкап не содержит старую версию"
+grep -q "local tweak" "$H/block-dangerous.sh" && fail "хук не обновлён комплектом"
 n2=$(python3 -c "
 import json;d=json.load(open('$T/.claude/settings.json'))
 print(sum(len(e['hooks']) for a in d['hooks'].values() for e in a))")
 [[ "$n2" == 9 ]] || fail "повторный прогон задвоил хуки: $n2"
 [[ "$(grep -c 'core/constitution.md' "$T/.claude/CLAUDE.md")" == 1 ]] || fail "задвоил @include"
+[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 5 ]] || fail "повторный прогон задвоил крон"
 
-echo "✓ agent-kit smoke ok (9 хуков, 6 гейтов сработали, идемпотентно)"
+# Смена --tz переписывает СВОИ строки (час меняется), а не пропускает их
+bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Asia/Yekaterinburg >/dev/null
+h1="$(grep "$T/bin/open-threads-digest.py" "$CRONTAB_FILE" | awk '{print $2}')"
+bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Europe/Moscow >/dev/null
+h2="$(grep "$T/bin/open-threads-digest.py" "$CRONTAB_FILE" | awk '{print $2}')"
+[[ "$h1" =~ ^[0-9]+$ && "$h2" =~ ^[0-9]+$ && "$h1" != "$h2" ]] || fail "смена --tz не переписала час крона ($h1 -> $h2)"
+[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 5 ]] || fail "смена --tz задвоила крон"
+grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "смена --tz затёрла чужую строку"
+
+echo "✓ agent-kit smoke ok (9 хуков, 6 гейтов сработали, 5 утренних кронов, идемпотентно)"

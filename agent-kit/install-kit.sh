@@ -8,11 +8,11 @@
 #
 # Idempotent: re-running replaces files and never double-registers a hook.
 #
-# Usage: install-kit.sh --claude-dir DIR [--chat-id ID] [--agent NAME] [--settings FILE]
+# Usage: install-kit.sh --claude-dir DIR [--chat-id ID] [--agent NAME] [--settings FILE] [--tz TZ]
 set -euo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAUDE_DIR=""; CHAT_ID=""; AGENT=""; SETTINGS=""
+CLAUDE_DIR=""; CHAT_ID=""; AGENT=""; SETTINGS=""; OWNER_TZ=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -20,6 +20,7 @@ while [[ $# -gt 0 ]]; do
     --chat-id)    CHAT_ID="$2";    shift 2 ;;
     --agent)      AGENT="$2";      shift 2 ;;
     --settings)   SETTINGS="$2";   shift 2 ;;
+    --tz)         OWNER_TZ="$2";   shift 2 ;;   # пояс ХОЗЯИНА: сводка в 09:00 по нему
     *) echo "unknown arg: $1" >&2; exit 2 ;;
   esac
 done
@@ -32,11 +33,24 @@ WORKSPACE="$(dirname "$CLAUDE_DIR")"
 mkdir -p "$CLAUDE_DIR"/{hooks,core,agents} "$WORKSPACE/bin" "$WORKSPACE/logs"
 
 # Placeholders are substituted on copy — the kit itself stays host-agnostic.
+# A file that already exists AND differs is copied to .kit-backup/<stamp>/<same
+# relative path> first: the kit refreshes hooks/bin/agents/constitution on a
+# living agent, and a local tweak lost without a copy is a silent regression.
+BACKUP_DIR="$WORKSPACE/.kit-backup/$(date +%Y%m%d-%H%M)"
+BACKED=0
 render() {
+  local tmp; tmp="$(mktemp)"
   sed -e "s|__CLAUDE_DIR__|$CLAUDE_DIR|g" \
       -e "s|__WORKSPACE__|$WORKSPACE|g" \
       -e "s|__CHAT_ID__|$CHAT_ID|g" \
-      -e "s|__AGENT__|$AGENT|g" "$1" > "$2"
+      -e "s|__AGENT__|$AGENT|g" "$1" > "$tmp"
+  if [[ -f "$2" ]] && ! cmp -s "$tmp" "$2"; then
+    local rel="${2#"$WORKSPACE"/}"
+    mkdir -p "$BACKUP_DIR/$(dirname "$rel")"
+    cp -p "$2" "$BACKUP_DIR/$rel"
+    BACKED=$((BACKED + 1))
+  fi
+  cat "$tmp" > "$2"; rm -f "$tmp"
 }
 
 for f in "$KIT"/hooks/*; do render "$f" "$CLAUDE_DIR/hooks/$(basename "$f")"; done
@@ -61,6 +75,7 @@ for f in SOURCES.md open-threads.md; do
 done
 mkdir -p "$CLAUDE_DIR/docs"
 render "$KIT/docs/agent-self-audit.md" "$CLAUDE_DIR/docs/agent-self-audit.md"
+(( BACKED == 0 )) || echo "  сохранил $BACKED старых файлов в $BACKUP_DIR"
 
 # Hook registration. Matchers mirror what the gates actually intercept.
 python3 - "$SETTINGS" "$CLAUDE_DIR" <<'PY'
@@ -100,28 +115,50 @@ settings.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 print(f"  хуков зарегистрировано: {added} (уже стояло: {len(WIRING) - added})")
 PY
 
-# Советник по обновлениям в кроне. Установщик ставит его при первой установке;
-# здесь — чтобы он доехал и до агентов, поднятых раньше: этот скрипт гоняется
-# на каждом /update, а шаг установщика — нет. Час берём тот же, что у утренней
-# сводки (он уже посчитан по поясу хозяина), иначе 07:00 по серверу.
-# KIT_NO_CRON=1 — раскладка без правки крона (песочница, тесты): иначе прогон
-# теста переписал бы боевой крон пользователя.
-CRON_NOW="$(crontab -l 2>/dev/null || true)"
-[ -n "${KIT_NO_CRON:-}" ] && CRON_NOW="update-notify (пропущено: KIT_NO_CRON)"
-case "$CRON_NOW" in
-  *update-notify*) ;;
-  *)
-    H="$(printf '%s\n' "$CRON_NOW" | sed -n 's/^0 \([0-9]*\) .*open-threads-digest.*/\1/p' | head -1)"
-    case "$H" in ''|*[!0-9]*) H=7 ;; esac
-    CT_TMP="$(mktemp)"
-    printf '%s\n10 %s * * * /bin/bash %s/bin/update-notify.sh >> %s/logs/update-notify.log 2>&1\n' \
-      "$CRON_NOW" "$H" "$WORKSPACE" "$WORKSPACE" > "$CT_TMP"
-    if crontab "$CT_TMP"; then
-      echo "  советник по обновлениям в кроне (${H}:10 по серверу)"
-    else
-      echo "  крон советника прописать не смог — поставь руками"
-    fi
-    rm -f "$CT_TMP" ;;
-esac
+# Утренние задачи в кроне: будильник по срокам, сводка леджера, советник по
+# обновлениям, самопроверка, отчёт о состоянии сервера. Раньше их ставил только
+# полный install-agent.sh — агент, обновлённый по гайду «Update плагина» или
+# через /update, получал скрипты, но кроны ему молчали (Саня 31.08). Теперь
+# кроны — часть комплекта: этот скрипт гоняется и установщиком, и на каждом
+# /update (dashi-ctl update), так что доезжает и до агентов, поднятых раньше.
+# Крон живёт по часам СЕРВЕРА, сводку читает хозяин — считаем час под его 09:00.
+# KIT_NO_CRON=1 — раскладка без правки крона (песочница, чужой тест): иначе
+# прогон переписал бы боевой крон того, кто его гоняет.
+OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
+# python3 -c, не heredoc: вложенный heredoc внутри $( ) вешал установку на stdin.
+DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own=zoneinfo.ZoneInfo(os.environ["OWNER_TZ"]); srv=dt.datetime.now().astimezone().tzinfo; print(dt.datetime.now(own).replace(hour=9,minute=0,second=0,microsecond=0).astimezone(srv).hour)' 2>/dev/null || true)"
+[[ -n "$DIG_H" ]] || { DIG_H=7; echo "  ! не смог посчитать пояс ($OWNER_TZ, нет tzdata?) — сводка в 07:00 по серверу"; }
+# Порядок утра (минуты после часа сводки): 00 сводка, 10 советник по обновлениям
+# (что вышло нового + напоминание про /update), 20 самопроверка (хуки, крон,
+# канарейка, модель, память — шлёт ТОЛЬКО подозрения), 30 будильник по срокам
+# и отчёт о сервере (диск, память, сервисы, вход в Claude — шлётся всегда).
+CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh)
+CRON_LINES=(
+  "0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
+  "10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
+  "20 $DIG_H * * * /bin/bash $WORKSPACE/bin/self-audit-morning.sh >> $WORKSPACE/logs/self-audit.log 2>&1"
+  "30 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
+  "30 $DIG_H * * * /bin/bash $WORKSPACE/bin/health-daily.sh >> $WORKSPACE/logs/health-daily.log 2>&1"
+)
+if [[ -n "${KIT_NO_CRON:-}" ]]; then
+  echo "  крон не трогаю (KIT_NO_CRON)"
+else
+  # Смотрим ТОЛЬКО на строки этого workspace: у второго агента под тем же
+  # пользователем свои строки, чужие не трогаем. Час мог измениться (--tz) или
+  # добавился новый скрипт — тогда свои строки переписываем, а не пропускаем.
+  CUR="$(crontab -l 2>/dev/null || true)"
+  MISSING=0
+  for line in "${CRON_LINES[@]}"; do grep -qxF "$line" <<<"$CUR" || MISSING=1; done
+  if (( MISSING == 0 )); then
+    echo "  утренние задачи уже в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)"
+  else
+    OWN=(); for s in "${CRON_SCRIPTS[@]}"; do OWN+=(-e "$WORKSPACE/bin/$s"); done
+    if grep -qF "${OWN[@]}" <<<"$CUR"; then verb="переставлены на"; else verb="в кроне:"; fi
+    { grep -vF "${OWN[@]}" <<<"$CUR" || true
+      printf '%s\n' "${CRON_LINES[@]}"; } | crontab - \
+      && echo "  утренние задачи (сводка, советник, самопроверка, будильник, отчёт о сервере) $verb 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
+      || echo "  ! не смог прописать крон — поставь руками"
+  fi
+fi
 
 echo "  комплект разложен в $CLAUDE_DIR"

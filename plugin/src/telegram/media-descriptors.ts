@@ -100,6 +100,31 @@ export function buildDocumentDescriptor(doc: Document | undefined): MediaDescrip
   return [md]
 }
 
+// Document — eager: saves the file to the inbox and attaches local_path,
+// the same deal photos get. Without it a CSV/PDF arrives as a bare file_id
+// and only a session holding the download_attachment tool can read it —
+// cron jobs and multichat sessions could not (Саня 31.08.2026).
+// Download failure yields a descriptor WITHOUT local_path; the agent can
+// still re-fetch via download_attachment.
+export async function buildDocumentDescriptorEager(
+  doc: Document | undefined,
+  deps: PhotoDownloadDeps,
+): Promise<MediaDescriptor[]> {
+  const metas = buildDocumentDescriptor(doc)
+  const md = metas[0]
+  if (md === undefined || md.kind !== 'document') return metas
+  const nameExt = (doc?.file_name ?? '').split('.').pop()
+  const localPath = await downloadPhotoToInbox(
+    deps.botApi,
+    deps.botToken,
+    md.fileId,
+    deps.inboxDir,
+    nameExt && nameExt !== doc?.file_name ? { fallbackExt: nameExt } : {},
+  )
+  if (localPath !== undefined) md.localPath = localPath
+  return [md]
+}
+
 // Voice — metadata only (no Groq call). Status is `skipped`: we did not
 // transcribe (this is the reply-target path, where the author is not
 // allowlisted). The status is always present so the agent never has to
@@ -262,7 +287,7 @@ export async function buildOwnMediaDescriptors(
   // A GIF carries BOTH `animation` and a back-compat `document` twin. When
   // `animation` is present, skip the duplicate document so the GIF renders
   // (and downloads) once, not twice (Codex Low, GIF de-dup).
-  out.push(...buildDocumentDescriptor(src.animation ? undefined : src.document))
+  out.push(...(await buildDocumentDescriptorEager(src.animation ? undefined : src.document, deps.photo)))
   out.push(...(await buildVoiceDescriptor(src.voice, deps.voice)))
   out.push(...buildAudioDescriptor(src.audio))
   out.push(...buildVideoDescriptor(src.video))

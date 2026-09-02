@@ -49,6 +49,7 @@ function mkStatePaths(): StatePaths {
       webhook: join(root, 'logs', 'webhook.log'),
       ask_user_question: join(root, 'logs', 'ask-user-question.jsonl'),
       permission_gate: join(root, 'logs', 'permission-gate.jsonl'),
+      rejected_inbound: join(root, 'logs', 'rejected-inbound.jsonl'),
     },
   }
 }

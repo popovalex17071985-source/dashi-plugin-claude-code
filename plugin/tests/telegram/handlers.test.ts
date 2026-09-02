@@ -8,7 +8,7 @@
 //     normal channel forward instead of invoking handleOobCommand.
 
 import { describe, expect, test } from 'bun:test'
-import { mkdtempSync, rmSync } from 'fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import type { Context } from 'grammy'
@@ -75,6 +75,7 @@ function makeStatePaths(): StatePaths {
       webhook: join(root, 'logs', 'webhook.log'),
       ask_user_question: join(root, 'logs', 'ask-user-question.jsonl'),
       permission_gate: join(root, 'logs', 'permission-gate.jsonl'),
+      rejected_inbound: join(root, 'logs', 'rejected-inbound.jsonl'),
     },
   }
 }
@@ -320,6 +321,29 @@ describe('handleInboundText — permission text DM-only guard (Fix 2)', () => {
 
     expect(spy.consumed).toEqual([])
     expect(spy.emitted).toEqual([])
+    rmSync(statePaths.root, { recursive: true, force: true })
+  })
+})
+
+describe('gate drop journal (rejected-inbound.jsonl)', () => {
+  test('foreign DM sender appends a journal line with reason and ids', async () => {
+    const { deps, statePaths } = makeDeps()
+    const ctx = makeCtx({ text: 'привет', chatId: 999001, chatType: 'private', fromId: 999001 })
+    await handleInboundText(ctx, deps)
+    const raw = readFileSync(statePaths.logs.rejected_inbound, 'utf8').trim()
+    const row = JSON.parse(raw)
+    expect(row.reason).toBe('sender_not_allowed')
+    expect(row.chat_id).toBe('999001')
+    expect(row.sender_id).toBe('999001')
+    expect(typeof row.ts).toBe('string')
+    rmSync(statePaths.root, { recursive: true, force: true })
+  })
+
+  test('allowlisted DM sender writes no journal line', async () => {
+    const { deps, statePaths } = makeDeps()
+    const ctx = makeCtx({ text: 'привет', chatId: 164795011, chatType: 'private', fromId: 164795011 })
+    await handleInboundText(ctx, deps)
+    expect(existsSync(statePaths.logs.rejected_inbound)).toBe(false)
     rmSync(statePaths.root, { recursive: true, force: true })
   })
 })

@@ -30,19 +30,21 @@
 
 ## OS-specific команды (Linux vs macOS)
 
-Проблемы ниже описаны примерами **для Linux/systemd**. Если вы на macOS — везде где встретите `systemctl` / `journalctl` / `sudo -u <user>`, используйте эквиваленты:
+Проблемы ниже описаны примерами **для Linux/systemd**. Если вы на macOS — везде где встретите `systemctl` / `journalctl` / `sudo -u <user>`, используйте эквиваленты.
+
+> **Имена.** Агент, поставленный установщиком `scripts/install-agent.sh` (основной путь на Linux): системный пользователь `agent`, сервис **`dashi-<agent>`**, конфиг `/etc/dashi-plugin/<agent>/channel.env`, держатель сессии `/usr/local/bin/dashi-run`, самообслуживание `sudo dashi-ctl-<agent> restart|status|logs|fix-owner|vacuum|update-claude|check|update`. Агент, собранный руками по [03-installation-linux.md](03-installation-linux.md): пользователь `agentctl`, сервис **`channel-<agent>`**. Tmux-сессия в обеих схемах называется `channel-<agent>`. Команды ниже даны в именах установщика; для ручной схемы подставьте `channel-<agent>` вместо `dashi-<agent>`. Разделы, относящиеся только к ручной схеме, помечены.
 
 | Действие | Linux (systemd) | macOS (launchd) |
 |---|---|---|
-| Статус сервиса | `systemctl status channel-<agent>` | `launchctl print gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
-| Рестарт | `systemctl restart channel-<agent>` | `launchctl kickstart -k gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
-| Стоп | `systemctl stop channel-<agent>` | `launchctl kill SIGTERM gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
-| Логи stdout/stderr | `journalctl -u channel-<agent> -n 50` | `tail -n 50 ~/Library/Logs/dashi-plugin/channel-<agent>.out.log` и `.err.log` |
-| Tail логов в реалтайме | `journalctl -u channel-<agent> -f` | `tail -f ~/Library/Logs/dashi-plugin/channel-<agent>.err.log` |
+| Статус сервиса | `systemctl status dashi-<agent>` | `launchctl print gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
+| Рестарт | `systemctl restart dashi-<agent>` | `launchctl kickstart -k gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
+| Стоп | `systemctl stop dashi-<agent>` | `launchctl kill SIGTERM gui/$(id -u)/com.dashi-plugin.channel-<agent>` |
+| Логи stdout/stderr | `journalctl -u dashi-<agent> -n 50` | `tail -n 50 ~/Library/Logs/dashi-plugin/channel-<agent>.out.log` и `.err.log` |
+| Tail логов в реалтайме | `journalctl -u dashi-<agent> -f` | `tail -f ~/Library/Logs/dashi-plugin/channel-<agent>.err.log` |
 | Tmux attach | `sudo -u <service-user> tmux attach -t channel-<agent>` | `tmux attach -t channel-<agent>` (без sudo, под вашим user) |
 | Список процессов | `ps -ef \| grep -E "bun\|claude\|tmux"` | `ps -ef \| grep -E "bun\|claude\|tmux"` (одинаково) |
 | Открытые порты | `sudo ss -tlnp \| grep <port>` | `sudo lsof -nP -i :<port>` |
-| Конфиг сервиса | `cat /etc/systemd/system/channel-<agent>.service` | `cat ~/Library/LaunchAgents/com.dashi-plugin.channel-<agent>.plist` |
+| Конфиг сервиса | `cat /etc/systemd/system/dashi-<agent>.service` | `cat ~/Library/LaunchAgents/com.dashi-plugin.channel-<agent>.plist` |
 | Перезагрузить конфиг | `systemctl daemon-reload` | `launchctl bootout ... && launchctl bootstrap ...` |
 | Env-файл | `cat /etc/dashi-plugin/<agent>/channel.env` | `cat ~/.claude-lab/<agent>/secrets/channel.env` |
 
@@ -57,8 +59,8 @@ _Применимо ко всем установкам current Bun + TypeScript 
 ### Симптом
 
 ```
-$ systemctl status channel-myagent
-● channel-myagent.service - Dashi Plugin Channel for myagent
+$ systemctl status dashi-myagent
+● dashi-myagent.service - Dashi channel for myagent (Telegram -> Claude Code)
    Active: active (running) since ...
 ```
 
@@ -89,15 +91,17 @@ Claude Code при первом запуске показывает **2 инте
 
 ### Как не повторить
 
-В systemd unit `ExecStartPost`:
+**Установщик (`install-agent.sh`)** закрывает это штатно: юнит `dashi-<agent>` — `Type=simple`, `ExecStart=/usr/local/bin/dashi-run channel-<agent> <plugin-dir>`. Держатель `dashi-run` поднимает tmux-сессию и фоном запускает `/usr/local/bin/dashi-press-dialogs`, который до 2 минут читает экран (`tmux capture-pane`) и жмёт клавишу **по содержимому**: «Bypass Permissions» → Down+Enter, диалоги dev-каналов / trust / внешних импортов / онбординга → Enter, «bypass permissions on» на экране → готово. Слепые Enter по таймеру от этого отказались: набор стартовых вопросов от запуска к запуску разный, и Down попадал в «Exit» — сервис сам убивал Claude. Если у такого агента сессия всё же зависла на диалоге — `systemctl restart dashi-<agent>`, прожиматель отработает заново.
+
+**Ручная схема (`channel-<agent>`, Type=forking):** в systemd unit `ExecStartPost`:
 
 ```ini
 ExecStartPost=/bin/sh -c 'sleep 6 && /usr/bin/tmux send-keys -t channel-<agent> Enter && sleep 2 && /usr/bin/tmux send-keys -t channel-<agent> Enter'
 ```
 
-(два Enter с паузой — на оба промта)
+(два Enter с паузой — на оба промта). Надёжнее — повторить логику `dashi-press-dialogs` (текст в `scripts/install-agent.sh`, секция «8. systemd»).
 
-Persistent fix — записать accepts в `~/.claude/settings.json` (см. [03-installation.md → Шаг 7](03-installation.md#persistent-welcome-approvals-чтобы-не-нажимать-enter-после-каждого-рестарта)).
+Persistent fix — записать accepts в `~/.claude/settings.json` (см. [03-installation.md → Persistent welcome approvals](03-installation.md#persistent-welcome-approvals)).
 
 **Урок:** «systemctl active» = «процесс жив», не = «работает корректно». После каждого рестарта проверяйте `tmux capture-pane | tail -30` на наличие welcome-окон.
 
@@ -123,7 +127,7 @@ Persistent fix — записать accepts в `~/.claude/settings.json` (см. 
 
 ### Фикс
 
-1. Откройте `/etc/systemd/system/channel-<agent>.service`, проверьте строку `WorkingDirectory=`.
+1. Откройте `/etc/systemd/system/dashi-<agent>.service`, проверьте строку `WorkingDirectory=`.
 2. Этот путь должен быть **внутри** каталога, в котором лежит `CLAUDE.md` (поднимаясь вверх).
 3. Проверьте файл существует: `ls -la <workspace>/CLAUDE.md`
 4. Через tmux в Claude Code: команда `/memory` — должна показать **оба** CLAUDE.md (глобальный + project).
@@ -164,7 +168,7 @@ curl ".../getWebhookInfo"
 
 Когда бот не отвечает:
 
-1. **Сначала** проверьте сервис: `systemctl status channel-<agent>`
+1. **Сначала** проверьте сервис: `systemctl status dashi-<agent>`
 2. **Сначала** проверьте tmux: `tmux capture-pane` — не висит ли на welcome-промте
 3. **Сначала** проверьте идентичность: `/memory` или ping бота
 4. **Только потом** — Telegram очередь:
@@ -204,7 +208,7 @@ Default allowlist в коде = `[<your-telegram-user-id>]` (зашитый user
    TELEGRAM_ALLOWED_CHAT_IDS=<your_id>
    ```
 3. Для group chat — `TELEGRAM_ALLOWED_CHAT_IDS=-100123456789` (group chat IDs начинаются с `-100`).
-4. `systemctl restart channel-<agent>`.
+4. `systemctl restart dashi-<agent>`.
 
 ### Как не повторить
 
@@ -224,7 +228,7 @@ Default allowlist в коде = `[<your-telegram-user-id>]` (зашитый user
 
 Telegram-бот получает сообщения (видны emoji-реакции — 👀 или похожие), но текстовых ответов нет. В Telegram пользователь пишет, бот молча реагирует и тишина.
 
-`systemctl status channel-<agent>` — `active (running)`. `pm2 list` (если есть) — всё зелёное. Tmux session жива.
+`systemctl status dashi-<agent>` — `active (running)`. `pm2 list` (если есть) — всё зелёное. Tmux session жива.
 
 ### Корень
 
@@ -320,7 +324,7 @@ OAuth восстановить только через интерактивны�
 
 ```bash
 # 1. Stop crash loop
-sudo systemctl stop channel-<agent>
+sudo systemctl stop dashi-<agent>
 
 # 2. Manual claude session с TTY
 sudo -u <service-user> -i
@@ -334,7 +338,7 @@ restic restore <latest-snapshot> --target /home/<service-user>/.openclaw/.secret
   --include /home/<service-user>/.openclaw/.secrets
 
 # 4. Restart systemd
-sudo systemctl start channel-<agent>
+sudo systemctl start dashi-<agent>
 
 # 5. Smoke: написать боту, должен ответить
 ```
@@ -395,7 +399,9 @@ Destructive операции (`sudo rm`, `sudo systemctl stop|start|disable`, `s
 
 ---
 
-## Проблема 9. Tmux death loop (claude exits → service в crash loop)
+## Проблема 9. Tmux death loop (claude exits → service в crash loop) — ручная схема
+
+> Только для юнита `channel-<agent>` с `Type=forking` из ручной схемы. У установщика (`dashi-<agent>`, `Type=simple` + `dashi-run`) systemd видит смерть сессии честно, а сторож в `dashi-run` дополнительно перезапускает сервис, если вебхук-порт моста пропал на 2 проверки подряд, — этой петли там нет. Имена ниже оставлены как в ручной схеме.
 
 ### Симптом
 
@@ -586,7 +592,7 @@ Watchdog хелсчек: cron, который раз в минуту прове�
 После правки — **рестарт сервиса**, `settings.json` читается на старте новой Claude-сессии (на лету не подхватится).
 
 ```bash
-systemctl restart channel-<agent>     # Linux
+systemctl restart dashi-<agent>     # Linux
 launchctl kickstart -k gui/$(id -u)/com.dashi-plugin.channel-<agent>  # macOS
 ```
 
@@ -754,7 +760,7 @@ Claude Code читает **project settings** (`<project>/.claude/settings.json`
 ```bash
 # 1. Проверить, какой settings реально читает сессия:
 #    cwd сервиса → его git-root → там ищется .claude/settings.json
-systemctl show channel-<agent> -p WorkingDirectory
+systemctl show dashi-<agent> -p WorkingDirectory
 cd <WorkingDirectory> && git rev-parse --show-toplevel   # это и есть "project" для сессии
 
 # 2. Убедиться что workspace-хуки НЕ срабатывают (косвенный признак):
@@ -766,7 +772,7 @@ cp ~/.claude/settings.json ~/.claude/settings.json.bak.$(date +%Y%m%d-%H%M%S)
 python3 -c "import json; json.load(open('$HOME/.claude/settings.json')); print('OK')"
 
 # 4. Рестарт сервиса — settings читается только на старте новой сессии
-sudo systemctl restart channel-<agent>
+sudo systemctl restart dashi-<agent>
 ```
 
 ### Как не повторить
@@ -777,7 +783,7 @@ sudo systemctl restart channel-<agent>
 
 ## Когда ничего не помогает
 
-1. Логи systemd: `journalctl -u channel-<agent> --since "1 hour ago" --no-pager -l`
+1. Логи systemd: `journalctl -u dashi-<agent> --since "1 hour ago" --no-pager -l`
 2. Tmux со скроллом: `sudo -u <service-user> tmux capture-pane -t channel-<agent> -p -S -200`
 3. Bun процессы: `ps -ef | grep bun | grep -v grep` — должен быть **один** `bun ./src/server.ts`
 4. Permission лог: `cat $TELEGRAM_STATE_DIR/logs/permissions.jsonl`

@@ -10,7 +10,7 @@ Laid down by `install-kit.sh` (called automatically from `install-agent.sh`, ste
 |---|---|---|
 | Constitution | `core/constitution.md` (@include'd) | answering off a proxy; refusing before trying; going silent after finishing; treating an imperative as a question |
 | `block-dangerous.sh` | PreToolUse Bash | recursive deletes and destructive SQL run without a confirm |
-| `block-red-zone.sh` | PreToolUse Write/Edit | writing secrets to disk; silent edits to the constitution |
+| `block-red-zone.sh` | PreToolUse Write/Edit | writing secrets to disk (`.env`, `*.key`, `*.pem`, `.ssh/`, any `secrets/`); silent edits to the constitution. One deliberate exception: plain files directly inside the agent's OWN `<workspace>/secrets/` are allowed — storing a key the owner hands over is the agent's job (the installer's CLAUDE.md template says so); nested paths, `..`, and secret-shaped names inside it stay blocked |
 | `block-selfmatching-pgrep.sh` | PreToolUse Bash | a `pgrep -f` waiter that matches its own command line and hangs forever |
 | `truncate-bash-output.sh` | PostToolUse Bash | a huge log dumped into context, burning cache every turn after |
 | `lesson-needs-mechanism.sh` | PostToolUse Edit/Write | a lesson filed as a diary line and repeated the next week |
@@ -35,7 +35,31 @@ or `open-threads.md` is left alone too.
 
 ```
 ./install-kit.sh --claude-dir ~/.claude-lab/<agent>/.claude \
-                 --chat-id <telegram id> --agent <name>
+                 --chat-id <telegram id> --agent <name> \
+                 [--settings ~/.claude/settings.json] [--tz Asia/Yekaterinburg]
 ```
 
 Idempotent: re-running refreshes the files and never double-registers a hook.
+
+**Re-run behaviour:**
+
+- **`.kit-backup/`** — a kit file that already exists on the agent AND differs
+  from the fresh render (a hook, a `bin/` script, a subagent, the constitution,
+  the self-audit task) is copied to `<workspace>/.kit-backup/<YYYYMMDD-HHMM>/<same
+  relative path>` before it is overwritten, and the run prints «сохранил N старых
+  файлов в …». Local tweaks on a living agent are no longer lost silently; diff
+  against the backup and re-apply what matters. Registries the agent writes into
+  (`core/SOURCES.md`, `core/open-threads.md`) and `core/rules.md` are never
+  overwritten at all.
+- **`--tz`** — the owner's timezone. The morning digest and the promise sweeper
+  are cron lines computed for 09:00 in that zone (server clock may differ);
+  without the flag the server's `timedatectl` zone is used (UTC if unknown).
+  Re-running with a different `--tz` rewrites the kit's own two cron lines to the
+  new hour instead of reporting «already in cron». Only lines pointing at this
+  workspace are touched — a second agent under the same user keeps its own.
+- Hooks are matched by command path, so a re-run never registers one twice.
+
+Linux is the tested target (`install-agent.sh` calls the kit from step 7b). On
+macOS the kit itself has no hard Linux dependency beyond `timedatectl` (pass
+`--tz`) and `/usr/bin/python3`, but it has not been exercised there — see
+`docs/03-installation-macos.md`.

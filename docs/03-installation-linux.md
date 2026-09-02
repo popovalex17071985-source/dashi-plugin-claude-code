@@ -336,23 +336,63 @@ sudo tar czf /var/backups/myagent-$(date +%Y%m%d-%H%M).tgz \
 
 ## Update плагина
 
-Штатный путь для уже поднятого агента — команда `/update` в чате (или
-`sudo dashi-ctl-myagent update`). Она забирает новый код, ставит зависимости и
-САМА прогоняет комплект дисциплины (`agent-kit/`), потому что комплект лежит
-копиями в `~/.claude`, а не читается из репозитория. Прогон идемпотентен:
-личные правки в `core/rules.md` и накопленный леджер не трогает. При сбое —
-откат на резервную копию рядом.
+### Агент поставлен установщиком (`scripts/install-agent.sh`) — основной путь
 
-Руками комплект нужен только там, где `dashi-ctl` не ставился (агент поднят до
-появления комплекта) — тогда `git pull` принесёт файлы, но не разложит их:
+Установщик создаёт пользователя `agent` (не `agentctl`), сервис `dashi-<имя>`
+(не `channel-<имя>`) и конфиг `/etc/dashi-plugin/<имя>/channel.env`.
+
+Штатный путь для уже поднятого агента — команда `/update` в чате (или
+`sudo dashi-ctl-<имя> update`). Она забирает новый код той ветки, на которой
+агент сидит (`DASHI_BRANCH` в `channel.env`), ставит зависимости и САМА
+прогоняет комплект дисциплины (`agent-kit/install-kit.sh`) с поясом хозяина из
+того же конфига (`DASHI_OWNER_TZ`), потому что комплект лежит копиями в
+`~/.claude`, а не читается из репозитория. Прогон идемпотентен: личные правки в
+`core/rules.md` и накопленный леджер не трогает, изменённые файлы комплекта
+перед перезаписью уходят в `<workspace>/.kit-backup/<дата>/`. При сбое — откат
+на резервную копию рядом. Чего `/update` НЕ делает — то, что живёт под root:
+юнит systemd, `dashi-ctl`, хуки плагина (`install-hooks.sh`), канарейка
+планировщика. Для этого — повторный прогон того же установщика под root:
 
 ```bash
-sudo -u agentctl bash /home/agentctl/.claude-lab/myagent/.claude/dashi-plugin-claude-code/agent-kit/install-kit.sh \
-  --claude-dir /home/agentctl/.claude-lab/myagent/.claude \
-  --chat-id <telegram id хозяина> --agent myagent
+sudo bash install-agent.sh --name myagent --tz Asia/Yekaterinburg
 ```
 
-Дальше обычное обновление плагина:
+Что он делает за один прогон:
+
+- обновляет плагин до свежей версии **той ветки, на которой агент сидит**
+  (`DASHI_BRANCH` в `channel.env`; `--branch feature/x` переключает —
+  staging-агенты живут на feature-ветке). Есть локальные правки в папке
+  плагина — обновление пропускается с предупреждением, правки не стираются;
+- заново раскладывает комплект дисциплины (`agent-kit/install-kit.sh`):
+  хуки, помощников, конституцию, скрипты сводки. Изменённые вами файлы
+  комплекта перед перезаписью копируются в `<workspace>/.kit-backup/<дата>/`.
+  `core/rules.md`, леджер и память не трогаются;
+- `--tz` — пояс хозяина: утренние кроны комплекта (сводка, будильник по срокам,
+  советник по обновлениям, самопроверка, отчёт о сервере) встают на 09:00 по
+  нему; новый пояс на повторном прогоне переставляет крон. Пояс запоминается в
+  `channel.env` (`DASHI_OWNER_TZ`) — `/update` и прогон без флага берут его
+  оттуда. Совсем без пояса — пояс сервера;
+- ставит канарейку планировщика: минутная задача в кроне + systemd-таймер,
+  который пишет хозяину, если крон молча встал;
+- переустанавливает хуки плагина (`install-hooks.sh`), sudo-скрипт
+  `dashi-ctl-<имя>`, юнит и держатель сессии;
+- **перезапускает сервис** в конце (связь с ботом моргнёт, текущий ход агента
+  оборвётся — не запускайте посреди его работы).
+
+Токены и id повторно не спрашиваются — берутся из конфига. Второй агент на
+том же хосте ставится с `--user <другой пользователь> --webhook-port <не 8089>`.
+
+`/update` из чата (и `sudo dashi-ctl-<имя> update`) делает часть этого без
+root: код моста (git + bun install, с бэкапом и откатом) плюс раскладка
+комплекта дисциплины. Юнит, `dashi-ctl`, хуки плагина и канарейку обновляет
+только прогон установщика.
+
+### Агент поставлен руками по этому документу
+
+`git pull` приносит новые файлы, но НЕ раскладывает их: после него нужно
+заново прогнать `install-hooks.sh` (Шаг 9) и комплект дисциплины
+`install-kit.sh` — оба идемпотентны, личные правки в `core/rules.md` и
+накопленный леджер не трогают:
 
 ```bash
 sudo systemctl stop channel-myagent
@@ -361,6 +401,14 @@ sudo -u agentctl git pull
 cd plugin
 sudo -u agentctl bun install
 sudo -u agentctl bun test
+sudo -u agentctl bash scripts/install-hooks.sh --settings /home/agentctl/.claude/settings.json \
+  --chat-id <telegram id хозяина> --webhook-url http://127.0.0.1:8089/hooks/agent \
+  --agent-id dashi-channel --verbose-progress
+sudo -u agentctl bash ../agent-kit/install-kit.sh \
+  --claude-dir /home/agentctl/.claude-lab/myagent/.claude \
+  --chat-id <telegram id хозяина> --agent myagent \
+  --settings /home/agentctl/.claude/settings.json \
+  --tz Asia/Yekaterinburg
 sudo systemctl start channel-myagent
 ```
 

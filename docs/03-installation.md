@@ -1,6 +1,31 @@
 # Установка (production)
 
-Этот документ — точка входа. Выберите свою операционную систему — каждая имеет свой supervisor (systemd vs launchd), свои пути (`/home/<user>/` vs `/Users/<user>/`), свои conventions.
+## Быстрый путь: установщик (Linux)
+
+На чистом Linux-сервере (Ubuntu 22.04+) не нужно проходить ручную схему ниже —
+есть установщик `scripts/install-agent.sh`, который делает всё за один прогон:
+система, Node.js, Claude Code, отдельный пользователь `agent`, Bun, workspace,
+клон плагина, `channel.env`, хуки, комплект дисциплины (`agent-kit/`), systemd-юнит
+`dashi-<имя>`, годовой токен Claude, шифрованный бэкап, бот-ремонтник (опция):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/popovalex17071985-source/dashi-plugin-claude-code/main/scripts/install-agent.sh -o install-agent.sh
+sudo bash install-agent.sh --tz Asia/Yekaterinburg     # спросит имя, токен бота, ваш id
+```
+
+Идемпотентный: повторный прогон доделывает недостающее и обновляет агента
+(плагин + комплект + хуки, с перезапуском). Пошаговая инструкция для человека
+без опыта, «что вставить и что увидеть» — [artifacts/dashi-agent-guide-v2.md](../artifacts/dashi-agent-guide-v2.md);
+все флаги — `bash install-agent.sh --help`.
+
+Установщик и ручная схема ниже раскладывают агента по-разному: установщик —
+пользователь `agent`, сервис `dashi-<имя>`, `channel.env` в `/etc/dashi-plugin/<имя>/`
+с правами 660; ручная схема — пользователь `agentctl`, сервис `channel-<agent>`,
+640. Таблицы ниже и OS-специфичные документы описывают **ручную схему**.
+
+## Ручная схема: выбор OS
+
+Дальше — точка входа для ручной установки. Выберите свою операционную систему — каждая имеет свой supervisor (systemd vs launchd), свои пути (`/home/<user>/` vs `/Users/<user>/`), свои conventions.
 
 | OS | Supervisor | Документ |
 |---|---|---|
@@ -9,16 +34,16 @@
 
 ## В чём принципиальная разница
 
-Архитектура плагина одинакова на обоих OS — Bun runtime + Claude Code session + Telegram polling работают идентично. Разница только в **обвязке вокруг**:
+Архитектура плагина одинакова на обоих OS — Bun runtime + Claude Code session + Telegram polling работают идентично. Разница только в **обвязке вокруг** (имена ниже — ручной схемы; у установщика на Linux пользователь `agent` и сервис `dashi-<agent>`):
 
 | Аспект | Linux | macOS |
 |---|---|---|
 | **Process supervisor** | systemd (`.service` unit) | launchd (`.plist` agent/daemon) |
 | **Команда управления** | `systemctl start/stop/restart` | `launchctl bootstrap/bootout/kickstart` |
-| **Файл сервиса лежит** | `/etc/systemd/system/channel-<agent>.service` | `~/Library/LaunchAgents/com.<you>.channel-<agent>.plist` |
-| **Service user** | Отдельный непривилегированный (`useradd agentctl`) | Запускается под вашим основным GUI user (single-user конвенция macOS) |
+| **Файл сервиса лежит** | `/etc/systemd/system/channel-<agent>.service` (ручная схема; установщик: `dashi-<agent>.service`) | `~/Library/LaunchAgents/com.<you>.channel-<agent>.plist` |
+| **Service user** | Отдельный непривилегированный (ручная схема: `useradd agentctl`; установщик: `agent`) | Запускается под вашим основным GUI user (single-user конвенция macOS) |
 | **Workspace path** | `/home/<user>/.claude-lab/<agent>/.claude/` | `/Users/<user>/.claude-lab/<agent>/.claude/` |
-| **Файл с секретами** | `/etc/dashi-plugin/<agent>/channel.env` (root:agentctl, 640) | `~/.claude-lab/<agent>/secrets/channel.env` (user, 600) |
+| **Файл с секретами** | `/etc/dashi-plugin/<agent>/channel.env` (ручная схема: root:agentctl, 640; установщик: root:agent, 660 — агент правит сам) | `~/.claude-lab/<agent>/secrets/channel.env` (user, 600) |
 | **Передача env в процесс** | `EnvironmentFile=` директива systemd | `EnvironmentVariables` dict в plist **или** wrapper-скрипт `source channel.env && exec ...` |
 | **Логи** | `journalctl -u channel-<agent>` | `~/Library/Logs/dashi-plugin/<agent>.log` (через `StandardOutPath` в plist) |
 | **Auto-start при boot** | `systemctl enable channel-<agent>` | `RunAtLoad=true` в plist + `launchctl bootstrap` |
@@ -59,7 +84,7 @@ Welcome-промты Claude Code (external imports + `--dangerously-load-develop
 - Linux / systemd → [03-installation-linux.md#persistent-welcome-approvals](03-installation-linux.md#persistent-welcome-approvals-чтобы-не-нажимать-enter-после-каждого-рестарта)
 - macOS / launchd → [03-installation-macos.md#persistent-welcome-approvals](03-installation-macos.md#persistent-welcome-approvals)
 
-> **Известный gap (Claude Code v2.1.143):** часть промтов не сохраняется persistent. Workaround: держите `ExecStartPost` / wrapper-скрипт, который шлёт несколько `Enter` подряд через `sleep`, и тестируйте рестарт сервиса, чтобы убедиться.
+> **Известный gap (Claude Code v2.1.143):** часть промтов не сохраняется persistent. Workaround в ручной схеме: держите `ExecStartPost` / wrapper-скрипт, который шлёт несколько `Enter` подряд через `sleep`, и тестируйте рестарт сервиса, чтобы убедиться. Установщик (`install-agent.sh`) эту проблему закрывает иначе: держатель `dashi-run` запускает `dashi-press-dialogs`, который до 2 минут смотрит на экран tmux и жмёт нужную клавишу по содержимому («Bypass Permissions» → Down+Enter, остальные диалоги → Enter), — слепые Enter по таймеру попадали не в те кнопки.
 
 ---
 
