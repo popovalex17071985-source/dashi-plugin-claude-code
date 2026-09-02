@@ -48,5 +48,5 @@ echo "✓ install-agent smoke ok"
 
 # 02.09.2026: `read -p ... 2>/dev/null` глотал сам ВОПРОС (bash печатает prompt в stderr) —
 # живой прогон на Смите молча висел на «Имя агента». Приглашение обязано доходить до экрана.
-grep -qE 'read -r -p "\$__prompt" __val </dev/tty 2>/dev/null' "$INSTALLER" 2>/dev/null \
+grep -qE 'read -r -p "\$__prompt" __val </dev/tty 2>/dev/null' "$S" \
   && fail "ask(): stderr read'а уведён в /dev/null — приглашение не видно" || true
