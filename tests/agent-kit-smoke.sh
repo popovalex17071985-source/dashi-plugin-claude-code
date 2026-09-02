@@ -15,6 +15,20 @@ grep -q "promise-sweeper.py" "$KIT/install-kit.sh" || fail "будильник �
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 mkdir -p "$T/.claude/core"
+# crontab — подменный: комплект пишет в крон, а тест не должен трогать живой
+# крон того, кто его гоняет (раньше спасало только то, что строки уже стояли)
+mkdir -p "$T/shim"; export CRONTAB_FILE="$T/crontab.txt"
+cat > "$T/shim/crontab" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  -l) cat "$CRONTAB_FILE" 2>/dev/null ;;
+  -)  cat > "$CRONTAB_FILE" ;;
+  *)  echo "shim: unsupported $*" >&2; exit 1 ;;
+esac
+SH
+chmod +x "$T/shim/crontab"; export PATH="$T/shim:$PATH"
+# Чужая строка в кроне (другой агент) — комплект обязан её не трогать
+echo "30 7 * * * /usr/bin/python3 /srv/other/bin/promise-sweeper.py" > "$CRONTAB_FILE"
 printf '# Агент\n\n@core/rules.md\n' > "$T/.claude/CLAUDE.md"
 printf '# Правила и правки\n- правка хозяина\n' > "$T/.claude/core/rules.md"
 
@@ -69,6 +83,11 @@ echo "{\"transcript_path\":\"$J\",\"session_id\":\"s\"}" \
 python3 "$T/bin/promise-sweeper.py" --selfcheck >/dev/null || fail "будильник по срокам"
 python3 "$T/bin/open-threads-digest.py" --selfcheck >/dev/null || fail "утренняя сводка"
 
+# Кроны: свои строки поставлены, чужая цела
+[[ "$(grep -c "$T/bin/promise-sweeper.py" "$CRONTAB_FILE")" == 1 ]] || fail "будильник не в кроне"
+[[ "$(grep -c "$T/bin/open-threads-digest.py --send" "$CRONTAB_FILE")" == 1 ]] || fail "сводка не в кроне"
+grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "затёр чужую строку крона"
+
 # Повторный прогон ничего не задваивает
 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke >/dev/null
 n2=$(python3 -c "
@@ -76,5 +95,15 @@ import json;d=json.load(open('$T/.claude/settings.json'))
 print(sum(len(e['hooks']) for a in d['hooks'].values() for e in a))")
 [[ "$n2" == 9 ]] || fail "повторный прогон задвоил хуки: $n2"
 [[ "$(grep -c 'core/constitution.md' "$T/.claude/CLAUDE.md")" == 1 ]] || fail "задвоил @include"
+[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 2 ]] || fail "повторный прогон задвоил крон"
+
+# Смена --tz переписывает СВОИ строки (час меняется), а не пропускает их
+bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Asia/Yekaterinburg >/dev/null
+h1="$(grep "$T/bin/open-threads-digest.py" "$CRONTAB_FILE" | awk '{print $2}')"
+bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Europe/Moscow >/dev/null
+h2="$(grep "$T/bin/open-threads-digest.py" "$CRONTAB_FILE" | awk '{print $2}')"
+[[ "$h1" =~ ^[0-9]+$ && "$h2" =~ ^[0-9]+$ && "$h1" != "$h2" ]] || fail "смена --tz не переписала час крона ($h1 -> $h2)"
+[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 2 ]] || fail "смена --tz задвоила крон"
+grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "смена --tz затёрла чужую строку"
 
 echo "✓ agent-kit smoke ok (9 хуков, 6 гейтов сработали, идемпотентно)"

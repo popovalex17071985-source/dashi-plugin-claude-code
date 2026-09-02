@@ -111,11 +111,17 @@ DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own
 [[ -n "$DIG_H" ]] || { DIG_H=7; echo "  ! не смог посчитать пояс ($OWNER_TZ, нет tzdata?) — сводка в 07:00 по серверу"; }
 SWEEP="30 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
 DIGEST="0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
-if crontab -l 2>/dev/null | grep -q promise-sweeper; then
-  echo "  будильник и сводка уже в кроне"
+# Смотрим ТОЛЬКО на строки этого workspace: у второго агента под тем же
+# пользователем свои строки, чужие не трогаем. Час мог измениться (--tz) —
+# тогда свои строки переписываем, а не пропускаем.
+CUR="$(crontab -l 2>/dev/null || true)"
+if grep -qxF "$SWEEP" <<<"$CUR" && grep -qxF "$DIGEST" <<<"$CUR"; then
+  echo "  будильник и сводка уже в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)"
 else
-  (crontab -l 2>/dev/null; echo "$SWEEP"; echo "$DIGEST") | crontab - \
-    && echo "  будильник и сводка в кроне: 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
+  if grep -qF "$WORKSPACE/bin/promise-sweeper.py" <<<"$CUR"; then verb="перенесены на"; else verb="в кроне:"; fi
+  { grep -vF -e "$WORKSPACE/bin/promise-sweeper.py" -e "$WORKSPACE/bin/open-threads-digest.py" <<<"$CUR" || true
+    echo "$SWEEP"; echo "$DIGEST"; } | crontab - \
+    && echo "  будильник и сводка $verb 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
     || echo "  ! не смог прописать крон — поставь руками"
 fi
 
