@@ -561,7 +561,11 @@ async function gateAndNotify(
   // that "DMs use the legacy notify path even in multichat builds").
   // For groups the router still takes full ownership — no fallback — so
   // the master session never sees traffic belonging to a different chat.
-  if (deps.router && deps.policy && isGroup) {
+  // Exception: a chat marked `route: master` in policy.yaml is deliberately
+  // merged into the master session (same place DMs land), so one Claude holds
+  // both threads instead of two sessions duplicating the same work.
+  const routesToMaster = deps.policy?.chats[decision.chatId]?.route === 'master'
+  if (deps.router && deps.policy && isGroup && !routesToMaster) {
     // Open a status before dispatch — symmetric with the legacy path so
     // the user sees "Печатает..." within a tick. Streaming is per-chat
     // gated inside StatusManager.start via shouldStreamForChat(policy,
