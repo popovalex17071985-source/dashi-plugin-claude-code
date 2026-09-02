@@ -30,6 +30,13 @@
 set -euo pipefail
 
 NODE_MAJOR=22
+# Версии зашиты, чтобы «поставил вчера — работает, поставил сегодня — нет» не
+# случалось. Bun: та, что живёт у Jarvis (bun --version); OpenViking: digest
+# образа, который крутится у Jarvis (docker images --digests). nodesource и uv
+# НЕ запинены сознательно: nodesource сам держит мажор 22.x, а uv нужен только
+# ремонтнику как установщик Python — их поломки нам пока не встречались.
+BUN_VERSION="bun-v1.4.0"
+OPENVIKING_IMAGE="ghcr.io/volcengine/openviking@sha256:46f9e34cd37238c28cbd9535033773d179006bdf7f3e528dd1c46567abce7701"
 REPO_URL="${DASHI_REPO_URL:-https://github.com/popovalex17071985-source/dashi-plugin-claude-code.git}"
 # Ветка, с которой агент обновляется (/update, советник, повторный прогон).
 # main = проверенное, раскатывается всем после обсуждения; staging-агенты
@@ -261,7 +268,7 @@ say "Bun"
 if as_agent 'test -x ~/.bun/bin/bun'; then
   skip "bun $(as_agent '~/.bun/bin/bun --version')"
 else
-  as_agent 'curl -fsSL https://bun.sh/install | bash' >/dev/null
+  as_agent "curl -fsSL https://bun.sh/install | bash -s -- '$BUN_VERSION'" >/dev/null
   as_agent 'test -x ~/.bun/bin/bun' || die "bun не встал — проверь, что unzip на месте"
   ok "bun $(as_agent '~/.bun/bin/bun --version')"
 fi
@@ -1092,7 +1099,7 @@ EOF
     docker run -d --name openviking --network host --restart unless-stopped \
       -v "$OV_DIR:/app/.openviking" -e OPENVIKING_CONFIG_FILE=/app/.openviking/ov.conf \
       -e OPENVIKING_SERVER_HOST=127.0.0.1 \
-      ghcr.io/volcengine/openviking:latest >/dev/null 2>&1 || die "контейнер openviking не запустился (docker logs openviking)"
+      "$OPENVIKING_IMAGE" >/dev/null 2>&1 || die "контейнер openviking не запустился (docker logs openviking)"
     ok "контейнер openviking запущен"
   fi
   for _ in $(seq 1 45); do
