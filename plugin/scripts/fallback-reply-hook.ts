@@ -584,8 +584,15 @@ export function readLastChat(
   }
 }
 
-function persistLastChat(path: string | undefined, chatId: string): void {
+export function persistLastChat(path: string | undefined, chatId: string): void {
   if (!path) return
+  // Groups never become the fallback anchor. A group message used to make the
+  // NEXT envelope-less turn (background task notification, hook retry) post the
+  // operator's working notes into that public chat — 03.09.2026 a status meant
+  // for the DM landed in «Агентская схема». Only a private chat (positive id)
+  // is a safe default destination; a group gets the fallback only when THAT
+  // turn is anchored in it.
+  if (chatId.startsWith('-')) return
   try {
     mkdirSync(dirname(path), { recursive: true })
     writeFileSync(path, chatId, { mode: 0o600 })
