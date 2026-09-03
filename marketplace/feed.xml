@@ -1735,40 +1735,6 @@
       </Ad>
 
       <Ad>
-        <Id>1887979745</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Стилусы</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Планшеты и электронные книги</Category>
-        <Title>Apple Pencil 2 бу</Title>
-        <Description><![CDATA[<p>Apple Pencil 2 бу</p>
-<p>✅Хорошее состояние, полностью исправен<br>✅Гарантия от магазина 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является, ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.<br><br>Арт. 3JKM9</p>]]></Description>
-        <Price>6490</Price>
-        
-        
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3057/3200027633/IMG_2685.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3089/3200027665/IMG_2687.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/3081/3200027657/IMG_2686.jpg"/>
-        </Images>
-        <Category>Планшеты и электронные книги</Category>
-        
-        <Condition>Б/у</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-      </Ad>
-
-      <Ad>
         <Id>1888790361</Id>
         <DateBegin>2023-03-01</DateBegin>
         <DateEnd>2033-03-31</DateEnd>
@@ -2660,54 +2626,6 @@
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Царапины</CaseFlaws>
       <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework><GoodsSubType>Смарт-часы</GoodsSubType></Ad>
-
-      <Ad>
-        <Id>1912300201</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>iPhone</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Телефоны</Category>
-        <Title>iPhone 17 Pro Max 256Gb Silver бу</Title>
-        <Description><![CDATA[<p>iPhone 17 Pro Max 256Gb Silver бу</p>
-<p>✅Отличное состояние, технически исправен<br>✅Комплект: коробка + устройство<br>✅Аккумулятор 98%<br>✅Гарантия 180 дней</p>
-<p>🔥 Более 100 единиц проверенной бу техники всегда в наличии</p>
-<p>👍🏼 Гарантия лучшей стоимости</p>
-<p>💰Возможна покупка в кредит и по банковской карте</p>
-<p>🔄 Сдайте своё старое устройство по программе TRADE IN и получите скидку до 70%</p>
-<p>⬇️ Сделаем скидку на предложение конкурента</p>
-<p>🥇Работаем для Вас с 2008 года и дорожим своей репутацией</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, проверена по чек-листу из 27 пунктов</p>
-<p>Арт. 47522</p>]]></Description>
-        <Price>101990</Price>
-        
-        <Model>iPhone 17 Pro Max</Model>
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5297/3270620337/IMG_3686.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5321/3270620361/IMG_3687.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5329/3270620369/IMG_3688.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5353/3270620393/IMG_3689.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/5361/3270620401/IMG_3690.jpg"/>
-        </Images>
-        <MemorySize>256 ГБ</MemorySize>
-        <Color>серебристый</Color>
-        <Vendor>Apple</Vendor>
-        <Category>Телефоны</Category>
-        
-        <RamSize>12 ГБ</RamSize>
-        
-        <Condition>отличное</Condition>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Case_Condition>Без дефектов</Case_Condition>
-        <Screen_Condition>Без дефектов</Screen_Condition>
-        <Akb>98</Akb>
-      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Без дефектов</CaseCondition><Devicework>Включается</Devicework></Ad>
 
       <Ad>
         <Id>1912304289</Id>
@@ -4705,7 +4623,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2980729</Revalidate></Ad>
+      <Revalidate>2980735</Revalidate></Ad>
 <Ad>
         <Id>496127545</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -4903,7 +4821,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2980729</Revalidate></Ad>
+      <Revalidate>2980735</Revalidate></Ad>
 <Ad>
         <Id>1640714561</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -4987,7 +4905,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>100990</Price>
+        <Price>101990</Price>
         
         <Model>iPhone 17 Pro</Model>
         <Images>
@@ -5037,7 +4955,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>97990</Price>
+        <Price>97490</Price>
         
         <Model>iPhone 17 Pro</Model>
         <Images>
@@ -5053,7 +4971,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2980729</Revalidate></Ad>
+      <Revalidate>2980735</Revalidate></Ad>
 <Ad>
         <Id>1640726593</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5187,7 +5105,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>114990</Price>
+        <Price>113990</Price>
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
@@ -5203,7 +5121,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2980729</Revalidate></Ad>
+      <Revalidate>2980735</Revalidate></Ad>
 <Ad>
         <Id>1640736641</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5237,7 +5155,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>114990</Price>
+        <Price>114490</Price>
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
@@ -5337,7 +5255,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>102990</Price>
+        <Price>101490</Price>
         
         <Model>iPhone 17 Pro</Model>
         <Images>
@@ -5437,7 +5355,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>125990</Price>
+        <Price>126490</Price>
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
@@ -5487,7 +5405,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>125990</Price>
+        <Price>124990</Price>
         
         <Model>iPhone 17 Pro Max</Model>
         <Images>
@@ -5587,7 +5505,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>117990</Price>
+        <Price>117490</Price>
         
         <Model>iPhone 17 Pro</Model>
         <Images>
@@ -5687,7 +5605,7 @@
 <p><br><br>🌐 Еще больше классных предложений на сайте ipointperm</p>
 <p>*цены на всю технику указаны со скидкой за наличный расчёт</p>
 <p>*90% товаров, представленных на витрине Авито имеются в наличии, если какого-то товара нет сегодня - доставим в течение двух дней</p>]]></Description>
-        <Price>120990</Price>
+        <Price>120490</Price>
         
         <Model>iPhone 17 Pro</Model>
         <Images>
@@ -5803,7 +5721,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2980729</Revalidate></Ad>
+      <Revalidate>2980735</Revalidate></Ad>
 <Ad>
         <Id>1642060329</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5903,7 +5821,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2980729</Revalidate></Ad>
+      <Revalidate>2980735</Revalidate></Ad>
 <Ad>
         <Id>1642061641</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -6203,7 +6121,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2980729</Revalidate></Ad>
+      <Revalidate>2980735</Revalidate></Ad>
 <Ad>
         <Id>1645613473</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -6353,7 +6271,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2980729</Revalidate></Ad>
+      <Revalidate>2980735</Revalidate></Ad>
 <Ad>
         <Id>1645614297</Id>
         <DateBegin>2023-03-01</DateBegin>
