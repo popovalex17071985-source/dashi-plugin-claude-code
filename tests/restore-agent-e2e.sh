@@ -13,7 +13,7 @@ PASS=e2epass123
 WORK=/tmp/restore-e2e-$$
 # При обрыве контейнер НЕ трогаем (для разбора); чистим только временное.
 # Успешный конец удалит контейнер сам (в самом низу).
-trap 'rm -rf "$WORK"' EXIT
+trap 'rm -rf "$WORK"; docker rm -f "$C" >/dev/null 2>&1' EXIT   # контейнер сносим и при падении
 ok(){ echo "✓ $1"; }
 fail(){ echo "✗ $1" >&2; exit 1; }
 
