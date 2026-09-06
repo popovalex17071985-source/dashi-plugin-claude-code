@@ -18,6 +18,7 @@ import {
   resolveFallbackConfig,
   resolveStatePath,
   lastChatPath,
+  persistLastChat,
   readLastChat,
   dedupeToken,
   truncateForTelegram,
@@ -775,5 +776,22 @@ describe('sanitizeForForward (BUG 2 — tool-call syntax leak)', () => {
   test('empty residue after stripping → undefined', () => {
     const only = '<invoke name="a"><parameter name="b">c</parameter></invoke>'
     expect(sanitizeForForward(only)).toBeUndefined()
+  })
+})
+
+describe('persistLastChat (group chats never become the fallback anchor)', () => {
+  test('remembers a DM chat_id but ignores a group one', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'fallback-lastchat-'))
+    const path = join(dir, 'last-chat')
+
+    persistLastChat(path, '140141496')
+    expect(readLastChat(path)).toBe('140141496')
+
+    // A group message must not overwrite the anchor — otherwise the next
+    // envelope-less turn posts DM working notes into the public chat.
+    persistLastChat(path, '-5341584820')
+    expect(readLastChat(path)).toBe('140141496')
+
+    rmSync(dir, { recursive: true, force: true })
   })
 })

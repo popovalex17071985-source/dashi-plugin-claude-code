@@ -208,7 +208,7 @@ EOF
     ask __tz_in "Твой город или пояс [Enter -- как на сервере, $SERVER_TZ]: " 0
     if [[ -z "$__tz_in" ]]; then OWNER_TZ="$SERVER_TZ"; break; fi
     __tz_try="$(tz_from_city "$__tz_in")"
-    if [[ -f "/usr/share/zoneinfo/$__tz_try" ]]; then
+    if [[ ! -d /usr/share/zoneinfo || -f "/usr/share/zoneinfo/$__tz_try" ]]; then
       OWNER_TZ="$__tz_try"
       echo "    -> $OWNER_TZ, сейчас там $(TZ="$OWNER_TZ" date '+%H:%M')"
       break
@@ -218,8 +218,31 @@ EOF
 fi
 OWNER_TZ="${OWNER_TZ:-$SERVER_TZ}"
 OWNER_TZ="$(tz_from_city "$OWNER_TZ")"
-[[ -f "/usr/share/zoneinfo/$OWNER_TZ" ]] || die "неизвестный часовой пояс: $OWNER_TZ (пример правильного: Asia/Yekaterinburg)"
+# Проверяем по справочнику tzdata, но ТОЛЬКО если он на машине есть: на голой
+# ubuntu:22.04 его ещё нет (ставится ниже вместе с системой), и жёсткая
+# проверка роняла установку на первом же шаге — e2e поймал 02.09.
+if [[ -d /usr/share/zoneinfo ]] && [[ ! -f "/usr/share/zoneinfo/$OWNER_TZ" ]]; then
+  die "неизвестный часовой пояс: $OWNER_TZ (пример правильного: Asia/Yekaterinburg)"
+fi
 ok "пояс хозяина: $OWNER_TZ (сейчас там $(TZ="$OWNER_TZ" date '+%H:%M'), утренняя сводка в 09:00 по нему)"
+
+# Часы САМОГО сервера тоже переводим на пояс хозяина — но только на ПЕРВОЙ
+# установке и только когда агент на хосте один. Иначе агент читает `date`,
+# логи и метки файлов в чужом поясе и называет хозяину время на 2-5 часов
+# мимо: у Jarvis этот класс ошибок живёт с четырьмя напоминалками и всё равно
+# повторяется (Саня 02.09). У нового агента расписаний ещё нет — переставлять
+# нечего, поэтому здесь это бесплатно; на повторном прогоне НЕ трогаем, чтобы
+# не сдвинуть уже стоящие задачи.
+if [[ ! -f "$ENV_FILE" && -z "$OTHER_AGENTS" && "$SERVER_TZ" != "$OWNER_TZ" ]]; then
+  if timedatectl set-timezone "$OWNER_TZ" 2>/dev/null; then
+    SERVER_TZ="$OWNER_TZ"
+    ok "часы сервера переведены на $OWNER_TZ — время в логах и у агента совпадает с твоим"
+  else
+    warn "не смог перевести часы сервера на $OWNER_TZ — агент будет видеть время сервера ($SERVER_TZ)"
+  fi
+elif [[ -f "$ENV_FILE" && "$SERVER_TZ" != "$OWNER_TZ" ]]; then
+  warn "часы сервера ($SERVER_TZ) не совпадают с твоим поясом ($OWNER_TZ) — расписания пересчитываются, но время в логах серверное; смена часов сдвинет уже стоящие задачи, поэтому руками: timedatectl set-timezone $OWNER_TZ"
+fi
 
 # Токен и id спрашиваем, только если конфига ещё нет — на повторном прогоне не дёргаем.
 if [[ ! -f "$ENV_FILE" ]]; then

@@ -43,6 +43,13 @@ export const ChatPolicySchema = z
     handoff_file: z.string().min(1),
     deny: DenyRulesSchema.optional(),
     system_reminder: z.string(),
+    // Where this chat's traffic lands. 'session' (default) = its own tmux
+    // session via the multichat pool. 'master' = the warchief's main session,
+    // same place DMs land — so one Claude sees both the DM and this chat and
+    // two sessions stop working the same task twice (Саня 02.09.2026).
+    // Only addressed messages ever reach here (mention gate in handlers),
+    // so merging a chat in does NOT pour group chatter into that context.
+    route: z.enum(['session', 'master']).optional(),   // absent = own session
     idle_ttl_ms: z.number().int().positive().default(1_800_000),
     max_queue_depth: z.number().int().positive().default(1),
   })
