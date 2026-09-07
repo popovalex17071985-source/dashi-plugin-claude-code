@@ -15,6 +15,10 @@ WORKSPACE="${WORKSPACE:-__WORKSPACE__}"
 SERVICES=("dashi-$AGENT")
 systemctl list-unit-files "claude-repair-$AGENT.service" >/dev/null 2>&1 \
   && SERVICES+=("claude-repair-$AGENT")
+# Годовой токен (`claude setup-token`) НЕ создаёт .credentials.json -- он лежит в
+# env-файле службы. Установка через токен давала ежедневный ложный FAIL «creds missing»
+# при полностью живом агенте (Саня 07.09.2026, новый агент после установки).
+TOKEN_ENV="${TOKEN_ENV:-/etc/dashi-plugin/$AGENT/channel.env}"
 HEARTBEAT="${HEARTBEAT:-$WORKSPACE/data/cron-heartbeat}"
 BACKUP_DIR="${BACKUP_DIR:-$WORKSPACE/backups}"
 
@@ -58,10 +62,15 @@ classify_service() {
 }
 
 # classify_credentials PATH -> echoes "STATUS|DETAILS"
+# Второй аргумент -- env-файл службы; если там лежит годовой токен, вход в порядке
+# даже без .credentials.json (интерактивного /login на таком агенте не было).
 classify_credentials() {
-  local path="$1"
-  if [ ! -e "$path" ]; then
-    printf 'FAIL|%s missing\n' "$path"
+  local path="$1" env_file="${2:-}"
+  if [ ! -s "$path" ] && [ -n "$env_file" ] \
+     && grep -q '^CLAUDE_CODE_OAUTH_TOKEN=sk-ant-' "$env_file" 2>/dev/null; then
+    printf 'OK|годовой токен в %s\n' "$env_file"
+  elif [ ! -e "$path" ]; then
+    printf 'FAIL|входа нет: ни %s, ни годового токена в %s\n' "$path" "${env_file:-env}"
   elif [ ! -s "$path" ]; then
     printf 'FAIL|%s empty\n' "$path"
   else
@@ -132,7 +141,16 @@ run_tests() {
   : > "$tmp"
   assert "FAIL|$tmp empty"   "$(classify_credentials "$tmp")"          "empty file -> FAIL"
   rm -f "$tmp"
-  assert "FAIL|$tmp missing" "$(classify_credentials "$tmp")"          "missing file -> FAIL"
+  assert "FAIL|входа нет: ни $tmp, ни годового токена в env" \
+    "$(classify_credentials "$tmp")"                                    "missing file -> FAIL"
+  local envf; envf=$(mktemp)
+  echo "CLAUDE_CODE_OAUTH_TOKEN=sk-ant-oat01-XXXX" > "$envf"
+  assert "OK|годовой токен в $envf" "$(classify_credentials "$tmp" "$envf")" \
+    "нет creds, но есть годовой токен -> OK"
+  echo "BOT_TOKEN=123" > "$envf"
+  assert "FAIL|входа нет: ни $tmp, ни годового токена в $envf" \
+    "$(classify_credentials "$tmp" "$envf")" "нет ни creds, ни токена -> FAIL"
+  rm -f "$envf"
 
 
   echo "== classify_backup =="
@@ -177,7 +195,7 @@ probe_service() {
 }
 
 probe_credentials() {
-  classify_credentials "$CRED_PATH"
+  classify_credentials "$CRED_PATH" "$TOKEN_ENV"
 }
 
 probe_cron() {
