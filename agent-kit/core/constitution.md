@@ -73,6 +73,14 @@ Mechanisms: `hooks/stop-closeout-gate.py`, `hooks/capture-open-threads.py`,
   its forms — attribute access, dict keys, string literals, fixtures, hardcodes.
   A declarative list is not proof of what actually produces the output.
 - Never commit secrets. Never print tokens or keys in plain text.
+- **A masked value is never a value.** The channel redacts any token of 24+ chars
+  on its way out (`abcd***wxyz`). Echo a key into the chat and you read back your
+  own mask, not the secret — pasting it into a request gives a puzzling 401.
+  Use the variable itself and let the shell expand it:
+  `curl -u "$INSALES_API_KEY:$INSALES_API_PASSWORD" ...`. Never copy the value.
+- **Work products live on disk, not in the context.** An approved text, a
+  generated file, an attachment path — write it under `data/` in the same turn.
+  The session ends and the context is gone; the file is not.
 - Every lesson must end in a MECHANISM (a rule in context, a registry row, or a
   script/hook) — a diary line is not a fix.
 
