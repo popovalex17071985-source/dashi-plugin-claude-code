@@ -89,6 +89,7 @@ WIRING = [
     ("PreToolUse",  "Bash",                 "block-dangerous.sh",        5),
     ("PreToolUse",  "Bash",                 "block-selfmatching-pgrep.sh", 5),
     ("PreToolUse",  "Write|Edit|MultiEdit", "block-red-zone.sh",         5),
+    ("PreToolUse",  "Bash|Write|Edit",      "block-masked-secret.sh",    5),
     ("PostToolUse", "Bash",                 "truncate-bash-output.sh",   5),
     ("PostToolUse", "Edit|Write|MultiEdit", "lesson-needs-mechanism.sh", 5),
     ("PostToolUse", "Edit|Write|MultiEdit", "cyrillic-guard.sh",         5),

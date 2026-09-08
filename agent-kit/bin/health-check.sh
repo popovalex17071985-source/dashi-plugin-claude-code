@@ -194,6 +194,20 @@ probe_service() {
   classify_service "$name" "$state"
 }
 
+probe_secrets() {
+  # Маска вместо секрета: канал режет длинные токены на выходе в чат, и агент,
+  # взявший ключ из переписки, кладёт на диск «8ad1***0bd4». Файл есть, служба
+  # поднялась, а каждый запрос отвечает 401 (живой агент 08.09.2026).
+  local hits
+  hits=$(grep -rlE '[A-Za-z0-9_]{4}\*{2,}[A-Za-z0-9_]{4}' \
+           "$WORKSPACE/secrets" "$WORKSPACE/config" 2>/dev/null | head -3 | tr '\n' ' ')
+  if [ -n "$hits" ]; then
+    echo "FAIL|маска вместо ключа: ${hits% }"
+  else
+    echo "OK|секреты без масок"
+  fi
+}
+
 probe_credentials() {
   classify_credentials "$CRED_PATH" "$TOKEN_ENV"
 }
@@ -259,6 +273,7 @@ main() {
   results[OAuth]=$(probe_credentials)
   results[Cron]=$(probe_cron)
   results[Backup]=$(probe_backup)
+  results[Secrets]=$(probe_secrets)
 
   local sep="+----------------------+------+-----------------------------------------"
   echo "$sep"
@@ -271,6 +286,7 @@ main() {
   render_row "OAuth creds"     "${results[OAuth]}"
   render_row "Планировщик"     "${results[Cron]}"
   render_row "Бэкап"           "${results[Backup]}"
+  render_row "Секреты"         "${results[Secrets]}"
   echo "$sep"
 
   local worst=0
