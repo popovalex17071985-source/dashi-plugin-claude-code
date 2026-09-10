@@ -76,7 +76,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>1–2 мелкие царапины</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>87</Akb></Ad>
+      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>84</Akb></Ad>
 
       <Ad>
         <Id>490852539</Id>
@@ -253,7 +253,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb><BoxSealed>Нет</BoxSealed></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>83</Akb><BoxSealed>Нет</BoxSealed></Ad>
 
       <Ad>
         <Id>1615196817</Id>
@@ -335,7 +335,7 @@
         <AdType>Товар приобретен на продажу</AdType>
         <Case_Condition>Мелкие царапины</Case_Condition>
         <Screen_Condition>Без дефектов</Screen_Condition>
-      <ScreenCondition>1–2 мелкие царапины</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
+      <ScreenCondition>Без дефектов</ScreenCondition><CaseCondition>Мелкие царапины</CaseCondition><Devicework>Включается</Devicework><Akb>100</Akb></Ad>
 
       <Ad>
         <Id>1645655185</Id>
@@ -889,44 +889,6 @@
         <Akb>100</Akb>
         <ScreenFlaws>Без дефектов</ScreenFlaws>
         <CaseFlaws>Без дефектов</CaseFlaws>
-      </Ad>
-
-      <Ad>
-        <Id>1820513017</Id>
-        <DateBegin>2023-03-01</DateBegin>
-        <DateEnd>2033-03-31</DateEnd>
-        <ListingFee>Package</ListingFee>
-        <AdStatus>Free</AdStatus>
-        
-        <ManagerName>Тимофей</ManagerName>
-        <ContactPhone>+73422140020</ContactPhone>
-        <Address>Россия, Пермь, улица Н. Островского 52, ЖК Премьер</Address>
-        <GoodsType>Наушники</GoodsType>
-        <AdType>Товар приобретен на продажу</AdType>
-        <Category>Аудио и видео</Category>
-        <Title>Apple AirPods Max Silver бу</Title>
-        <Description><![CDATA[<p>Apple AirPods Max Silver бу</p>
-<p>✅Комплект: наушники</p>
-<p>✅Гарантия 180 дней!</p>
-<p>👍🏼 ГАРАНТИЯ ЛУЧШЕЙ ЦЕНЫ!</p>
-<p>⬇️ СДЕЛАЕМ СКИДКУ НА ПРЕДЛОЖЕНИЯ КОНКУРЕНТА!</p>
-<p>🥇РАБОТАЕМ ДЛЯ ВАС С 2008 ГОДА И ОЧЕНЬ ДОРОЖИМ СВОЕЙ РЕПУТАЦИЕЙ!</p>
-<p>☝🏼Вся Б/У техника является ОРИГИНАЛЬНОЙ, НЕ ВОССТАНОВЛЕННОЙ.</p>
-<p>Арт. RP3WC</p>]]></Description>
-        <Price>17990</Price>
-        
-        
-        <Images>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7689/3002326537/IMG_9446.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7697/3002326545/IMG_9447.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7705/3002326553/IMG_9448.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7721/3002326569/IMG_9449.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7793/3002326641/IMG_9450.jpg"/>
-          <Image url="https://cdn.insales-shop.ru/images/products/1/7801/3002326649/IMG_9451.jpg"/>
-        </Images>
-        <Category>Аудио и видео</Category>
-        
-        <Condition>Б/у</Condition>
       </Ad>
 
       <Ad>
@@ -4037,7 +3999,7 @@
         <Condition>новое</Condition>
         <MemorySize>256 ГБ</MemorySize>
         <AdType>Товар приобретен на продажу</AdType>
-      <Revalidate>2981725</Revalidate></Ad>
+      <Revalidate>2981731</Revalidate></Ad>
 <Ad>
         <Id>496127545</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -4235,7 +4197,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2981725</Revalidate></Ad>
+      <Revalidate>2981731</Revalidate></Ad>
 <Ad>
         <Id>1640714561</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -4385,7 +4347,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2981725</Revalidate></Ad>
+      <Revalidate>2981731</Revalidate></Ad>
 <Ad>
         <Id>1640726593</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -4535,7 +4497,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2981725</Revalidate></Ad>
+      <Revalidate>2981731</Revalidate></Ad>
 <Ad>
         <Id>1640736641</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5135,7 +5097,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2981725</Revalidate></Ad>
+      <Revalidate>2981731</Revalidate></Ad>
 <Ad>
         <Id>1642060329</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5235,7 +5197,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2981725</Revalidate></Ad>
+      <Revalidate>2981731</Revalidate></Ad>
 <Ad>
         <Id>1642061641</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5535,7 +5497,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>SIM + eSIM</SimConfig>
-      <Revalidate>2981725</Revalidate></Ad>
+      <Revalidate>2981731</Revalidate></Ad>
 <Ad>
         <Id>1645613473</Id>
         <DateBegin>2023-03-01</DateBegin>
@@ -5685,7 +5647,7 @@
         <Condition>новое</Condition>
         <AdType>Товар приобретен на продажу</AdType>
         <SimConfig>Только eSIM</SimConfig>
-      <Revalidate>2981725</Revalidate></Ad>
+      <Revalidate>2981731</Revalidate></Ad>
 <Ad>
         <Id>1645614297</Id>
         <DateBegin>2023-03-01</DateBegin>
