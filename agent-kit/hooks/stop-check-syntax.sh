@@ -35,8 +35,7 @@ if [ -z "$FILES" ]; then
   exit 0
 fi
 
-PYTHON="/home/edgelab/claude-gateway/.venv/bin/python"
-[ -x "$PYTHON" ] || PYTHON=python3
+PYTHON=python3
 
 ERRORS=""
 OK_COUNT=0
