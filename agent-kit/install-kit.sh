@@ -55,8 +55,8 @@ render() {
 
 # -f: каталоги (например __pycache__ после прогона тестов) раскладке не подлежат.
 for f in "$KIT"/hooks/*; do [[ -f "$f" ]] && render "$f" "$CLAUDE_DIR/hooks/$(basename "$f")"; done
-for f in "$KIT"/bin/*;   do render "$f" "$WORKSPACE/bin/$(basename "$f")"; done
-for f in "$KIT"/agents/*; do render "$f" "$CLAUDE_DIR/agents/$(basename "$f")"; done
+for f in "$KIT"/bin/*;   do [[ -f "$f" ]] && render "$f" "$WORKSPACE/bin/$(basename "$f")"; done
+for f in "$KIT"/agents/*; do [[ -f "$f" ]] && render "$f" "$CLAUDE_DIR/agents/$(basename "$f")"; done
 chmod +x "$CLAUDE_DIR"/hooks/* "$WORKSPACE"/bin/* 2>/dev/null || true
 
 # Registries: never clobber a ledger the agent has already been writing into.
@@ -155,13 +155,16 @@ DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own
 # (что вышло нового + напоминание про /update), 20 самопроверка (хуки, крон,
 # канарейка, модель, память — шлёт ТОЛЬКО подозрения), 30 будильник по срокам
 # и отчёт о сервере (диск, память, сервисы, вход в Claude — шлётся всегда).
-CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh)
+CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py)
 CRON_LINES=(
   "0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
   "10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
   "20 $DIG_H * * * /bin/bash $WORKSPACE/bin/self-audit-morning.sh >> $WORKSPACE/logs/self-audit.log 2>&1"
   "30 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
   "30 $DIG_H * * * /bin/bash $WORKSPACE/bin/health-daily.sh >> $WORKSPACE/logs/health-daily.log 2>&1"
+  # Сторож фоновых задач: старт без финиша + мёртвый процесс = сообщение хозяину.
+  # Интервал в минутах, от часового пояса не зависит.
+  "*/2 * * * * /usr/bin/python3 $WORKSPACE/bin/job-watch.py >> $WORKSPACE/logs/job-watch.log 2>&1"
 )
 if [[ -n "${KIT_NO_CRON:-}" ]]; then
   echo "  крон не трогаю (KIT_NO_CRON)"
