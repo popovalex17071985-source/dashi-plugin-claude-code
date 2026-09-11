@@ -802,7 +802,7 @@ SESSION="${1:?usage: dashi-press-dialogs <tmux-session>}"
 press() {
   ( exec 9>"/tmp/dashi-pane-${SESSION//[^a-zA-Z0-9]/_}.lock"
     flock -w 3 9 || exit 0
-    press "$@" ) || true
+    tmux send-keys -t "$SESSION" "$@" ) || true
 }
 # 40×3с = 2 мин: на слабом VPS (1 ГБ + своп) Claude грузится дольше 45 секунд
 for _ in $(seq 1 40); do
