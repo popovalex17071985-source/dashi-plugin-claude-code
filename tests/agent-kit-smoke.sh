@@ -124,17 +124,27 @@ KIT_NO_CRON=1 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 
 cmp -s "$CRONTAB_FILE" "$T/crontab.before" || fail "KIT_NO_CRON=1 всё равно переписал крон"
 
 # Повторный прогон ничего не задваивает, а локально правленный файл — сначала в бэкап
+# Считаем ДО второго прогона: прибитое число хуков протухает с каждым новым
+# гейтом, и тест начинает краснеть на исправном комплекте (12.09.2026: ждал 9
+# при 28 живых и полгода числился «багом дедупликации»). Инвариант -- НЕ РОС.
+count_hooks() { python3 -c "
+import json;d=json.load(open('$T/.claude/settings.json'))
+print(sum(len(e['hooks']) for a in d['hooks'].values() for e in a))"; }
+n1=$(count_hooks)
+(( n1 >= 9 )) || fail "хуки не зарегистрированы вовсе: $n1"
 echo "# local tweak" >> "$H/block-dangerous.sh"
 out="$(bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke)"
 grep -q "сохранил 1 старых файлов" <<<"$out" || fail "перезапись без бэкапа: $out"
 grep -rq "local tweak" "$T/.kit-backup/"*/.claude/hooks/block-dangerous.sh || fail "бэкап не содержит старую версию"
 grep -q "local tweak" "$H/block-dangerous.sh" && fail "хук не обновлён комплектом"
-n2=$(python3 -c "
-import json;d=json.load(open('$T/.claude/settings.json'))
-print(sum(len(e['hooks']) for a in d['hooks'].values() for e in a))")
-[[ "$n2" == 9 ]] || fail "повторный прогон задвоил хуки: $n2"
+n2=$(count_hooks)
+[[ "$n2" == "$n1" ]] || fail "повторный прогон изменил число хуков: было $n1, стало $n2"
 [[ "$(grep -c 'core/constitution.md' "$T/.claude/CLAUDE.md")" == 1 ]] || fail "задвоил @include"
-[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 5 ]] || fail "повторный прогон задвоил крон"
+# Не прибитое число строк (оно растёт с каждым новым скриптом комплекта), а
+# сам инвариант: ни одна строка не встречается дважды.
+dups="$(grep -F "$T/bin/" "$CRONTAB_FILE" | sort | uniq -d)"
+[[ -z "$dups" ]] || fail "повторный прогон задвоил крон: $dups"
+[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" -ge 5 ]] || fail "строки комплекта пропали из крона"
 
 # Смена --tz переписывает СВОИ строки (час меняется), а не пропускает их
 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Asia/Yekaterinburg >/dev/null
@@ -142,7 +152,8 @@ h1="$(grep "$T/bin/open-threads-digest.py" "$CRONTAB_FILE" | awk '{print $2}')"
 bash "$KIT/install-kit.sh" --claude-dir "$T/.claude" --chat-id 42 --agent smoke --tz Europe/Moscow >/dev/null
 h2="$(grep "$T/bin/open-threads-digest.py" "$CRONTAB_FILE" | awk '{print $2}')"
 [[ "$h1" =~ ^[0-9]+$ && "$h2" =~ ^[0-9]+$ && "$h1" != "$h2" ]] || fail "смена --tz не переписала час крона ($h1 -> $h2)"
-[[ "$(grep -c "$T/bin/" "$CRONTAB_FILE")" == 5 ]] || fail "смена --tz задвоила крон"
+dups="$(grep -F "$T/bin/" "$CRONTAB_FILE" | sort | uniq -d)"
+[[ -z "$dups" ]] || fail "смена --tz задвоила крон: $dups"
 grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "смена --tz затёрла чужую строку"
 
-echo "✓ agent-kit smoke ok (9 хуков, 6 гейтов сработали, 5 утренних кронов, идемпотентно)"
+echo "✓ agent-kit smoke ok ($n2 хуков, 6 гейтов сработали, утренние кроны без дублей, идемпотентно)"

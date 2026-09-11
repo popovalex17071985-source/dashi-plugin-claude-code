@@ -1,7 +1,7 @@
 // `route: master` merges a group chat into the warchief's main session
 // instead of spawning its own — so one Claude holds both threads and two
 // sessions stop duplicating the same task (Саня 02.09.2026).
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'bun:test'
 import { ChatPolicySchema } from '../../src/chats/policy-loader.js'
 
 const base = {

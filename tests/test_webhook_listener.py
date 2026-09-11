@@ -25,6 +25,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 LISTENER_PATH = REPO_ROOT / "webhook-listener" / "listener.py"
 
+# listener.py импортирует aiohttp. Слушатель -- необязательная часть комплекта,
+# и на машине без aiohttp все 18 тестов падали с ModuleNotFoundError, красили
+# полный прогон и прятали настоящие поломки. Нет библиотеки -- честный skip.
+_HAS_AIOHTTP = importlib.util.find_spec("aiohttp") is not None
+
 
 def _load_listener(tmpdir: Path) -> object:
     """Load listener.py with safe defaults pointing into tmpdir."""
@@ -52,6 +57,7 @@ def _load_listener(tmpdir: Path) -> object:
     return module
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class ListenerImportTest(unittest.TestCase):
     def test_module_loads(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -62,6 +68,7 @@ class ListenerImportTest(unittest.TestCase):
             self.assertTrue(module.LOG_DIR.exists())
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class RedactingFormatterTest(unittest.TestCase):
     def test_redacts_bearer_and_sk(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -83,6 +90,7 @@ class RedactingFormatterTest(unittest.TestCase):
             self.assertIn("<REDACTED>", out)
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class BuildPromptTest(unittest.TestCase):
     def test_prompt_includes_agent_name_and_task_id(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -99,6 +107,7 @@ class BuildPromptTest(unittest.TestCase):
             self.assertIn("Do the thing", prompt)
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class NotifyOwnerTest(unittest.TestCase):
     def test_notify_owner_noop_without_chat_id(self) -> None:
         """When WEBHOOK_OWNER_CHAT_ID is unset, _notify_owner is a silent no-op."""
@@ -123,6 +132,7 @@ class NotifyOwnerTest(unittest.TestCase):
             self.assertEqual(module._NOTIFY_DEDUP, {})
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class TaskIdSanitizationTest(unittest.TestCase):
     def test_strips_unsafe_chars_and_caps_length(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -147,6 +157,7 @@ class TaskIdSanitizationTest(unittest.TestCase):
             self.assertGreater(len(cleaned), 0)
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class BuildPromptInjectionTest(unittest.TestCase):
     def test_prompt_does_not_carry_quote_or_newline(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -164,6 +175,7 @@ class BuildPromptInjectionTest(unittest.TestCase):
             self.assertNotIn("'\n--break", prompt)
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class NotifyOwnerHtmlEscapeTest(unittest.TestCase):
     """Hostile interpolation values must not break Telegram parse_mode=HTML."""
 
@@ -227,6 +239,7 @@ class NotifyOwnerHtmlEscapeTest(unittest.TestCase):
             self.assertIn("&lt;/b&gt;", body["text"])
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class SubprocessEnvAllowlistTest(unittest.TestCase):
     """`_build_subprocess_env` must drop WEBHOOK_* and other secrets."""
 
@@ -254,6 +267,7 @@ class SubprocessEnvAllowlistTest(unittest.TestCase):
                 os.environ.pop("CLAUDE_HARNESS_MARKER", None)
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class RequiredEnvTest(unittest.TestCase):
     def test_agent_name_required(self) -> None:
         """Empty WEBHOOK_AGENT_NAME must abort startup, not fall back to a default."""
@@ -277,6 +291,7 @@ class RequiredEnvTest(unittest.TestCase):
                 loader.exec_module(module)
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class EnrichmentSortKeyTest(unittest.TestCase):
     """Numeric ids must sort by value, not lexicographic order."""
 
@@ -335,6 +350,7 @@ class EnrichmentSortKeyTest(unittest.TestCase):
             self.assertEqual(result["title"], "new")
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class EnrichmentWritebackTest(unittest.TestCase):
     """Codex HIGH: enriched task_id/from_agent must be written into payload
     so _build_prompt sees the real values, not 'no-id'/'unknown'."""
@@ -407,6 +423,7 @@ class EnrichmentWritebackTest(unittest.TestCase):
             asyncio.run(run())
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class BearerAuthTest(unittest.TestCase):
     def test_missing_bearer_returns_401(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -443,6 +460,7 @@ class BearerAuthTest(unittest.TestCase):
             asyncio.run(run())
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class HealthzMinimalTest(unittest.TestCase):
     """`/healthz` must not leak workspace path / claude binary path."""
 
@@ -458,6 +476,7 @@ class HealthzMinimalTest(unittest.TestCase):
             asyncio.run(run())
 
 
+@unittest.skipUnless(_HAS_AIOHTTP, "нет aiohttp: слушатель вебхуков не установлен")
 class ListenerSourceSafetyTest(unittest.TestCase):
     """Catch Orgrimmar-internal identifiers if they sneak into the listener
     or its bundled examples. Mirrors the docs-zone check in
