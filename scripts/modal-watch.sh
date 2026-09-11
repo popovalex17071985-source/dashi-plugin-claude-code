@@ -136,6 +136,14 @@ if [[ -n "$typed" && -z "$ghost" ]] && ! printf '%s' "$pane" | grep -q 'esc to i
   elif [[ -z "$(find "$STUCK" -mmin -3 2>/dev/null)" ]] \
        && [[ -z "$(find "$STATE_DIR/stuck-restarted" -mmin -15 2>/dev/null)" ]]; then
     # тот же текст висит дольше 3 минут и последний перезапуск был давно
+    # DASHI_WATCH_NO_RESTART=1 -- сторожу запрещено трогать службу вообще: он
+    # только зовёт хозяина. Обкатка на Смите с 12.09.2026: если недели хватает
+    # без перезапусков, запрет становится поведением по умолчанию для всех.
+    if [[ -n "${DASHI_WATCH_NO_RESTART:-}" ]]; then
+      tell "Твоё сообщение застряло в строке ввода, дожать не вышло. Службу не трогаю (так велено). Текст: «${typed:0:200}»" || true
+      logger -t modal-watch "stuck input in $SESSION — restart withheld (DASHI_WATCH_NO_RESTART)" 2>/dev/null || true
+      exit 0
+    fi
     CTL="/usr/local/bin/dashi-ctl-$AGENT"
     if [[ -x "$CTL" ]] && sudo -n "$CTL" restart >/dev/null 2>&1; then
       touch "$STATE_DIR/stuck-restarted" 2>/dev/null || true
