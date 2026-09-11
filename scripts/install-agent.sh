@@ -1046,15 +1046,31 @@ EOF
     Подключаем Google Drive — это займёт 5 минут и делается один раз.
     Вход в гугл требует браузера, поэтому сделай это на СВОЁМ компьютере
     (в отдельном окне терминала, НЕ внутри ssh на сервер):
-      1) поставь rclone: mac — brew install rclone,
+    СНАЧАЛА заведи свой ключ Google — без него rclone ходит под общим ключом,
+    одним на всех пользователей в мире, и в часы пик бэкап падает с «квота
+    превышена». Это бесплатно, карта и биллинг не нужны:
+      1) console.cloud.google.com под тем гуглом, где будет лежать бэкап →
+         создай проект (имя любое, например dashi-backups)
+      2) «APIs & Services» → «Library» → найди «Google Drive API» → Enable
+      3) «APIs & Services» → «OAuth consent screen» → тип External →
+         заполни обязательные поля → в «Test users» добавь свой же гугл-адрес
+      4) «APIs & Services» → «Credentials» → «Create credentials» →
+         «OAuth client ID» → тип «Desktop app» → скопируй Client ID и Client secret
+
+    ПОТОМ вход в гугл — он требует браузера, поэтому делай на СВОЁМ компьютере
+    (в отдельном окне терминала, НЕ внутри ssh на сервер):
+      5) поставь rclone: mac — brew install rclone,
          windows/linux — установщик со страницы rclone.org/downloads
-      2) выполни:  rclone authorize "drive"
-      3) войди в гугл, разреши доступ — в терминале появится строка
+      6) выполни, подставив свои значения из шага 4:
+         rclone authorize "drive" --client-id ВАШ_ID --client-secret ВАШ_SECRET
+      7) войди в гугл, разреши доступ — в терминале появится строка
          вида {"access_token":...}
-    Скопируй эту строку целиком и вставь сюда. Пропустить — просто Enter
+    Вставь сюда Client ID, Client secret и эту строку. Пропустить — просто Enter
     (тогда бэкап останется только на этом сервере).
 
 EOF
+    ask GDRIVE_CLIENT_ID "    Client ID (шаг 4, пусто = общий ключ и падения по квоте): " 0
+    ask GDRIVE_CLIENT_SECRET "    Client secret: " 0
     ask GDRIVE_TOKEN "    Строка токена: " 0
     if [[ -n "${GDRIVE_TOKEN:-}" ]]; then
       TOKFILE="$(mktemp)"; printf '%s' "$GDRIVE_TOKEN" > "$TOKFILE"
@@ -1062,14 +1078,24 @@ EOF
       # Пишем секцию в конфиг руками: `rclone config create ... token` на старых
       # версиях (1.53 в Ubuntu 22.04) игнорирует готовый токен и всё равно лезет
       # в интерактивный OAuth — на сервере это тупик.
-      as_agent "mkdir -p ~/.config/rclone && umask 077 && { grep -q '^\[gdrive\]' ~/.config/rclone/rclone.conf 2>/dev/null || printf '[gdrive]\ntype = drive\nscope = drive\ntoken = %s\n' \"\$(cat '$TOKFILE')\" >> ~/.config/rclone/rclone.conf; }"
+      # Свой client_id — не косметика: на общем ключе rclone бэкап падает по квоте
+      # в часы пик (агент Лены, 4 дня подряд, 11.09.2026).
+      GD_KEYS=""
+      if [[ -n "${GDRIVE_CLIENT_ID:-}" && -n "${GDRIVE_CLIENT_SECRET:-}" ]]; then
+        GD_KEYS="client_id = ${GDRIVE_CLIENT_ID}\nclient_secret = ${GDRIVE_CLIENT_SECRET}\n"
+      fi
+      as_agent "mkdir -p ~/.config/rclone && umask 077 && { grep -q '^\[gdrive\]' ~/.config/rclone/rclone.conf 2>/dev/null || printf '[gdrive]\ntype = drive\nscope = drive\n${GD_KEYS}token = %s\n' \"\$(cat '$TOKFILE')\" >> ~/.config/rclone/rclone.conf; }"
       # Причину показываем словами rclone: «403 quota» — это не битый токен, а лимит Google
       # на минуту, конфиг уже записан и ночью заработает сам (живой прогон 02.09).
       rc_err="$(as_agent "rclone lsd gdrive: --retries 1 --low-level-retries 1 --timeout 20s 2>&1 >/dev/null" | tail -1 | cut -c1-160)"
       if [[ -z "$rc_err" ]]; then
         ok "Google Drive подключён — ночная копия уедет в облако"
       elif grep -qiE "quota|rate ?limit|403" <<<"$rc_err"; then
-        warn "Google ответил лимитом (${rc_err#*: }) — токен записан, копия уедет ночью; проверить: rclone lsd gdrive:"
+        if [[ -z "${GDRIVE_CLIENT_ID:-}" ]]; then
+          warn "Google ответил лимитом (${rc_err#*: }) — это ОБЩИЙ ключ rclone, падения повторятся. Заведи свой ключ (шаги 1-4 выше) и перезапиши gdrive в ~/.config/rclone/rclone.conf"
+        else
+          warn "Google ответил лимитом (${rc_err#*: }) — токен записан, копия уедет ночью; проверить: rclone lsd gdrive:"
+        fi
       else
         warn "Drive не подключился: ${rc_err} — проверь строку токена: rclone config create gdrive drive token '<строка>'"
       fi
