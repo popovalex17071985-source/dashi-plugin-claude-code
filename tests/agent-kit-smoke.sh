@@ -55,7 +55,18 @@ grep -q "core/constitution.md" "$T/.claude/CLAUDE.md" || fail "конститу�
 n=$(python3 -c "
 import json;d=json.load(open('$T/.claude/settings.json'))
 print(sum(len(e['hooks']) for a in d['hooks'].values() for e in a))")
-[[ "$n" == 9 ]] || fail "зарегистрировано хуков: $n (ждём 9)"
+# Число не прибито гвоздями: комплект растёт, а сверка «ровно 9» протухла и
+# держала тест красным (11.09). Смысл проверки в другом -- каждый
+# зарегистрированный хук должен указывать на существующий файл, иначе он
+# молча не сработает. Пустой список тоже недопустим.
+(( n >= 9 )) || fail "зарегистрировано хуков: $n -- комплект недоставился"
+python3 -c "
+import json,os,sys
+d=json.load(open('$T/.claude/settings.json'))
+bad=[h['command'] for a in d['hooks'].values() for e in a for h in e['hooks']
+     if not os.path.exists(h['command'].split()[-1].strip('\"'))]
+sys.exit('хуки указывают в никуда: ' + ', '.join(bad) if bad else 0)
+" || fail "зарегистрирован хук без файла"
 
 H="$T/.claude/hooks"
 # 1. опасная команда
