@@ -92,7 +92,18 @@ gws_upload() {
 
 # Off-site — только если rclone и remote настроены.
 if [[ -x "$RCLONE_BIN" ]] && "$RCLONE_BIN" listremotes 2>/dev/null | grep -q "^${RCLONE_REMOTE}:"; then
-  if "$RCLONE_BIN" copy "$ARCHIVE" "${RCLONE_REMOTE}:${RCLONE_PATH}/" 2>>"$LOG"; then
+  # Общий OAuth-клиент rclone делит квоту Google на сотни агентов, и одиночный
+  # 403 rateLimitExceeded почти всегда проходит со второй-третьей попытки.
+  # Найдено агентом Гора 11.09.2026: бэкап падал 4 дня подряд, а тот же
+  # рукой повторённый copy уезжал через несколько секунд.
+  ok=""
+  for attempt in 1 2 3 4 5; do
+    if "$RCLONE_BIN" copy "$ARCHIVE" "${RCLONE_REMOTE}:${RCLONE_PATH}/" 2>>"$LOG"; then
+      ok=1; break
+    fi
+    sleep $((attempt * 5))
+  done
+  if [[ -n "$ok" ]]; then
     log "OK off-site: ${RCLONE_REMOTE}:${RCLONE_PATH}/$(basename "$ARCHIVE")"
     "$RCLONE_BIN" delete --min-age "${RETAIN}d" "${RCLONE_REMOTE}:${RCLONE_PATH}/" 2>>"$LOG" || true
   elif gws_upload "$ARCHIVE"; then
