@@ -63,6 +63,11 @@ ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
 skip() { printf '    \033[2m· %s (уже сделано)\033[0m\n' "$*"; }
 die()  { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 warn() { printf '    \033[33m! %s\033[0m\n' "$*"; }
+# 11.09.2026: «предупредил и пошёл дальше» = тихая дыра. Ключ Google так и
+# просочился: установка считалась успешной, а бэкап падал по квоте четыре дня.
+# gap() = то же предупреждение, но пункт попадает в итоговый список недоделок.
+GAPS=()
+gap()  { warn "$1"; GAPS+=("$1${2:+ | доделать: $2}"); }
 # Есть ли настоящий терминал. `-r /dev/tty` врёт: файл читаем всегда, а открыть
 # его без управляющего терминала (docker exec, CI, cloud-init) нельзя.
 have_tty() { { : </dev/tty; } 2>/dev/null; }
@@ -438,13 +443,24 @@ else
     # иначе кэш уляжется в /root и агент его не увидит.
     as_agent "cd '$WORKSPACE' && npx playwright install-deps chromium" >/dev/null 2>&1 \
       || npx --yes playwright install-deps chromium >/dev/null 2>&1 || true
-    if as_agent "cd '$WORKSPACE' && npx playwright install chromium" >/dev/null 2>&1; then
+    # качаем до трёх раз: срыв закачки на слабом канале -- обычное дело,
+    # а без браузера агент молча теряет все веб-кабинеты
+    _chromium_ok=0
+    for _try in 1 2 3; do
+      if as_agent "cd '$WORKSPACE' && npx playwright install chromium" >/dev/null 2>&1; then
+        _chromium_ok=1; break
+      fi
+      sleep 5
+    done
+    if [[ $_chromium_ok -eq 1 ]]; then
       ok "Chromium готов — агент умеет ходить в веб-кабинеты"
     else
-      warn "Chromium не скачался — агент попросит доставить: npx playwright install chromium"
+      gap "Chromium не скачался с трёх попыток — веб-кабинеты (Авито, InSales, amo) агенту недоступны" \
+          "su - $SERVICE_USER -c 'cd $WORKSPACE && npx playwright install chromium'"
     fi
   else
-    warn "playwright не встал (npm) — веб-кабинеты будут недоступны"
+    gap "playwright не встал (npm) — веб-кабинеты будут недоступны" \
+        "su - $SERVICE_USER -c 'cd $WORKSPACE && npm i -D playwright && npx playwright install chromium'"
   fi
 fi
 
@@ -1092,7 +1108,8 @@ EOF
         ok "Google Drive подключён — ночная копия уедет в облако"
       elif grep -qiE "quota|rate ?limit|403" <<<"$rc_err"; then
         if [[ -z "${GDRIVE_CLIENT_ID:-}" ]]; then
-          warn "Google ответил лимитом (${rc_err#*: }) — это ОБЩИЙ ключ rclone, падения повторятся. Заведи свой ключ (шаги 1-4 выше) и перезапиши gdrive в ~/.config/rclone/rclone.conf"
+          gap "Google ответил лимитом (${rc_err#*: }) — это ОБЩИЙ ключ rclone, падения повторятся" \
+              "заведи свой ключ (шаги 1-4 выше) и перезапиши секцию gdrive в ~/.config/rclone/rclone.conf"
         else
           warn "Google ответил лимитом (${rc_err#*: }) — токен записан, копия уедет ночью; проверить: rclone lsd gdrive:"
         fi
@@ -1101,10 +1118,11 @@ EOF
       fi
       rm -f "$TOKFILE"
     else
-      warn "off-site пропущен: копия лежит на этом же сервере и умрёт вместе с ним."
+      gap "off-site пропущен: копия лежит на этом же сервере и умрёт вместе с ним" \
+        "повторить установку с подключением Drive либо настроить rclone вручную"
     fi
   else
-    warn "off-site НЕ настроен: копия лежит на этом же сервере и умрёт вместе с ним."
+    gap "off-site НЕ настроен: копия лежит на этом же сервере и умрёт вместе с ним."
     cat <<EOF
 
     Подключить Google Drive (10 минут; вход в гугл требует браузера, а на сервере
@@ -1172,8 +1190,8 @@ if [[ -n "$CLAUDE_TOKEN" ]]; then
 elif have_token; then
   skip "годовой токен уже в конфиге"
 elif logged_in; then
-  warn "нашёл обычный вход — работает, но протухает ~раз в 30 дней."
-  warn "Годовой: su - $SERVICE_USER -c 'claude setup-token', затем повторный прогон с --claude-token TOKEN"
+  gap "вход обычный — протухнет примерно через 30 дней, и агент встанет молча" \
+      "su - $SERVICE_USER -c 'claude setup-token', затем прогон с --claude-token TOKEN"
 elif ! have_tty; then
   cat <<EOF
 
@@ -1513,6 +1531,10 @@ if systemctl is-active --quiet "$UNIT"; then
   ✓ Готово. Агент $AGENT_NAME поднят и стартует сам после перезагрузки.
 
   Напиши своему боту в Telegram — он ответит.
+$(if ((${#GAPS[@]})); then
+    printf '\n  НЕ ЗАКРЫТО (%d) — установка прошла, но вот это работать не будет:\n' "${#GAPS[@]}"
+    for g in "${GAPS[@]}"; do printf '    · %s\n' "$g"; done
+  fi)
   Не ответил:  journalctl -u $UNIT -n 50 --no-pager
                su - $SERVICE_USER -c 'tmux attach -t channel-$AGENT_NAME'
   Перезапуск:  systemctl restart $UNIT
