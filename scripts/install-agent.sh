@@ -971,6 +971,9 @@ esac
 EOF
 chmod 755 "$CTL"
 SUDOERS_FILE="/etc/sudoers.d/dashi-$AGENT_NAME"
+# На минимальных образах (без пакета sudo) каталога нет, и установка падала
+# здесь целиком -- шаги после этого места не выполнялись вовсе (11.09.2026).
+mkdir -p /etc/sudoers.d
 cat > "$SUDOERS_FILE" <<EOF
 # Агент $AGENT_NAME обслуживает себя ТОЛЬКО через root-owned dashi-ctl
 $SERVICE_USER ALL=(root) NOPASSWD: $CTL
