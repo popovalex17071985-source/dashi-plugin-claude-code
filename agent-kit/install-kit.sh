@@ -131,6 +131,11 @@ for event, matcher, name, timeout in WIRING:
     slot["hooks"].append({"type": "command", "command": cmd, "timeout": timeout})
     added += 1
 
+# Окно контекста: без него Claude Code считает потолок в 200k, и автосжатие
+# дёргает разговор вдвое чаще нужного. Хозяин 11.09.2026: «сделай тоже 400».
+env = data.setdefault("env", {})
+env.setdefault("CLAUDE_CODE_AUTO_COMPACT_WINDOW", "400000")
+
 settings.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 print(f"  хуков зарегистрировано: {added} (уже стояло: {len(WIRING) - added})")
 PY
