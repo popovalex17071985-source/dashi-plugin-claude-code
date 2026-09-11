@@ -870,6 +870,15 @@ while tmux has-session -t "$SESSION" 2>/dev/null; do
     down=$((down + 1))
     (( down >= 2 )) && { echo "bridge port $PORT dead, restarting" >&2; exit 1; }
   fi
+  # Лог экрана пишется постоянно (у боевого агента ~15 МБ в сутки), а сессия
+  # может жить месяцами -- режем хвостом, не трогая файл как объект: pipe-pane
+  # держит его открытым на дозапись, и подмена через mv увела бы вывод в
+  # удалённый inode. Нужен последний экран, а не архив за месяц.
+  if (( $(stat -c%s "$HOME/logs/tmux-pane.log" 2>/dev/null || echo 0) > 4194304 )); then
+    tail -c 2097152 "$HOME/logs/tmux-pane.log" > "$HOME/logs/.pane-tail" \
+      && cat "$HOME/logs/.pane-tail" > "$HOME/logs/tmux-pane.log"
+    rm -f "$HOME/logs/.pane-tail"
+  fi
   sleep 15
 done
 EOF
