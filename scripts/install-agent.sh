@@ -794,6 +794,16 @@ cat > /usr/local/bin/dashi-press-dialogs <<'EOF'
 # с ошибкой только засоряет журнал.
 set -u
 SESSION="${1:?usage: dashi-press-dialogs <tmux-session>}"
+# Замок на панель: в неё печатает ещё и автосжатие (context-autocompact.sh),
+# у которого между набором «/compact» и Enter есть пауза. Наш Enter в эту щель
+# подтверждает не ту строку, а на диалоге с «No, exit» -- выбивает Claude:
+# сессия умирает, systemd поднимает службу заново, и в журналетолько факт смерти.
+# 11.09.2026, агент Гора: 15 таких рестартов за день. Один писатель на панель.
+press() {
+  ( exec 9>"/tmp/dashi-pane-${SESSION//[^a-zA-Z0-9]/_}.lock"
+    flock -w 3 9 || exit 0
+    press "$@" ) || true
+}
 # 40×3с = 2 мин: на слабом VPS (1 ГБ + своп) Claude грузится дольше 45 секунд
 for _ in $(seq 1 40); do
   sleep 3
@@ -802,17 +812,17 @@ for _ in $(seq 1 40); do
   # «No, exit» — слепой Enter ВЫХОДИЛ из Claude, сервис крутился в рестартах (живой прогон
   # на Смите). Любой диалог, где выделено «No, exit», — сначала Down, потом Enter.
   if grep -qE "❯ *No, exit" <<<"$screen"; then
-    tmux send-keys -t "$SESSION" Down
+    press Down
     sleep 1
-    tmux send-keys -t "$SESSION" Enter
+    press Enter
   elif grep -q "Bypass Permissions" <<<"$screen"; then
-    tmux send-keys -t "$SESSION" Down
+    press Down
     sleep 1
-    tmux send-keys -t "$SESSION" Enter
+    press Enter
   # Онбординг (выбор темы и пр.) раньше проходил человек при ручном логине;
   # с годовым токеном логина нет — экраны всплывают при первом старте сервиса
   elif grep -qE "development channels|Do you trust|Enter to confirm|Light mode|Dark mode|text style|Syntax theme" <<<"$screen"; then
-    tmux send-keys -t "$SESSION" Enter
+    press Enter
   elif grep -q "bypass permissions on" <<<"$screen"; then
     exit 0  # диалоги пройдены, Claude работает
   fi
@@ -844,6 +854,12 @@ tmux kill-session -t "$SESSION" 2>/dev/null || true
 tmux new-session -d -s "$SESSION" \
   "/bin/bash -lc 'cd $PLUGIN && exec claude ${DASHI_MODEL:+--model $DASHI_MODEL} --dangerously-skip-permissions --dangerously-load-development-channels server:dashi-channel'"
 sleep 3
+# Экран сессии пишем в файл: Claude выводит всё в псевдотерминал, и когда он
+# умирает, в journald долетает только «сессия умерла», без причины. Файл
+# обнуляем на каждом старте -- нужен экран последнего падения, не архив.
+mkdir -p "$HOME/logs"
+: > "$HOME/logs/tmux-pane.log"
+tmux pipe-pane -o -t "$SESSION" "cat >> $HOME/logs/tmux-pane.log"
 tmux has-session -t "$SESSION" 2>/dev/null || { echo "tmux session did not start" >&2; exit 1; }
 /usr/local/bin/dashi-press-dialogs "$SESSION" &
 seen_up=0 down=0
