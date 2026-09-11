@@ -858,6 +858,9 @@ sleep 3
 # умирает, в journald долетает только «сессия умерла», без причины. Файл
 # обнуляем на каждом старте -- нужен экран последнего падения, не архив.
 mkdir -p "$HOME/logs"
+# Предыдущий экран не стираем, а сдвигаем в .prev: причина падения видна
+# ИМЕННО в том, что было до смерти сессии, а старт затирал бы её начисто.
+[[ -f "$HOME/logs/tmux-pane.log" ]] && mv -f "$HOME/logs/tmux-pane.log" "$HOME/logs/tmux-pane.prev.log"
 : > "$HOME/logs/tmux-pane.log"
 tmux pipe-pane -o -t "$SESSION" "cat >> $HOME/logs/tmux-pane.log"
 tmux has-session -t "$SESSION" 2>/dev/null || { echo "tmux session did not start" >&2; exit 1; }
