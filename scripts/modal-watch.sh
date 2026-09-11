@@ -78,40 +78,86 @@ if printf '%s' "$pane" | grep -qE 'Login expired|Please run /login'; then
 fi
 
 # ── Залипший ввод ────────────────────────────────────────────────────────────
-# Канал вставляет сообщение владельца в строку ввода, но Enter не проходит:
-# текст висит в «❯ …», ход не начинается, бот молчит на всё. Руками дожать
-# нельзя — send-keys Enter текст не отправляет, он возвращается обратно.
-# Лечится только перезапуском службы; зависшее сообщение при этом теряется,
-# поэтому владельцу пишем, что повторить. (11.09.2026, чужой агент gorbot.)
+# Канал вставляет сообщение владельца в строку ввода, но ход не стартует: текст
+# висит в «❯ …», бот молчит на всё. Лестница из трёх ступеней -- каждая мягче
+# следующей, перезапуск только последним (он убивает сессию).
+#   1. дожать Enter -- чаще всего подтверждение просто потерялось;
+#   2. перенабрать: C-u, напечатать тот же текст самим и Enter. Свой набор
+#      через send-keys доходит всегда (проверено на Смите 12.09), а вставка
+#      канала -- нет, поэтому перенабор вытаскивает сообщение без перезапуска;
+#   3. перезапуск службы -- и СРАЗУ после подъёма вернуть тот же текст в панель,
+#      чтобы сообщение не пропало вместе с сессией.
 STUCK="$STATE_DIR/stuck-input"
+RETYPED="$STATE_DIR/stuck-retyped"
 # Claude Code ставит после «❯» неразрывный пробел (U+00A0), обычный '^❯ ' по
 # нему не матчится — залипание проходило мимо (проверено на живой панели).
-typed="$(printf '%s\n' "$pane" | grep -a '^❯' | tail -1 | sed 's/^❯//; s/^\(\xc2\xa0\| \)*//; s/\(\xc2\xa0\| \)*$//' || true)"
-if [[ -n "$typed" ]] && ! printf '%s' "$pane" | grep -q 'esc to interrupt'; then
+# Длинное сообщение переносится, продолжение идёт без «❯» и с отступом --
+# склеиваем блок до нижней рамки, иначе вернули бы обрезанный текст.
+
+# Claude Code сам подставляет в пустую строку ввода ПОДСКАЗКУ -- текст, который
+# он предлагает отправить. Выглядит в панели как обычный ввод, но печатается
+# тусклым (ESC[2m), тогда как живой черновик -- обычной яркостью. Сторож ловил
+# подсказку за «залипшее сообщение» и раз в 25 минут перезапускал агента,
+# убивая живой ход (12.09.2026, gorbot: подсказка «Проверь и Buds 4 в кабинете»).
+ghost=""
+comp_raw="$(tmux capture-pane -pet "$SESSION" -S -5 2>/dev/null | grep -a '❯' | tail -1 || true)"
+[[ "$comp_raw" == *$'\033[2m'* ]] && ghost=1
+
+typed="$(printf '%s\n' "$pane" | awk '
+  /^❯/ { buf = $0; on = 1; next }
+  on && /^─/ { on = 0; next }
+  on { line = $0; sub(/^ +/, "", line); sub(/ +$/, "", line)
+       if (line != "") buf = buf " " line }
+  END { print buf }' | sed 's/^❯//; s/^\(\xc2\xa0\| \)*//; s/\(\xc2\xa0\| \)*$//')"
+
+# pane_send <текст> — набрать и отправить. Замок на панель уже взят в начале
+# скрипта; брать его ВТОРОЙ раз нельзя -- flock считает это чужим захватом и
+# ждёт до таймаута, после чего нажатие молча не уходит. Ровно так 11-12.09 у
+# Гора «дожатый Enter» не нажимался ни разу, а в журнал писалось, что нажат.
+pane_send() {
+  tmux send-keys -t "$SESSION" C-u 2>/dev/null || return 1
+  sleep 0.3
+  tmux send-keys -t "$SESSION" -l "$1" 2>/dev/null || return 1
+  sleep 0.5
+  tmux send-keys -t "$SESSION" Enter 2>/dev/null || return 1
+}
+
+if [[ -n "$typed" && -z "$ghost" ]] && ! printf '%s' "$pane" | grep -q 'esc to interrupt'; then
   sum="$(printf '%s' "$typed" | md5sum | cut -c1-16)"
   if [[ "$(cat "$STUCK" 2>/dev/null)" != "$sum" ]]; then
     printf '%s' "$sum" > "$STUCK"          # новый текст — засекаем время
-    # Сначала просто дожимаем Enter: чаще всего сообщение доехало до строки
-    # ввода, а подтверждение потерялось -- тогда ход стартует и перезапуск не
-    # нужен. Перезапуск убивает сообщение вместе с сессией, это крайняя мера.
-    # (12.09.2026: у агента Гора сообщение хозяина так и висело в строке, а
-    # сторож вместо нажатия сразу перезапускал службу -- текст пропадал.)
-    ( exec 9>"/tmp/dashi-pane-${SESSION//[^a-zA-Z0-9]/_}.lock"
-      flock -w 3 9 || exit 0
-      tmux send-keys -t "$SESSION" Enter 2>/dev/null ) || true
+    tmux send-keys -t "$SESSION" Enter 2>/dev/null || true
     logger -t modal-watch "stuck input in $SESSION — pressed Enter" 2>/dev/null || true
+  elif [[ "$(cat "$RETYPED" 2>/dev/null)" != "$sum" ]]; then
+    # Enter не помог: тот же текст висит вторую минуту — перенабираем сами.
+    printf '%s' "$sum" > "$RETYPED"
+    pane_send "$typed" || true
+    logger -t modal-watch "stuck input in $SESSION — retyped the message" 2>/dev/null || true
   elif [[ -z "$(find "$STUCK" -mmin -3 2>/dev/null)" ]] \
        && [[ -z "$(find "$STATE_DIR/stuck-restarted" -mmin -15 2>/dev/null)" ]]; then
     # тот же текст висит дольше 3 минут и последний перезапуск был давно
     CTL="/usr/local/bin/dashi-ctl-$AGENT"
     if [[ -x "$CTL" ]] && sudo -n "$CTL" restart >/dev/null 2>&1; then
       touch "$STATE_DIR/stuck-restarted" 2>/dev/null || true
-      rm -f "$STUCK" 2>/dev/null || true
-      tell "Я завис на твоём сообщении и перезапустил себя. Повтори, пожалуйста: «${typed:0:200}»" || true
-      logger -t modal-watch "stuck input in $SESSION — service restarted" 2>/dev/null || true
+      rm -f "$STUCK" "$RETYPED" 2>/dev/null || true
+      # Ждём, пока поднимется панель, и возвращаем в неё то же сообщение.
+      delivered=""
+      for _ in $(seq 1 30); do
+        sleep 2
+        scr="$(tmux capture-pane -pt "$SESSION" -S -10 2>/dev/null || true)"
+        printf '%s' "$scr" | grep -q 'bypass permissions on' || continue
+        pane_send "$typed" && delivered=1
+        break
+      done
+      if [[ -n "$delivered" ]]; then
+        logger -t modal-watch "stuck input in $SESSION — restarted, message redelivered" 2>/dev/null || true
+      else
+        tell "Я завис на твоём сообщении и перезапустил себя, вернуть его в работу не вышло. Повтори, пожалуйста: «${typed:0:200}»" || true
+        logger -t modal-watch "stuck input in $SESSION — restarted, redelivery FAILED" 2>/dev/null || true
+      fi
     fi
   fi
 else
-  rm -f "$STUCK" 2>/dev/null || true       # ввод пуст или идёт ход — всё в порядке
+  rm -f "$STUCK" "$RETYPED" 2>/dev/null || true   # ввод пуст или идёт ход — всё в порядке
 fi
 exit 0
