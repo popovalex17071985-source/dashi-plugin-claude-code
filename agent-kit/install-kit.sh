@@ -53,7 +53,8 @@ render() {
   cat "$tmp" > "$2"; rm -f "$tmp"
 }
 
-for f in "$KIT"/hooks/*; do render "$f" "$CLAUDE_DIR/hooks/$(basename "$f")"; done
+# -f: каталоги (например __pycache__ после прогона тестов) раскладке не подлежат.
+for f in "$KIT"/hooks/*; do [[ -f "$f" ]] && render "$f" "$CLAUDE_DIR/hooks/$(basename "$f")"; done
 for f in "$KIT"/bin/*;   do render "$f" "$WORKSPACE/bin/$(basename "$f")"; done
 for f in "$KIT"/agents/*; do render "$f" "$CLAUDE_DIR/agents/$(basename "$f")"; done
 chmod +x "$CLAUDE_DIR"/hooks/* "$WORKSPACE"/bin/* 2>/dev/null || true
@@ -93,7 +94,13 @@ WIRING = [
     ("PostToolUse", "Bash",                 "truncate-bash-output.sh",   5),
     ("PostToolUse", "Edit|Write|MultiEdit", "lesson-needs-mechanism.sh", 5),
     ("PostToolUse", "Edit|Write|MultiEdit", "cyrillic-guard.sh",         5),
+    ("PreToolUse",  "Bash",                 "tz-guard.sh",               5),
+    ("PreToolUse",  "mcp__dashi-channel__reply", "owner-time-guard.sh",  5),
+    ("PreCompact",  "",                     "flush-to-openviking.sh",   20),
+    ("UserPromptSubmit", "",                "echo-last-turn-cost.sh",    5),
     ("UserPromptSubmit", "",                "rule-inject.sh",            5),
+    ("Stop",        "",                     "usage-logger.py",          10),
+    ("Stop",        "",                     "stop-check-syntax.sh",     10),
     ("UserPromptSubmit", "",                "correction-detector.sh",    5),
     ("Stop",        "",                     "capture-open-threads.py",  10),
     ("Stop",        "",                     "stop-verify-gate.py",      10),
