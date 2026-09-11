@@ -22,6 +22,18 @@ if printf '%s' "$pane" | grep -qE 'Switch model\?|Continue\?' \
   logger -t modal-watch "pressed 1 in $SESSION (blocking modal)" 2>/dev/null || true
 fi
 
+# ── Предложение отправить баг-репорт ────────────────────────────────────────
+# Claude Code сам предлагает пожаловаться на свою ошибку («Submit feedback /
+# bug report», варианты 1 review / 2 send / 0 dismiss) и ждёт нажатия. В
+# headless-агенте нажимать некому: очередь встаёт, бот молчит на всё подряд.
+# Отправлять отчёт от чужого имени мы не вправе, поэтому закрываем окно -- «0».
+# (11.09.2026: чужой агент так провисел, пока владелец не нажал 0 вручную.)
+if printf '%s' "$pane" | grep -q 'Submit feedback / bug report' \
+   && printf '%s' "$pane" | grep -q 'dismiss'; then
+  tmux send-keys -t "$SESSION" 0 2>/dev/null || true
+  logger -t modal-watch "pressed 0 in $SESSION (bug-report prompt)" 2>/dev/null || true
+fi
+
 # ── Протухший вход в Claude ──────────────────────────────────────────────────
 # «Login expired» — модалка, которую нажатием не прожать: нужен полный
 # перелогин через /relogin. Бот в этом состоянии молчит, поэтому пишем хозяину
