@@ -91,6 +91,15 @@ if [[ -n "$typed" ]] && ! printf '%s' "$pane" | grep -q 'esc to interrupt'; then
   sum="$(printf '%s' "$typed" | md5sum | cut -c1-16)"
   if [[ "$(cat "$STUCK" 2>/dev/null)" != "$sum" ]]; then
     printf '%s' "$sum" > "$STUCK"          # новый текст — засекаем время
+    # Сначала просто дожимаем Enter: чаще всего сообщение доехало до строки
+    # ввода, а подтверждение потерялось -- тогда ход стартует и перезапуск не
+    # нужен. Перезапуск убивает сообщение вместе с сессией, это крайняя мера.
+    # (12.09.2026: у агента Гора сообщение хозяина так и висело в строке, а
+    # сторож вместо нажатия сразу перезапускал службу -- текст пропадал.)
+    ( exec 9>"/tmp/dashi-pane-${SESSION//[^a-zA-Z0-9]/_}.lock"
+      flock -w 3 9 || exit 0
+      tmux send-keys -t "$SESSION" Enter 2>/dev/null ) || true
+    logger -t modal-watch "stuck input in $SESSION — pressed Enter" 2>/dev/null || true
   elif [[ -z "$(find "$STUCK" -mmin -3 2>/dev/null)" ]] \
        && [[ -z "$(find "$STATE_DIR/stuck-restarted" -mmin -15 2>/dev/null)" ]]; then
     # тот же текст висит дольше 3 минут и последний перезапуск был давно
