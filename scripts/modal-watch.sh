@@ -34,6 +34,14 @@ tell() {
   curl -sf -m 10 -o /dev/null --data-urlencode "text=$1" -d "chat_id=$CHAT" \
     "${TELEGRAM_API_ROOT:-https://api.telegram.org}/bot$TOKEN/sendMessage"
 }
+# Замок на панель: в неё печатают ДВА автомата -- этот сторож и автосжатие
+# (context-autocompact.sh). Между набором «/compact» и Enter есть пауза, и
+# чужое нажатие в эту щель уходит не туда: в диалоге «No, exit» так убивает
+# Claude, tmux-сессия умирает, systemd поднимает службу заново
+# (11.09.2026, gorbot: 15 рестартов за день). Один писатель на панель.
+exec 9>"/tmp/dashi-pane-${SESSION//[^a-zA-Z0-9]/_}.lock"
+flock -w 3 9 || exit 0
+
 # Известные блокирующие модалки: «Switch model?», «Continue?» с нумерованным
 # выбором. Признак живой модалки — маркер выбора «❯» рядом с пунктом 1/2.
 if printf '%s' "$pane" | grep -qE 'Switch model\?|Continue\?' \

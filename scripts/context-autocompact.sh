@@ -31,6 +31,12 @@ if [[ -f "$mark" ]] && (( now - $(cat "$mark" 2>/dev/null || echo 0) < COOLDOWN 
 printf '%s' "$now" > "$mark"
 if [[ -n "${CONTEXT_AUTOCOMPACT_DRY_RUN:-}" ]]; then echo "would /compact: ${pct}% of ${WINDOW}"; exit 0; fi
 [[ -n "${TMUX_PANE:-}" ]] || exit 0
+_sess=$(tmux display -p -t "$TMUX_PANE" '#{session_name}' 2>/dev/null || echo "$TMUX_PANE")
+exec 9>"/tmp/dashi-pane-${_sess//[^a-zA-Z0-9]/_}.lock"
+# Замок держим до конца набора: сторож модалок (modal-watch.sh) жмёт клавиши в
+# ту же панель, и его нажатие в паузе перед Enter ломает команду.
+flock -w 3 9 || exit 0
+
 # Строку ввода СНАЧАЛА чистим: в ней мог остаться недобитый текст, и тогда
 # вместо команды уходит «11/compact» -- Claude Code такое за slash-команду не
 # считает, и мусор улетает хозяину как сообщение от него же (11.09.2026,
