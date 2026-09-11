@@ -1126,14 +1126,29 @@ EOF
     cat <<EOF
 
     Подключить Google Drive (10 минут; вход в гугл требует браузера, а на сервере
-    его нет — поэтому вход делается на СВОЁМ компьютере, НЕ внутри ssh):
-      1) на своём компьютере поставь rclone: mac — brew install rclone,
+    его нет — поэтому вход делается на СВОЁМ компьютере, НЕ внутри ssh).
+
+    СНАЧАЛА свой ключ Google — без него rclone ходит под общим ключом, одним на
+    всех в мире, и в часы пик бэкап падает с «квота превышена». Бесплатно, карта
+    не нужна:
+      1) console.cloud.google.com под тем гуглом, где будет лежать бэкап →
+         создай проект (имя любое, например dashi-backups)
+      2) «APIs & Services» → «Library» → «Google Drive API» → Enable
+      3) «APIs & Services» → «OAuth consent screen» → тип External →
+         заполни обязательные поля → в «Test users» добавь свой гугл-адрес
+      4) «APIs & Services» → «Credentials» → «Create credentials» →
+         «OAuth client ID» → «Desktop app» → скопируй Client ID и Client secret
+
+    ПОТОМ вход:
+      5) на своём компьютере поставь rclone: mac — brew install rclone,
          windows/linux — установщик с rclone.org/downloads
-      2) там же выполни и пройди вход в гугл:  rclone authorize "drive"
-      3) он напечатает строку вида {"access_token":...} — скопируй её целиком
-      4) на СЕРВЕРЕ подставь её в кавычках:
-           sudo -u $SERVICE_USER rclone config create gdrive drive token '<строка>'
-      5) проверь: sudo -u $SERVICE_USER rclone lsd gdrive:
+      6) там же выполни, подставив свои значения из шага 4:
+         rclone authorize "drive" --client-id ВАШ_ID --client-secret ВАШ_SECRET
+      7) он напечатает строку вида {"access_token":...} — скопируй её целиком
+      8) на СЕРВЕРЕ создай конфиг СО СВОИМ ключом (одной командой):
+           sudo -u $SERVICE_USER rclone config create gdrive drive \
+             client_id ВАШ_ID client_secret ВАШ_SECRET token '<строка>'
+      9) проверь: sudo -u $SERVICE_USER rclone lsd gdrive:
     Дальше ночной бэкап сам начнёт уезжать в облако.
 
 EOF
