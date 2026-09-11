@@ -24,7 +24,7 @@ LOG=$(mktemp /tmp/run-and-report.XXXXXX.log)
 # сторож bin/job-watch.py -- задача, у которой процесс умер, а финиша нет,
 # больше не превращается в тишину (хозяин 11.09.2026).
 JOBS="$ROOT/data/jobs.jsonl"
-JOB_ID="$$-$(date +%s)"
+JOB_ID="${BG_JOB_ID:-$$-$(date +%s)}"
 python3 - "$JOBS" "$JOB_ID" "$TITLE" "$LOG" <<'PYJOB' 2>/dev/null || true
 import json, os, sys, datetime
 jobs, jid, title, log = sys.argv[1:5]
