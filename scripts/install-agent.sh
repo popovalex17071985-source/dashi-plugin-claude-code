@@ -725,6 +725,19 @@ else
   ok "сторож контекста включён"
 fi
 
+# Автосжатие: когда разговор занял 85% памяти, агент сам подрезает его, не
+# дожидаясь потолка. Без этого сессия пухнет, пока не перестаёт отвечать вовсе
+# (11.09.2026: у чужого агента набежало 779k при потолке 200k -- ни /compact,
+# ни команды уже не проходили, спасал только полный сброс).
+AUTOC="$CLAUDE_DIR/dashi-plugin-claude-code/scripts/context-autocompact.sh"
+if as_agent "grep -q context-autocompact.sh ~/.claude/settings.json 2>/dev/null"; then
+  skip "автосжатие разговора прописано"
+else
+  as_agent "jq --arg c '$AUTOC' '.hooks.Stop = ((.hooks.Stop // []) + [{matcher:\"\",hooks:[{type:\"command\",command:\$c}]}])' ~/.claude/settings.json > ~/.claude/settings.json.new && mv ~/.claude/settings.json.new ~/.claude/settings.json" \
+    || die "не смог прописать автосжатие в settings.json"
+  ok "автосжатие разговора включено"
+fi
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 7b. Дисциплина (agent-kit)
 # ─────────────────────────────────────────────────────────────────────────────
