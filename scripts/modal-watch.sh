@@ -76,7 +76,9 @@ fi
 # Лечится только перезапуском службы; зависшее сообщение при этом теряется,
 # поэтому владельцу пишем, что повторить. (11.09.2026, чужой агент gorbot.)
 STUCK="$STATE_DIR/stuck-input"
-typed="$(printf '%s\n' "$pane" | grep -a '^❯ ' | tail -1 | sed 's/^❯ //;s/[[:space:]]*$//' || true)"
+# Claude Code ставит после «❯» неразрывный пробел (U+00A0), обычный '^❯ ' по
+# нему не матчится — залипание проходило мимо (проверено на живой панели).
+typed="$(printf '%s\n' "$pane" | grep -a '^❯' | tail -1 | sed 's/^❯//; s/^\(\xc2\xa0\| \)*//; s/\(\xc2\xa0\| \)*$//' || true)"
 if [[ -n "$typed" ]] && ! printf '%s' "$pane" | grep -q 'esc to interrupt'; then
   sum="$(printf '%s' "$typed" | md5sum | cut -c1-16)"
   if [[ "$(cat "$STUCK" 2>/dev/null)" != "$sum" ]]; then
