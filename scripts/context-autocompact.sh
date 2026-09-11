@@ -31,6 +31,11 @@ if [[ -f "$mark" ]] && (( now - $(cat "$mark" 2>/dev/null || echo 0) < COOLDOWN 
 printf '%s' "$now" > "$mark"
 if [[ -n "${CONTEXT_AUTOCOMPACT_DRY_RUN:-}" ]]; then echo "would /compact: ${pct}% of ${WINDOW}"; exit 0; fi
 [[ -n "${TMUX_PANE:-}" ]] || exit 0
+# Строку ввода СНАЧАЛА чистим: в ней мог остаться недобитый текст, и тогда
+# вместо команды уходит «11/compact» -- Claude Code такое за slash-команду не
+# считает, и мусор улетает хозяину как сообщение от него же (11.09.2026,
+# Саня: «с хуя ли ты решил сжимать разговор?»).
+tmux send-keys -t "$TMUX_PANE" C-u 2>/dev/null; sleep 0.3
 # Enter отдельным нажатием и с паузой: Claude дочитывает команду, потом подтверждает.
 tmux send-keys -t "$TMUX_PANE" -l "/compact" 2>/dev/null && sleep 1 && tmux send-keys -t "$TMUX_PANE" Enter 2>/dev/null
 exit 0
