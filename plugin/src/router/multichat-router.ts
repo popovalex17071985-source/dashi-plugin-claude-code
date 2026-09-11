@@ -35,6 +35,7 @@ import { isPhotoExtension, MAX_ATTACHMENT_BYTES } from '../security/paths.js'
 import type { Logger } from '../log.js'
 import {
   assertValidChatId,
+  autojoinGroupChat,
   getChatPolicyOrDeny,
   type MultichatPolicy,
 } from '../chats/policy-loader.js'
@@ -342,8 +343,28 @@ export class MultichatRouter {
     //    tmux-mirror. Legacy single-DM mode never
     //    runs through this router.
     const userAllowed = this.policy.allowlist.users.includes(input.user_id)
-    const chatPolicy = getChatPolicyOrDeny(this.policy, input.chat_id)
+    let chatPolicy = getChatPolicyOrDeny(this.policy, input.chat_id)
     const chatAllowed = this.policy.allowlist.chats.includes(input.chat_id)
+
+    // Новая рабочая группа работает сразу: владелец создал чат, позвал бота
+    // через @ — отвечаем, без правки policy.yaml руками (Саня 11.09.2026).
+    // Ворота узкие: пишет пользователь ИЗ allowlist.users, чат групповой.
+    // Только адресованные сообщения вообще доходят сюда (mention-гейт выше),
+    // так что чужая болтовня в контекст не попадает.
+    if (chatPolicy === null && userAllowed) {
+      const joined = autojoinGroupChat(chatsBasePath(this.workspaceDir), input.chat_id, input.user_id)
+      if (joined !== null) {
+        this.policy.chats[input.chat_id] = joined
+        if (!this.policy.allowlist.chats.includes(input.chat_id)) {
+          this.policy.allowlist.chats.push(input.chat_id)
+        }
+        chatPolicy = joined
+        this.logger.info('router.dispatch.group_autojoined', {
+          chat_id: input.chat_id,
+          user_id: input.user_id,
+        })
+      }
+    }
 
     if (chatPolicy === null || !userAllowed) {
       this.logger.warn('router.dispatch.denied', {

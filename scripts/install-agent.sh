@@ -63,6 +63,11 @@ ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
 skip() { printf '    \033[2m· %s (уже сделано)\033[0m\n' "$*"; }
 die()  { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 warn() { printf '    \033[33m! %s\033[0m\n' "$*"; }
+# 11.09.2026: «предупредил и пошёл дальше» = тихая дыра. Ключ Google так и
+# просочился: установка считалась успешной, а бэкап падал по квоте четыре дня.
+# gap() = то же предупреждение, но пункт попадает в итоговый список недоделок.
+GAPS=()
+gap()  { warn "$1"; GAPS+=("$1${2:+ | доделать: $2}"); }
 # Есть ли настоящий терминал. `-r /dev/tty` врёт: файл читаем всегда, а открыть
 # его без управляющего терминала (docker exec, CI, cloud-init) нельзя.
 have_tty() { { : </dev/tty; } 2>/dev/null; }
@@ -438,13 +443,24 @@ else
     # иначе кэш уляжется в /root и агент его не увидит.
     as_agent "cd '$WORKSPACE' && npx playwright install-deps chromium" >/dev/null 2>&1 \
       || npx --yes playwright install-deps chromium >/dev/null 2>&1 || true
-    if as_agent "cd '$WORKSPACE' && npx playwright install chromium" >/dev/null 2>&1; then
+    # качаем до трёх раз: срыв закачки на слабом канале -- обычное дело,
+    # а без браузера агент молча теряет все веб-кабинеты
+    _chromium_ok=0
+    for _try in 1 2 3; do
+      if as_agent "cd '$WORKSPACE' && npx playwright install chromium" >/dev/null 2>&1; then
+        _chromium_ok=1; break
+      fi
+      sleep 5
+    done
+    if [[ $_chromium_ok -eq 1 ]]; then
       ok "Chromium готов — агент умеет ходить в веб-кабинеты"
     else
-      warn "Chromium не скачался — агент попросит доставить: npx playwright install chromium"
+      gap "Chromium не скачался с трёх попыток — веб-кабинеты (Авито, InSales, amo) агенту недоступны" \
+          "su - $SERVICE_USER -c 'cd $WORKSPACE && npx playwright install chromium'"
     fi
   else
-    warn "playwright не встал (npm) — веб-кабинеты будут недоступны"
+    gap "playwright не встал (npm) — веб-кабинеты будут недоступны" \
+        "su - $SERVICE_USER -c 'cd $WORKSPACE && npm i -D playwright && npx playwright install chromium'"
   fi
 fi
 
@@ -516,11 +532,16 @@ reply — иначе человек не увидит ничего.
 | Итоги сессий | core/hot/handoff.md | возвращаясь к теме |
 | Решения (~14 дней) | core/warm/decisions.md | возвращаясь к теме |
 | Факты | memory/MEMORY.md + файлы | индекс при старте, факт — по нужде |
+| Дословная переписка | logs/verbose-ГГГГ-ММ-ДД.jsonl | спросили «что я говорил раньше» |
 | Уроки | core/LEARNINGS.md | после ошибки |
 
 Правила: узнал факт или получил правку — сразу сохраняю файлом и строкой в
 индекс, а не держу в голове до конца сессии. Правку хозяина пишу в rules.md.
 Память против реальности — реальность выше.
+
+Спросили про то, что было раньше в переписке — НЕ отвечаю «истории нет»: сначала
+ищу в logs/verbose-*.jsonl (дословный журнал ходов, переживает перезапуск) и в
+core/hot/recent.md. Telegram прошлое не отдаёт, а этот журнал — отдаёт.
 
 Всегда в контексте только два лёгких файла, остальное читаю по нужде — иначе
 каждый запуск жжёт контекст на том, что сегодня не понадобится.
@@ -653,6 +674,13 @@ TELEGRAM_ALLOWED_USER_IDS=$USER_ID
 TELEGRAM_ALLOWED_CHAT_IDS=$USER_ID
 TELEGRAM_WORKSPACE_ROOT=$CLAUDE_DIR
 TELEGRAM_STATE_DIR=$WORKSPACE/state/telegram
+# Дословный журнал переписки: каждый ход пишется в $WORKSPACE/logs/verbose-ГГГГ-ММ-ДД.jsonl
+# и выжимка в core/hot/recent.md. Без этого агент на вопрос «что я тебе утром
+# говорил» честно отвечает «истории нет»: Telegram ботам прошлое не отдаёт, а
+# своя память умирает с перезапуском (Саня 11.09.2026, агент gorbot).
+TELEGRAM_MEMORY_ENABLED=1
+TELEGRAM_MEMORY_WORKSPACE=$CLAUDE_DIR
+TELEGRAM_MEMORY_AGENT_LABEL=$AGENT_NAME
 # Приёмник событий от Claude. Без явного порта плагин берёт случайный, и хуки,
 # прописанные на этот порт, стучатся в пустоту — карточка «работаю…» не появляется.
 # Тот же порт читают хуки (install-hooks) и сторож моста в dashi-run.
@@ -707,6 +735,19 @@ else
   as_agent "jq --arg c '$WATCH' '.hooks.UserPromptSubmit = ((.hooks.UserPromptSubmit // []) + [{matcher:\"\",hooks:[{type:\"command\",command:\$c}]}])' ~/.claude/settings.json > ~/.claude/settings.json.new && mv ~/.claude/settings.json.new ~/.claude/settings.json" \
     || die "не смог прописать сторож контекста в settings.json"
   ok "сторож контекста включён"
+fi
+
+# Автосжатие: когда разговор занял 85% памяти, агент сам подрезает его, не
+# дожидаясь потолка. Без этого сессия пухнет, пока не перестаёт отвечать вовсе
+# (11.09.2026: у чужого агента набежало 779k при потолке 200k -- ни /compact,
+# ни команды уже не проходили, спасал только полный сброс).
+AUTOC="$CLAUDE_DIR/dashi-plugin-claude-code/scripts/context-autocompact.sh"
+if as_agent "grep -q context-autocompact.sh ~/.claude/settings.json 2>/dev/null"; then
+  skip "автосжатие разговора прописано"
+else
+  as_agent "jq --arg c '$AUTOC' '.hooks.Stop = ((.hooks.Stop // []) + [{matcher:\"\",hooks:[{type:\"command\",command:\$c}]}])' ~/.claude/settings.json > ~/.claude/settings.json.new && mv ~/.claude/settings.json.new ~/.claude/settings.json" \
+    || die "не смог прописать автосжатие в settings.json"
+  ok "автосжатие разговора включено"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -955,6 +996,9 @@ esac
 EOF
 chmod 755 "$CTL"
 SUDOERS_FILE="/etc/sudoers.d/dashi-$AGENT_NAME"
+# На минимальных образах (без пакета sudo) каталога нет, и установка падала
+# здесь целиком -- шаги после этого места не выполнялись вовсе (11.09.2026).
+mkdir -p /etc/sudoers.d
 cat > "$SUDOERS_FILE" <<EOF
 # Агент $AGENT_NAME обслуживает себя ТОЛЬКО через root-owned dashi-ctl
 $SERVICE_USER ALL=(root) NOPASSWD: $CTL
@@ -1046,15 +1090,31 @@ EOF
     Подключаем Google Drive — это займёт 5 минут и делается один раз.
     Вход в гугл требует браузера, поэтому сделай это на СВОЁМ компьютере
     (в отдельном окне терминала, НЕ внутри ssh на сервер):
-      1) поставь rclone: mac — brew install rclone,
+    СНАЧАЛА заведи свой ключ Google — без него rclone ходит под общим ключом,
+    одним на всех пользователей в мире, и в часы пик бэкап падает с «квота
+    превышена». Это бесплатно, карта и биллинг не нужны:
+      1) console.cloud.google.com под тем гуглом, где будет лежать бэкап →
+         создай проект (имя любое, например dashi-backups)
+      2) «APIs & Services» → «Library» → найди «Google Drive API» → Enable
+      3) «APIs & Services» → «OAuth consent screen» → тип External →
+         заполни обязательные поля → в «Test users» добавь свой же гугл-адрес
+      4) «APIs & Services» → «Credentials» → «Create credentials» →
+         «OAuth client ID» → тип «Desktop app» → скопируй Client ID и Client secret
+
+    ПОТОМ вход в гугл — он требует браузера, поэтому делай на СВОЁМ компьютере
+    (в отдельном окне терминала, НЕ внутри ssh на сервер):
+      5) поставь rclone: mac — brew install rclone,
          windows/linux — установщик со страницы rclone.org/downloads
-      2) выполни:  rclone authorize "drive"
-      3) войди в гугл, разреши доступ — в терминале появится строка
+      6) выполни, подставив свои значения из шага 4:
+         rclone authorize "drive" --client-id ВАШ_ID --client-secret ВАШ_SECRET
+      7) войди в гугл, разреши доступ — в терминале появится строка
          вида {"access_token":...}
-    Скопируй эту строку целиком и вставь сюда. Пропустить — просто Enter
+    Вставь сюда Client ID, Client secret и эту строку. Пропустить — просто Enter
     (тогда бэкап останется только на этом сервере).
 
 EOF
+    ask GDRIVE_CLIENT_ID "    Client ID (шаг 4, пусто = общий ключ и падения по квоте): " 0
+    ask GDRIVE_CLIENT_SECRET "    Client secret: " 0
     ask GDRIVE_TOKEN "    Строка токена: " 0
     if [[ -n "${GDRIVE_TOKEN:-}" ]]; then
       TOKFILE="$(mktemp)"; printf '%s' "$GDRIVE_TOKEN" > "$TOKFILE"
@@ -1062,34 +1122,61 @@ EOF
       # Пишем секцию в конфиг руками: `rclone config create ... token` на старых
       # версиях (1.53 в Ubuntu 22.04) игнорирует готовый токен и всё равно лезет
       # в интерактивный OAuth — на сервере это тупик.
-      as_agent "mkdir -p ~/.config/rclone && umask 077 && { grep -q '^\[gdrive\]' ~/.config/rclone/rclone.conf 2>/dev/null || printf '[gdrive]\ntype = drive\nscope = drive\ntoken = %s\n' \"\$(cat '$TOKFILE')\" >> ~/.config/rclone/rclone.conf; }"
+      # Свой client_id — не косметика: на общем ключе rclone бэкап падает по квоте
+      # в часы пик (агент Лены, 4 дня подряд, 11.09.2026).
+      GD_KEYS=""
+      if [[ -n "${GDRIVE_CLIENT_ID:-}" && -n "${GDRIVE_CLIENT_SECRET:-}" ]]; then
+        GD_KEYS="client_id = ${GDRIVE_CLIENT_ID}\nclient_secret = ${GDRIVE_CLIENT_SECRET}\n"
+      fi
+      as_agent "mkdir -p ~/.config/rclone && umask 077 && { grep -q '^\[gdrive\]' ~/.config/rclone/rclone.conf 2>/dev/null || printf '[gdrive]\ntype = drive\nscope = drive\n${GD_KEYS}token = %s\n' \"\$(cat '$TOKFILE')\" >> ~/.config/rclone/rclone.conf; }"
       # Причину показываем словами rclone: «403 quota» — это не битый токен, а лимит Google
       # на минуту, конфиг уже записан и ночью заработает сам (живой прогон 02.09).
       rc_err="$(as_agent "rclone lsd gdrive: --retries 1 --low-level-retries 1 --timeout 20s 2>&1 >/dev/null" | tail -1 | cut -c1-160)"
       if [[ -z "$rc_err" ]]; then
         ok "Google Drive подключён — ночная копия уедет в облако"
       elif grep -qiE "quota|rate ?limit|403" <<<"$rc_err"; then
-        warn "Google ответил лимитом (${rc_err#*: }) — токен записан, копия уедет ночью; проверить: rclone lsd gdrive:"
+        if [[ -z "${GDRIVE_CLIENT_ID:-}" ]]; then
+          gap "Google ответил лимитом (${rc_err#*: }) — это ОБЩИЙ ключ rclone, падения повторятся" \
+              "заведи свой ключ (шаги 1-4 выше) и перезапиши секцию gdrive в ~/.config/rclone/rclone.conf"
+        else
+          warn "Google ответил лимитом (${rc_err#*: }) — токен записан, копия уедет ночью; проверить: rclone lsd gdrive:"
+        fi
       else
         warn "Drive не подключился: ${rc_err} — проверь строку токена: rclone config create gdrive drive token '<строка>'"
       fi
       rm -f "$TOKFILE"
     else
-      warn "off-site пропущен: копия лежит на этом же сервере и умрёт вместе с ним."
+      gap "off-site пропущен: копия лежит на этом же сервере и умрёт вместе с ним" \
+        "повторить установку с подключением Drive либо настроить rclone вручную"
     fi
   else
-    warn "off-site НЕ настроен: копия лежит на этом же сервере и умрёт вместе с ним."
+    gap "off-site НЕ настроен: копия лежит на этом же сервере и умрёт вместе с ним."
     cat <<EOF
 
     Подключить Google Drive (10 минут; вход в гугл требует браузера, а на сервере
-    его нет — поэтому вход делается на СВОЁМ компьютере, НЕ внутри ssh):
-      1) на своём компьютере поставь rclone: mac — brew install rclone,
+    его нет — поэтому вход делается на СВОЁМ компьютере, НЕ внутри ssh).
+
+    СНАЧАЛА свой ключ Google — без него rclone ходит под общим ключом, одним на
+    всех в мире, и в часы пик бэкап падает с «квота превышена». Бесплатно, карта
+    не нужна:
+      1) console.cloud.google.com под тем гуглом, где будет лежать бэкап →
+         создай проект (имя любое, например dashi-backups)
+      2) «APIs & Services» → «Library» → «Google Drive API» → Enable
+      3) «APIs & Services» → «OAuth consent screen» → тип External →
+         заполни обязательные поля → в «Test users» добавь свой гугл-адрес
+      4) «APIs & Services» → «Credentials» → «Create credentials» →
+         «OAuth client ID» → «Desktop app» → скопируй Client ID и Client secret
+
+    ПОТОМ вход:
+      5) на своём компьютере поставь rclone: mac — brew install rclone,
          windows/linux — установщик с rclone.org/downloads
-      2) там же выполни и пройди вход в гугл:  rclone authorize "drive"
-      3) он напечатает строку вида {"access_token":...} — скопируй её целиком
-      4) на СЕРВЕРЕ подставь её в кавычках:
-           sudo -u $SERVICE_USER rclone config create gdrive drive token '<строка>'
-      5) проверь: sudo -u $SERVICE_USER rclone lsd gdrive:
+      6) там же выполни, подставив свои значения из шага 4:
+         rclone authorize "drive" --client-id ВАШ_ID --client-secret ВАШ_SECRET
+      7) он напечатает строку вида {"access_token":...} — скопируй её целиком
+      8) на СЕРВЕРЕ создай конфиг СО СВОИМ ключом (одной командой):
+           sudo -u $SERVICE_USER rclone config create gdrive drive \
+             client_id ВАШ_ID client_secret ВАШ_SECRET token '<строка>'
+      9) проверь: sudo -u $SERVICE_USER rclone lsd gdrive:
     Дальше ночной бэкап сам начнёт уезжать в облако.
 
 EOF
@@ -1146,8 +1233,8 @@ if [[ -n "$CLAUDE_TOKEN" ]]; then
 elif have_token; then
   skip "годовой токен уже в конфиге"
 elif logged_in; then
-  warn "нашёл обычный вход — работает, но протухает ~раз в 30 дней."
-  warn "Годовой: su - $SERVICE_USER -c 'claude setup-token', затем повторный прогон с --claude-token TOKEN"
+  gap "вход обычный — протухнет примерно через 30 дней, и агент встанет молча" \
+      "su - $SERVICE_USER -c 'claude setup-token', затем прогон с --claude-token TOKEN"
 elif ! have_tty; then
   cat <<EOF
 
@@ -1478,6 +1565,33 @@ if as_agent "cd '$PLUGIN_DIR' && { claude mcp remove -s user dashi-channel >/dev
 else
   warn "не смог зарегистрировать мост: su - $SERVICE_USER -c 'cd $PLUGIN_DIR && claude mcp add -s user dashi-channel -- bun ./src/server.ts'"
 fi
+# Рабочие группы: владелец + люди + агент. Бот по умолчанию видит в группе только
+# сообщения с упоминанием (Telegram privacy mode). Этого хватает, чтобы к агенту
+# обращались через @имя_бота, но без упоминания он глух -- и это ловится только
+# живьём. Спрашиваем Telegram напрямую: getMe.can_read_all_group_messages.
+say "Рабочие группы"
+BOT_NAME="$(curl -s -m 20 "https://api.telegram.org/bot${BOT_TOKEN}/getMe" | sed -n 's/.*"username":"\([^"]*\)".*/\1/p')"
+if curl -s -m 20 "https://api.telegram.org/bot${BOT_TOKEN}/getMe" | grep -q '"can_read_all_group_messages":true'; then
+  ok "бот читает все сообщения группы — в группе он отвечает и на упоминания, и на обращения по смыслу"
+else
+  cat <<EOF
+
+    В группе агент сейчас увидит только сообщения, где его упомянули:
+    @${BOT_NAME:-имя_бота} текст вопроса
+
+    Так и работает по умолчанию, это нормально. Хочешь, чтобы он читал всю
+    переписку группы (и отвечал, когда его зовут по смыслу, без собачки):
+      @BotFather → /setprivacy → выбери бота → Disable
+    Либо сделай бота администратором группы — тогда privacy не действует.
+
+EOF
+  # НЕ gap: ответ на @упоминание в группе работает из коробки, это и есть
+  # штатный режим. Раньше строка падала в «НЕ ЗАКРЫТО» и владелец читал её как
+  # поломку, хотя речь про необязательную опцию -- читать всю переписку группы
+  # без собачки (Саня 11.09.2026).
+  ok "в группах отвечает на @${BOT_NAME:-имя_бота} сразу; чтение всей переписки — по желанию, см. выше"
+fi
+
 systemctl enable --now "$UNIT" >/dev/null 2>&1 || true
 sleep 8
 
@@ -1487,6 +1601,10 @@ if systemctl is-active --quiet "$UNIT"; then
   ✓ Готово. Агент $AGENT_NAME поднят и стартует сам после перезагрузки.
 
   Напиши своему боту в Telegram — он ответит.
+$(if ((${#GAPS[@]})); then
+    printf '\n  НЕ ЗАКРЫТО (%d) — установка прошла, но вот это работать не будет:\n' "${#GAPS[@]}"
+    for g in "${GAPS[@]}"; do printf '    · %s\n' "$g"; done
+  fi)
   Не ответил:  journalctl -u $UNIT -n 50 --no-pager
                su - $SERVICE_USER -c 'tmux attach -t channel-$AGENT_NAME'
   Перезапуск:  systemctl restart $UNIT

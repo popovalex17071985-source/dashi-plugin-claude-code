@@ -11,9 +11,9 @@
 //     match the values declared in PLAN.md section 2 / 7 so a missing
 //     entry in policy.yaml is interpreted identically across modules.
 
-import { readFileSync, statSync } from 'node:fs'
+import { readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { JSON_SCHEMA, load as parseYaml } from 'js-yaml'
+import { JSON_SCHEMA, dump as dumpYaml, load as parseYaml } from 'js-yaml'
 import { z } from 'zod'
 
 // Per-chat deny rules. All three lists are optional; when omitted the
@@ -290,6 +290,56 @@ export function getChatPolicyOrDeny(
   if (policy === null) return null
   const entry = policy.chats[chatId]
   return entry ?? null
+}
+
+/**
+ * Принять новую рабочую группу без правки конфига руками.
+ *
+ * Владелец создаёт группу, добавляет людей и бота, зовёт его через @ — и всё
+ * работает. Без этого новая группа молча игнорировалась роутером, и человек
+ * не понимал почему (Саня 11.09.2026).
+ *
+ * Ворота: писать должен пользователь ИЗ allowlist.users, и чат должен быть
+ * групповым (отрицательный id). Чужой человек со своей группой бота не
+ * получит — его user_id в списке отсутствует.
+ *
+ * @returns политику нового чата, либо null, если добавлять нечего.
+ */
+export function autojoinGroupChat(
+  basePath: string,
+  chatId: string,
+  userId: string,
+): ChatPolicy | null {
+  if (!chatId.startsWith('-')) return null             // личка заводится установкой
+  assertValidChatId(chatId)
+  const path = join(basePath, 'policy.yaml')
+  const policy = loadPolicyFromPath(path)
+  if (!policy.allowlist.users.includes(userId)) return null
+  if (policy.chats[chatId]) return null
+
+  const owner = policy.chats[policy.allowlist.chats[0] ?? ''] ?? null
+  policy.chats[chatId] = {
+    mode: 'public',
+    // Группа видит только готовый ответ: черновики и «печатает…» в общий чат
+    // не льём, там сидят люди, а не только владелец.
+    streaming: 'off',
+    tmux_mirror: false,
+    edit_message_progress: false,
+    delivery: 'final_only',
+    persona_file: owner?.persona_file ?? 'CLAUDE.md',
+    handoff_file: owner?.handoff_file ?? 'handoff.md',
+    system_reminder: '',
+    idle_ttl_ms: 1_800_000,
+    max_queue_depth: 1,
+  }
+  if (!policy.allowlist.chats.includes(chatId)) policy.allowlist.chats.push(chatId)
+
+  // Пишем через временный файл: оборванная запись не должна оставить агента
+  // с битым policy.yaml — он тогда не ответит вообще никуда.
+  const tmp = `${path}.tmp-${process.pid}`
+  writeFileSync(tmp, dumpYaml(policy, { schema: JSON_SCHEMA, lineWidth: 120 }), { mode: 0o600 })
+  renameSync(tmp, path)
+  return policy.chats[chatId] ?? null
 }
 
 /**
