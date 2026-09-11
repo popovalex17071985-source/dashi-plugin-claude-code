@@ -81,13 +81,27 @@ log "OK local: $ARCHIVE ($(du -h "$ARCHIVE" | cut -f1)), self-check пройде
 mapfile -t old < <(ls -1t "$BACKUP_DIR/$AGENT"-*.tar.gz.gpg 2>/dev/null | tail -n +$((RETAIN + 1)))
 for f in "${old[@]:-}"; do [[ -n "$f" ]] && rm -f "$f" && log "rotated: $f"; done
 
+# Запасной канал в Drive: gws CLI под нашим OAuth-клиентом (~/.config/gws).
+# ponytail: без своего кода загрузки -- зовём готовый хелпер +upload.
+gws_upload() {
+  local f="$1"
+  command -v npx >/dev/null 2>&1 || return 1
+  [[ -f "$HOME/.config/gws/client_secret.json" ]] || return 1
+  npx --yes @googleworkspace/cli drive +upload "$f" >>"$LOG" 2>&1
+}
+
 # Off-site — только если rclone и remote настроены.
 if [[ -x "$RCLONE_BIN" ]] && "$RCLONE_BIN" listremotes 2>/dev/null | grep -q "^${RCLONE_REMOTE}:"; then
   if "$RCLONE_BIN" copy "$ARCHIVE" "${RCLONE_REMOTE}:${RCLONE_PATH}/" 2>>"$LOG"; then
     log "OK off-site: ${RCLONE_REMOTE}:${RCLONE_PATH}/$(basename "$ARCHIVE")"
     "$RCLONE_BIN" delete --min-age "${RETAIN}d" "${RCLONE_REMOTE}:${RCLONE_PATH}/" 2>>"$LOG" || true
+  elif gws_upload "$ARCHIVE"; then
+    # rclone по умолчанию ходит под ОБЩИМ ключом -- в пик Google отвечает «квота».
+    # Запасной канал: googleworkspace CLI, он авторизован под нашим собственным
+    # OAuth-клиентом, и своя квота не зависит от чужих людей (проверено 11.09.2026).
+    log "OK off-site через gws (rclone упёрся в квоту): $(basename "$ARCHIVE")"
   else
-    fail "rclone copy в ${RCLONE_REMOTE} упал (локальная копия цела)"
+    fail "off-site не уехал ни через rclone, ни через gws (локальная копия цела)"
   fi
 else
   log "WARN: нет rclone-remote '${RCLONE_REMOTE}' — бэкап ТОЛЬКО локальный (смерть VPS не переживёт)"

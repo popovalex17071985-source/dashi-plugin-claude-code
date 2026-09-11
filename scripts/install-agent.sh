@@ -1522,6 +1522,30 @@ if as_agent "cd '$PLUGIN_DIR' && { claude mcp remove -s user dashi-channel >/dev
 else
   warn "не смог зарегистрировать мост: su - $SERVICE_USER -c 'cd $PLUGIN_DIR && claude mcp add -s user dashi-channel -- bun ./src/server.ts'"
 fi
+# Рабочие группы: владелец + люди + агент. Бот по умолчанию видит в группе только
+# сообщения с упоминанием (Telegram privacy mode). Этого хватает, чтобы к агенту
+# обращались через @имя_бота, но без упоминания он глух -- и это ловится только
+# живьём. Спрашиваем Telegram напрямую: getMe.can_read_all_group_messages.
+say "Рабочие группы"
+BOT_NAME="$(curl -s -m 20 "https://api.telegram.org/bot${BOT_TOKEN}/getMe" | sed -n 's/.*"username":"\([^"]*\)".*/\1/p')"
+if curl -s -m 20 "https://api.telegram.org/bot${BOT_TOKEN}/getMe" | grep -q '"can_read_all_group_messages":true'; then
+  ok "бот читает все сообщения группы — в группе он отвечает и на упоминания, и на обращения по смыслу"
+else
+  cat <<EOF
+
+    В группе агент сейчас увидит только сообщения, где его упомянули:
+    @${BOT_NAME:-имя_бота} текст вопроса
+
+    Так и работает по умолчанию, это нормально. Хочешь, чтобы он читал всю
+    переписку группы (и отвечал, когда его зовут по смыслу, без собачки):
+      @BotFather → /setprivacy → выбери бота → Disable
+    Либо сделай бота администратором группы — тогда privacy не действует.
+
+EOF
+  gap "в группах бот отвечает ТОЛЬКО на прямое упоминание @${BOT_NAME:-имя_бота}" \
+      "@BotFather → /setprivacy → Disable, либо сделать бота админом группы"
+fi
+
 systemctl enable --now "$UNIT" >/dev/null 2>&1 || true
 sleep 8
 
