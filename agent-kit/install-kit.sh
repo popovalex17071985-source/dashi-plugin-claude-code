@@ -93,7 +93,12 @@ WIRING = [
     ("PostToolUse", "Bash",                 "truncate-bash-output.sh",   5),
     ("PostToolUse", "Edit|Write|MultiEdit", "lesson-needs-mechanism.sh", 5),
     ("PostToolUse", "Edit|Write|MultiEdit", "cyrillic-guard.sh",         5),
+    ("UserPromptSubmit", "",                "rule-inject.sh",            5),
+    ("UserPromptSubmit", "",                "correction-detector.sh",    5),
     ("Stop",        "",                     "capture-open-threads.py",  10),
+    ("Stop",        "",                     "stop-verify-gate.py",      10),
+    ("Stop",        "",                     "stop-proxy-gate.py",       10),
+    ("Stop",        "",                     "stop-register-gate.py",    10),
     ("Stop",        "",                     "stop-closeout-gate.py",    10),
     ("Stop",        "",                     "stop-blocker-gate.py",     10),
 ]
@@ -126,6 +131,9 @@ PY
 # KIT_NO_CRON=1 — раскладка без правки крона (песочница, чужой тест): иначе
 # прогон переписал бы боевой крон того, кто его гоняет.
 OWNER_TZ="${OWNER_TZ:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
+# Пояс хозяина файлом: его читает rule-inject.sh, чтобы напоминать про время
+# в ЕГО часах, а не в серверных. Без файла хук про время молчит.
+printf '%s\n' "$OWNER_TZ" > "$CLAUDE_DIR/core/owner-tz"
 # python3 -c, не heredoc: вложенный heredoc внутри $( ) вешал установку на stdin.
 DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own=zoneinfo.ZoneInfo(os.environ["OWNER_TZ"]); srv=dt.datetime.now().astimezone().tzinfo; print(dt.datetime.now(own).replace(hour=9,minute=0,second=0,microsecond=0).astimezone(srv).hour)' 2>/dev/null || true)"
 [[ -n "$DIG_H" ]] || { DIG_H=7; echo "  ! не смог посчитать пояс ($OWNER_TZ, нет tzdata?) — сводка в 07:00 по серверу"; }
