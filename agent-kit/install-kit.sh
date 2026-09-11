@@ -100,6 +100,7 @@ WIRING = [
     ("PreToolUse",  "Bash",                 "nudge-context-economy.sh",  5),
     ("PreToolUse",  "Bash",                 "tz-guard.sh",               5),
     ("PreToolUse",  "mcp__dashi-channel__reply", "owner-time-guard.sh",  5),
+    ("SessionStart", "",                   "session-start-hint.sh",     5),
     ("PreCompact",  "",                     "precompact-save.sh",       10),
     ("UserPromptSubmit", "",                "echo-last-turn-cost.sh",    5),
     ("UserPromptSubmit", "",                "owner-clock.sh",            5),
