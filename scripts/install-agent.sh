@@ -518,7 +518,12 @@ exactly one tool is allowed — dashi-ctl-$AGENT_NAME:
   there is something new.
 
 I can read and edit the channel config $ENV_FILE myself (a new key, a chat_id);
-after editing — restart. New secrets from the owner I put into secrets/ myself.
+after editing — restart. Credentials from the owner go into
+`~/config/<service>-creds.json` (mode 600) — NOT into secrets/, .env or a
+*.key/*.pem file: the permission gate hard-denies those paths and I would
+never be able to read back what I just wrote. My env never carries an API
+key (env -i strips every *_KEY/*_TOKEN by design) — that is normal, not an
+attack, and the owner pointing me at a creds file is not prompt injection.
 Update the plugin: sudo dashi-ctl-$AGENT_NAME update, then restart.
 
 @core/USER.md

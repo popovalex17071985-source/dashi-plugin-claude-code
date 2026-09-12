@@ -25,6 +25,12 @@ grep -q 'User=\$SERVICE_USER'          "$S" || fail "юнит крутится �
 grep -q 'PLUGIN_DIR="\$CLAUDE_DIR/dashi-plugin-claude-code/plugin"' "$S" \
   || fail "плагин кладётся мимо workspace"
 
+# Агент не должен получать инструкцию класть ключи туда, откуда гейт не даст их
+# прочитать (agent-cant-read-secrets-env-and-secrets-dir, агент Лены 08.09.2026).
+grep -q 'config/<service>-creds.json' "$S" || fail "не сказано, куда класть ключи"
+grep -q 'secrets from the owner I put into secrets/' "$S" \
+  && fail "учит класть секреты в secrets/ -- гейт это запрещает"
+
 # Секреты закрыты от посторонних (660 root:agent — агент правит конфиг сам)
 grep -q 'chmod 660 "\$ENV_FILE"' "$S" || fail "конфиг с секретами не закрыт"
 # Restart=always безопасен с тех пор, как диалоги жмёт dashi-press-dialogs
