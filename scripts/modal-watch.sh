@@ -88,6 +88,7 @@ fi
 #   3. перезапуск службы -- и СРАЗУ после подъёма вернуть тот же текст в панель,
 #      чтобы сообщение не пропало вместе с сессией.
 STUCK="$STATE_DIR/stuck-input"
+PRESSED="$STATE_DIR/stuck-pressed"
 RETYPED="$STATE_DIR/stuck-retyped"
 # Claude Code ставит после «❯» неразрывный пробел (U+00A0), обычный '^❯ ' по
 # нему не матчится — залипание проходило мимо (проверено на живой панели).
@@ -125,7 +126,14 @@ pane_send() {
 if [[ -n "$typed" && -z "$ghost" ]] && ! printf '%s' "$pane" | grep -q 'esc to interrupt'; then
   sum="$(printf '%s' "$typed" | md5sum | cut -c1-16)"
   if [[ "$(cat "$STUCK" 2>/dev/null)" != "$sum" ]]; then
-    printf '%s' "$sum" > "$STUCK"          # новый текст — засекаем время
+    # Первый раз текст только ЗАСЕКАЕМ, не жмём. Скрипты самого агента печатают
+    # промпт через pane-send.sh и жмут Enter сами; тик сторожа попадает ровно в
+    # эту секунду (у Гора каждый час в :20:02), видит ещё не отправленный текст
+    # и добавляет лишний Enter. Ждём минуту: живой ход к тому времени начнётся,
+    # и текста в строке уже не будет.
+    printf '%s' "$sum" > "$STUCK"
+  elif [[ "$(cat "$PRESSED" 2>/dev/null)" != "$sum" ]]; then
+    printf '%s' "$sum" > "$PRESSED"
     tmux send-keys -t "$SESSION" Enter 2>/dev/null || true
     logger -t modal-watch "stuck input in $SESSION — pressed Enter" 2>/dev/null || true
   elif [[ "$(cat "$RETYPED" 2>/dev/null)" != "$sum" ]]; then
@@ -147,7 +155,7 @@ if [[ -n "$typed" && -z "$ghost" ]] && ! printf '%s' "$pane" | grep -q 'esc to i
     CTL="/usr/local/bin/dashi-ctl-$AGENT"
     if [[ -x "$CTL" ]] && sudo -n "$CTL" restart >/dev/null 2>&1; then
       touch "$STATE_DIR/stuck-restarted" 2>/dev/null || true
-      rm -f "$STUCK" "$RETYPED" 2>/dev/null || true
+      rm -f "$STUCK" "$PRESSED" "$RETYPED" 2>/dev/null || true
       # Ждём, пока поднимется панель, и возвращаем в неё то же сообщение.
       delivered=""
       for _ in $(seq 1 30); do
@@ -166,6 +174,6 @@ if [[ -n "$typed" && -z "$ghost" ]] && ! printf '%s' "$pane" | grep -q 'esc to i
     fi
   fi
 else
-  rm -f "$STUCK" "$RETYPED" 2>/dev/null || true   # ввод пуст или идёт ход — всё в порядке
+  rm -f "$STUCK" "$PRESSED" "$RETYPED" 2>/dev/null || true   # ввод пуст или идёт ход — всё в порядке
 fi
 exit 0
