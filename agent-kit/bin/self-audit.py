@@ -310,7 +310,12 @@ def audit_memory_refs() -> list[dict]:
             if rel in seen:
                 continue
             seen.add(rel)
-            alts = [ROOT / rel, ROOT / ".claude" / rel]
+            # Память ссылается и на скрипты комплекта агентов: они лежат в
+            # репозитории плагина, а не в корне рабочей папки (13.09.2026 --
+            # remind-at.sh и install-agent.sh два дня числились пропавшими).
+            plug = ROOT / ".claude" / "dashi-plugin-claude-code"
+            alts = [ROOT / rel, ROOT / ".claude" / rel,
+                    plug / rel, plug / "agent-kit" / rel, plug / "plugin" / rel]
             if not any(a.exists() for a in alts):
                 out.append({"ref": rel, "in": f.name, "verdict": "НЕТ ФАЙЛА"})
     return out
@@ -386,7 +391,7 @@ def main() -> int:
                                  f"Это не одна задача, это все сразу. Разбираюсь немедленно.")
                 elif "модель" in name or v == "ДРЕЙФ":
                     probs.append(f"• модель — {r.get('detail', 'часть ходов за сутки прошла не на основной модели')}. Если это не мои тесты — разберусь почему.")
-                elif v == "НЕТ ФАЙЛА":
+                elif v == "НЕТ ФАЙЛА" and section != "memory_refs":
                     probs.append(f"• {name} — хук прописан в настройках, а файла нет. Починю.")
                 elif v == "ОБЕЩАЕТ БЕЗ ПОБУДКИ":
                     probs.append(f"• {name} — шлёт тебе «проверю/вернусь» напрямую, но меня не будит: обещание повиснет. Подключу побудку.")
