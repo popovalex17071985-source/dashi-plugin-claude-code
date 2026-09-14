@@ -18,7 +18,28 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 LEDGER = Path(__file__).resolve().parents[1] / ".claude/core/open-threads.md"
-SESSION = os.environ.get("DASHI_TMUX_SESSION", "dashi-__AGENT__")
+def _session() -> str:
+    """Имя живой панели, а не угаданное по шаблону.
+
+    12.09.2026: у агента панель звалась «channel-gorbot», а скрипт слал в
+    «dashi-gorbot» -- напоминание уходило в никуда, и заметили это только
+    потому, что хозяин спросил про слетевший будильник.
+    """
+    env = os.environ.get("DASHI_TMUX_SESSION")
+    if env:
+        return env
+    try:
+        live = subprocess.run(["tmux", "ls", "-F", "#{session_name}"],
+                              capture_output=True, text=True, timeout=10).stdout.split()
+    except Exception:                      # noqa: BLE001 -- нет tmux: вернём шаблон
+        live = []
+    for name in live:
+        if "__AGENT__" in name:
+            return name
+    return live[0] if live else "dashi-__AGENT__"
+
+
+SESSION = _session()
 CHAT_ID = os.environ.get("DASHI_CHAT_ID", "__CHAT_ID__")
 TZ = ZoneInfo("Asia/Yekaterinburg")
 # 2026-08-27: the old pattern demanded a «→/к/до» marker, so my own ledger line

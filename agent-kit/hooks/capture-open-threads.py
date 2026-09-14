@@ -14,10 +14,12 @@ from __future__ import annotations
 import json
 import re
 import sys
-from datetime import datetime
+import subprocess
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
-LEDGER = Path("__CLAUDE_DIR__/core/open-threads.md")
+LEDGER = Path("__WORKSPACE__/.claude/core/open-threads.md")
 
 # First-person forward commitments / parked topics. Tight enough to avoid most
 # chatter, loose enough that a missed promise is the rare case (operator's ask).
@@ -29,6 +31,55 @@ COMMIT_RE = re.compile(
 )
 # Sentence splitter — keep the clause carrying the commitment as the ledger note.
 SENT_RE = re.compile(r"[^.!?\n]*[.!?\n]")
+
+
+# --- закрытие ---------------------------------------------------------------
+# 13.09.2026 (Саня: «почему в леджере столько задач и они не закрываются?»):
+# леджер был append-only -- строки копил хук, а снимал их только я по памяти,
+# поэтому за всё время не закрылось НИ ОДНОЙ. Здесь вторая половина: сказал
+# «готово» -- хук ищет похожую открытую строку и не даёт закончить ход, пока
+# я её не закрою. Одно срабатывание на строку (штамп), иначе ход зациклится.
+DONE_RE = re.compile(r"\b(готово|сделано|сделал|закрыл|доделал|раскатал|"
+                     r"проверено и работает)\b", re.IGNORECASE)
+FIRED = Path("__WORKSPACE__/logs/.ledger-close-asked")
+STOP_WORDS = {"саня", "сани", "сане", "надо", "нужно", "чтобы", "можно", "будет",
+              "этого", "этой", "теперь", "после", "через", "перед", "потом"}
+
+
+def _words(text):
+    return {w for w in re.findall(r"[а-яёa-z0-9]{5,}", text.lower())
+            if w not in STOP_WORDS}
+
+
+def close_candidates(message, ledger_text):
+    """Открытые строки леджера, сильнее всего похожие на сказанное «готово»."""
+    said = _words(message)
+    hits = []
+    for line in ledger_text.splitlines():
+        if not line.startswith("- [ ]"):
+            continue
+        common = said & _words(line)
+        if len(common) >= 3:
+            hits.append((len(common), line.strip()[:150]))
+    return [h[1] for h in sorted(hits, reverse=True)[:3]]
+
+
+def _set_alarm(note):
+    """Обещание без будильника = обещание без исполнителя (Саня 13.09.2026).
+
+    Сторож обещаний будит меня только по строкам с ДАТОЙ («к 22.08»), а
+    «возьмусь сразу после» даты не несёт -- такие задачи ждали, пока хозяин
+    не пнёт. Здесь обещание сразу превращается в машинный будильник через
+    полтора часа: он в кроне и переживает рестарт сессии.
+    """
+    remind = Path("__WORKSPACE__/bin/remind-at.sh")
+    if not remind.exists():
+        return
+    when = datetime.now(ZoneInfo("Asia/Yekaterinburg")) + timedelta(minutes=90)
+    text = re.sub(r"^- \[ \] \S+ — ", "", note)[:120]
+    subprocess.run([str(remind), when.strftime("%d.%m %H:%M"),
+                    f"обещал и не сделал: {text} -- доделай и отчитайся"],
+                   capture_output=True, timeout=20, check=False)
 
 
 def last_assistant_text(transcript: Path) -> str:
@@ -72,7 +123,23 @@ def main() -> int:
     if not tpath or not Path(tpath).exists():
         return 0
 
-    sentences = commitment_sentences(last_assistant_text(Path(tpath)))
+    said = last_assistant_text(Path(tpath))
+
+    # сначала закрытие: «готово» без снятой строки -- и есть корень вечного леджера
+    if DONE_RE.search(said) and LEDGER.exists():
+        cands = close_candidates(said, LEDGER.read_text())
+        asked = FIRED.read_text().splitlines() if FIRED.exists() else []
+        fresh = [c for c in cands if c[:60] not in asked]
+        if fresh:
+            FIRED.parent.mkdir(parents=True, exist_ok=True)
+            with FIRED.open("a") as f:
+                f.write("\n".join(c[:60] for c in fresh) + "\n")
+            print("ЛЕДЖЕР: ты сказал «готово». Похоже, закрылись эти строки "
+                  "core/open-threads.md -- сними [ ] -> [x] или объясни, почему нет:\n"
+                  + "\n".join(f"  {c}" for c in fresh), file=sys.stderr)
+            return 2
+
+    sentences = commitment_sentences(said)
     if not sentences:
         return 0
 
@@ -93,6 +160,7 @@ def main() -> int:
     if new_lines:
         with LEDGER.open("a") as f:
             f.write("\n".join(new_lines) + "\n")
+        _set_alarm(new_lines[0])
     return 0
 
 

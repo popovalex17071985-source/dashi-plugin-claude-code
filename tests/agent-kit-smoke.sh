@@ -156,4 +156,14 @@ dups="$(grep -F "$T/bin/" "$CRONTAB_FILE" | sort | uniq -d)"
 [[ -z "$dups" ]] || fail "смена --tz задвоила крон: $dups"
 grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "смена --tz затёрла чужую строку"
 
+# Будильник, переживающий рестарт: разложен, исполняемый, время считает по Перми
+R="$T/bin/remind-at.sh"
+[[ -x "$R" ]] || fail "remind-at.sh не разложен или не исполняемый"
+grep -q "__WORKSPACE__" "$R" && fail "в remind-at.sh остался неподставленный путь"
+grep -q "Asia/Yekaterinburg" "$R" || fail "remind-at.sh считает время не по Перми"
+bash -n "$R" || fail "remind-at.sh не компилируется"
+# Сторож обещаний не должен слать в панель, угаданную по шаблону
+grep -q "def _session" "$T/bin/promise-sweeper.py" \
+  || fail "promise-sweeper всё ещё берёт имя панели из шаблона"
+
 echo "✓ agent-kit smoke ok ($n2 хуков, 6 гейтов сработали, утренние кроны без дублей, идемпотентно)"
