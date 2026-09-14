@@ -160,7 +160,7 @@ DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own
 # (что вышло нового + напоминание про /update), 20 самопроверка (хуки, крон,
 # канарейка, модель, память — шлёт ТОЛЬКО подозрения), 30 будильник по срокам
 # и отчёт о сервере (диск, память, сервисы, вход в Claude — шлётся всегда).
-CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py)
+CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py)
 CRON_LINES=(
   "0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
   "10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
@@ -170,6 +170,9 @@ CRON_LINES=(
   # Сторож фоновых задач: старт без финиша + мёртвый процесс = сообщение хозяину.
   # Интервал в минутах, от часового пояса не зависит.
   "*/2 * * * * /usr/bin/python3 $WORKSPACE/bin/job-watch.py >> $WORKSPACE/logs/job-watch.log 2>&1"
+  # Сторож провалов: след ошибки в логах -> задание агенту чинить самому, а не
+  # счётчик «ошибок N» хозяину в чат. Интервал в минутах, пояс не при чём.
+  "*/20 * * * * /usr/bin/python3 $WORKSPACE/bin/job-fail-watch.py >> $WORKSPACE/logs/job-fail-watch.log 2>&1"
 )
 if [[ -n "${KIT_NO_CRON:-}" ]]; then
   echo "  крон не трогаю (KIT_NO_CRON)"
