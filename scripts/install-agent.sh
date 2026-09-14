@@ -753,9 +753,19 @@ f="$WORKSPACE/data/cron-heartbeat"
 age=\$(( ( \$(date +%s) - \$(stat -c %Y "\$f") ) / 60 ))
 [ "\$age" -gt 10 ] || exit 0
 . "$ENV_FILE"
-curl -s -m 20 -X POST "https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage" \\
+# Отправку ПРОВЕРЯЕМ. Слепой curl >/dev/null означает: протух токен или сменился
+# chat_id -- крик о мёртвом планировщике уходит в никуда, и молчат оба, и крон,
+# и канарейка. Код ответа идёт в журнал службы (Jarvis 14.09.2026: у себя нашёл
+# ровно это -- за десять дней ни одной строки о доставке сигнала «я поднялся»).
+code=\$(curl -s -m 20 -o /dev/null -w '%{http_code}' -X POST \\
+  "https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage" \\
   -d chat_id="\${TELEGRAM_ALLOWED_USER_IDS%%,*}" \\
-  -d text="Планировщик задач не работает: минутная задача молчит \$age мин. Ночные задачи агента $AGENT_NAME сейчас НЕ выполняются." >/dev/null
+  -d text="Планировщик задач не работает: минутная задача молчит \$age мин. Ночные задачи агента $AGENT_NAME сейчас НЕ выполняются.") || code=000
+if [ "\$code" = "200" ]; then
+  echo "cron-canary: хозяин предупреждён (HTTP 200), простой \$age мин"
+else
+  echo "cron-canary: ПРЕДУПРЕДИТЬ НЕ УДАЛОСЬ (HTTP \$code), простой \$age мин" >&2
+fi
 CANEOF
   chmod 755 "/usr/local/bin/cron-canary-$AGENT_NAME"
   cat > "/etc/systemd/system/cron-canary-$AGENT_NAME.service" <<CANEOF
