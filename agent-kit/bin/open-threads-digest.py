@@ -31,6 +31,8 @@ WIDTH = 400            # полный текст пункта; обрезаем 
 
 DATE_RE = re.compile(r"(20\d{2})-(\d{2})-(\d{2})|\b(\d{2})\.(\d{2})(?:\.(20\d{2}))?\b")
 
+CLOSED_RE = re.compile(r"закрыт[оа]\s+(\d{2})\.(\d{2})", re.IGNORECASE)
+
 ON_SANYA = re.compile(r"ЖД[ЁЕ]М|ЖДУ|PENDING|напомнить\s+хозяину|"
                       r"ждём\s+(?:от\s+)?Сан|решени[ея]\s+оператор|за\s+Саней", re.IGNORECASE)
 
@@ -138,17 +140,39 @@ def _section(title: str, rows: list[str], start_no: int,
     return head + "\n<blockquote expandable>" + "\n".join(lines) + "</blockquote>", n
 
 
+def closed_on(day: dt.date, ledger: pathlib.Path | None = None) -> list[str]:
+    """Пункты, закрытые в указанный день: «- [x] ЗАКРЫТО дд.мм …».
+
+    Сводка говорила только «кто кого ждёт», поэтому реестр выглядел стоячим даже
+    в день, когда закрыли три пункта: движения не видно ни хозяину, ни мне
+    (Jarvis 14.09.2026 — 39 открытых строк накопились ровно так). Закрытое за
+    вчера показываем первым блоком: это единственное место, где видно прогресс.
+    """
+    out = []
+    for ln in (ledger or LEDGER).read_text().splitlines():
+        if not ln.startswith("- [x]"):
+            continue
+        m = CLOSED_RE.search(ln)
+        if m and (int(m.group(1)), int(m.group(2))) == (day.day, day.month):
+            out.append(ln[5:].strip())
+    return out
+
+
 def messages(mine: list[str], sanya: list[str],
-             late: list[tuple[int, str]] | None = None) -> list[str]:
+             late: list[tuple[int, str]] | None = None,
+             done: list[str] | None = None) -> list[str]:
     """Separate message per section (operator 2026-08-27), numbered straight through.
 
     Each section is chunked on its own if it exceeds the Telegram limit, so a
     section never leaks into a neighbour's message.
     """
-    if not mine and not sanya:
+    if not mine and not sanya and not done:
         return ["Открытых дел нет — всё закрыто."]
 
     out, n = [], 0
+    if done:
+        block, n = _section("✅ <b>Закрыто вчера</b>", done, n)
+        out.append(block)
     if late:
         rows = [f"[{'+' + str(d) + ' дн' if d else 'срок сегодня'}] {r}" for d, r in late]
         block, n = _section("🔴 <b>Просрочено</b>", rows, n)
@@ -205,7 +229,8 @@ def main() -> int:
     mine, sanya = split(rows)
     # просрочку ищем по ВСЕМУ реестру: обещание могло быть дано месяц назад,
     # и фильтр «свежие» его как раз выкидывает.
-    msgs = messages(mine, sanya, overdue(all_rows, today))
+    msgs = messages(mine, sanya, overdue(all_rows, today),
+                    closed_on(today - dt.timedelta(days=1)))
     if old:
         msgs[-1] += f"\nСтарше {FRESH_DAYS} дней и не разобрано: {old} — нужна чистка реестра."
     print("\n\n--- следующее сообщение ---\n\n".join(msgs))
@@ -249,6 +274,20 @@ def _selfcheck() -> None:
     assert all(len(c) <= 4096 for c in big), [len(c) for c in big]
     assert sum(c.count("<blockquote") for c in big) == len(big)  # блок в каждой части
     assert chunks("short") == ["short"]
+    # «Закрыто вчера»: обе формы отметки, и чужая дата не считается своей.
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False,
+                                     encoding="utf-8") as fh:
+        fh.write("- [x] ЗАКРЫТО 13.09: дашборд проверен\n"
+                 "- [x] (закрыто 13.09 по слову хозяина) ключ выдан\n"
+                 "- [x] ЗАКРЫТО 12.09: позавчерашнее\n"
+                 "- [ ] открытый пункт, 13.09 упомянута\n")
+        tmp = fh.name
+    got = closed_on(dt.date(2026, 9, 13), pathlib.Path(tmp))
+    pathlib.Path(tmp).unlink()
+    assert len(got) == 2, got                       # обе формы найдены
+    assert all("12.09" not in g for g in got), got  # чужой день не подмешан
+    assert "Закрыто вчера" in messages([], [], None, ["что-то закрыл"])[0]
     print("selfcheck ok")
 
 
