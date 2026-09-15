@@ -56,8 +56,12 @@ fi
 # headless-агенте нажимать некому: очередь встаёт, бот молчит на всё подряд.
 # Отправлять отчёт от чужого имени мы не вправе, поэтому закрываем окно -- «0».
 # (11.09.2026: чужой агент так провисел, пока владелец не нажал 0 вручную.)
-if printf '%s' "$pane" | grep -q 'Submit feedback / bug report' \
-   && printf '%s' "$pane" | grep -q 'dismiss'; then
+# 15.09.2026: у агента Гора окно назвалось иначе -- «Bug report drafted: ...»,
+# и точное совпадение по 'Submit feedback / bug report' его не поймало: диалог
+# провисел с 11:07. Узнаём по строке вариантов «0 to dismiss» рядом со словом
+# про отчёт -- формулировка шапки у Claude Code меняется, а варианты нет.
+if printf '%s' "$pane" | grep -qiE 'submit feedback|bug report' \
+   && printf '%s' "$pane" | grep -qE '0 to dismiss|\bdismiss\b'; then
   tmux send-keys -t "$SESSION" 0 2>/dev/null || true
   logger -t modal-watch "pressed 0 in $SESSION (bug-report prompt)" 2>/dev/null || true
 fi
