@@ -76,6 +76,7 @@ function makeStatePaths(): StatePaths {
       ask_user_question: join(root, 'logs', 'ask-user-question.jsonl'),
       permission_gate: join(root, 'logs', 'permission-gate.jsonl'),
       rejected_inbound: join(root, 'logs', 'rejected-inbound.jsonl'),
+      accepted_inbound: join(root, 'logs', 'accepted-inbound.jsonl'),
     },
   }
 }
@@ -344,6 +345,32 @@ describe('gate drop journal (rejected-inbound.jsonl)', () => {
     const ctx = makeCtx({ text: 'привет', chatId: 164795011, chatType: 'private', fromId: 164795011 })
     await handleInboundText(ctx, deps)
     expect(existsSync(statePaths.logs.rejected_inbound)).toBe(false)
+    rmSync(statePaths.root, { recursive: true, force: true })
+  })
+})
+
+describe('accepted inbound journal (accepted-inbound.jsonl)', () => {
+  // 15.09.2026: two digit-only messages reached the session under the owner's
+  // user id which he had not sent. Nothing on disk recorded what Telegram
+  // actually delivered, so the trail is the fix.
+  test('allowlisted DM writes the delivered text and the ids', async () => {
+    const { deps, statePaths } = makeDeps()
+    const ctx = makeCtx({ text: '00000', chatId: 164795011, chatType: 'private', fromId: 164795011 })
+    await handleInboundText(ctx, deps)
+    const row = JSON.parse(readFileSync(statePaths.logs.accepted_inbound, 'utf8').trim())
+    expect(row.text).toBe('00000')
+    expect(row.len).toBe(5)
+    expect(row.chat_id).toBe('164795011')
+    expect(row.sender_id).toBe('164795011')
+    expect(row.kind).toBe('text')
+    rmSync(statePaths.root, { recursive: true, force: true })
+  })
+
+  test('gate-dropped sender leaves no accepted line', async () => {
+    const { deps, statePaths } = makeDeps()
+    const ctx = makeCtx({ text: 'привет', chatId: 999001, chatType: 'private', fromId: 999001 })
+    await handleInboundText(ctx, deps)
+    expect(existsSync(statePaths.logs.accepted_inbound)).toBe(false)
     rmSync(statePaths.root, { recursive: true, force: true })
   })
 })

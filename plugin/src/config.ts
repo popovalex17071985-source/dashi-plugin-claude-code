@@ -707,6 +707,7 @@ export type StatePaths = {
      */
     permission_gate: string
     rejected_inbound: string
+    accepted_inbound: string
   }
 }
 
@@ -742,6 +743,12 @@ export function getStatePaths(_config: AppConfig, env: RuntimeEnv): StatePaths {
       // Owner-facing "who knocked and was turned away": debug logs vanish at
       // default LOG_LEVEL, so rejected traffic was invisible before this.
       rejected_inbound: join(root, 'logs', 'rejected-inbound.jsonl'),
+      // Journal of inbound messages the gate ACCEPTED. Added 2026-09-15:
+      // two digit-only messages reached the session that the owner never
+      // sent, and nothing on disk could say what Telegram actually
+      // delivered. Text is truncated; this is a forensic trail, not a
+      // chat archive.
+      accepted_inbound: join(root, 'logs', 'accepted-inbound.jsonl'),
     },
   }
 }

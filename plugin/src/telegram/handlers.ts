@@ -471,6 +471,40 @@ function journalRejectedInbound(
   }
 }
 
+// Journal an ACCEPTED inbound to logs/accepted-inbound.jsonl. 2026-09-15: two
+// digit-only messages ("00000", "000") arrived under the owner's user id and he
+// had sent neither; nothing on disk could say what Telegram actually delivered.
+// Records the raw text (truncated) plus the ids needed to chase it. Best-effort.
+const ACCEPTED_TEXT_CAP = 200
+
+function journalAcceptedInbound(
+  deps: HandlerDeps,
+  input: GateInput,
+  kind: string,
+  messageId: number | undefined,
+  text: string,
+): void {
+  try {
+    const p = deps.statePaths.logs.accepted_inbound
+    mkdirSync(dirname(p), { recursive: true })
+    appendFileSync(
+      p,
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        chat_id: input.chatId,
+        chat_type: input.chatType,
+        sender_id: input.senderId,
+        kind,
+        ...(messageId !== undefined ? { message_id: messageId } : {}),
+        len: text.length,
+        text: text.slice(0, ACCEPTED_TEXT_CAP),
+      }) + '\n',
+    )
+  } catch {
+    /* journal is best-effort */
+  }
+}
+
 // Common gate+notify body. Each per-kind handler computes its primary text
 // and (in T8+) a list of MediaDescriptors via buildMedia. We render the
 // descriptors and feed them to buildChannelContent so the agent sees
@@ -552,6 +586,11 @@ async function gateAndNotify(
   const descriptors = buildMedia ? await buildMedia() : []
   const renderedMedia = descriptors.map(renderMediaDescriptor)
 
+  // One call, two consumers below (router DTO and legacy notify) — and the
+  // forensic journal sees exactly the text that reaches the session.
+  const primaryText = buildText()
+  journalAcceptedInbound(deps, input, kind, ctx.message?.message_id, primaryText)
+
   // Router path: route GROUP/supergroup chats to their per-chat tmux
   // session via the file-based inbox. Private DMs deliberately fall
   // through to the legacy sendChannelNotification path below so they
@@ -606,7 +645,7 @@ async function gateAndNotify(
       : undefined
 
     const inboundMsg: InboundMessage = {
-      text: buildText(),
+      text: primaryText,
       chat_id: decision.chatId,
       user_id: decision.senderId,
       user:
@@ -647,7 +686,7 @@ async function gateAndNotify(
   // single-chat (DM-only) wiring; will be removed once all deployments
   // run multichat.
   const content = buildChannelContent({
-    text: buildText(),
+    text: primaryText,
     bot: deps.bot,
     ...(ctx.message?.reply_to_message
       ? { reply: adaptReply(ctx.message.reply_to_message)! }
