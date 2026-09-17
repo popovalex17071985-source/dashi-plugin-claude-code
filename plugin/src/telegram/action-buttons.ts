@@ -10,8 +10,6 @@
 //   ord:done:mail:<cls>:<uid>          InSales order (mail)
 //   lead:touch:<how>:<number>          «Покупай с выгодой» lead — contact made
 //   lead:done:<cls>:<number>           «Покупай с выгодой» lead — outcome
-//   lead:nudge:<number>                владелец просит напомнить группе
-//   lead:seen:<number>                 владелец: видел, пинать не надо
 //   *:locked                           already-handled button — just ack
 //
 // Division of labour: this module owns the Telegram I/O (collapse the keyboard
@@ -92,7 +90,6 @@ export async function handleActionCallback(
   const root = data.startsWith('mqz:') ? 'mqz' : data.startsWith('lead:') ? 'lead' : 'ord'
   const known = root === 'lead'
     ? data.startsWith('lead:done:') || data.startsWith('lead:touch:')
-      || data.startsWith('lead:nudge:') || data.startsWith('lead:seen:')
     : data.startsWith(`${root}:done:`)
   if (!known) {
     // Unknown variant under our prefix — clear the spinner, do nothing.
