@@ -111,9 +111,11 @@ echo "{\"transcript_path\":\"$J\",\"session_id\":\"s\"}" \
 # Самопроверки перенесённых скриптов
 python3 "$T/bin/promise-sweeper.py" --selfcheck >/dev/null || fail "будильник по срокам"
 python3 "$T/bin/open-threads-digest.py" --selfcheck >/dev/null || fail "утренняя сводка"
+# Сторож индекса памяти: без --apply обязан только смотреть и не падать
+python3 "$T/bin/memory-index-trim.py" >/dev/null || fail "сторож индекса памяти"
 
 # Кроны: свои строки поставлены, чужая цела
-for s in promise-sweeper.py "open-threads-digest.py --send" update-notify.sh self-audit-morning.sh health-daily.sh; do
+for s in promise-sweeper.py "open-threads-digest.py --send" update-notify.sh self-audit-morning.sh health-daily.sh "memory-index-trim.py --apply"; do
   [[ "$(grep -c "$T/bin/$s" "$CRONTAB_FILE")" == 1 ]] || fail "не в кроне: $s"
 done
 grep -q "/srv/other/bin/promise-sweeper.py" "$CRONTAB_FILE" || fail "затёр чужую строку крона"
