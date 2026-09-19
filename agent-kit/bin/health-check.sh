@@ -299,6 +299,24 @@ probe_sizes() {
   echo "ok|$out"
 }
 
+probe_dead_letter() {
+  # Quarantines with no reader are /dev/null with extra steps: 82 parked inbound
+  # updates sat unseen for three months (19.09.2026). Surface them here.
+  local digest out fresh total
+  digest="$WORKSPACE/bin/dead-letter-digest.py"
+  [ -x "$digest" ] || { echo "skip|разборщика карантина нет"; return; }
+  out=$(/usr/bin/python3 "$digest" --workspace "$WORKSPACE" --quiet --json 2>/dev/null) || {
+    echo "WARN|разборщик карантина упал"; return; }
+  total=$(printf '%s' "$out" | /usr/bin/python3 -c 'import json,sys; d=json.load(sys.stdin); print(sum(r["total"] for r in d))' 2>/dev/null)
+  fresh=$(printf '%s' "$out" | /usr/bin/python3 -c 'import json,sys; d=json.load(sys.stdin); print(sum(r["fresh"] for r in d))' 2>/dev/null)
+  total=${total:-0}; fresh=${fresh:-0}
+  if [ "$fresh" -gt 0 ]; then
+    echo "WARN|в карантине $total записей, свежих $fresh -- разобрать: bin/dead-letter-digest.py --json"
+    return
+  fi
+  echo "ok|в карантине $total записей, свежих нет"
+}
+
 main() {
   declare -A results
 
@@ -313,6 +331,7 @@ main() {
   results[Memory]=$(probe_memory)
   results[Embeddings]=$(probe_embed)
   results[Sizes]=$(probe_sizes)
+  results[Dead_letter]=$(probe_dead_letter)
 
   local sep="+----------------------+------+-----------------------------------------"
   echo "$sep"

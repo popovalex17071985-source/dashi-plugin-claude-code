@@ -115,6 +115,7 @@ WIRING = [
     ("Stop",        "",                     "stop-register-gate.py",    10),
     ("Stop",        "",                     "stop-closeout-gate.py",    10),
     ("Stop",        "",                     "stop-blocker-gate.py",     10),
+    ("Stop",        "",                     "promise-alarm.py",         25),
 ]
 
 added = 0
@@ -160,13 +161,14 @@ DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own
 # (что вышло нового + напоминание про /update), 20 самопроверка (хуки, крон,
 # канарейка, модель, память — шлёт ТОЛЬКО подозрения), 30 будильник по срокам
 # и отчёт о сервере (диск, память, сервисы, вход в Claude — шлётся всегда).
-CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py memory-index-trim.py fallback-reply-sweeper.sh claude-link-guard.sh auth-alive-watch.sh multichat-nudge.sh)
+CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py memory-index-trim.py fallback-reply-sweeper.sh claude-link-guard.sh auth-alive-watch.sh multichat-nudge.sh dead-letter-digest.py)
 CRON_LINES=(
   "0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
   "10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
   "20 $DIG_H * * * /bin/bash $WORKSPACE/bin/self-audit-morning.sh >> $WORKSPACE/logs/self-audit.log 2>&1"
   "30 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
   "30 $DIG_H * * * /bin/bash $WORKSPACE/bin/health-daily.sh >> $WORKSPACE/logs/health-daily.log 2>&1"
+  "40 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/dead-letter-digest.py >> $WORKSPACE/logs/dead-letter.log 2>&1"
   # Индекс памяти грузится в каждую сессию целиком: перерос лимит -- молча
   # обрезается, и агент теряет часть памяти. Раз в сутки ужимаем сами.
   "40 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/memory-index-trim.py --apply >> $WORKSPACE/logs/memory-trim.log 2>&1"
