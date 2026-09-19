@@ -27,7 +27,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 
 import type { Logger } from '../../src/log.js'
 import type {
@@ -386,6 +386,12 @@ describe('FIX-E M2 — kill() preserves dead-letter + mismatched', () => {
     expect(existsSync(seeded.inboxFile)).toBe(false)
     expect(existsSync(seeded.outboxRootFile)).toBe(false)
     expect(existsSync(seeded.processingFile)).toBe(false)
+
+    // 19.09.2026: a root-level outbox file is an ANSWER already produced. It
+    // must not vanish on kill — it is parked in dead-letter/ for recovery.
+    const parked = readdirSync(join(dirname(seeded.outboxRootFile), 'dead-letter'))
+      .filter((n) => n.startsWith('killed-') && n.endsWith('.json'))
+    expect(parked.length).toBe(1)
 
     // Operator-facing state — must be PRESERVED.
     expect(existsSync(seeded.deadLetterFile)).toBe(true)

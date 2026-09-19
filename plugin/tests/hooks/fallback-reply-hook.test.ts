@@ -801,7 +801,7 @@ describe('persistLastChat (group chats never become the fallback anchor)', () =>
 // saw an empty transcript and dropped the answer. It must grow the window instead.
 describe('tailReadTranscript: строка больше окна', () => {
   test('расширяет окно, пока не найдёт границу строки', async () => {
-    const { tailReadTranscript } = await import('../../scripts/fallback-reply-hook.ts')
+    const { tailReadTranscript } = await import('../../scripts/fallback-reply-hook.js')
     const calls: number[] = []
     const fat = 'x'.repeat(50)
     const fake = (_p: string, bytes: number = 1024 * 1024) => {
@@ -817,7 +817,7 @@ describe('tailReadTranscript: строка больше окна', () => {
   })
 
   test('не возвращает пустоту, когда границы нет совсем', async () => {
-    const { tailReadTranscript } = await import('../../scripts/fallback-reply-hook.ts')
+    const { tailReadTranscript } = await import('../../scripts/fallback-reply-hook.js')
     const fake = () => ({ text: 'no-newline-anywhere', truncated: true })
     expect(tailReadTranscript('/nonexistent', fake)).toBe('no-newline-anywhere')
   })
