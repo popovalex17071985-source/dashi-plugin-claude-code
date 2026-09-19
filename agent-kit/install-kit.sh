@@ -108,6 +108,13 @@ WIRING = [
     ("UserPromptSubmit", "",                "owner-clock.sh",            5),
     ("UserPromptSubmit", "",                "register-mirror.sh",        5),
     ("UserPromptSubmit", "",                "rule-inject.sh",            5),
+    # Долгая память в обе стороны: подсказка прошлых ходов на входе и
+    # запись эпизода на выходе. Без них сервер памяти стоит вхолостую.
+    ("UserPromptSubmit", "",                "ov-recall.py",              8),
+    ("Stop",        "",                     "ov-digest-capture.py",     10),
+    # Конец хода оставляет состояние на диске: что правил, что закоммитил,
+    # что назвал следующим шагом. Иначе обрыв сессии уносит это с собой.
+    ("Stop",        "",                     "session-state.py",         15),
     ("Stop",        "",                     "usage-logger.py",          10),
     ("Stop",        "",                     "stop-check-syntax.sh",     10),
     ("UserPromptSubmit", "",                "correction-detector.sh",    5),
