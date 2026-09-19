@@ -345,6 +345,12 @@ main() {
   render_row "Планировщик"     "${results[Cron]}"
   render_row "Бэкап"           "${results[Backup]}"
   render_row "Секреты"         "${results[Secrets]}"
+  # 19.09.2026: эти четыре считались, но в таблицу не попадали -- вердикт
+  # портился, а какой пункт просел, видно не было.
+  render_row "Долгая память"   "${results[Memory]}"
+  render_row "Эмбеддинги"      "${results[Embeddings]}"
+  render_row "Размеры"         "${results[Sizes]}"
+  render_row "Карантин"        "${results[Dead_letter]}"
   echo "$sep"
 
   local worst=0
