@@ -46,6 +46,17 @@ EMBED_OK=0
 # Re-run on a box where the service already answers: it is holding that RAM
 # itself, so the free-memory gate below would read "too tight" and wrongly
 # report the local path as impossible (caught on gorbot, 19.09.2026).
+# Порт может отвечать процессом, поднятым руками: после перезагрузки он не
+# вернётся, а прошлая версия считала такой порт «уже готовым» и уходила дальше
+# без автозапуска (поймано на Смите 20.09.2026). Нет службы -- гасим процесс и
+# ставим всё как положено.
+if curl -sf -m 5 "http://127.0.0.1:$EMBED_PORT/health" >/dev/null 2>&1 \
+   && ! systemctl is-enabled --quiet dashi-embed 2>/dev/null; then
+  say "эмбеддинги отвечают, но без службы -- оформляю автозапуск"
+  pkill -f "uvicorn embed-serve[r]" 2>/dev/null || true
+  sleep 2
+fi
+
 if curl -sf -m 5 "http://127.0.0.1:$EMBED_PORT/health" >/dev/null 2>&1; then
   EMBED_OK=1
   say "служба эмбеддингов уже живёт на 127.0.0.1:$EMBED_PORT"
