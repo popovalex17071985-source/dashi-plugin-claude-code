@@ -1334,7 +1334,21 @@ fi
 say "Память OpenViking"
 OV_DIR="/home/$SERVICE_USER/.openviking"
 if [[ -z "$OPENAI_KEY" && ! -s "$OV_DIR/ov.conf" ]]; then
-  skip "без семантической памяти (повторный прогон с --openai-key KEY включит)"
+  # Ключа нет -- это не повод оставлять агента без памяти. В комплекте лежит
+  # второй путь: эмбеддинги локальной моделью, пересказы на ключе, который уже
+  # есть на этой машине. 20.09.2026 Смит встал без памяти именно потому, что
+  # установщик знал только про OpenAI и молча пропускал шаг.
+  KIT_MEM="/home/$SERVICE_USER/.claude-lab/$AGENT_NAME/.claude/dashi-plugin-claude-code/agent-kit/scripts/setup-memory.sh"
+  if [[ -x "$KIT_MEM" || -f "$KIT_MEM" ]]; then
+    if bash "$KIT_MEM" --workspace "/home/$SERVICE_USER/.claude-lab/$AGENT_NAME" --agent "$AGENT_NAME" >/dev/null 2>&1 \
+       && curl -sf -m 5 http://127.0.0.1:1933/health >/dev/null 2>&1; then
+      ok "память на локальных эмбеддингах (ключ OpenAI не нужен)"
+    else
+      skip "память не поднялась локально -- прогон с --openai-key KEY поставит её на OpenAI"
+    fi
+  else
+    skip "без семантической памяти (повторный прогон с --openai-key KEY включит)"
+  fi
 else
   if ! command -v docker >/dev/null 2>&1; then
     apt-get install -y -qq docker.io >/dev/null 2>&1 && systemctl enable --now docker >/dev/null 2>&1 \
