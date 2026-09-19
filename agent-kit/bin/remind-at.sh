@@ -27,7 +27,7 @@ case "${1:-}" in
   --fire)
     shift
     id="$1"; shift
-    "$WORKSPACE/bin/pane-send.sh" "$(session)" "$*" || true
+    "$WORKSPACE/bin/pane-send-when-idle.sh" "$(session)" "$*" || true
     crontab -l 2>/dev/null | grep -v "remind:$id\$" | crontab - || true
     ;;
   --list)

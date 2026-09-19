@@ -114,3 +114,15 @@ registries, checks the text being written, not the legacy file.
   model — don't burn the top model on grunt work.
 
 Agents: `agents/proxy-skeptic.md`, `agents/reviewer.md`, `agents/parser.md`.
+
+## Scheduled work: script + report, never typed into my session
+
+A scheduled job runs as a SCRIPT and sends me the finished result (`bin/tg-send.py`,
+`bin/run-and-report.sh`). Typing a job into my own pane makes it look like a human
+wrote it: it merges with a real message into one turn, the turn loses the chat it
+came from, and the human's answer is composed and then dropped (gorbot, 19.09.2026
+-- three questions from a group answered into the void).
+
+A job that genuinely needs ME to act (an alarm, a failed job to fix) goes through
+`bin/pane-send-when-idle.sh`, which waits until the turn in flight has ended.
+Never `pane-send.sh` directly from a schedule.
