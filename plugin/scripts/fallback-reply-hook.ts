@@ -87,6 +87,9 @@ import {
 // before the client saw the error) and KEEPS the old suppression to avoid a
 // duplicate delivery. Imported from the guard so the two stay in lockstep.
 import { ASK_GUARD_BLOCK_MARKER } from '../src/safety/ask-guard.js'
+// Same chunker the MCP reply tool uses, so a long fallback answer is split on
+// paragraph/tag boundaries instead of being guillotined at 4096.
+import { splitMessage } from '../src/format/chunk.js'
 
 // Re-export the borrowed helpers under this module too, so tests importing
 // from this hook get a single surface. (parseEnvFile is used transitively by
@@ -129,6 +132,31 @@ export function truncateForTelegram(text: string): string {
   if (text.length <= TELEGRAM_TEXT_MAX) return text
   const room = TELEGRAM_TEXT_MAX - TRUNCATION_MARKER.length
   return text.slice(0, room) + TRUNCATION_MARKER
+}
+
+/**
+ * FIX 8 (правка 5, 19.09.2026): split a long answer instead of truncating it.
+ *
+ * Truncation was the minimum viable fix — it always delivered SOMETHING, but the
+ * tail (which in a report is where the numbers and the next step live) was
+ * simply thrown away. The route's bare sendMessage does not chunk, so we chunk
+ * here with the same splitter the MCP reply tool uses: cuts land on paragraph
+ * boundaries and balanced tags are reopened, so each part renders on its own.
+ *
+ * Bounded by MAX_PARTS: an absurdly long text still ends with a truncation
+ * marker rather than spamming the chat with dozens of messages.
+ */
+export const FALLBACK_CHUNK_MAX = 4000
+export const FALLBACK_MAX_PARTS = 6
+
+export function splitForTelegram(text: string): string[] {
+  const parts = splitMessage(text, FALLBACK_CHUNK_MAX)
+  if (parts.length <= FALLBACK_MAX_PARTS) return parts
+  const kept = parts.slice(0, FALLBACK_MAX_PARTS)
+  const last = kept[FALLBACK_MAX_PARTS - 1] as string
+  const room = Math.max(0, FALLBACK_CHUNK_MAX - TRUNCATION_MARKER.length)
+  kept[FALLBACK_MAX_PARTS - 1] = last.slice(0, room) + TRUNCATION_MARKER
+  return kept
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -933,10 +961,21 @@ async function main(): Promise<void> {
 
   // FIX 5: truncate-with-marker so a >4096-char answer delivers SOMETHING
   // rather than 400-dropping at the route's schema cap.
-  const outText = truncateForTelegram(text)
+  const parts = splitForTelegram(text)
   const send = (toChat: string, body: string): Promise<boolean> =>
     postFallback(config as FallbackConfig, toChat, body)
-  const ok = await send(chatId, outText)
+  // Deliver every part in order. On the first failure, park the REMAINDER (the
+  // part that failed plus everything after it) so a retry resumes where the send
+  // stopped instead of re-sending what already landed.
+  let ok = true
+  let outText = parts[0] ?? ''
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i] as string
+    if (await send(chatId, part)) continue
+    ok = false
+    outText = parts.slice(i).join('\n')
+    break
+  }
   if (ok && statePath) persistDedupState(statePath, next)
   const undeliveredDir = resolveUndeliveredDir(env, statePath)
   if (!ok && undeliveredDir) {

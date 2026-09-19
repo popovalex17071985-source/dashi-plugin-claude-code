@@ -914,3 +914,34 @@ describe('карантин недоставленных ответов (прав
     expect(readdirSync(dir).filter((f) => f.endsWith('.json')).length).toBe(3)
   })
 })
+
+describe('длинный ответ режется, а не рубится (правка 5)', () => {
+  test('текст больше 4096 уходит частями, хвост не теряется', async () => {
+    const { splitForTelegram, FALLBACK_CHUNK_MAX } = await import(
+      '../../scripts/fallback-reply-hook.js'
+    )
+    const body = Array.from({ length: 60 }, (_, i) => `Абзац номер ${i} ${'ц'.repeat(120)}`).join(
+      '\n\n',
+    )
+    const parts = splitForTelegram(body)
+    expect(parts.length).toBeGreaterThan(1)
+    for (const part of parts) expect(part.length).toBeLessThanOrEqual(FALLBACK_CHUNK_MAX)
+    // Хвост на месте: последний абзац должен попасть в последнюю часть.
+    expect(parts[parts.length - 1]).toContain('Абзац номер 59')
+    expect(parts.join('').includes('…[обрезано]')).toBe(false)
+  })
+
+  test('абсурдно длинный текст ограничен шестью частями с маркером', async () => {
+    const { splitForTelegram, FALLBACK_MAX_PARTS } = await import(
+      '../../scripts/fallback-reply-hook.js'
+    )
+    const parts = splitForTelegram('я'.repeat(200_000))
+    expect(parts.length).toBe(FALLBACK_MAX_PARTS)
+    expect(parts[parts.length - 1]).toContain('…[обрезано]')
+  })
+
+  test('короткий ответ остаётся одной частью', async () => {
+    const { splitForTelegram } = await import('../../scripts/fallback-reply-hook.js')
+    expect(splitForTelegram('коротко и ясно')).toEqual(['коротко и ясно'])
+  })
+})
