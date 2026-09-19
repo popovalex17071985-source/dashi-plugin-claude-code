@@ -14,10 +14,14 @@ SRV_TZ="$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)"
 [[ "$OWNER_TZ" != "$SRV_TZ" ]] || exit 0        # один пояс -- расходиться нечему
 
 cmd=$(jq -r '.tool_input.command // ""')
-grep -qE "crontab|systemd-run|OnCalendar=|\bat\s+[0-9]{1,2}:" <<<"$cmd" || exit 0
+# Anchored to the start of a statement: otherwise the gate fires on its own
+# name inside a heredoc or a string literal and blocks editing this very file.
+grep -qE "(^|[;&|]|&&|\\|\\||\$\\()[[:space:]]*(crontab|systemd-run)|OnCalendar=|(^|[;&|])[[:space:]]*at[[:space:]]+[0-9]{1,2}:" <<<"$cmd" || exit 0
 # `crontab -l | ... | crontab -` -- это ЗАПИСЬ с чтением в одной строке.
 if ! grep -qE "\|\s*crontab\s+-\s*($|&&|;)|\|\s*crontab\s+-[^a-zA-Z]" <<<"$cmd"; then
-  grep -qE "crontab\s+-l|systemctl.*list-timers" <<<"$cmd" && exit 0
+  # `-u <user>` between command and flag: reading someone else's schedule is
+  # still a read, and the gate used to call it a write.
+  grep -qE "crontab\s+(-u\s+[^ ]+\s+)?-l|systemctl.*list-timers" <<<"$cmd" && exit 0
 fi
 grep -qE "$OWNER_TZ|--timezone|Timezone=" <<<"$cmd" && exit 0
 
