@@ -30,7 +30,7 @@ SETTINGS="${SETTINGS:-$CLAUDE_DIR/settings.json}"
 AGENT="${AGENT:-agent}"
 WORKSPACE="$(dirname "$CLAUDE_DIR")"
 
-mkdir -p "$CLAUDE_DIR"/{hooks,core,agents} "$WORKSPACE/bin" "$WORKSPACE/logs"
+mkdir -p "$CLAUDE_DIR"/{hooks,core,agents} "$WORKSPACE/bin" "$WORKSPACE/logs" "$WORKSPACE/data"
 
 # Placeholders are substituted on copy — the kit itself stays host-agnostic.
 # A file that already exists AND differs is copied to .kit-backup/<stamp>/<same
@@ -160,7 +160,7 @@ DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own
 # (что вышло нового + напоминание про /update), 20 самопроверка (хуки, крон,
 # канарейка, модель, память — шлёт ТОЛЬКО подозрения), 30 будильник по срокам
 # и отчёт о сервере (диск, память, сервисы, вход в Claude — шлётся всегда).
-CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py memory-index-trim.py)
+CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py memory-index-trim.py fallback-reply-sweeper.sh)
 CRON_LINES=(
   "0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
   "10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
@@ -176,6 +176,15 @@ CRON_LINES=(
   # Сторож провалов: след ошибки в логах -> задание агенту чинить самому, а не
   # счётчик «ошибок N» хозяину в чат. Интервал в минутах, пояс не при чём.
   "*/20 * * * * /usr/bin/python3 $WORKSPACE/bin/job-fail-watch.py >> $WORKSPACE/logs/job-fail-watch.log 2>&1"
+  # Догоняльщик ответов: Stop-хук читает финальный текст из транскрипта и на
+  # разросшемся файле не успевает к сбросу на диск -- ответ хозяину пропадает
+  # молча (gorbot 19.09.2026, три вопроса из группы). Повторный прогон того же
+  # хука досылает; дубль невозможен, у хука своя отметка. Минуты, пояс не при чём.
+  "*/2 * * * * /bin/bash $WORKSPACE/bin/fallback-reply-sweeper.sh $WORKSPACE $AGENT >> $WORKSPACE/logs/fallback-sweeper.log 2>&1"
+  # Канарейка крона: минутная задача трогает файл, самопроверка утром смотрит
+  # его свежесть. Без неё смерть расписания не видна ниоткуда (27.08.2026 -- 6
+  # часов простоя), а self-audit.py каждое утро кричит «КРОН НЕ РАБОТАЕТ».
+  "* * * * * /usr/bin/touch $WORKSPACE/data/cron-heartbeat"
 )
 if [[ -n "${KIT_NO_CRON:-}" ]]; then
   echo "  крон не трогаю (KIT_NO_CRON)"
