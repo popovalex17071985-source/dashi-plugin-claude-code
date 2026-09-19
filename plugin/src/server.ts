@@ -1182,6 +1182,13 @@ bot.on('callback_query:data', async ctx => {
         editReplyMarkup: async keyboard => {
           await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: keyboard } })
         },
+        editText: async (text, keyboard) => {
+          await ctx.editMessageText(text, {
+            parse_mode: 'HTML',
+            link_preview_options: { is_disabled: true },
+            reply_markup: { inline_keyboard: keyboard },
+          })
+        },
         answerCallbackQuery: async (text, showAlert) => {
           if (text) await ctx.answerCallbackQuery({ text, show_alert: showAlert ?? false })
           else await ctx.answerCallbackQuery()

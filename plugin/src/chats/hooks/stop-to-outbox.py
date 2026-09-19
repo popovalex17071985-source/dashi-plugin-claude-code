@@ -73,6 +73,14 @@ from typing import Any
 # the window and the walk could reach a previous turn's text; dedupe is the
 # secondary guard against re-delivering it (Codex review 2026-05-28 [high]).
 TAIL_BYTES = 1024 * 1024
+# Upper bound for the growing tail window. A single transcript line can exceed
+# TAIL_BYTES (a long tool result, a pasted dump), and a window that lands inside
+# such a line yields NO complete line at all — the hook then concludes "no text"
+# and the turn is silently dropped. Grow the window until a line boundary is in
+# view, capped here so a pathological transcript cannot exhaust memory.
+# Ported from fallback-reply-hook.ts (the DM path) after 19.09.2026, when three
+# group answers were lost against a 30 MB transcript.
+TAIL_BYTES_MAX = 32 * 1024 * 1024
 
 # Telegram chat ids are integers (groups are negative). CHAT_ID is used as a
 # filesystem path segment, so we reject anything else to block path-traversal
@@ -136,7 +144,51 @@ def _sanitize_tool_call_syntax(text: str) -> str | None:
     return out
 
 
-def read_last_assistant_text(transcript_path: Path) -> tuple[str, str | None] | None:
+def _tail_read_transcript(transcript_path: Path) -> str | None:
+    """Read the transcript tail, growing the window until a line boundary fits.
+
+    Reads the trailing ``TAIL_BYTES``; when the read did not start at byte 0 the
+    first line is possibly truncated and is dropped. If the window contains no
+    newline at all, the window sits inside ONE oversized line and dropping it
+    would leave nothing — so the window grows (x4 per round, up to
+    ``TAIL_BYTES_MAX``) instead of returning an empty string.
+
+    Args:
+        transcript_path: Absolute path to the session transcript ``.jsonl``.
+
+    Returns:
+        The tail text with the truncated leading line removed, or ``None`` when
+        the file is empty/unreadable.
+    """
+    want = TAIL_BYTES
+    while True:
+        try:
+            with transcript_path.open("rb") as fh:
+                fh.seek(0, os.SEEK_END)
+                size = fh.tell()
+                if size == 0:
+                    return None
+                length = min(size, want)
+                start = size - length
+                fh.seek(start, os.SEEK_SET)
+                buf = fh.read(length)
+        except OSError as exc:
+            logger.error("transcript read failed: %s", exc)
+            return None
+        # errors="replace" guarantees decode never raises.
+        text = buf.decode("utf-8", errors="replace")
+        if start == 0:
+            return text
+        head, sep, rest = text.partition("\n")
+        if sep:
+            return rest
+        if want >= TAIL_BYTES_MAX:
+            # Cap reached — hand back what we have rather than looping forever.
+            return text
+        want = min(want * 4, TAIL_BYTES_MAX)
+
+
+def read_last_assistant_text(transcript_path: Path) -> tuple[str, str | None, bool] | None:
     """Tail-read the latest assistant text from a Claude transcript JSONL.
 
     Based on ``readLastAssistantText`` (transcript-reader.ts): reads at most
@@ -153,32 +205,22 @@ def read_last_assistant_text(transcript_path: Path) -> tuple[str, str | None] | 
         transcript_path: Absolute path to the session transcript ``.jsonl``.
 
     Returns:
-        ``(text, uuid)`` for the most recent text-bearing assistant message of
-        the current turn — ``uuid`` is that transcript line's ``uuid`` field
-        or ``None`` if absent. Returns ``None`` if the file is
-        missing/empty/unreadable, or the current turn produced no assistant
-        text (pure tool-use turn).
+        ``(text, uuid, is_trailing)`` for the most recent text-bearing assistant
+        message of the current turn — ``uuid`` is that transcript line's
+        ``uuid`` field or ``None`` if absent, and ``is_trailing`` is False when
+        tool activity follows that text (i.e. it is a mid-turn interim, not the
+        final reply). Returns ``None`` if the file is missing/empty/unreadable,
+        or the current turn produced no assistant text (pure tool-use turn).
     """
-    try:
-        with transcript_path.open("rb") as fh:
-            fh.seek(0, os.SEEK_END)
-            size = fh.tell()
-            if size == 0:
-                return None
-            length = min(size, TAIL_BYTES)
-            start = size - length
-            fh.seek(start, os.SEEK_SET)
-            buf = fh.read(length)
-    except OSError as exc:
-        logger.error("transcript read failed: %s", exc)
+    tail = _tail_read_transcript(transcript_path)
+    if tail is None:
         return None
+    lines = [line for line in tail.split("\n") if line]
 
-    # errors="replace" guarantees decode never raises.
-    text = buf.decode("utf-8", errors="replace")
-
-    split = text.split("\n")
-    lines = (split[1:] if start > 0 else split)
-    lines = [line for line in lines if line]
+    # Walking backward, any tool activity met BEFORE the most recent text was
+    # emitted AFTER that text chronologically — so that text is a mid-turn
+    # interim, not the trailing final. Tracked only until the text is captured.
+    saw_tool_after = False
 
     for line in reversed(lines):
         try:
@@ -201,6 +243,9 @@ def read_last_assistant_text(transcript_path: Path) -> tuple[str, str | None] | 
             # output as a user-role message) — skip past it, do not stop.
             if _is_user_prompt(content):
                 return None
+            # tool_result echo — tool activity. Sitting after the most recent
+            # text makes that text a non-trailing interim.
+            saw_tool_after = True
             continue
 
         if role != "assistant":
@@ -217,9 +262,14 @@ def read_last_assistant_text(transcript_path: Path) -> tuple[str, str | None] | 
             # Tool-use-only assistant message — keep walking back within the
             # current turn to the text the turn already produced (the reply
             # must not be dropped just because the turn ended on a tool call).
+            saw_tool_after = True
             continue
         uuid = obj.get("uuid")
-        return "\n".join(parts), (uuid if isinstance(uuid, str) and uuid else None)
+        return (
+            "\n".join(parts),
+            (uuid if isinstance(uuid, str) and uuid else None),
+            not saw_tool_after,
+        )
     return None
 
 
@@ -339,11 +389,13 @@ _DEBUG_LOG_CAP_BYTES = 512 * 1024
 
 
 def _debug_log(hook_state_dir: Path, decision: str, **fields: Any) -> None:
-    """Append a one-line JSON diagnostic record — opt-in, fail-safe, capped.
+    """Append a one-line JSON diagnostic record — always-on, fail-safe, capped.
 
-    Enabled only when the ``STOP_OUTBOX_DEBUG`` environment variable is set, so
-    production sessions write nothing. Records every Stop invocation and its
-    decision (``fired`` / ``no_text`` / ``deduped`` / ``written`` / ``error``)
+    On by default since 19.09.2026: when group answers vanish, this journal is
+    the only evidence of what the hook decided, and an opt-in flag is never set
+    before the incident. Set ``STOP_OUTBOX_DEBUG=0`` to silence it. Records every
+    Stop invocation and its decision (``fired`` / ``no_text`` / ``interim_text``
+    / ``deduped`` / ``written`` / ``error``)
     to ``{hook_state_dir}/stop-outbox-debug.log``. This is the only way to tell,
     after the fact, whether Claude Code fired the Stop hook for a given turn —
     the symptom we cannot observe otherwise. Truncated when it exceeds
@@ -355,7 +407,7 @@ def _debug_log(hook_state_dir: Path, decision: str, **fields: Any) -> None:
         decision: Short decision tag for this invocation.
         **fields: Extra JSON-serialisable context (session_id, reason, ...).
     """
-    if not os.environ.get("STOP_OUTBOX_DEBUG"):
+    if os.environ.get("STOP_OUTBOX_DEBUG", "1") in {"0", "false", "no"}:
         return
     try:
         hook_state_dir.mkdir(parents=True, exist_ok=True)
@@ -408,7 +460,7 @@ def main() -> int:
     session_id = session_id_raw if isinstance(session_id_raw, str) else ""
 
     # Records that the Stop hook fired at all — the symptom we otherwise cannot
-    # observe (opt-in via STOP_OUTBOX_DEBUG; no-op in production).
+    # observe (always on; STOP_OUTBOX_DEBUG=0 silences it).
     _debug_log(hook_state_dir, "fired", session_id=session_id)
 
     # Bounded retry on empty extraction. 2026-05-29 (M5b): a reply produced
@@ -424,19 +476,50 @@ def main() -> int:
     # (~360ms with defaults) before exiting 0 — acceptable since the hot path
     # always ends on a reply. Knobs are upper-clamped so an oversized value
     # cannot hang the synchronous hook.
-    attempts = _env_int("STOP_OUTBOX_RETRY_ATTEMPTS", 4, minimum=1, maximum=50)
+    # 2026-09-19: same budget and same stop condition as the DM path
+    # (fallback-reply-hook.ts). Breaking on the FIRST non-empty read loses the
+    # real final answer when a turn emits an interim line, then tool calls, then
+    # the final text: the hook grabs the stale interim, writes dedupe state, and
+    # the final — landing a beat later — never gets a second Stop. So re-read
+    # until the text STABILISES (identical across two reads) AND is TRAILING (no
+    # tool cycle after it). Attempts default to 8 (was 4), matching the DM path.
+    attempts = _env_int("STOP_OUTBOX_RETRY_ATTEMPTS", 8, minimum=1, maximum=50)
     delay_s = _env_int("STOP_OUTBOX_RETRY_DELAY_MS", 120, minimum=0, maximum=2000) / 1000.0
+    # Hard ceiling on CUMULATIVE sleep regardless of the attempts x delay
+    # product (up to 50 x 2000 = 100 s otherwise). Once exhausted we stop
+    # sleeping but still run the remaining reads back-to-back, so a late
+    # transcript is picked up without hanging the synchronous Stop hook.
+    sleep_budget_s = 6.0
+    slept_s = 0.0
     extracted = None
+    prev_text: str | None = None
     for attempt in range(attempts):
-        extracted = read_last_assistant_text(Path(transcript_path_raw))
-        if extracted is not None:
-            break
-        if attempt < attempts - 1:
+        candidate = read_last_assistant_text(Path(transcript_path_raw))
+        if candidate is not None:
+            current = candidate[0].strip()
+            if current:
+                # Freshest non-empty read wins if the budget runs out before the
+                # text settles — never worse than the old first-read behaviour.
+                extracted = candidate
+                if current == prev_text and candidate[2]:
+                    break
+                prev_text = current
+        if attempt < attempts - 1 and delay_s > 0 and slept_s < sleep_budget_s:
             time.sleep(delay_s)
+            slept_s += delay_s
     if extracted is None:
         _debug_log(hook_state_dir, "no_text", session_id=session_id, reason="tool_only_turn")
         return 0
-    assistant_text, assistant_uuid = extracted
+    assistant_text, assistant_uuid, text_is_trailing = extracted
+    if not text_is_trailing:
+        # Budget exhausted on a non-trailing interim: deliver it (silence is the
+        # worse failure) but leave the reason in the journal.
+        _debug_log(
+            hook_state_dir,
+            "interim_text",
+            session_id=session_id,
+            reason="text_not_trailing_after_retries",
+        )
 
     # Attachment markers. A multichat session has no reply tool, so it signals
     # files with `[[file: /abs/path]]` in its reply text. Extract the paths and

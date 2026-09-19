@@ -30,7 +30,7 @@ SETTINGS="${SETTINGS:-$CLAUDE_DIR/settings.json}"
 AGENT="${AGENT:-agent}"
 WORKSPACE="$(dirname "$CLAUDE_DIR")"
 
-mkdir -p "$CLAUDE_DIR"/{hooks,core,agents} "$WORKSPACE/bin" "$WORKSPACE/logs"
+mkdir -p "$CLAUDE_DIR"/{hooks,core,agents} "$WORKSPACE/bin" "$WORKSPACE/logs" "$WORKSPACE/data"
 
 # Placeholders are substituted on copy — the kit itself stays host-agnostic.
 # A file that already exists AND differs is copied to .kit-backup/<stamp>/<same
@@ -102,10 +102,19 @@ WIRING = [
     ("PreToolUse",  "mcp__dashi-channel__reply", "owner-time-guard.sh",  5),
     ("SessionStart", "",                   "session-start-hint.sh",     5),
     ("PreCompact",  "",                     "precompact-save.sh",       10),
+    # Слив в долгую память: без него сервер OpenViking стоит, а писать в него нечем.
+    ("PreCompact",  "",                     "flush-to-openviking.sh",   90),
     ("UserPromptSubmit", "",                "echo-last-turn-cost.sh",    5),
     ("UserPromptSubmit", "",                "owner-clock.sh",            5),
     ("UserPromptSubmit", "",                "register-mirror.sh",        5),
     ("UserPromptSubmit", "",                "rule-inject.sh",            5),
+    # Долгая память в обе стороны: подсказка прошлых ходов на входе и
+    # запись эпизода на выходе. Без них сервер памяти стоит вхолостую.
+    ("UserPromptSubmit", "",                "ov-recall.py",              8),
+    ("Stop",        "",                     "ov-digest-capture.py",     10),
+    # Конец хода оставляет состояние на диске: что правил, что закоммитил,
+    # что назвал следующим шагом. Иначе обрыв сессии уносит это с собой.
+    ("Stop",        "",                     "session-state.py",         15),
     ("Stop",        "",                     "usage-logger.py",          10),
     ("Stop",        "",                     "stop-check-syntax.sh",     10),
     ("UserPromptSubmit", "",                "correction-detector.sh",    5),
@@ -115,6 +124,7 @@ WIRING = [
     ("Stop",        "",                     "stop-register-gate.py",    10),
     ("Stop",        "",                     "stop-closeout-gate.py",    10),
     ("Stop",        "",                     "stop-blocker-gate.py",     10),
+    ("Stop",        "",                     "promise-alarm.py",         25),
 ]
 
 added = 0
@@ -160,19 +170,41 @@ DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own
 # (что вышло нового + напоминание про /update), 20 самопроверка (хуки, крон,
 # канарейка, модель, память — шлёт ТОЛЬКО подозрения), 30 будильник по срокам
 # и отчёт о сервере (диск, память, сервисы, вход в Claude — шлётся всегда).
-CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py)
+CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py memory-index-trim.py fallback-reply-sweeper.sh claude-link-guard.sh auth-alive-watch.sh multichat-nudge.sh dead-letter-digest.py)
 CRON_LINES=(
   "0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
   "10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
   "20 $DIG_H * * * /bin/bash $WORKSPACE/bin/self-audit-morning.sh >> $WORKSPACE/logs/self-audit.log 2>&1"
   "30 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/promise-sweeper.py >> $WORKSPACE/logs/promise-sweeper.log 2>&1"
   "30 $DIG_H * * * /bin/bash $WORKSPACE/bin/health-daily.sh >> $WORKSPACE/logs/health-daily.log 2>&1"
+  "40 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/dead-letter-digest.py >> $WORKSPACE/logs/dead-letter.log 2>&1"
+  # Индекс памяти грузится в каждую сессию целиком: перерос лимит -- молча
+  # обрезается, и агент теряет часть памяти. Раз в сутки ужимаем сами.
+  "40 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/memory-index-trim.py --apply >> $WORKSPACE/logs/memory-trim.log 2>&1"
   # Сторож фоновых задач: старт без финиша + мёртвый процесс = сообщение хозяину.
   # Интервал в минутах, от часового пояса не зависит.
   "*/2 * * * * /usr/bin/python3 $WORKSPACE/bin/job-watch.py >> $WORKSPACE/logs/job-watch.log 2>&1"
   # Сторож провалов: след ошибки в логах -> задание агенту чинить самому, а не
   # счётчик «ошибок N» хозяину в чат. Интервал в минутах, пояс не при чём.
   "*/20 * * * * /usr/bin/python3 $WORKSPACE/bin/job-fail-watch.py >> $WORKSPACE/logs/job-fail-watch.log 2>&1"
+  # Догоняльщик ответов: Stop-хук читает финальный текст из транскрипта и на
+  # разросшемся файле не успевает к сбросу на диск -- ответ хозяину пропадает
+  # молча (gorbot 19.09.2026, три вопроса из группы). Повторный прогон того же
+  # хука досылает; дубль невозможен, у хука своя отметка. Минуты, пояс не при чём.
+  "*/2 * * * * /bin/bash $WORKSPACE/bin/fallback-reply-sweeper.sh $WORKSPACE $AGENT >> $WORKSPACE/logs/fallback-sweeper.log 2>&1"
+  # Канарейка крона: минутная задача трогает файл, самопроверка утром смотрит
+  # его свежесть. Без неё смерть расписания не видна ниоткуда (27.08.2026 -- 6
+  # часов простоя), а self-audit.py каждое утро кричит «КРОН НЕ РАБОТАЕТ».
+  "* * * * * /usr/bin/touch $WORKSPACE/data/cron-heartbeat"
+  # Ярлык claude после автообновления замыкался сам на себя, и ВСЕ фоновые
+  # задачи молча падали (координатор, 29.08.2026). Сторож чинит, а не жалуется.
+  "*/15 * * * * /bin/bash $WORKSPACE/bin/claude-link-guard.sh $WORKSPACE >> $WORKSPACE/logs/claude-link-guard.log 2>&1"
+  # Вход протухает по жёсткому сроку и ничем не продлевается: агент просто
+  # замолкает, и хозяин узнаёт это из тишины. Пробный запрос раз в 6 часов.
+  "7 */6 * * * /bin/bash $WORKSPACE/bin/auth-alive-watch.sh $WORKSPACE >> $WORKSPACE/logs/auth-alive-watch.log 2>&1"
+  # Вопрос из группы лежит в inbox и ждёт, пока сессия освободится: у
+  # координатора такой провисел полтора часа (29.08.2026). Толкаем сессию.
+  "*/2 * * * * /bin/bash $WORKSPACE/bin/multichat-nudge.sh $WORKSPACE >> $WORKSPACE/logs/multichat-nudge.log 2>&1"
 )
 if [[ -n "${KIT_NO_CRON:-}" ]]; then
   echo "  крон не трогаю (KIT_NO_CRON)"
@@ -193,6 +225,16 @@ else
       && echo "  утренние задачи (сводка, советник, самопроверка, будильник, отчёт о сервере) $verb 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
       || echo "  ! не смог прописать крон — поставь руками"
   fi
+fi
+
+# Долгая память (OpenViking). Ставим сразу, с заделом на будущее: денег не
+# стоит -- эмбеддинги локальные, пересказы на ключе, который уже лежит на этой
+# машине. Не хватает железа или нет docker -- скрипт сам пропускает шаг, а
+# агент попросит ключ у хозяина, когда память наберёт вес (bin/memory-key-ask.py).
+# KIT_NO_MEMORY=1 -- раскладка без долгой памяти (песочница, слабый VPS).
+if [ "${KIT_NO_MEMORY:-0}" != "1" ] && [ -x "$KIT/scripts/setup-memory.sh" ]; then
+  "$KIT/scripts/setup-memory.sh" --workspace "$WORKSPACE" --agent "$AGENT" \
+    || echo "  ! долгая память не встала -- смотри вывод выше"
 fi
 
 echo "  комплект разложен в $CLAUDE_DIR"

@@ -49,6 +49,12 @@ Mechanism: `hooks/stop-blocker-gate.py`.
 - **Delegated outward → set your own alarm in the SAME turn.** External executors
   do not wake me when they finish; without a waiter the work sits done and the
   operator only learns of it when they ping.
+- **A flaw you found is fixed in the SAME turn -- no «noted for later».**
+  Work of your own that you can finish now is never parked in the ledger:
+  the owner does not read it, and the next turn moves to another topic, so a
+  report ending in «later» describes a task that will not happen. Found five
+  flaws while doing one job -- fix five, then report once. The ledger is for
+  what needs the OWNER's decision, someone else's access or money.
 - **Long runs go through `bin/bg.sh`, never a hand-rolled waiter.** `until pgrep -f
   x; sleep; done` matches its own command line and hangs forever — silently.
 
@@ -114,3 +120,47 @@ registries, checks the text being written, not the legacy file.
   model — don't burn the top model on grunt work.
 
 Agents: `agents/proxy-skeptic.md`, `agents/reviewer.md`, `agents/parser.md`.
+
+## Scheduled work: script + report, never typed into my session
+
+A scheduled job runs as a SCRIPT and sends me the finished result (`bin/tg-send.py`,
+`bin/run-and-report.sh`). Typing a job into my own pane makes it look like a human
+wrote it: it merges with a real message into one turn, the turn loses the chat it
+came from, and the human's answer is composed and then dropped (gorbot, 19.09.2026
+-- three questions from a group answered into the void).
+
+A job that genuinely needs ME to act (an alarm, a failed job to fix) goes through
+`bin/pane-send-when-idle.sh`, which waits until the turn in flight has ended.
+Never `pane-send.sh` directly from a schedule.
+
+## The owner's accounting system is READ-ONLY until he says otherwise
+
+Reads are free. A WRITE (POST/PATCH/PUT to 1C, CRM, marketplace, anything that
+holds the owner's records) happens only when the owner said so IN THAT TURN, in
+words that name the write. «Can you create it?» / «check whether you have rights»
+is a QUESTION -- answer it by reading, at most by describing the record shape.
+Never prove a capability by writing a pilot batch: that cost the coordinator 35
+warehouses, 15 tills and 20 item cards on 16.09.2026, and the reply was «don't
+pour anything in». Most such systems forbid DELETE for an API user, so every
+write I make is irreversible on my side and becomes manual cleanup for the owner.
+
+## Durations: measured or nothing
+
+Never state how long something will take from the head -- every such figure so
+far was wrong. Allowed: a number from `bin/timing.py eta <job>` (median of real
+runs), live progress from a log, or «нет замеров, скажу по факту» followed by
+actually reporting. Wrap long jobs in `bin/timing.py start/end` so the NEXT
+estimate is measured.
+
+## Restarting my own channel is the LAST action of a turn
+
+The bridge restart kills the session mid-turn, and a composed answer dies with
+it. Send the result first, plus one line that the link will blink, and only then
+restart. Same for anything that reloads my own runtime.
+
+## One turn = one reply + a short terminal echo
+
+Never end a turn with only a `reply` call and nothing in the terminal: the
+harness re-invokes and the Stop fallback forwards the text again, so the owner
+reads the same answer twice. And never end a turn that owes the owner an answer
+with terminal text only -- he does not read the terminal.

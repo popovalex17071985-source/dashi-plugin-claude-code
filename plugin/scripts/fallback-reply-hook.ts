@@ -57,7 +57,18 @@
 //   FALLBACK_REPLY_RETRY_ATTEMPTS  bounded retry on empty extraction (default 4)
 //   FALLBACK_REPLY_RETRY_DELAY_MS  delay between retries (default 120ms)
 
-import { readFileSync, writeFileSync, mkdirSync, openSync, readSync, fstatSync, closeSync } from 'fs'
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  openSync,
+  readSync,
+  fstatSync,
+  closeSync,
+  readdirSync,
+  renameSync,
+  unlinkSync,
+} from 'fs'
 import { createHash } from 'crypto'
 import { dirname, join } from 'path'
 
@@ -76,6 +87,9 @@ import {
 // before the client saw the error) and KEEPS the old suppression to avoid a
 // duplicate delivery. Imported from the guard so the two stay in lockstep.
 import { ASK_GUARD_BLOCK_MARKER } from '../src/safety/ask-guard.js'
+// Same chunker the MCP reply tool uses, so a long fallback answer is split on
+// paragraph/tag boundaries instead of being guillotined at 4096.
+import { splitMessage } from '../src/format/chunk.js'
 
 // Re-export the borrowed helpers under this module too, so tests importing
 // from this hook get a single surface. (parseEnvFile is used transitively by
@@ -88,6 +102,11 @@ export { loadChannelEnvFile, parseEnvFile }
 // single turn exceeds this, the boundary can fall outside and the walk could
 // reach a previous turn's text; dedup is the secondary guard.
 const TAIL_BYTES = 1024 * 1024
+// A single JSONL line can be larger than the tail window (one fat tool result on
+// a 30 MB transcript). The window then holds no newline at all, the old code
+// returned an empty string and the hook went silent -- the answer was in the file
+// the whole time. So we grow the window until a line boundary appears.
+const TAIL_BYTES_MAX = 32 * 1024 * 1024
 
 // The two MCP tools that deliver a reply to the warchief's Telegram. If either
 // was called this turn, the warchief already saw the answer → no fallback.
@@ -113,6 +132,31 @@ export function truncateForTelegram(text: string): string {
   if (text.length <= TELEGRAM_TEXT_MAX) return text
   const room = TELEGRAM_TEXT_MAX - TRUNCATION_MARKER.length
   return text.slice(0, room) + TRUNCATION_MARKER
+}
+
+/**
+ * FIX 8 (правка 5, 19.09.2026): split a long answer instead of truncating it.
+ *
+ * Truncation was the minimum viable fix — it always delivered SOMETHING, but the
+ * tail (which in a report is where the numbers and the next step live) was
+ * simply thrown away. The route's bare sendMessage does not chunk, so we chunk
+ * here with the same splitter the MCP reply tool uses: cuts land on paragraph
+ * boundaries and balanced tags are reopened, so each part renders on its own.
+ *
+ * Bounded by MAX_PARTS: an absurdly long text still ends with a truncation
+ * marker rather than spamming the chat with dozens of messages.
+ */
+export const FALLBACK_CHUNK_MAX = 4000
+export const FALLBACK_MAX_PARTS = 6
+
+export function splitForTelegram(text: string): string[] {
+  const parts = splitMessage(text, FALLBACK_CHUNK_MAX)
+  if (parts.length <= FALLBACK_MAX_PARTS) return parts
+  const kept = parts.slice(0, FALLBACK_MAX_PARTS)
+  const last = kept[FALLBACK_MAX_PARTS - 1] as string
+  const room = Math.max(0, FALLBACK_CHUNK_MAX - TRUNCATION_MARKER.length)
+  kept[FALLBACK_MAX_PARTS - 1] = last.slice(0, room) + TRUNCATION_MARKER
+  return kept
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -459,21 +503,29 @@ export function analyzeCurrentTurn(transcript: string): TurnResult {
 
 export function tailReadTranscript(
   path: string,
-  read: (p: string) => { text: string; truncated: boolean } = readTailDefault,
+  read: (p: string, bytes?: number) => { text: string; truncated: boolean } = readTailDefault,
 ): string {
-  const { text, truncated } = read(path)
-  if (!truncated) return text
-  const nl = text.indexOf('\n')
-  return nl >= 0 ? text.slice(nl + 1) : ''
+  let bytes = TAIL_BYTES
+  for (;;) {
+    const { text, truncated } = read(path, bytes)
+    if (!truncated) return text
+    const nl = text.indexOf('\n')
+    if (nl >= 0) return text.slice(nl + 1)
+    // No line boundary in the window: the last line alone is bigger than it.
+    // Grow and retry; give up only at TAIL_BYTES_MAX and hand back what we have
+    // rather than an empty string, so a caller still sees the tail.
+    if (bytes >= TAIL_BYTES_MAX) return text
+    bytes = Math.min(bytes * 4, TAIL_BYTES_MAX)
+  }
 }
 
-function readTailDefault(path: string): { text: string; truncated: boolean } {
+function readTailDefault(path: string, bytes: number = TAIL_BYTES): { text: string; truncated: boolean } {
   let fd = -1
   try {
     fd = openSync(path, 'r')
     const size = fstatSync(fd).size
     if (size === 0) return { text: '', truncated: false }
-    const length = Math.min(size, TAIL_BYTES)
+    const length = Math.min(size, bytes)
     const start = size - length
     const buf = Buffer.alloc(length)
     readSync(fd, buf, 0, length, start)
@@ -909,9 +961,198 @@ async function main(): Promise<void> {
 
   // FIX 5: truncate-with-marker so a >4096-char answer delivers SOMETHING
   // rather than 400-dropping at the route's schema cap.
-  const outText = truncateForTelegram(text)
-  const ok = await postFallback(config as FallbackConfig, chatId, outText)
+  const parts = splitForTelegram(text)
+  const send = (toChat: string, body: string): Promise<boolean> =>
+    postFallback(config as FallbackConfig, toChat, body)
+  // Deliver every part in order. On the first failure, park the REMAINDER (the
+  // part that failed plus everything after it) so a retry resumes where the send
+  // stopped instead of re-sending what already landed.
+  let ok = true
+  let outText = parts[0] ?? ''
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i] as string
+    if (await send(chatId, part)) continue
+    ok = false
+    outText = parts.slice(i).join('\n')
+    break
+  }
   if (ok && statePath) persistDedupState(statePath, next)
+  const undeliveredDir = resolveUndeliveredDir(env, statePath)
+  if (!ok && undeliveredDir) {
+    // FIX 7: a Stop fires once per turn, so "skip dedup and hope for a retry"
+    // lost the answer outright. Park it; the next run drains it.
+    parkUndelivered(undeliveredDir, {
+      chat_id: chatId,
+      text: outText,
+      session_id: sessionId,
+      transcript_path: transcriptPath,
+      dedupe_token: token,
+      state_path: statePath,
+      first_failed_at: new Date().toISOString(),
+      attempts: 1,
+    })
+    warn('send unconfirmed — answer parked for retry')
+  }
+  if (ok && undeliveredDir) {
+    // Drain AFTER the fresh answer so the current turn is never delayed behind
+    // a backlog, and ONLY when this turn's own send succeeded — the route is
+    // clearly down otherwise, and re-hitting it (including the record just
+    // parked) would double the load for nothing. Writing dedup state on success
+    // keeps a parked answer from being sent twice.
+    await retryUndelivered(undeliveredDir, send, (record) => {
+      if (record.state_path && record.dedupe_token) {
+        persistDedupState(record.state_path, {
+          session_id: record.session_id ?? '',
+          transcript_path: record.transcript_path ?? '',
+          dedupe_token: record.dedupe_token,
+        })
+      }
+    })
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// FIX 7 (2026-09-19): an undelivered answer must be quarantined and retried,
+// never dropped. Until today a failed send only skipped the dedup write and
+// hoped a LATER Stop fire for the same turn would retry — but a turn fires Stop
+// once, so a transient Telegram/route failure meant the answer was gone with no
+// trace. Now the payload is parked as a file and every subsequent hook run (a
+// later turn, or the 2-minute sweeper) drains the quarantine first.
+// ─────────────────────────────────────────────────────────────────────
+
+const UNDELIVERED_MAX_ATTEMPTS = 10
+const UNDELIVERED_MAX_AGE_MS = 24 * 60 * 60 * 1000
+/** Per-run drain cap: a Stop hook must not linger behind a long backlog. */
+const UNDELIVERED_DRAIN_PER_RUN = 5
+
+export interface UndeliveredRecord {
+  readonly chat_id: string
+  readonly text: string
+  readonly session_id?: string
+  readonly transcript_path?: string
+  readonly dedupe_token?: string
+  readonly state_path?: string | undefined
+  readonly first_failed_at: string
+  readonly attempts: number
+}
+
+/**
+ * Quarantine directory for answers whose send did not confirm. It sits NEXT TO
+ * the dedup state file, so an explicit TELEGRAM_FALLBACK_REPLY_STATE (tests, a
+ * pinned state path) keeps its quarantine in the same place and never writes
+ * into the shared runtime dir.
+ */
+export function resolveUndeliveredDir(
+  env: Readonly<Record<string, string | undefined>>,
+  statePath?: string,
+): string | undefined {
+  if (statePath) return join(dirname(statePath), 'undelivered')
+  const base = env.TELEGRAM_STATE_DIR ?? env.MULTICHAT_STATE_DIR
+  if (!base) return undefined
+  return join(base, 'fallback-reply', 'undelivered')
+}
+
+/**
+ * Park an unconfirmed answer in the quarantine. Best-effort: a failure here is
+ * logged and swallowed — parking must never throw out of the Stop hook.
+ */
+export function parkUndelivered(dir: string, record: UndeliveredRecord): string | undefined {
+  try {
+    mkdirSync(dir, { recursive: true })
+    const name = `${Date.now()}-${Math.random().toString(16).slice(2, 6)}.json`
+    const path = join(dir, name)
+    writeFileSync(path, JSON.stringify(record), 'utf8')
+    return path
+  } catch (err) {
+    warn(`park failed: ${err instanceof Error ? err.message : 'unknown'}`)
+    return undefined
+  }
+}
+
+/**
+ * Drain the quarantine: oldest first, at most UNDELIVERED_DRAIN_PER_RUN per run.
+ *
+ * A delivered record is unlinked and its dedup state written through
+ * `onDelivered`, so the same answer can never be sent twice (once from the
+ * quarantine, once from a later transcript read). A record that fails again has
+ * its attempt counter bumped; one that is too old or has burnt its attempts is
+ * renamed to `*.failed` so it stops consuming the budget but stays readable.
+ *
+ * Returns how many records were actually delivered.
+ */
+export async function retryUndelivered(
+  dir: string,
+  send: (chatId: string, text: string) => Promise<boolean>,
+  onDelivered?: (record: UndeliveredRecord) => void,
+  now: number = Date.now(),
+): Promise<number> {
+  let names: string[]
+  try {
+    names = readdirSync(dir)
+      .filter((n) => n.endsWith('.json'))
+      .sort()
+  } catch {
+    return 0 // No quarantine dir — nothing to drain.
+  }
+  let delivered = 0
+  for (const name of names.slice(0, UNDELIVERED_DRAIN_PER_RUN)) {
+    const path = join(dir, name)
+    let record: UndeliveredRecord
+    try {
+      const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'))
+      if (parsed === null || typeof parsed !== 'object') throw new Error('not an object')
+      record = parsed as UndeliveredRecord
+      if (typeof record.chat_id !== 'string' || typeof record.text !== 'string') {
+        throw new Error('missing chat_id/text')
+      }
+    } catch {
+      // Unreadable/corrupt payload: retiring it keeps the queue moving.
+      try {
+        renameSync(path, `${path}.failed`)
+      } catch {
+        /* ignore */
+      }
+      continue
+    }
+    const firstFailedMs = Date.parse(record.first_failed_at ?? '')
+    const tooOld = Number.isFinite(firstFailedMs) && now - firstFailedMs > UNDELIVERED_MAX_AGE_MS
+    const attempts = typeof record.attempts === 'number' ? record.attempts : 0
+    if (tooOld || attempts >= UNDELIVERED_MAX_ATTEMPTS) {
+      warn(`undelivered retired after ${attempts} attempts`)
+      try {
+        renameSync(path, `${path}.failed`)
+      } catch {
+        /* ignore */
+      }
+      continue
+    }
+    let ok = false
+    try {
+      ok = await send(record.chat_id, record.text)
+    } catch {
+      ok = false
+    }
+    if (ok) {
+      delivered += 1
+      try {
+        onDelivered?.(record)
+      } catch {
+        /* dedup bookkeeping must not undo a successful send */
+      }
+      try {
+        unlinkSync(path)
+      } catch {
+        /* ignore */
+      }
+      continue
+    }
+    try {
+      writeFileSync(path, JSON.stringify({ ...record, attempts: attempts + 1 }), 'utf8')
+    } catch {
+      /* ignore */
+    }
+  }
+  return delivered
 }
 
 const isMainModule = (() => {

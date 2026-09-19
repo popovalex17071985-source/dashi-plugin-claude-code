@@ -374,10 +374,13 @@ def main() -> int:
             for r in rows:
                 v = str(r.get("verdict", ""))
                 name = pathlib.Path(str(r.get("hook") or r.get("job") or r.get("ref") or "?")).name
-                if v.startswith("ок") or v in ("?", "жив, но без самопроверки",
-                                               "нет лога — проверить вручную",
-                                               "ЛОГА НЕТ (не запускался?)"):
-                    continue  # ponytail: no-log jobs are a known-noise class, kept in --json
+                if v in ("нет лога — проверить вручную", "ЛОГА НЕТ (не запускался?)"):
+                    # 19.09.2026: именно через этот класс прошёл слив памяти --
+                    # задача не запускалась ни разу, и отчёт об этом молчал.
+                    probs.append(f"{name}: НИ РАЗУ НЕ ЗАПУСКАЛСЯ (лога нет)")
+                    continue
+                if v.startswith("ок") or v in ("?", "жив, но без самопроверки"):
+                    continue
                 if v.startswith("МОЛЧИТ"):
                     days = v.split()[1]
                     per = r.get("period_h") or 0

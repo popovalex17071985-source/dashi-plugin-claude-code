@@ -28,7 +28,7 @@ import time
 
 ROOT = pathlib.Path("__WORKSPACE__")
 STATE = ROOT / "state/job-fail-watch.json"
-PANE = ROOT / "bin/pane-send.sh"
+PANE = ROOT / "bin/pane-send-when-idle.sh"
 TAIL_LINES = 300
 FRESH_SEC = 3 * 3600      # лог не менялся 3 часа -- прогон давно прошёл, не дёргаем
 

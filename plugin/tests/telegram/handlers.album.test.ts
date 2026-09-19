@@ -134,6 +134,8 @@ function makeStatePaths(): StatePaths {
       ask_user_question: join(root, 'logs', 'ask-user-question.jsonl'),
       permission_gate: join(root, 'logs', 'permission-gate.jsonl'),
       rejected_inbound: join(root, 'logs', 'rejected-inbound.jsonl'),
+      accepted_inbound: join(root, 'logs', 'accepted-inbound.jsonl'),
+      sent_outbound: join(root, 'logs', 'sent-outbound.jsonl'),
     },
   }
 }
@@ -518,9 +520,13 @@ describe('Album fragment persistence (Bug #2)', () => {
     // into dead-letter — not leave it lingering, not silently drop.
     await clock.tick(60)
     // Drain the void-async cleanup chain: sendAlbumNotification ->
-    // moveToAlbumDeadLetter both await fs ops. Multiple yields cover
-    // the worst case (4 awaits deep on a slow CI box).
-    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 5))
+    // moveToAlbumDeadLetter both await fs ops. Since правка 6 the notify path
+    // also retries the transport twice (250 + 500 ms), so poll for the move
+    // instead of a fixed handful of yields.
+    for (let i = 0; i < 200; i++) {
+      if (!existsSync(join(statePaths.root, 'albums', key))) break
+      await new Promise((r) => setTimeout(r, 10))
+    }
 
     expect(existsSync(join(statePaths.root, 'albums', key))).toBe(false)
     const dl = readdirSync(join(statePaths.root, 'albums', 'dead-letter'))

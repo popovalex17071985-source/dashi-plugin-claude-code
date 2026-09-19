@@ -8,6 +8,8 @@
 //   mqz:done:<cls>:<dedupe>            marquiz lead (розыгрыш / выкуп б/у)
 //   ord:done:<cls>:<order_number>      InSales order (site)
 //   ord:done:mail:<cls>:<uid>          InSales order (mail)
+//   lead:touch:<how>:<number>          «Покупай с выгодой» lead — contact made
+//   lead:done:<cls>:<number>           «Покупай с выгодой» lead — outcome
 //   *:locked                           already-handled button — just ack
 //
 // Division of labour: this module owns the Telegram I/O (collapse the keyboard
@@ -21,7 +23,7 @@ const execFileAsync = promisify(execFile)
 
 /** True for any callback this module is responsible for. */
 export function isActionCallback(data: string): boolean {
-  return data.startsWith('mqz:') || data.startsWith('ord:')
+  return data.startsWith('mqz:') || data.startsWith('ord:') || data.startsWith('lead:')
 }
 
 export interface InlineButton {
@@ -42,6 +44,8 @@ export interface ActionCallbackContext {
   }
   /** Replace the message's inline keyboard with a single locked button. */
   editReplyMarkup: (keyboard: InlineButton[][]) => Promise<void>
+  /** Rewrite the card text (HTML) together with its keyboard. */
+  editText?: (text: string, keyboard: InlineButton[][]) => Promise<void>
   /** Clear the Telegram spinner (optionally with a toast / alert). */
   answerCallbackQuery: (text?: string, showAlert?: boolean) => Promise<void>
 }
@@ -61,6 +65,9 @@ interface CliResult {
   cls: string
   mins: number | null
   ok: boolean
+  /** Lead cards redraw the whole card instead of just collapsing the row. */
+  text?: string
+  keyboard?: InlineButton[][]
 }
 
 /**
@@ -75,13 +82,16 @@ export async function handleActionCallback(
   const { data } = ctx
 
   // Already-handled card: the locked button is non-functional, just ack.
-  if (data === 'mqz:locked' || data === 'ord:locked') {
+  if (data === 'mqz:locked' || data === 'ord:locked' || data === 'lead:locked') {
     await ctx.answerCallbackQuery()
     return
   }
 
-  const root = data.startsWith('mqz:') ? 'mqz' : 'ord'
-  if (!data.startsWith(`${root}:done:`)) {
+  const root = data.startsWith('mqz:') ? 'mqz' : data.startsWith('lead:') ? 'lead' : 'ord'
+  const known = root === 'lead'
+    ? data.startsWith('lead:done:') || data.startsWith('lead:touch:')
+    : data.startsWith(`${root}:done:`)
+  if (!known) {
     // Unknown variant under our prefix — clear the spinner, do nothing.
     await ctx.answerCallbackQuery()
     return
@@ -109,7 +119,11 @@ export async function handleActionCallback(
     const res = JSON.parse(stdout.trim()) as CliResult
     if (!res.ok || !res.label) throw new Error('CLI returned not-ok')
 
-    await ctx.editReplyMarkup([[{ text: res.label, callback_data: res.locked_data }]])
+    if (res.text !== undefined && ctx.editText) {
+      await ctx.editText(res.text, res.keyboard ?? [])
+    } else {
+      await ctx.editReplyMarkup([[{ text: res.label, callback_data: res.locked_data }]])
+    }
     await ctx.answerCallbackQuery('Готово')
     opts.log.info('action-buttons handled', { root, cls: res.cls, mins: res.mins })
   } catch (err) {

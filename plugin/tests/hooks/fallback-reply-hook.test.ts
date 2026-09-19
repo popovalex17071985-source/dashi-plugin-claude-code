@@ -7,7 +7,7 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 import { createServer, type Server } from 'http'
 import { spawn } from 'child_process'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs'
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 
@@ -622,6 +622,12 @@ describe('hook E2E dedup persistence (FIX 1)', () => {
         persisted = false
       }
       expect(persisted).toBe(false)
+      // …and the answer is parked for retry instead of vanishing (правка 3).
+      const parked = readdirSync(join(dir, 'undelivered')).filter((f) => f.endsWith('.json'))
+      expect(parked.length).toBe(1)
+      const rec = JSON.parse(readFileSync(join(dir, 'undelivered', parked[0] as string), 'utf8'))
+      expect(rec.text).toBe('final answer')
+      expect(rec.chat_id).toBe('164795011')
     } finally {
       await route.close()
     }
@@ -793,5 +799,149 @@ describe('persistLastChat (group chats never become the fallback anchor)', () =>
     expect(readLastChat(path)).toBe('140141496')
 
     rmSync(dir, { recursive: true, force: true })
+  })
+})
+
+// 19.09.2026: on a 30 MB transcript one JSONL line can exceed the tail window.
+// The window then holds no newline, and the old reader returned '' -- the hook
+// saw an empty transcript and dropped the answer. It must grow the window instead.
+describe('tailReadTranscript: строка больше окна', () => {
+  test('расширяет окно, пока не найдёт границу строки', async () => {
+    const { tailReadTranscript } = await import('../../scripts/fallback-reply-hook.js')
+    const calls: number[] = []
+    const fat = 'x'.repeat(50)
+    const fake = (_p: string, bytes: number = 1024 * 1024) => {
+      calls.push(bytes)
+      // A newline appears only once the caller asks for a wider window.
+      if (bytes < 4 * 1024 * 1024) return { text: fat, truncated: true }
+      return { text: `${fat}\nfinal-line`, truncated: true }
+    }
+    const out = tailReadTranscript('/nonexistent', fake)
+    expect(out).toBe('final-line')
+    expect(calls.length).toBeGreaterThan(1)
+    expect(calls[1]).toBeGreaterThan(calls[0]!)
+  })
+
+  test('не возвращает пустоту, когда границы нет совсем', async () => {
+    const { tailReadTranscript } = await import('../../scripts/fallback-reply-hook.js')
+    const fake = () => ({ text: 'no-newline-anywhere', truncated: true })
+    expect(tailReadTranscript('/nonexistent', fake)).toBe('no-newline-anywhere')
+  })
+})
+
+describe('карантин недоставленных ответов (правка 3)', () => {
+  // 19.09.2026: отправка не подтвердилась -> хук просто не писал дедуп и
+  // надеялся на повторный Stop. Stop за ход срабатывает ОДИН раз, поэтому
+  // ответ терялся молча. Теперь он парkуется файлом и досылается.
+  let dir: string
+
+  afterEach(() => {
+    if (dir) rmSync(dir, { recursive: true, force: true })
+  })
+
+  function park(overrides: Record<string, unknown> = {}): string {
+    dir = dir ?? mkdtempSync(join(tmpdir(), 'undelivered-'))
+    const { parkUndelivered } = require('../../scripts/fallback-reply-hook.js')
+    const path = parkUndelivered(dir, {
+      chat_id: '140141496',
+      text: 'ответ, который нельзя терять',
+      session_id: 's1',
+      transcript_path: '/t.jsonl',
+      dedupe_token: 'tok-1',
+      state_path: join(dir, 'state.json'),
+      first_failed_at: new Date().toISOString(),
+      attempts: 1,
+      ...overrides,
+    })
+    return path as string
+  }
+
+  test('досланный ответ уходит из карантина и пишет дедуп', async () => {
+    dir = mkdtempSync(join(tmpdir(), 'undelivered-'))
+    park()
+    const { retryUndelivered } = await import('../../scripts/fallback-reply-hook.js')
+    const sent: Array<[string, string]> = []
+    const delivered: unknown[] = []
+    const n = await retryUndelivered(
+      dir,
+      async (chatId: string, text: string) => {
+        sent.push([chatId, text])
+        return true
+      },
+      (record: unknown) => delivered.push(record),
+    )
+    expect(n).toBe(1)
+    expect(sent[0]?.[0]).toBe('140141496')
+    expect(delivered.length).toBe(1)
+    expect(readdirSync(dir).filter((f) => f.endsWith('.json')).length).toBe(0)
+  })
+
+  test('повторный провал только повышает счётчик попыток', async () => {
+    dir = mkdtempSync(join(tmpdir(), 'undelivered-'))
+    const path = park()
+    const { retryUndelivered } = await import('../../scripts/fallback-reply-hook.js')
+    const n = await retryUndelivered(dir, async () => false)
+    expect(n).toBe(0)
+    const rec = JSON.parse(readFileSync(path, 'utf8'))
+    expect(rec.attempts).toBe(2)
+    expect(rec.text).toBe('ответ, который нельзя терять')
+  })
+
+  test('исчерпанные попытки и просрочка уходят в .failed, отправку не трогают', async () => {
+    dir = mkdtempSync(join(tmpdir(), 'undelivered-'))
+    park({ attempts: 10 })
+    park({
+      attempts: 1,
+      first_failed_at: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+    })
+    const { retryUndelivered } = await import('../../scripts/fallback-reply-hook.js')
+    let calls = 0
+    const n = await retryUndelivered(dir, async () => {
+      calls += 1
+      return true
+    })
+    expect(n).toBe(0)
+    expect(calls).toBe(0)
+    expect(readdirSync(dir).filter((f) => f.endsWith('.failed')).length).toBe(2)
+  })
+
+  test('за один прогон досылает не больше пяти -- хук не висит на завале', async () => {
+    dir = mkdtempSync(join(tmpdir(), 'undelivered-'))
+    for (let i = 0; i < 8; i++) park()
+    const { retryUndelivered } = await import('../../scripts/fallback-reply-hook.js')
+    const n = await retryUndelivered(dir, async () => true)
+    expect(n).toBe(5)
+    expect(readdirSync(dir).filter((f) => f.endsWith('.json')).length).toBe(3)
+  })
+})
+
+describe('длинный ответ режется, а не рубится (правка 5)', () => {
+  test('текст больше 4096 уходит частями, хвост не теряется', async () => {
+    const { splitForTelegram, FALLBACK_CHUNK_MAX } = await import(
+      '../../scripts/fallback-reply-hook.js'
+    )
+    const body = Array.from({ length: 60 }, (_, i) => `Абзац номер ${i} ${'ц'.repeat(120)}`).join(
+      '\n\n',
+    )
+    const parts = splitForTelegram(body)
+    expect(parts.length).toBeGreaterThan(1)
+    for (const part of parts) expect(part.length).toBeLessThanOrEqual(FALLBACK_CHUNK_MAX)
+    // Хвост на месте: последний абзац должен попасть в последнюю часть.
+    expect(parts[parts.length - 1]).toContain('Абзац номер 59')
+    expect(parts.join('').includes('…[обрезано]')).toBe(false)
+  })
+
+  test('абсурдно длинный текст ограничен шестью частями с маркером', async () => {
+    const { splitForTelegram, FALLBACK_MAX_PARTS } = await import(
+      '../../scripts/fallback-reply-hook.js'
+    )
+    const parts = splitForTelegram('я'.repeat(200_000))
+    expect(parts.length).toBe(FALLBACK_MAX_PARTS)
+    expect(parts[parts.length - 1]).toContain('…[обрезано]')
+  })
+
+  test('короткий ответ остаётся одной частью', async () => {
+    const { splitForTelegram } = await import('../../scripts/fallback-reply-hook.js')
+    expect(splitForTelegram('коротко и ясно')).toEqual(['коротко и ясно'])
   })
 })

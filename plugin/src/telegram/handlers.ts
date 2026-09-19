@@ -31,7 +31,12 @@ import type { StatusManager } from '../status/status-manager.js'
 import type { MultichatPolicy } from '../chats/policy-loader.js'
 import type { MultichatRouter } from '../router/multichat-router.js'
 import type { InboundMessage } from '../router/inbox-bridge.js'
-import { sendChannelNotification, type ChannelEvent } from '../channel/notify.js'
+import {
+  parkPendingInbound,
+  replayPendingInbound,
+  sendChannelNotification,
+  type ChannelEvent,
+} from '../channel/notify.js'
 import { appendFileSync, mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { gateTelegramMessage, type GateInput, type GateDecision } from './gate.js'
@@ -471,6 +476,40 @@ function journalRejectedInbound(
   }
 }
 
+// Journal an ACCEPTED inbound to logs/accepted-inbound.jsonl. 2026-09-15: two
+// digit-only messages ("00000", "000") arrived under the owner's user id and he
+// had sent neither; nothing on disk could say what Telegram actually delivered.
+// Records the raw text (truncated) plus the ids needed to chase it. Best-effort.
+const ACCEPTED_TEXT_CAP = 200
+
+function journalAcceptedInbound(
+  deps: HandlerDeps,
+  input: GateInput,
+  kind: string,
+  messageId: number | undefined,
+  text: string,
+): void {
+  try {
+    const p = deps.statePaths.logs.accepted_inbound
+    mkdirSync(dirname(p), { recursive: true })
+    appendFileSync(
+      p,
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        chat_id: input.chatId,
+        chat_type: input.chatType,
+        sender_id: input.senderId,
+        kind,
+        ...(messageId !== undefined ? { message_id: messageId } : {}),
+        len: text.length,
+        text: text.slice(0, ACCEPTED_TEXT_CAP),
+      }) + '\n',
+    )
+  } catch {
+    /* journal is best-effort */
+  }
+}
+
 // Common gate+notify body. Each per-kind handler computes its primary text
 // and (in T8+) a list of MediaDescriptors via buildMedia. We render the
 // descriptors and feed them to buildChannelContent so the agent sees
@@ -552,6 +591,11 @@ async function gateAndNotify(
   const descriptors = buildMedia ? await buildMedia() : []
   const renderedMedia = descriptors.map(renderMediaDescriptor)
 
+  // One call, two consumers below (router DTO and legacy notify) — and the
+  // forensic journal sees exactly the text that reaches the session.
+  const primaryText = buildText()
+  journalAcceptedInbound(deps, input, kind, ctx.message?.message_id, primaryText)
+
   // Router path: route GROUP/supergroup chats to their per-chat tmux
   // session via the file-based inbox. Private DMs deliberately fall
   // through to the legacy sendChannelNotification path below so they
@@ -606,7 +650,7 @@ async function gateAndNotify(
       : undefined
 
     const inboundMsg: InboundMessage = {
-      text: buildText(),
+      text: primaryText,
       chat_id: decision.chatId,
       user_id: decision.senderId,
       user:
@@ -647,7 +691,7 @@ async function gateAndNotify(
   // single-chat (DM-only) wiring; will be removed once all deployments
   // run multichat.
   const content = buildChannelContent({
-    text: buildText(),
+    text: primaryText,
     bot: deps.bot,
     ...(ctx.message?.reply_to_message
       ? { reply: adaptReply(ctx.message.reply_to_message)! }
@@ -679,10 +723,34 @@ async function gateAndNotify(
   deps.log.info('inbound delivered', { kind, chat_id: decision.chatId })
   const delivered = await sendChannelNotification(deps.server, event, deps.log)
   if (!delivered) {
+    // Правка 6: the offset still advances (infinite redelivery is worse), but
+    // the message no longer dies with it — park the event so a later, working
+    // notification replays it, and tell the user their message is queued rather
+    // than leaving them talking to a wall.
+    if (deps.statePaths?.root) {
+      await parkPendingInbound(deps.statePaths.root, event, deps.log)
+    }
+    try {
+      await ctx.reply('Связь с агентом моргнула — сообщение сохранено, отвечу как только поднимется.')
+    } catch {
+      /* best-effort: the user warning must not mask the notify failure */
+    }
     // Throw so the poller dead-letters this update AND advances offset (it
     // does that on every handler throw). We never want infinite redelivery
     // for a notify-transport failure — the channel may be torn down.
-    throw new Error('channel notify failed — message dead-lettered')
+    throw new Error('channel notify failed — message parked for replay')
+  }
+  // The transport just proved it works: drain anything parked by an earlier
+  // failure. Runs AFTER the live message, so it never delays it.
+  if (deps.statePaths?.root) {
+    try {
+      const replayed = await replayPendingInbound(deps.statePaths.root, deps.server, deps.log)
+      if (replayed > 0) deps.log.info('parked inbound drained', { replayed })
+    } catch (err) {
+      deps.log.warn('parked inbound drain failed', {
+        error: err instanceof Error ? err.message : String(err),
+      })
+    }
   }
 }
 

@@ -20,6 +20,7 @@ import { z } from 'zod'
 import type { AppConfig, StatePaths } from '../config.js'
 import { resolveAskGuardMode } from '../config.js'
 import { fetchTelegramFile } from '../telegram/media.js'
+import { journalSentOutbound } from './outbound-journal.js'
 import type { Logger } from '../log.js'
 import type { MultichatPolicy } from '../chats/policy-loader.js'
 import type { StatusManager, StatusState } from '../status/status-manager.js'
@@ -521,6 +522,12 @@ export async function callTool(req: CallToolRequest, deps: ToolDeps): Promise<Ca
   const name = req.params.name
   const rawArgs: unknown = req.params.arguments ?? {}
 
+  // Set by the `reply` tool right before its FIRST Telegram call, so a throw
+  // anywhere in the send path still leaves a journal line. `ids` aliases the
+  // live sentIds array, so a partial delivery (chunk 1 shipped, chunk 2 threw)
+  // is recorded with the ids that DID land rather than as a blank failure.
+  let outboundOnThrow: { chatId: string; text: string; ids: readonly number[] } | undefined
+
   try {
     switch (name) {
       case 'reply': {
@@ -612,10 +619,24 @@ export async function callTool(req: CallToolRequest, deps: ToolDeps): Promise<Ca
                 await telegramApi.answerGuestQuery(args.guest_query_id, plainBody, {})
               } catch (err2) {
                 deps.guestQueries.release(args.guest_query_id)
+                journalSentOutbound(statePaths.logs.sent_outbound, {
+                  chatId: args.chat_id,
+                  ok: false,
+                  text: args.text,
+                  error: err2 instanceof Error ? err2.message : String(err2),
+                  via: 'guest',
+                })
                 return toolError(name, err2 instanceof Error ? err2.message : String(err2))
               }
             } else {
               deps.guestQueries.release(args.guest_query_id)
+              journalSentOutbound(statePaths.logs.sent_outbound, {
+                chatId: args.chat_id,
+                ok: false,
+                text: args.text,
+                error: err instanceof Error ? err.message : String(err),
+                via: 'guest',
+              })
               return toolError(name, err instanceof Error ? err.message : String(err))
             }
           }
@@ -623,6 +644,16 @@ export async function callTool(req: CallToolRequest, deps: ToolDeps): Promise<Ca
           // Send succeeded — freeze the entry as answered so a repeat
           // reply reads 'consumed' and cap-eviction may reclaim the slot.
           deps.guestQueries.confirm(args.guest_query_id)
+
+          // Journal the guest answer too: answerGuestQuery returns no
+          // message_id, so the record carries a null id — it still proves
+          // the answer left, which is the whole point of the trail.
+          journalSentOutbound(statePaths.logs.sent_outbound, {
+            chatId: args.chat_id,
+            ok: true,
+            text: args.text,
+            via: 'guest',
+          })
 
           return {
             content: [{
@@ -740,6 +771,7 @@ export async function callTool(req: CallToolRequest, deps: ToolDeps): Promise<Ca
         const replyToId = args.reply_to !== undefined ? Number(args.reply_to) : undefined
 
         const sentIds: number[] = []
+        outboundOnThrow = { chatId: args.chat_id, text: args.text, ids: sentIds }
 
         // ── M1 Rich Messages (Bot API 10.1) ─────────────────────────────
         // Attempt a single RAW-markdown rich send when ALL conditions hold.
@@ -855,6 +887,19 @@ export async function callTool(req: CallToolRequest, deps: ToolDeps): Promise<Ca
             : await telegramApi.sendDocument(args.chat_id, canonical, opts)
           sentIds.push(out.message_id)
         }
+
+        // Everything shipped — journal it before anything else can throw.
+        // This is the agent's own «писал или нет» trail: until 20.09.2026 only
+        // bin/tg-notify.py wrote this file, so a live reply left no record and
+        // an empty grep proved nothing.
+        outboundOnThrow = undefined
+        journalSentOutbound(statePaths.logs.sent_outbound, {
+          chatId: args.chat_id,
+          ok: true,
+          text: args.text,
+          messageIds: sentIds,
+          via: 'reply',
+        })
 
         // Real answer shipped — clear the transient status. complete() is
         // idempotent (no-op when no status is active), so this is safe even
@@ -1153,6 +1198,16 @@ export async function callTool(req: CallToolRequest, deps: ToolDeps): Promise<Ca
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
+    if (outboundOnThrow !== undefined) {
+      journalSentOutbound(deps.statePaths.logs.sent_outbound, {
+        chatId: outboundOnThrow.chatId,
+        ok: false,
+        text: outboundOnThrow.text,
+        messageIds: outboundOnThrow.ids,
+        error: msg,
+        via: 'reply',
+      })
+    }
     log.error('tool call failed', { tool: name, error: msg })
     return toolError(name, msg)
   }

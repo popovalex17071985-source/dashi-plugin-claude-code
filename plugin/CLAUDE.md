@@ -26,10 +26,17 @@ fallback.
 
 ## Public group / multichat chats
 
-For group/supergroup chats the channel **outbox** path delivers your final text
-automatically — do not manually re-send it (that double-posts). The invariant
-still holds: terminal-only text is never visible to the user, so put anything
-they must see into the turn's delivered output.
+**Call `reply` in a group too.** A group chat has a per-chat outbox path, but it
+delivers only when the turn is anchored in that chat AND the final text reaches
+the transcript in time. Both conditions failed in production: 10.09.2026 a group
+answer never left the terminal, and 19.09.2026 three answers to a group question
+were composed and dropped (the turn had been merged with a scheduled prompt, and
+a 30 MB transcript flushed too late for the Stop hook). Relying on the automatic
+path is how a live agent goes silent in front of people.
+
+So: put every group answer through `reply` with that chat's `chat_id`, exactly as
+in a direct chat. Do not send the same text twice in one turn — one `reply` per
+answer.
 
 ## Reminders
 

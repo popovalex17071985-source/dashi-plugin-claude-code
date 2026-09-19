@@ -490,14 +490,33 @@ export class TmuxSessionPool {
     // 2. Outbox ROOT-LEVEL only: `.json` files awaiting rename-claim.
     //    Subdirectories (processing/, dead-letter/, mismatched/) MUST
     //    survive — they are handled in dedicated branches below.
+    //    They are ANSWERS the agent already produced: deleting them is how a
+    //    reply the human was waiting for disappears without a trace (audit
+    //    19.09.2026). Park them in dead-letter/ instead, so the answer is
+    //    recoverable and the loss is visible.
     try {
       const entries = await readdir(outboxDir, { withFileTypes: true })
+      const deadLetterDir = join(outboxDir, 'dead-letter')
       for (const entry of entries) {
         if (!entry.isFile()) continue
         if (!entry.name.endsWith('.json')) continue
-        await rm(join(outboxDir, entry.name), { force: true }).catch(
-          () => {},
-        )
+        const from = join(outboxDir, entry.name)
+        const to = join(deadLetterDir, `killed-${Date.now()}-${entry.name}`)
+        try {
+          await mkdir(deadLetterDir, { recursive: true })
+          await rename(from, to)
+          this.logger.warn(
+            'tmux kill: unsent answer parked in dead-letter (was awaiting dispatch)',
+            { chatId, file: entry.name, parkedAs: to },
+          )
+        } catch (err) {
+          this.logger.warn('tmux kill: could not park unsent answer, dropping', {
+            chatId,
+            file: entry.name,
+            err: err instanceof Error ? err.message : String(err),
+          })
+          await rm(from, { force: true }).catch(() => {})
+        }
       }
     } catch {
       // Outbox dir missing — no work to do.
@@ -535,6 +554,24 @@ export class TmuxSessionPool {
     } catch {
       return false
     }
+  }
+
+  /**
+   * True when the chat still holds unfinished work: an unread inbound message
+   * or an outbox claim the session has not confirmed yet. Both mean a turn is
+   * in flight, whatever the idle clock says.
+   */
+  private async hasPendingWork(chatId: string): Promise<boolean> {
+    const chatStateDir = join(this.stateDir, 'chats', chatId)
+    for (const dir of [join(chatStateDir, 'inbox'), join(chatStateDir, 'outbox', 'processing')]) {
+      try {
+        const entries = await readdir(dir)
+        if (entries.some((name) => name.endsWith('.json'))) return true
+      } catch {
+        // Missing dir — nothing pending there.
+      }
+    }
+    return false
   }
 
   /** Mark the chat as having received a message just now. */
@@ -587,6 +624,19 @@ export class TmuxSessionPool {
       // 30min default mirrors policy-loader's Zod default.
       const ttl = chatPolicy?.idle_ttl_ms ?? 1_800_000
       const idle = now - handle.lastMessageAt
+      // `lastMessageAt` only moves on INBOUND messages, so a long turn (or a
+      // queue still being drained) looks idle even while the agent is working.
+      // Killing then throws away answers mid-flight (audit 19.09.2026), so a
+      // chat with pending work is never idle — and its clock restarts.
+      if (idle > ttl && (await this.hasPendingWork(chatId))) {
+        this.logger.info('tmux session idle-kill skipped: work in flight', {
+          chatId,
+          sessionName: handle.sessionName,
+          idleMs: idle,
+        })
+        handle.lastMessageAt = now
+        continue
+      }
       if (idle > ttl) {
         this.logger.info('tmux session idle-kill', {
           chatId,

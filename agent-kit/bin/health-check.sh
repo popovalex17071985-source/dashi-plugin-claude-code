@@ -263,6 +263,60 @@ render_row() {
   printf '| %-20s | %b%-4s%b | %s\n' "$check" "$color" "$status" "$reset" "$detail"
 }
 
+# Долговременная память. Не «порт открыт», а служба отвечает на /health: 19.09.2026
+# у партнёрского агента памяти не было вовсе, а слив три дня писал «недоступен, skip»
+# в лог, который никто не читал.
+probe_memory() {
+  curl -sf -m 5 "http://127.0.0.1:1933/health" >/dev/null 2>&1 \
+    && { echo "ok|сервис памяти отвечает"; return; }
+  [ -s "$HOME/.openviking/ov.conf" ] \
+    && { echo "WARN|память настроена, но сервис на :1933 не отвечает"; return; }
+  echo "ok|долгой памяти нет (не настраивали)"
+}
+
+# Считалка смыслов: без неё память принимает записи, но не индексирует.
+probe_embed() {
+  if systemctl list-unit-files 2>/dev/null | grep -q '^dashi-embed'; then
+    systemctl is-active --quiet dashi-embed \
+      && echo "ok|считалка смыслов работает" || echo "WARN|служба эмбеддингов лежит"
+  else
+    echo "ok|локальной считалки нет"
+  fi
+}
+
+# Рост файлов. Транскрипт сессии = то, из чего Stop-хук достаёт ответ хозяину:
+# на разросшемся файле ответ не успевает записаться и пропадает (19.09.2026, 30 МБ).
+probe_sizes() {
+  local big proj logs data out=""
+  proj=$(du -sm "$HOME/.claude/projects" 2>/dev/null | cut -f1); proj=${proj:-0}
+  big=$(find "$HOME/.claude/projects" -name '*.jsonl' -printf '%s\n' 2>/dev/null | sort -rn | head -1)
+  big=$(( ${big:-0} / 1048576 ))
+  logs=$(du -sm "$WORKSPACE/logs" 2>/dev/null | cut -f1); logs=${logs:-0}
+  data=$(du -sm "$WORKSPACE/data" 2>/dev/null | cut -f1); data=${data:-0}
+  out="переписка ${proj}М (крупнейшая сессия ${big}М), логи ${logs}М, данные ${data}М"
+  if [ "$big" -ge 20 ]; then echo "WARN|$out -- сессию пора начать заново, ответы начнут теряться"; return; fi
+  if [ "$logs" -ge 500 ] || [ "$data" -ge 2000 ]; then echo "WARN|$out -- нужна ротация"; return; fi
+  echo "ok|$out"
+}
+
+probe_dead_letter() {
+  # Quarantines with no reader are /dev/null with extra steps: 82 parked inbound
+  # updates sat unseen for three months (19.09.2026). Surface them here.
+  local digest out fresh total
+  digest="$WORKSPACE/bin/dead-letter-digest.py"
+  [ -x "$digest" ] || { echo "skip|разборщика карантина нет"; return; }
+  out=$(/usr/bin/python3 "$digest" --workspace "$WORKSPACE" --quiet --json 2>/dev/null) || {
+    echo "WARN|разборщик карантина упал"; return; }
+  total=$(printf '%s' "$out" | /usr/bin/python3 -c 'import json,sys; d=json.load(sys.stdin); print(sum(r["total"] for r in d))' 2>/dev/null)
+  fresh=$(printf '%s' "$out" | /usr/bin/python3 -c 'import json,sys; d=json.load(sys.stdin); print(sum(r["fresh"] for r in d))' 2>/dev/null)
+  total=${total:-0}; fresh=${fresh:-0}
+  if [ "$fresh" -gt 0 ]; then
+    echo "WARN|в карантине $total записей, свежих $fresh -- разобрать: bin/dead-letter-digest.py --json"
+    return
+  fi
+  echo "ok|в карантине $total записей, свежих нет"
+}
+
 main() {
   declare -A results
 
@@ -274,6 +328,10 @@ main() {
   results[Cron]=$(probe_cron)
   results[Backup]=$(probe_backup)
   results[Secrets]=$(probe_secrets)
+  results[Memory]=$(probe_memory)
+  results[Embeddings]=$(probe_embed)
+  results[Sizes]=$(probe_sizes)
+  results[Dead_letter]=$(probe_dead_letter)
 
   local sep="+----------------------+------+-----------------------------------------"
   echo "$sep"
@@ -287,6 +345,12 @@ main() {
   render_row "Планировщик"     "${results[Cron]}"
   render_row "Бэкап"           "${results[Backup]}"
   render_row "Секреты"         "${results[Secrets]}"
+  # 19.09.2026: эти четыре считались, но в таблицу не попадали -- вердикт
+  # портился, а какой пункт просел, видно не было.
+  render_row "Долгая память"   "${results[Memory]}"
+  render_row "Эмбеддинги"      "${results[Embeddings]}"
+  render_row "Размеры"         "${results[Sizes]}"
+  render_row "Карантин"        "${results[Dead_letter]}"
   echo "$sep"
 
   local worst=0
