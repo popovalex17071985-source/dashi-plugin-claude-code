@@ -362,18 +362,34 @@ describe('stop-to-outbox.py — extraction', () => {
   })
 })
 
-describe('stop-to-outbox.py — diagnostic log (STOP_OUTBOX_DEBUG)', () => {
+describe('stop-to-outbox.py — diagnostic journal (always on)', () => {
   function debugLogPath(): string {
     return join(stateDir, 'chats', CHAT_ID, '.hook-state', 'stop-outbox-debug.log')
   }
 
-  test('off by default: no debug log written', () => {
+  test('on by default: the journal records a delivered turn without any flag', () => {
+    // 2026-09-19: the journal used to be opt-in, and the flag was never set
+    // before an incident — so a lost group answer left no evidence at all.
     const transcript = writeTranscript([
       userLine('вопрос'),
       assistantLine([{ type: 'text', text: 'ответ' }]),
     ])
     run(
       { CHAT_ID, MULTICHAT_STATE_DIR: stateDir },
+      { transcript_path: transcript, session_id: 's1' },
+    )
+    const log = readFileSync(debugLogPath(), 'utf8')
+    expect(log).toContain('"decision": "fired"')
+    expect(log).toContain('"decision": "written"')
+  })
+
+  test('STOP_OUTBOX_DEBUG=0 silences the journal', () => {
+    const transcript = writeTranscript([
+      userLine('вопрос'),
+      assistantLine([{ type: 'text', text: 'ответ' }]),
+    ])
+    run(
+      { CHAT_ID, MULTICHAT_STATE_DIR: stateDir, STOP_OUTBOX_DEBUG: '0' },
       { transcript_path: transcript, session_id: 's1' },
     )
     expect(() => readFileSync(debugLogPath(), 'utf8')).toThrow()
@@ -680,6 +696,72 @@ describe('stop-to-outbox.py — transcript-flush race (extended-thinking)', () =
     )
     expect(r.code).toBe(0)
     expect(listOutboxJson().length).toBe(0)
+  })
+})
+
+describe('гонка «потерянный финал» и окно чтения', () => {
+  test('интерим с инструментом после него не уходит вместо финала', async () => {
+    // 2026-06-22 в личном пути, 19.09.2026 в групповом: ход отдаёт
+    // промежуточную строку, потом инструменты, потом ФИНАЛ. Хук, прочитавший
+    // между интеримом и финалом, раньше отправлял интерим и писал дедуп —
+    // финал не получал второго Stop и терялся. Теперь чтение ждёт, пока текст
+    // не станет стабильным И замыкающим.
+    const transcript = join(stateDir, 'transcript.jsonl')
+    writeFileSync(
+      transcript,
+      [
+        userLine('посмотри, что с ценами'),
+        assistantLine([{ type: 'text', text: 'Минуту, смотрю.' }]),
+        assistantLine([{ type: 'tool_use', id: 't1', name: 'Bash', input: {} }]),
+        JSON.stringify({
+          message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 't1' }] },
+        }),
+      ].join('\n') + '\n',
+      'utf8',
+    )
+    const timer = setTimeout(() => {
+      appendFileSync(
+        transcript,
+        assistantLine([{ type: 'text', text: 'Готово: цены на месте.' }]) + '\n',
+      )
+    }, 150)
+    const r = await runAsync(
+      {
+        CHAT_ID,
+        MULTICHAT_STATE_DIR: stateDir,
+        STOP_OUTBOX_RETRY_ATTEMPTS: '30',
+        STOP_OUTBOX_RETRY_DELAY_MS: '50',
+      },
+      { transcript_path: transcript, session_id: 's1' },
+    )
+    clearTimeout(timer)
+    expect(r.code).toBe(0)
+    const files = listOutboxJson()
+    expect(files.length).toBe(1)
+    expect(readOutboxPayload(files[0] as string).text).toBe('Готово: цены на месте.')
+  })
+
+  test('строка длиннее окна чтения не съедает ответ', () => {
+    // Одна строка транскрипта больше TAIL_BYTES (1 МиБ) — окно попадает внутрь
+    // неё, полных строк нет, и хук раньше решал «текста не было». Окно должно
+    // вырасти до границы строки.
+    const huge = 'x'.repeat(1_200_000)
+    const transcript = writeTranscript([
+      userLine('дай отчёт'),
+      assistantLine([{ type: 'tool_use', id: 't1', name: 'Bash', input: {} }]),
+      JSON.stringify({
+        message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 't1', content: huge }] },
+      }),
+      assistantLine([{ type: 'text', text: 'Отчёт готов.' }]),
+    ])
+    const r = run(
+      { CHAT_ID, MULTICHAT_STATE_DIR: stateDir, STOP_OUTBOX_RETRY_ATTEMPTS: '2', STOP_OUTBOX_RETRY_DELAY_MS: '10' },
+      { transcript_path: transcript, session_id: 's1' },
+    )
+    expect(r.code).toBe(0)
+    const files = listOutboxJson()
+    expect(files.length).toBe(1)
+    expect(readOutboxPayload(files[0] as string).text).toBe('Отчёт готов.')
   })
 })
 
