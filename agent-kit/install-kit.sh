@@ -212,7 +212,18 @@ else
   # Смотрим ТОЛЬКО на строки этого workspace: у второго агента под тем же
   # пользователем свои строки, чужие не трогаем. Час мог измениться (--tz) или
   # добавился новый скрипт — тогда свои строки переписываем, а не пропускаем.
-  CUR="$(crontab -l 2>/dev/null || true)"
+  # Расписание принадлежит ПОЛЬЗОВАТЕЛЮ агента, а не тому, кто запустил
+  # установщик. Из-под root строки уезжали в рутовское расписание, а у агента
+  # оставались свои старые: те же задачи выполнялись ДВАЖДЫ, и логи в папке
+  # агента создавались от root, так что сам агент в них писать уже не мог
+  # (найдено у gorbot 20.09.2026 -- семь задач-двойников).
+  WS_OWNER="$(stat -c %U "$WORKSPACE" 2>/dev/null || id -un)"
+  if [[ "$(id -u)" -eq 0 && "$WS_OWNER" != "$(id -un)" ]]; then
+    SCHED=(crontab -u "$WS_OWNER")
+  else
+    SCHED=(crontab)
+  fi
+  CUR="$("${SCHED[@]}" -l 2>/dev/null || true)"
   MISSING=0
   for line in "${CRON_LINES[@]}"; do grep -qxF "$line" <<<"$CUR" || MISSING=1; done
   if (( MISSING == 0 )); then
@@ -221,7 +232,7 @@ else
     OWN=(); for s in "${CRON_SCRIPTS[@]}"; do OWN+=(-e "$WORKSPACE/bin/$s"); done
     if grep -qF "${OWN[@]}" <<<"$CUR"; then verb="переставлены на"; else verb="в кроне:"; fi
     { grep -vF "${OWN[@]}" <<<"$CUR" || true
-      printf '%s\n' "${CRON_LINES[@]}"; } | crontab - \
+      printf '%s\n' "${CRON_LINES[@]}"; } | "${SCHED[@]}" - \
       && echo "  утренние задачи (сводка, советник, самопроверка, будильник, отчёт о сервере) $verb 09:00 по $OWNER_TZ (на сервере $DIG_H:00)" \
       || echo "  ! не смог прописать крон — поставь руками"
   fi
