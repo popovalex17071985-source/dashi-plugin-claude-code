@@ -3,19 +3,17 @@
 Tried on gorbot (144.124.224.216, 2 cores / 3.9 GB) 19.09.2026. No OpenAI key,
 no card, no owner action. Two containers, both bound to loopback.
 
-1. Embeddings -- OpenAI-compatible server, local:
+1. Embeddings -- `scripts/embed-server.py` from this kit: fastembed behind
+   uvicorn, serving `POST /v1/embeddings` on 127.0.0.1:1934, model
+   `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` (384 dim).
+   systemd unit `dashi-embed`, `MemoryMax=1200M`, `OMP_NUM_THREADS=1`.
 
-```
-docker run -d --name tei-embed --restart unless-stopped \
-  -p 127.0.0.1:1934:80 -v ~/.cache/hf:/data \
-  ghcr.io/huggingface/text-embeddings-inference:cpu-1.8 \
-  --model-id intfloat/multilingual-e5-small --auto-truncate
-```
-
-   `--auto-truncate` is mandatory: OpenViking chunks run ~2100 tokens and the
-   model takes 512, otherwise every add fails with HTTP 413.
-   `Alibaba-NLP/gte-multilingual-base` (8k ctx) OOMs on a 4 GB box -- it restarts
-   in a loop. Use it only where RAM is free.
+   Why not HuggingFace TEI (`text-embeddings-inference:cpu`): it works, but its
+   ONNX arenas peak at ~1.9 GB, which left 73 MB free on a 4 GB box, and any cap
+   below that kills it with exit 137 in a restart loop.
+   fastembed rejects `intfloat/multilingual-e5-small` -- check
+   `TextEmbedding.list_supported_models()` before picking a model, and set
+   `dimension` in ov.conf to what `/v1/embeddings` actually returns.
 
 2. Summaries -- any OpenAI-compatible chat API the box ALREADY holds a key for
    (gorbot: Groq, `openai/gpt-oss-20b`). Never copy a key between servers.
