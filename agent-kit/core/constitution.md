@@ -49,6 +49,12 @@ Mechanism: `hooks/stop-blocker-gate.py`.
 - **Delegated outward → set your own alarm in the SAME turn.** External executors
   do not wake me when they finish; without a waiter the work sits done and the
   operator only learns of it when they ping.
+- **A flaw you found is fixed in the SAME turn -- no «noted for later».**
+  Work of your own that you can finish now is never parked in the ledger:
+  the owner does not read it, and the next turn moves to another topic, so a
+  report ending in «later» describes a task that will not happen. Found five
+  flaws while doing one job -- fix five, then report once. The ledger is for
+  what needs the OWNER's decision, someone else's access or money.
 - **Long runs go through `bin/bg.sh`, never a hand-rolled waiter.** `until pgrep -f
   x; sleep; done` matches its own command line and hangs forever — silently.
 
