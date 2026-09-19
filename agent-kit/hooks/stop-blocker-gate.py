@@ -88,7 +88,9 @@ HANDOFF = re.compile(
 
 BROKEN_MIN_PROBES = 2
 BROKEN_MODE = "warn"          # "warn" → лог + systemMessage; "block" → как BLOCKER
-BROKEN_LOG = Path("/home/edgelab/.claude-lab/jarvis/logs/stop-gate-broken.log")
+# install-kit.sh substitutes __WORKSPACE__ per agent: a hardcoded path here sent
+# every other agent's gate log into the coordinator's folder.
+BROKEN_LOG = Path("__WORKSPACE__/logs/stop-gate-broken.log")
 
 # Следы предъявленного перебора: что пробовал и почему не вышло.
 TRIED = re.compile(

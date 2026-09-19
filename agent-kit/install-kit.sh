@@ -102,6 +102,8 @@ WIRING = [
     ("PreToolUse",  "mcp__dashi-channel__reply", "owner-time-guard.sh",  5),
     ("SessionStart", "",                   "session-start-hint.sh",     5),
     ("PreCompact",  "",                     "precompact-save.sh",       10),
+    # Слив в долгую память: без него сервер OpenViking стоит, а писать в него нечем.
+    ("PreCompact",  "",                     "flush-to-openviking.sh",   90),
     ("UserPromptSubmit", "",                "echo-last-turn-cost.sh",    5),
     ("UserPromptSubmit", "",                "owner-clock.sh",            5),
     ("UserPromptSubmit", "",                "register-mirror.sh",        5),

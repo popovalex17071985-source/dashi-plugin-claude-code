@@ -141,4 +141,10 @@ fi
 install -d -o "$OWNER" -g "$OWNER" -m 700 "$OWNER_HOME/.claude-lab/shared/secrets"
 KEYF="$OWNER_HOME/.claude-lab/shared/secrets/openviking.key"
 [ -f "$KEYF" ] || { head -c 24 /dev/urandom | base64 > "$KEYF"; chmod 600 "$KEYF"; chown "$OWNER:$OWNER" "$KEYF"; }
-say "готово: память подключена, слив идёт через $HOOK"
+if [ -f "$HOOK" ]; then
+  say "готово: память подключена, слив идёт через $HOOK"
+else
+  # Раньше это место рапортовало об успехе безусловно: сервер стоял, а
+  # писать в него было нечем, и понять это было неоткуда.
+  say "! сервер памяти жив, но хука слива нет ($HOOK) -- память писаться НЕ будет"
+fi
