@@ -148,12 +148,15 @@ if [[ -n "$typed" && -z "$ghost" ]] && ! printf '%s' "$pane" | grep -q 'esc to i
   elif [[ -z "$(find "$STUCK" -mmin -3 2>/dev/null)" ]] \
        && [[ -z "$(find "$STATE_DIR/stuck-restarted" -mmin -15 2>/dev/null)" ]]; then
     # тот же текст висит дольше 3 минут и последний перезапуск был давно
-    # DASHI_WATCH_NO_RESTART=1 -- сторожу запрещено трогать службу вообще: он
-    # только зовёт хозяина. Обкатка на Смите с 12.09.2026: если недели хватает
-    # без перезапусков, запрет становится поведением по умолчанию для всех.
-    if [[ -n "${DASHI_WATCH_NO_RESTART:-}" ]]; then
+    # Перезапуск службы сторожу ЗАПРЕЩЁН по умолчанию (19.09.2026): он дожимает
+    # Enter, перенабирает и зовёт хозяина, но службу не трогает -- перезапуск
+    # убивает сессию вместе с контекстом. Обкатка на Смите 12.09--19.09 прошла
+    # чисто: ни одного срабатывания сторожа за неделю, единственный подъём службы
+    # 14.09 был ручным. До обкатки Гор поднимался 27 раз за сутки.
+    # DASHI_WATCH_ALLOW_RESTART=1 -- вернуть старое поведение на одном агенте.
+    if [[ -z "${DASHI_WATCH_ALLOW_RESTART:-}" ]]; then
       tell "Твоё сообщение застряло в строке ввода, дожать не вышло. Службу не трогаю (так велено). Текст: «${typed:0:200}»" || true
-      logger -t modal-watch "stuck input in $SESSION — restart withheld (DASHI_WATCH_NO_RESTART)" 2>/dev/null || true
+      logger -t modal-watch "stuck input in $SESSION — restart withheld (default since 19.09)" 2>/dev/null || true
       exit 0
     fi
     CTL="/usr/local/bin/dashi-ctl-$AGENT"
