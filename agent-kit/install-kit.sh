@@ -160,7 +160,7 @@ DIG_H="$(OWNER_TZ="$OWNER_TZ" python3 -c 'import os,datetime as dt,zoneinfo; own
 # (что вышло нового + напоминание про /update), 20 самопроверка (хуки, крон,
 # канарейка, модель, память — шлёт ТОЛЬКО подозрения), 30 будильник по срокам
 # и отчёт о сервере (диск, память, сервисы, вход в Claude — шлётся всегда).
-CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py memory-index-trim.py fallback-reply-sweeper.sh)
+CRON_SCRIPTS=(promise-sweeper.py open-threads-digest.py update-notify.sh self-audit-morning.sh health-daily.sh job-watch.py job-fail-watch.py memory-index-trim.py fallback-reply-sweeper.sh claude-link-guard.sh auth-alive-watch.sh multichat-nudge.sh)
 CRON_LINES=(
   "0 $DIG_H * * * /usr/bin/python3 $WORKSPACE/bin/open-threads-digest.py --send >> $WORKSPACE/logs/open-threads-digest.log 2>&1"
   "10 $DIG_H * * * /bin/bash $WORKSPACE/bin/update-notify.sh >> $WORKSPACE/logs/update-notify.log 2>&1"
@@ -185,6 +185,15 @@ CRON_LINES=(
   # его свежесть. Без неё смерть расписания не видна ниоткуда (27.08.2026 -- 6
   # часов простоя), а self-audit.py каждое утро кричит «КРОН НЕ РАБОТАЕТ».
   "* * * * * /usr/bin/touch $WORKSPACE/data/cron-heartbeat"
+  # Ярлык claude после автообновления замыкался сам на себя, и ВСЕ фоновые
+  # задачи молча падали (координатор, 29.08.2026). Сторож чинит, а не жалуется.
+  "*/15 * * * * /bin/bash $WORKSPACE/bin/claude-link-guard.sh $WORKSPACE >> $WORKSPACE/logs/claude-link-guard.log 2>&1"
+  # Вход протухает по жёсткому сроку и ничем не продлевается: агент просто
+  # замолкает, и хозяин узнаёт это из тишины. Пробный запрос раз в 6 часов.
+  "7 */6 * * * /bin/bash $WORKSPACE/bin/auth-alive-watch.sh $WORKSPACE >> $WORKSPACE/logs/auth-alive-watch.log 2>&1"
+  # Вопрос из группы лежит в inbox и ждёт, пока сессия освободится: у
+  # координатора такой провисел полтора часа (29.08.2026). Толкаем сессию.
+  "*/2 * * * * /bin/bash $WORKSPACE/bin/multichat-nudge.sh $WORKSPACE >> $WORKSPACE/logs/multichat-nudge.log 2>&1"
 )
 if [[ -n "${KIT_NO_CRON:-}" ]]; then
   echo "  крон не трогаю (KIT_NO_CRON)"

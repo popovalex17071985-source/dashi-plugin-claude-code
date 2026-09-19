@@ -26,4 +26,8 @@ ts:   $(date '+%Y-%m-%d %H:%M %Z')
 <pre>${CLEAN}</pre>"
 
 [ -n "${DRY:-}" ] && { printf '%s\n' "$MSG"; exit 0; }
+# След на диске обязателен: без него «отчёт не пришёл» и «отчёт не запускался»
+# неотличимы, а самопроверка судит живость задачи по возрасту её лога.
+printf '%s [health-daily] %s\n' "$(date -Is)" "$(printf '%s' "$CLEAN" | tr '\n' ' ' | cut -c1-400)" \
+  >> "$WORKSPACE/logs/health-daily.log"
 /usr/bin/python3 "$WORKSPACE/bin/tg-send.py" "$MSG" --html

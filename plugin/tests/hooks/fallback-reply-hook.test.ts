@@ -795,3 +795,30 @@ describe('persistLastChat (group chats never become the fallback anchor)', () =>
     rmSync(dir, { recursive: true, force: true })
   })
 })
+
+// 19.09.2026: on a 30 MB transcript one JSONL line can exceed the tail window.
+// The window then holds no newline, and the old reader returned '' -- the hook
+// saw an empty transcript and dropped the answer. It must grow the window instead.
+describe('tailReadTranscript: строка больше окна', () => {
+  test('расширяет окно, пока не найдёт границу строки', async () => {
+    const { tailReadTranscript } = await import('../../scripts/fallback-reply-hook.ts')
+    const calls: number[] = []
+    const fat = 'x'.repeat(50)
+    const fake = (_p: string, bytes: number = 1024 * 1024) => {
+      calls.push(bytes)
+      // A newline appears only once the caller asks for a wider window.
+      if (bytes < 4 * 1024 * 1024) return { text: fat, truncated: true }
+      return { text: `${fat}\nfinal-line`, truncated: true }
+    }
+    const out = tailReadTranscript('/nonexistent', fake)
+    expect(out).toBe('final-line')
+    expect(calls.length).toBeGreaterThan(1)
+    expect(calls[1]).toBeGreaterThan(calls[0]!)
+  })
+
+  test('не возвращает пустоту, когда границы нет совсем', async () => {
+    const { tailReadTranscript } = await import('../../scripts/fallback-reply-hook.ts')
+    const fake = () => ({ text: 'no-newline-anywhere', truncated: true })
+    expect(tailReadTranscript('/nonexistent', fake)).toBe('no-newline-anywhere')
+  })
+})

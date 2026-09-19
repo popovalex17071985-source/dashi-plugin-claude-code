@@ -88,6 +88,11 @@ export { loadChannelEnvFile, parseEnvFile }
 // single turn exceeds this, the boundary can fall outside and the walk could
 // reach a previous turn's text; dedup is the secondary guard.
 const TAIL_BYTES = 1024 * 1024
+// A single JSONL line can be larger than the tail window (one fat tool result on
+// a 30 MB transcript). The window then holds no newline at all, the old code
+// returned an empty string and the hook went silent -- the answer was in the file
+// the whole time. So we grow the window until a line boundary appears.
+const TAIL_BYTES_MAX = 32 * 1024 * 1024
 
 // The two MCP tools that deliver a reply to the warchief's Telegram. If either
 // was called this turn, the warchief already saw the answer → no fallback.
@@ -459,21 +464,29 @@ export function analyzeCurrentTurn(transcript: string): TurnResult {
 
 export function tailReadTranscript(
   path: string,
-  read: (p: string) => { text: string; truncated: boolean } = readTailDefault,
+  read: (p: string, bytes?: number) => { text: string; truncated: boolean } = readTailDefault,
 ): string {
-  const { text, truncated } = read(path)
-  if (!truncated) return text
-  const nl = text.indexOf('\n')
-  return nl >= 0 ? text.slice(nl + 1) : ''
+  let bytes = TAIL_BYTES
+  for (;;) {
+    const { text, truncated } = read(path, bytes)
+    if (!truncated) return text
+    const nl = text.indexOf('\n')
+    if (nl >= 0) return text.slice(nl + 1)
+    // No line boundary in the window: the last line alone is bigger than it.
+    // Grow and retry; give up only at TAIL_BYTES_MAX and hand back what we have
+    // rather than an empty string, so a caller still sees the tail.
+    if (bytes >= TAIL_BYTES_MAX) return text
+    bytes = Math.min(bytes * 4, TAIL_BYTES_MAX)
+  }
 }
 
-function readTailDefault(path: string): { text: string; truncated: boolean } {
+function readTailDefault(path: string, bytes: number = TAIL_BYTES): { text: string; truncated: boolean } {
   let fd = -1
   try {
     fd = openSync(path, 'r')
     const size = fstatSync(fd).size
     if (size === 0) return { text: '', truncated: false }
-    const length = Math.min(size, TAIL_BYTES)
+    const length = Math.min(size, bytes)
     const start = size - length
     const buf = Buffer.alloc(length)
     readSync(fd, buf, 0, length, start)

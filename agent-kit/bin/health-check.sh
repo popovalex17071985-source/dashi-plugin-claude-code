@@ -263,6 +263,42 @@ render_row() {
   printf '| %-20s | %b%-4s%b | %s\n' "$check" "$color" "$status" "$reset" "$detail"
 }
 
+# Долговременная память. Не «порт открыт», а служба отвечает на /health: 19.09.2026
+# у партнёрского агента памяти не было вовсе, а слив три дня писал «недоступен, skip»
+# в лог, который никто не читал.
+probe_memory() {
+  curl -sf -m 5 "http://127.0.0.1:1933/health" >/dev/null 2>&1 \
+    && { echo "ok|сервис памяти отвечает"; return; }
+  [ -s "$HOME/.openviking/ov.conf" ] \
+    && { echo "WARN|память настроена, но сервис на :1933 не отвечает"; return; }
+  echo "ok|долгой памяти нет (не настраивали)"
+}
+
+# Считалка смыслов: без неё память принимает записи, но не индексирует.
+probe_embed() {
+  if systemctl list-unit-files 2>/dev/null | grep -q '^dashi-embed'; then
+    systemctl is-active --quiet dashi-embed \
+      && echo "ok|считалка смыслов работает" || echo "WARN|служба эмбеддингов лежит"
+  else
+    echo "ok|локальной считалки нет"
+  fi
+}
+
+# Рост файлов. Транскрипт сессии = то, из чего Stop-хук достаёт ответ хозяину:
+# на разросшемся файле ответ не успевает записаться и пропадает (19.09.2026, 30 МБ).
+probe_sizes() {
+  local big proj logs data out=""
+  proj=$(du -sm "$HOME/.claude/projects" 2>/dev/null | cut -f1); proj=${proj:-0}
+  big=$(find "$HOME/.claude/projects" -name '*.jsonl' -printf '%s\n' 2>/dev/null | sort -rn | head -1)
+  big=$(( ${big:-0} / 1048576 ))
+  logs=$(du -sm "$WORKSPACE/logs" 2>/dev/null | cut -f1); logs=${logs:-0}
+  data=$(du -sm "$WORKSPACE/data" 2>/dev/null | cut -f1); data=${data:-0}
+  out="переписка ${proj}М (крупнейшая сессия ${big}М), логи ${logs}М, данные ${data}М"
+  if [ "$big" -ge 20 ]; then echo "WARN|$out -- сессию пора начать заново, ответы начнут теряться"; return; fi
+  if [ "$logs" -ge 500 ] || [ "$data" -ge 2000 ]; then echo "WARN|$out -- нужна ротация"; return; fi
+  echo "ok|$out"
+}
+
 main() {
   declare -A results
 
@@ -274,6 +310,9 @@ main() {
   results[Cron]=$(probe_cron)
   results[Backup]=$(probe_backup)
   results[Secrets]=$(probe_secrets)
+  results[Memory]=$(probe_memory)
+  results[Embeddings]=$(probe_embed)
+  results[Sizes]=$(probe_sizes)
 
   local sep="+----------------------+------+-----------------------------------------"
   echo "$sep"
