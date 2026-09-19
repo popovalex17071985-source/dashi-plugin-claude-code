@@ -24,6 +24,10 @@ LIMIT = 24 * 1024        # потолок, после которого инде�
 TARGET = 21 * 1024       # до чего ужимаем: запас и на новые записи, и на блок ссылок
 LINE_MAX = 140           # байт на строку индекса: имя, ссылка, короткий хвост
 ARCH_STEP = 10           # сколько пунктов уносим в архив за один заход
+# Второй потолок -- СТРОКИ. Чтение файла обрывается на 200 строках, и индекс
+# на 192 строках уже терял хвост, оставаясь по байтам «в норме» (19.09.2026).
+LINE_LIMIT = 170         # после этого числа строк режем
+TARGET_LINES = 140       # до скольких строк ужимаем
 
 LINK = re.compile(r"\(([A-Za-z0-9_\-]+\.md)\)")
 TAIL = re.compile(r"^(.*?)( — | -- )(.*)$")
@@ -59,20 +63,23 @@ def indexes() -> list[pathlib.Path]:
 def trim(path: pathlib.Path, apply: bool) -> str:
     text = path.read_text(encoding="utf-8")
     before = size(text)
-    if before <= LIMIT:
-        return f"{path.parent.parent.name}: {before} Б -- в норме"
+    before_lines = len(text.splitlines())
+    if before <= LIMIT and before_lines <= LINE_LIMIT:
+        return f"{path.parent.parent.name}: {before} Б / {before_lines} строк -- в норме"
 
     lines = text.splitlines()
     kept = [squeeze(x) for x in lines]
     arch = path.with_name("MEMORY-archive.md")
     moved: list[str] = []
     # Ужимки не хватило -- уносим хвост списка (самое старое) в архив.
-    while size("\n".join(kept)) > TARGET and sum(1 for x in kept if x.startswith("- ")) > 40:
+    while (size("\n".join(kept)) > TARGET or len(kept) > TARGET_LINES) \
+            and sum(1 for x in kept if x.startswith("- ")) > 40:
         for i in range(len(kept) - 1, -1, -1):
             if kept[i].startswith("- "):
                 moved.append(kept.pop(i))
                 break
-        if len(moved) % ARCH_STEP == 0 and size("\n".join(kept)) <= TARGET:
+        if (len(moved) % ARCH_STEP == 0 and size("\n".join(kept)) <= TARGET
+                and len(kept) <= TARGET_LINES):
             break
 
     # Ссылка не должна пропасть вместе с обрезанным хвостом.
