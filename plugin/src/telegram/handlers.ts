@@ -31,7 +31,12 @@ import type { StatusManager } from '../status/status-manager.js'
 import type { MultichatPolicy } from '../chats/policy-loader.js'
 import type { MultichatRouter } from '../router/multichat-router.js'
 import type { InboundMessage } from '../router/inbox-bridge.js'
-import { sendChannelNotification, type ChannelEvent } from '../channel/notify.js'
+import {
+  parkPendingInbound,
+  replayPendingInbound,
+  sendChannelNotification,
+  type ChannelEvent,
+} from '../channel/notify.js'
 import { appendFileSync, mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { gateTelegramMessage, type GateInput, type GateDecision } from './gate.js'
@@ -718,10 +723,34 @@ async function gateAndNotify(
   deps.log.info('inbound delivered', { kind, chat_id: decision.chatId })
   const delivered = await sendChannelNotification(deps.server, event, deps.log)
   if (!delivered) {
+    // Правка 6: the offset still advances (infinite redelivery is worse), but
+    // the message no longer dies with it — park the event so a later, working
+    // notification replays it, and tell the user their message is queued rather
+    // than leaving them talking to a wall.
+    if (deps.statePaths?.root) {
+      await parkPendingInbound(deps.statePaths.root, event, deps.log)
+    }
+    try {
+      await ctx.reply('Связь с агентом моргнула — сообщение сохранено, отвечу как только поднимется.')
+    } catch {
+      /* best-effort: the user warning must not mask the notify failure */
+    }
     // Throw so the poller dead-letters this update AND advances offset (it
     // does that on every handler throw). We never want infinite redelivery
     // for a notify-transport failure — the channel may be torn down.
-    throw new Error('channel notify failed — message dead-lettered')
+    throw new Error('channel notify failed — message parked for replay')
+  }
+  // The transport just proved it works: drain anything parked by an earlier
+  // failure. Runs AFTER the live message, so it never delays it.
+  if (deps.statePaths?.root) {
+    try {
+      const replayed = await replayPendingInbound(deps.statePaths.root, deps.server, deps.log)
+      if (replayed > 0) deps.log.info('parked inbound drained', { replayed })
+    } catch (err) {
+      deps.log.warn('parked inbound drain failed', {
+        error: err instanceof Error ? err.message : String(err),
+      })
+    }
   }
 }
 
