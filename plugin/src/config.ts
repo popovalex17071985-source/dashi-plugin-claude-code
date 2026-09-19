@@ -708,6 +708,15 @@ export type StatePaths = {
     permission_gate: string
     rejected_inbound: string
     accepted_inbound: string
+    /**
+     * Journal of OUTBOUND messages the agent itself shipped through the
+     * `reply` tool (2026-09-20). `bin/tg-notify.py` has written the same
+     * file since 16.09 for cron/script sends; until now the agent's own
+     * replies left no trace, so «писал или нет» could only be answered for
+     * scripted traffic. Same record shape as tg-notify.py so one grep
+     * covers both writers; `via` tells them apart.
+     */
+    sent_outbound: string
   }
 }
 
@@ -749,6 +758,7 @@ export function getStatePaths(_config: AppConfig, env: RuntimeEnv): StatePaths {
       // delivered. Text is truncated; this is a forensic trail, not a
       // chat archive.
       accepted_inbound: join(root, 'logs', 'accepted-inbound.jsonl'),
+      sent_outbound: join(root, 'logs', 'sent-outbound.jsonl'),
     },
   }
 }

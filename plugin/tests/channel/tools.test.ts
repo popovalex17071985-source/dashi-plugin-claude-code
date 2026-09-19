@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { mkdtempSync, rmSync } from 'fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 
@@ -122,6 +122,7 @@ function makeStatePaths(): StatePaths {
       permission_gate: join(root, 'logs', 'permission-gate.jsonl'),
       rejected_inbound: join(root, 'logs', 'rejected-inbound.jsonl'),
       accepted_inbound: join(root, 'logs', 'accepted-inbound.jsonl'),
+      sent_outbound: join(root, 'logs', 'sent-outbound.jsonl'),
     },
   }
 }
@@ -855,5 +856,97 @@ describe('autonomy tool — fix-loop-2', () => {
     expect(status.isError).toBeUndefined()
     expect(status.content[0]?.text).toContain('L-wl')
     rmSync(deps.statePaths.root, { recursive: true, force: true })
+  })
+})
+
+// ── Outbound journal (2026-09-20) ──────────────────────────────────────
+// Until now bin/tg-notify.py was the ONLY writer of sent-outbound.jsonl, so
+// replies the agent shipped itself left no trace and «писал или нет» could
+// not be answered for live answers. These tests pin the trail to the tool.
+describe('reply — outbound journal', () => {
+  function journalOf(deps: ToolDeps): Record<string, unknown>[] {
+    const path = deps.statePaths.logs.sent_outbound
+    if (!existsSync(path)) return []
+    return readFileSync(path, 'utf8')
+      .split('\n')
+      .filter((l) => l.length > 0)
+      .map((l) => JSON.parse(l) as Record<string, unknown>)
+  }
+
+  test('a delivered reply lands in the journal with its message id', async () => {
+    const api = makeStubApi({ sendMessage: async () => ({ message_id: 50172 }) })
+    const deps = makeDeps({ telegramApi: api })
+
+    const result = await callTool(callReq('reply', { chat_id: '164795011', text: 'привет' }), deps)
+    expect(result.isError).toBeUndefined()
+
+    const lines = journalOf(deps)
+    expect(lines.length).toBe(1)
+    expect(lines[0]!.chat_id).toBe('164795011')
+    expect(lines[0]!.ok).toBe(true)
+    expect(lines[0]!.message_id).toBe(50172)
+    expect(lines[0]!.via).toBe('reply')
+    // The journalled body is the agent's own text, not the rendered HTML.
+    expect(lines[0]!.text).toBe('привет')
+  })
+
+  test('a chunked reply is ONE record naming every chunk id', async () => {
+    let n = 0
+    const api = makeStubApi({ sendMessage: async () => ({ message_id: ++n }) })
+    const deps = makeDeps({ telegramApi: api })
+    const para = 'x'.repeat(1500)
+
+    await callTool(callReq('reply', { chat_id: '164795011', text: [para, para, para, para].join('\n\n') }), deps)
+
+    const lines = journalOf(deps)
+    expect(lines.length).toBe(1)
+    expect(lines[0]!.parts).toBe(n)
+    expect(lines[0]!.message_ids).toEqual(Array.from({ length: n }, (_, i) => i + 1))
+  })
+
+  test('a send that throws is journalled as ok:false with the ids that DID land', async () => {
+    let calls = 0
+    const api = makeStubApi({
+      sendMessage: async () => {
+        calls += 1
+        if (calls === 1) return { message_id: 41 }
+        throw new Error('Bad Request: chat not found')
+      },
+    })
+    const deps = makeDeps({ telegramApi: api })
+    const para = 'y'.repeat(1500)
+
+    const result = await callTool(
+      callReq('reply', { chat_id: '164795011', text: [para, para, para].join('\n\n') }),
+      deps,
+    )
+    expect(result.isError).toBe(true)
+
+    const lines = journalOf(deps)
+    expect(lines.length).toBe(1)
+    expect(lines[0]!.ok).toBe(false)
+    expect(lines[0]!.message_id).toBe(41)
+    expect(lines[0]!.error).toBe('Bad Request: chat not found')
+  })
+
+  test('a rejected chat writes NOTHING — the journal records sends, not attempts', async () => {
+    const deps = makeDeps()
+    const result = await callTool(callReq('reply', { chat_id: '999999', text: 'nope' }), deps)
+    expect(result.isError).toBe(true)
+    expect(journalOf(deps).length).toBe(0)
+  })
+
+  test('a broken journal never breaks the reply', async () => {
+    const api = makeStubApi({ sendMessage: async () => ({ message_id: 7 }) })
+    const deps = makeDeps({ telegramApi: api })
+    // Point the journal at an unwritable path (a directory component that is
+    // a file), then assert the send still reports success.
+    const broken = { ...deps.statePaths, logs: { ...deps.statePaths.logs, sent_outbound: '/dev/null/nope.jsonl' } }
+    const result = await callTool(
+      callReq('reply', { chat_id: '164795011', text: 'still ships' }),
+      { ...deps, statePaths: broken },
+    )
+    expect(result.isError).toBeUndefined()
+    expect(result.content[0]!.text).toContain('sent (id: 7)')
   })
 })

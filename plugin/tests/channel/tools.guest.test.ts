@@ -90,6 +90,7 @@ function makeStatePaths(): StatePaths {
       permission_gate: join(root, 'logs', 'permission-gate.jsonl'),
       rejected_inbound: join(root, 'logs', 'rejected-inbound.jsonl'),
       accepted_inbound: join(root, 'logs', 'accepted-inbound.jsonl'),
+      sent_outbound: join(root, 'logs', 'sent-outbound.jsonl'),
     },
   }
 }
