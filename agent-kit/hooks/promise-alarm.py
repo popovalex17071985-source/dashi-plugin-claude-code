@@ -95,7 +95,10 @@ def final_text(transcript_path: str) -> str:
 
 def promise_sentence(text: str) -> str | None:
     """The sentence carrying the commitment, trimmed for a pane message."""
-    for chunk in re.split(r"(?<=[.!?\n])\s+", text):
+    # A newline ENDS a sentence on its own: `(?<=\n)\s+` needed a second space
+    # after it, so a heading line with no full stop glued itself to the promise
+    # below and the pane got «Итог: тесты прошли\nВернусь…» as the commitment.
+    for chunk in re.split(r"(?<=[.!?])\s+|\n+", text):
         chunk = chunk.strip()
         if not chunk or DONE_ONLY_RE.match(chunk):
             continue
