@@ -13,8 +13,12 @@ set -euo pipefail
 
 WORKSPACE="${1:?нужен каталог агента}"
 AGENT="${2:?нужно имя агента}"
+# Installed agents keep channel secrets in /etc; the coordinator keeps its own
+# under the workspace. Accept both so one sweeper serves every layout.
 ENV_FILE="/etc/dashi-plugin/$AGENT/channel.env"
+[ -f "$ENV_FILE" ] || ENV_FILE="$WORKSPACE/secrets/channel.env"
 HOOK="$WORKSPACE/.claude/dashi-plugin-claude-code/plugin/scripts/fallback-reply-hook.ts"
+[ -f "$HOOK" ] || HOOK="$HOME/.claude/dashi-plugin-claude-code/plugin/scripts/fallback-reply-hook.ts"
 PROJECTS="$HOME/.claude/projects"
 
 [ -f "$ENV_FILE" ] && [ -f "$HOOK" ] || exit 0
