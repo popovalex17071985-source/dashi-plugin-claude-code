@@ -57,7 +57,18 @@
 //   FALLBACK_REPLY_RETRY_ATTEMPTS  bounded retry on empty extraction (default 4)
 //   FALLBACK_REPLY_RETRY_DELAY_MS  delay between retries (default 120ms)
 
-import { readFileSync, writeFileSync, mkdirSync, openSync, readSync, fstatSync, closeSync } from 'fs'
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  openSync,
+  readSync,
+  fstatSync,
+  closeSync,
+  readdirSync,
+  renameSync,
+  unlinkSync,
+} from 'fs'
 import { createHash } from 'crypto'
 import { dirname, join } from 'path'
 
@@ -923,8 +934,186 @@ async function main(): Promise<void> {
   // FIX 5: truncate-with-marker so a >4096-char answer delivers SOMETHING
   // rather than 400-dropping at the route's schema cap.
   const outText = truncateForTelegram(text)
-  const ok = await postFallback(config as FallbackConfig, chatId, outText)
+  const send = (toChat: string, body: string): Promise<boolean> =>
+    postFallback(config as FallbackConfig, toChat, body)
+  const ok = await send(chatId, outText)
   if (ok && statePath) persistDedupState(statePath, next)
+  const undeliveredDir = resolveUndeliveredDir(env, statePath)
+  if (!ok && undeliveredDir) {
+    // FIX 7: a Stop fires once per turn, so "skip dedup and hope for a retry"
+    // lost the answer outright. Park it; the next run drains it.
+    parkUndelivered(undeliveredDir, {
+      chat_id: chatId,
+      text: outText,
+      session_id: sessionId,
+      transcript_path: transcriptPath,
+      dedupe_token: token,
+      state_path: statePath,
+      first_failed_at: new Date().toISOString(),
+      attempts: 1,
+    })
+    warn('send unconfirmed — answer parked for retry')
+  }
+  if (ok && undeliveredDir) {
+    // Drain AFTER the fresh answer so the current turn is never delayed behind
+    // a backlog, and ONLY when this turn's own send succeeded — the route is
+    // clearly down otherwise, and re-hitting it (including the record just
+    // parked) would double the load for nothing. Writing dedup state on success
+    // keeps a parked answer from being sent twice.
+    await retryUndelivered(undeliveredDir, send, (record) => {
+      if (record.state_path && record.dedupe_token) {
+        persistDedupState(record.state_path, {
+          session_id: record.session_id ?? '',
+          transcript_path: record.transcript_path ?? '',
+          dedupe_token: record.dedupe_token,
+        })
+      }
+    })
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// FIX 7 (2026-09-19): an undelivered answer must be quarantined and retried,
+// never dropped. Until today a failed send only skipped the dedup write and
+// hoped a LATER Stop fire for the same turn would retry — but a turn fires Stop
+// once, so a transient Telegram/route failure meant the answer was gone with no
+// trace. Now the payload is parked as a file and every subsequent hook run (a
+// later turn, or the 2-minute sweeper) drains the quarantine first.
+// ─────────────────────────────────────────────────────────────────────
+
+const UNDELIVERED_MAX_ATTEMPTS = 10
+const UNDELIVERED_MAX_AGE_MS = 24 * 60 * 60 * 1000
+/** Per-run drain cap: a Stop hook must not linger behind a long backlog. */
+const UNDELIVERED_DRAIN_PER_RUN = 5
+
+export interface UndeliveredRecord {
+  readonly chat_id: string
+  readonly text: string
+  readonly session_id?: string
+  readonly transcript_path?: string
+  readonly dedupe_token?: string
+  readonly state_path?: string | undefined
+  readonly first_failed_at: string
+  readonly attempts: number
+}
+
+/**
+ * Quarantine directory for answers whose send did not confirm. It sits NEXT TO
+ * the dedup state file, so an explicit TELEGRAM_FALLBACK_REPLY_STATE (tests, a
+ * pinned state path) keeps its quarantine in the same place and never writes
+ * into the shared runtime dir.
+ */
+export function resolveUndeliveredDir(
+  env: Readonly<Record<string, string | undefined>>,
+  statePath?: string,
+): string | undefined {
+  if (statePath) return join(dirname(statePath), 'undelivered')
+  const base = env.TELEGRAM_STATE_DIR ?? env.MULTICHAT_STATE_DIR
+  if (!base) return undefined
+  return join(base, 'fallback-reply', 'undelivered')
+}
+
+/**
+ * Park an unconfirmed answer in the quarantine. Best-effort: a failure here is
+ * logged and swallowed — parking must never throw out of the Stop hook.
+ */
+export function parkUndelivered(dir: string, record: UndeliveredRecord): string | undefined {
+  try {
+    mkdirSync(dir, { recursive: true })
+    const name = `${Date.now()}-${Math.random().toString(16).slice(2, 6)}.json`
+    const path = join(dir, name)
+    writeFileSync(path, JSON.stringify(record), 'utf8')
+    return path
+  } catch (err) {
+    warn(`park failed: ${err instanceof Error ? err.message : 'unknown'}`)
+    return undefined
+  }
+}
+
+/**
+ * Drain the quarantine: oldest first, at most UNDELIVERED_DRAIN_PER_RUN per run.
+ *
+ * A delivered record is unlinked and its dedup state written through
+ * `onDelivered`, so the same answer can never be sent twice (once from the
+ * quarantine, once from a later transcript read). A record that fails again has
+ * its attempt counter bumped; one that is too old or has burnt its attempts is
+ * renamed to `*.failed` so it stops consuming the budget but stays readable.
+ *
+ * Returns how many records were actually delivered.
+ */
+export async function retryUndelivered(
+  dir: string,
+  send: (chatId: string, text: string) => Promise<boolean>,
+  onDelivered?: (record: UndeliveredRecord) => void,
+  now: number = Date.now(),
+): Promise<number> {
+  let names: string[]
+  try {
+    names = readdirSync(dir)
+      .filter((n) => n.endsWith('.json'))
+      .sort()
+  } catch {
+    return 0 // No quarantine dir — nothing to drain.
+  }
+  let delivered = 0
+  for (const name of names.slice(0, UNDELIVERED_DRAIN_PER_RUN)) {
+    const path = join(dir, name)
+    let record: UndeliveredRecord
+    try {
+      const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'))
+      if (parsed === null || typeof parsed !== 'object') throw new Error('not an object')
+      record = parsed as UndeliveredRecord
+      if (typeof record.chat_id !== 'string' || typeof record.text !== 'string') {
+        throw new Error('missing chat_id/text')
+      }
+    } catch {
+      // Unreadable/corrupt payload: retiring it keeps the queue moving.
+      try {
+        renameSync(path, `${path}.failed`)
+      } catch {
+        /* ignore */
+      }
+      continue
+    }
+    const firstFailedMs = Date.parse(record.first_failed_at ?? '')
+    const tooOld = Number.isFinite(firstFailedMs) && now - firstFailedMs > UNDELIVERED_MAX_AGE_MS
+    const attempts = typeof record.attempts === 'number' ? record.attempts : 0
+    if (tooOld || attempts >= UNDELIVERED_MAX_ATTEMPTS) {
+      warn(`undelivered retired after ${attempts} attempts`)
+      try {
+        renameSync(path, `${path}.failed`)
+      } catch {
+        /* ignore */
+      }
+      continue
+    }
+    let ok = false
+    try {
+      ok = await send(record.chat_id, record.text)
+    } catch {
+      ok = false
+    }
+    if (ok) {
+      delivered += 1
+      try {
+        onDelivered?.(record)
+      } catch {
+        /* dedup bookkeeping must not undo a successful send */
+      }
+      try {
+        unlinkSync(path)
+      } catch {
+        /* ignore */
+      }
+      continue
+    }
+    try {
+      writeFileSync(path, JSON.stringify({ ...record, attempts: attempts + 1 }), 'utf8')
+    } catch {
+      /* ignore */
+    }
+  }
+  return delivered
 }
 
 const isMainModule = (() => {
