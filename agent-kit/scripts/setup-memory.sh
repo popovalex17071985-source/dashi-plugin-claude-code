@@ -32,7 +32,12 @@ say() { echo "[memory] $*"; }
 command -v docker >/dev/null 2>&1 || { say "docker нет -- долгую память пропускаю"; exit 0; }
 [ "$(id -u)" = "0" ] || { say "нужен root для службы эмбеддингов -- пропускаю"; exit 0; }
 MEM_AVAIL_MB=$(awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo)
-say "свободно памяти: ${MEM_AVAIL_MB} МБ"
+SWAP_MB=$(awk '/SwapFree/ {print int($2/1024)}' /proc/meminfo)
+# Подкачка тоже считается: модель эмбеддингов держит в памяти одни и те же веса,
+# ядро спокойно свопит её холодную часть. Без этого VPS на 2 ГБ с включённым
+# свопом отбраковывался как «не потянет».
+MEM_BUDGET_MB=$(( MEM_AVAIL_MB + SWAP_MB / 2 ))
+say "свободно памяти: ${MEM_AVAIL_MB} МБ (с подкачкой в расчёте: ${MEM_BUDGET_MB} МБ)"
 
 # --- embeddings: local service when RAM allows ------------------------------
 # 1500 MB is measured, not guessed: the service settles at ~1.0 GB and OpenViking
@@ -44,10 +49,27 @@ EMBED_OK=0
 if curl -sf -m 5 "http://127.0.0.1:$EMBED_PORT/health" >/dev/null 2>&1; then
   EMBED_OK=1
   say "служба эмбеддингов уже живёт на 127.0.0.1:$EMBED_PORT"
-elif [ "$MEM_AVAIL_MB" -ge 1500 ]; then
+# Замер 20.09.2026 на Смите: поднятый сервер эмбеддингов держит 735 МБ.
+# Порог 1500 был взят с потолка и отсекал машины, где он помещается.
+elif [ "$MEM_BUDGET_MB" -ge 1100 ]; then
   install -o "$OWNER" -g "$OWNER" -m 755 "$KIT/embed-server.py" "$WORKSPACE/scripts/embed-server.py"
-  su - "$OWNER" -c "python3 -m pip install -q --user fastembed fastapi uvicorn" >/dev/null 2>&1 || {
-    say "не встали зависимости эмбеддингов -- локальный путь отпал"; }
+  # Ставим с логом и второй попыткой: 20.09.2026 на Смите первый прогон pip
+  # отвалился, вывод ушёл в /dev/null, и агент молча остался без памяти -- со
+  # стороны это выглядело как «путь невозможен». Ровно та же команда со второго
+  # раза отработала за минуту.
+  PIPLOG="$WORKSPACE/logs/embed-install.log"
+  mkdir -p "$(dirname "$PIPLOG")"
+  PKGS="fastembed fastapi uvicorn"
+  for attempt in 1 2; do
+    su - "$OWNER" -c "python3 -m pip install -q --user $PKGS" >>"$PIPLOG" 2>&1 && break
+    say "зависимости эмбеддингов не встали с попытки $attempt (подробности: $PIPLOG)"
+    sleep 5
+  done
+  # pip не справился вовсе -- пробуем uv, он есть почти на каждой машине агента.
+  if ! su - "$OWNER" -c "python3 -c 'import fastembed, fastapi, uvicorn'" >/dev/null 2>&1 \
+     && command -v uv >/dev/null 2>&1; then
+    su - "$OWNER" -c "uv pip install --system -q $PKGS" >>"$PIPLOG" 2>&1 || true
+  fi
   if su - "$OWNER" -c "python3 -c 'import fastembed, fastapi, uvicorn'" >/dev/null 2>&1; then
     cat > /etc/systemd/system/dashi-embed.service <<UNIT
 [Unit]
