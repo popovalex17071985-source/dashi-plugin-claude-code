@@ -11,9 +11,42 @@ set -uo pipefail
 WORKSPACE="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 LOG="$WORKSPACE/logs/auth-alive-watch.log"
 STATE="$WORKSPACE/data/auth-alive.state"
-CLAUDE_BIN="${CLAUDE_BIN:-$HOME/.local/bin/claude}"
+# Второй повод для вечной ложной тревоги: путь был зашит в ~/.local/bin, а
+# установщик кладёт CLI в /usr/bin (Смит, 20.09.2026) -- сторож не находил
+# бинарь и объявлял это протухшим входом.
+CLAUDE_BIN="${CLAUDE_BIN:-}"
+if [ -z "$CLAUDE_BIN" ] || [ ! -x "$CLAUDE_BIN" ]; then
+  for c in "$HOME/.local/bin/claude" /usr/local/bin/claude /usr/bin/claude; do
+    [ -x "$c" ] && { CLAUDE_BIN="$c"; break; }
+  done
+  [ -n "$CLAUDE_BIN" ] || CLAUDE_BIN="$(command -v claude 2>/dev/null || true)"
+fi
 mkdir -p "$(dirname "$LOG")" "$(dirname "$STATE")"
 touch "$LOG"
+
+# The probe runs from cron, and cron has no environment: without the token the
+# CLI answers "Not logged in" no matter how healthy the login is, so the watch
+# reported an outage every few hours while the agent was working fine (Smith,
+# 20.09.2026). A watchdog that cries wolf is worse than none -- the real expiry
+# would be ignored. Take the token from the same file the service uses.
+if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+  AGENT_NAME="$(basename "$WORKSPACE")"
+  ENV_FILE="/etc/dashi-plugin/$AGENT_NAME/channel.env"
+  if [ -r "$ENV_FILE" ]; then
+    CLAUDE_CODE_OAUTH_TOKEN="$(sed -n 's/^CLAUDE_CODE_OAUTH_TOKEN=//p' "$ENV_FILE" | tr -d '"' | head -1)"
+    export CLAUDE_CODE_OAUTH_TOKEN
+  fi
+fi
+if [ -z "$CLAUDE_BIN" ]; then
+  echo "$(date -Is) CLI не найден -- проверить нечем" >> "$LOG"
+  exit 0
+fi
+# No token anywhere = the probe cannot tell a dead login from a missing config.
+# Say exactly that instead of announcing an outage.
+if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+  echo "$(date -Is) токена нет ни в окружении, ни в ${ENV_FILE:-/etc/dashi-plugin/*/channel.env} -- проверить нечем" >> "$LOG"
+  exit 0
+fi
 
 notify() {
   [ -f "$WORKSPACE/bin/tg-send.py" ] && /usr/bin/python3 "$WORKSPACE/bin/tg-send.py" "$1" || true
