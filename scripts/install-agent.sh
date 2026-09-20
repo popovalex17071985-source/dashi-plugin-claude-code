@@ -14,7 +14,7 @@
 # Использование:
 #   bash install-agent.sh                      # спросит всё интерактивно
 #   bash install-agent.sh --name jarvis --token 123:AA... --user-id 140141496
-#   ... --openai-key sk-...                  # + семантическая память OpenViking (docker)
+#   ... --openai-key sk-...                  # запасной путь памяти, если локальная модель не влезла
 #   ... --branch feature/x                   # staging-агент: обновляется с feature-ветки, не с main
 #   ... --model opus                         # модель Claude для агента (opus|sonnet|haiku|полный id); без флага — дефолт аккаунта
 #   ... --claude-token sk-ant-oat01-...      # готовый годовой токен (claude setup-token на любой машине)
@@ -259,7 +259,10 @@ if [[ ! -f "$ENV_FILE" ]]; then
   # (cloud-init, CI) /dev/tty нет, и ask() сыпал ошибками в лог
   if [[ $ASSUME_YES -eq 0 ]]; then
     [[ -n "$GROQ_KEY" ]] || ask GROQ_KEY "Ключ Groq для голосовых (Enter — пропустить): " 0
-    [[ -n "$OPENAI_KEY" ]] || ask OPENAI_KEY "Ключ OpenAI для семантической памяти OpenViking (Enter — без неё): " 0
+    # Память ставится и БЕЗ этого ключа (локальные эмбеддинги). Прежний текст
+    # «Enter -- без неё» пугал хозяина в обратную сторону: он думал, что без
+    # ключа агент останется без долгой памяти, и шёл покупать ключ зря.
+    [[ -n "$OPENAI_KEY" ]] || ask OPENAI_KEY "Ключ OpenAI для памяти -- НЕ обязателен, память встанет и без него (Enter — пропустить): " 0
   fi
 else
   # Повторный прогон: id нужен ниже для хуков, берём из готового конфига,
@@ -1326,7 +1329,9 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 # Файловая память (MEMORY.md) ищет по словам; OpenViking — по смыслу, по всей
 # истории разговоров. Сервер — docker-контейнер (~400 МБ RAM, host-network,
-# 127.0.0.1:1933), эмбеддинги и разбор — через ключ OpenAI хозяина (копейки).
+# 127.0.0.1:1933). Эмбеддинги по умолчанию СВОИ, локальной моделью на машине
+# агента (agent-kit/scripts/setup-memory.sh) — ключ OpenAI не нужен и нужен
+# только как запасной путь, если локальная модель не помещается в память.
 # Entrypoint образа биндит 0.0.0.0, если не сказать иначе (OPENVIKING_SERVER_HOST) —
 # с host-network это открыло бы память наружу; dev-auth сам отказывается так стартовать.
 # ponytail: один агент на машину — порт 1933 зашит; второй агент на том же
@@ -1340,11 +1345,15 @@ if [[ -z "$OPENAI_KEY" && ! -s "$OV_DIR/ov.conf" ]]; then
   # установщик знал только про OpenAI и молча пропускал шаг.
   KIT_MEM="/home/$SERVICE_USER/.claude-lab/$AGENT_NAME/.claude/dashi-plugin-claude-code/agent-kit/scripts/setup-memory.sh"
   if [[ -x "$KIT_MEM" || -f "$KIT_MEM" ]]; then
-    if bash "$KIT_MEM" --workspace "/home/$SERVICE_USER/.claude-lab/$AGENT_NAME" --agent "$AGENT_NAME" >/dev/null 2>&1 \
+    # Вывод в лог, а не в /dev/null: именно молчание этого шага сделало провал
+    # памяти на Смите (20.09) неразбираемым.
+    MEM_LOG="/home/$SERVICE_USER/.claude-lab/$AGENT_NAME/logs/setup-memory.log"
+    mkdir -p "$(dirname "$MEM_LOG")"
+    if bash "$KIT_MEM" --workspace "/home/$SERVICE_USER/.claude-lab/$AGENT_NAME" --agent "$AGENT_NAME" >"$MEM_LOG" 2>&1 \
        && curl -sf -m 5 http://127.0.0.1:1933/health >/dev/null 2>&1; then
       ok "память на локальных эмбеддингах (ключ OpenAI не нужен)"
     else
-      skip "память не поднялась локально -- прогон с --openai-key KEY поставит её на OpenAI"
+      skip "память не поднялась локально ($MEM_LOG) -- прогон с --openai-key KEY поставит её на OpenAI"
     fi
   else
     skip "без семантической памяти (повторный прогон с --openai-key KEY включит)"
