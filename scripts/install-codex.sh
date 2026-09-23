@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # install-codex.sh — разворачивает Codex-агента в Telegram на чистом сервере
-# одной командой. Аналог install-agent.sh, но для Codex (подписка ChatGPT).
+# одной командой. Аналог install-agent.sh, но для Codex (подписка ChatGPT
+# или API-ключ OpenAI -- флаг --openai-key).
 #
 # Заменяет ручные части 2–8 из artifacts/codex-agent-guide-vps.md. Скрипт
 # идемпотентный: гоняй сколько угодно раз, он доделывает недостающее и не
@@ -9,12 +10,14 @@
 # Что человек делает сам (автоматизировать нельзя):
 #   1. арендует VPS и заходит на него root'ом
 #   2. заводит ДВУХ ботов у @BotFather и узнаёт свой id у @userinfobot
-#   3. логинится в ChatGPT по ссылке (codex login) — скрипт остановится и скажет как
+#   3. логинится в ChatGPT по ссылке (codex login) — скрипт остановится и скажет как;
+#      с --openai-key этот шаг не нужен: вход по ключу, одним прогоном
 #   4. правит характер агента в ~/.codex/AGENTS.md (шаблон скрипт положит сам)
 #
 # Использование:
 #   bash install-codex.sh                 # спросит всё интерактивно
 #   bash install-codex.sh --token 123:AA... --watchdog-token 456:BB... --chat-id 140141496
+#   bash install-codex.sh ... --openai-key sk-...   # вход по API-ключу вместо подписки
 #
 set -euo pipefail
 
@@ -22,7 +25,7 @@ MAIN_DIR=/root/agent-main
 WATCH_DIR=/root/agent-watchdog
 CODEX_HOME=/root/.codex
 
-BOT_TOKEN=""; WATCH_TOKEN=""; CHAT_ID=""; GROQ_KEY=""; ASSUME_YES=0
+BOT_TOKEN=""; WATCH_TOKEN=""; CHAT_ID=""; GROQ_KEY=""; OPENAI_KEY=""; ASSUME_YES=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
@@ -40,6 +43,7 @@ while [[ $# -gt 0 ]]; do
     --watchdog-token) WATCH_TOKEN="$2"; shift 2 ;;
     --chat-id)        CHAT_ID="$2";     shift 2 ;;
     --groq-key)       GROQ_KEY="$2";    shift 2 ;;
+    --openai-key)     OPENAI_KEY="$2";  shift 2 ;;
     --yes|-y)         ASSUME_YES=1;     shift ;;
     --help|-h)        usage ;;
     *) die "неизвестный аргумент: $1 (--help для справки)" ;;
@@ -457,6 +461,22 @@ ok "юниты записаны"
 # ─────────────────────────────────────────────────────────────────────────────
 # Проверяем файл с токенами, а не `codex login status`: у части версий CLI такой
 # подкоманды нет, и её ошибка неотличима от «не залогинен» — путь к вечному циклу.
+# Ключ OpenAI -- вход без браузера: `codex login --with-api-key` читает ключ из stdin
+# (developers.openai.com/codex/auth). Ключ не попадает ни в ps, ни в историю.
+if [[ ! -s "$CODEX_HOME/auth.json" && -n "$OPENAI_KEY" ]]; then
+  [[ "$OPENAI_KEY" == sk-* ]] || die "ключ OpenAI должен начинаться с sk-"
+  # `login --with-api-key` ключ НЕ проверяет (фальшивый тоже «Successfully logged in»),
+  # поэтому живость ключа и доступ к модели смотрим сами. Ключ -- через stdin curl'а.
+  MODEL="$(sed -n 's/^model = "\(.*\)"/\1/p' "$CODEX_HOME/config.toml" | head -1)"
+  MODELS="$(printf 'header = "Authorization: Bearer %s"\n' "$OPENAI_KEY" \
+    | curl -sm 20 --config - https://api.openai.com/v1/models || true)"
+  grep -q '"id"' <<<"$MODELS" || die "OpenAI не принял ключ -- проверь ключ и баланс на platform.openai.com"
+  grep -q "\"id\": *\"$MODEL\"" <<<"$MODELS" \
+    || die "ключ живой, но модели $MODEL на нём нет -- поменяй model в $CODEX_HOME/config.toml"
+  printf '%s' "$OPENAI_KEY" | CODEX_HOME="$CODEX_HOME" "$CODEX_BIN" login --with-api-key >/dev/null \
+    || die "Codex не записал ключ OpenAI"
+  ok "вход по ключу OpenAI"
+fi
 if [[ ! -s "$CODEX_HOME/auth.json" ]]; then
   cat <<EOF
 
