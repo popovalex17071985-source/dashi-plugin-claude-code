@@ -49,6 +49,8 @@ grep -q 'claude \${DASHI_MODEL:+--model \$DASHI_MODEL}' "$S" || fail "dashi-run 
 # Ремонтник-страховка: отдельный бот, отдельный юнит, не под root
 grep -q -- '--repair-token'           "$S" || fail "нет флага --repair-token (бот-страховка)"
 grep -q 'claude-code-telegram'        "$S" || fail "ремонтник не ставит claude-code-telegram"
+grep -q '^CLAUDE_CLI_PATH=\$R_CLI'      "$S" || fail "ремонтник без CLAUDE_CLI_PATH -- SDK возьмёт встроенный старый claude"
+! grep -q '^CLAUDE_CLI_PATH=$'        "$S" || fail "пустой CLAUDE_CLI_PATH в .env ремонтника"
 
 echo "✓ install-agent smoke ok"
 
