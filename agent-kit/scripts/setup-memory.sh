@@ -63,7 +63,17 @@ if curl -sf -m 5 "http://127.0.0.1:$EMBED_PORT/health" >/dev/null 2>&1; then
 # Замер 20.09.2026 на Смите: поднятый сервер эмбеддингов держит 735 МБ.
 # Порог 1500 был взят с потолка и отсекал машины, где он помещается.
 elif [ "$MEM_BUDGET_MB" -ge 1100 ]; then
+  # 24.09.2026, агент Лены: у агентов со старого установщика нет $WORKSPACE/scripts,
+  # install без -d падал «No such file or directory», и память молча не вставала.
+  install -d -o "$OWNER" -g "$OWNER" "$WORKSPACE/scripts"
   install -o "$OWNER" -g "$OWNER" -m 755 "$KIT/embed-server.py" "$WORKSPACE/scripts/embed-server.py"
+  # Там же не было pip (голая Ubuntu 22.04), а uv -- тоже нет: ставим pip из apt.
+  # apt-get update обязателен -- со старым индексом пакеты отдают 404.
+  if ! python3 -m pip --version >/dev/null 2>&1 && command -v apt-get >/dev/null 2>&1; then
+    DEBIAN_FRONTEND=noninteractive apt-get update -q >/dev/null 2>&1 || true
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -q python3-pip >/dev/null 2>&1 \
+      || say "pip из apt не встал"
+  fi
   # Ставим с логом и второй попыткой: 20.09.2026 на Смите первый прогон pip
   # отвалился, вывод ушёл в /dev/null, и агент молча остался без памяти -- со
   # стороны это выглядело как «путь невозможен». Ровно та же команда со второго
