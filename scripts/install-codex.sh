@@ -131,11 +131,16 @@ CODEX_BIN="$(command -v codex)"
 say "Конфиг Codex"
 mkdir -p "$CODEX_HOME"
 if [[ -f "$CODEX_HOME/config.toml" ]]; then
+  # Старые установки прибивали model = "gpt-5.5" -- на части подписок это 404.
+  if grep -q '^model = "gpt-5.5"' "$CODEX_HOME/config.toml"; then
+    sed -i '/^model = "gpt-5.5"/d' "$CODEX_HOME/config.toml"
+    ok "убрал прибитую модель gpt-5.5 из config.toml"
+  fi
   skip "config.toml на месте"
 else
   cat > "$CODEX_HOME/config.toml" <<'EOF'
-# Модель — свежая, оставь как есть
-model = "gpt-5.5"
+# Модель не задаём: Codex сам берёт ту, что доступна на твоей подписке
+# (прибитая gpt-5.5 давала 404 «model does not exist» на части аккаунтов, 25.09.2026)
 
 # "never" = агент не переспрашивает на каждом шаге (нужно для автономной работы)
 approval_policy = "never"
