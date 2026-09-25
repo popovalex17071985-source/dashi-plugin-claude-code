@@ -27,6 +27,7 @@ BOT_TOKEN=""; WATCH_TOKEN=""; CHAT_ID=""; GROQ_KEY=""; ASSUME_YES=0
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
 skip() { printf '    \033[2m· %s (уже сделано)\033[0m\n' "$*"; }
+warn() { printf '    \033[33m!\033[0m %s\n' "$*"; }
 die()  { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
 usage() {
@@ -163,6 +164,8 @@ MEMORY_SECTION=$(cat <<'EOF'
 - history/ГГГГ-ММ-ДД.md — полный журнал нашей переписки, его пишет мост сам.
 Как пользоваться:
 - В начале КАЖДОЙ задачи прочитай MEMORY.md и open-threads.md.
+- Блок «[Мост: из памяти по смыслу…]» в конце сообщения — найденное в памяти по
+  смыслу. Пригодилось — открой указанный файл и опирайся на него; не в тему — игнорируй.
 - Я ссылаюсь на прошлое («вернёмся к…», «помнишь…», «мы обсуждали…», незнакомая тема) —
   сначала ищи: rg -i по memory/, open-threads.md и history/ (несколько вариантов слова),
   прочитай найденное и продолжай с того места, где остановились. «Не помню» — только
@@ -175,7 +178,7 @@ MEMORY_SECTION=$(cat <<'EOF'
 EOF
 )
 if [[ -f "$CODEX_HOME/AGENTS.md" ]]; then
-  if grep -q "history/ГГГГ-ММ-ДД.md" "$CODEX_HOME/AGENTS.md"; then
+  if grep -q "Мост: из памяти по смыслу" "$CODEX_HOME/AGENTS.md"; then
     skip "AGENTS.md на месте (характер не трогаю)"
   else
     cp "$CODEX_HOME/AGENTS.md" "$CODEX_HOME/AGENTS.md.bak-$(date +%Y%m%d%H%M%S)"
@@ -205,6 +208,8 @@ else
 - history/ГГГГ-ММ-ДД.md — полный журнал нашей переписки, его пишет мост сам.
 Как пользоваться:
 - В начале КАЖДОЙ задачи прочитай MEMORY.md и open-threads.md.
+- Блок «[Мост: из памяти по смыслу…]» в конце сообщения — найденное в памяти по
+  смыслу. Пригодилось — открой указанный файл и опирайся на него; не в тему — игнорируй.
 - Я ссылаюсь на прошлое («вернёмся к…», «помнишь…», «мы обсуждали…», незнакомая тема) —
   сначала ищи: rg -i по memory/, open-threads.md и history/ (несколько вариантов слова),
   прочитай найденное и продолжай с того места, где остановились. «Не помню» — только
@@ -350,7 +355,15 @@ while :; do
     # с «Usage: codex exec resume ...» на каждом втором сообщении (25.09.2026).
     # --json: шаги работы идут событиями в events.jsonl, карточка пишет их по-людски.
     : > events.jsonl
-    timeout 600 "\$CODEX" exec --json --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" \$RESUME \$IMGARG "\$TEXT" < /dev/null > events.jsonl 2> task.log &
+    # Память по смыслу: найденное в журнале и файлах памяти мост подкладывает к
+    # сообщению сам -- как recall-хук у Claude-агентов. Нет службы -- пусто, не мешает.
+    PROMPT="\$TEXT"
+    MEMHITS=\$(timeout 30 python3 ./memsearch.py query "\$TEXT" 2>/dev/null)
+    [ -n "\$MEMHITS" ] && PROMPT="\$TEXT
+
+[Мост: из памяти по смыслу, может пригодиться -- подробности в указанных файлах:
+\$MEMHITS]"
+    timeout 600 "\$CODEX" exec --json --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" \$RESUME \$IMGARG "\$PROMPT" < /dev/null > events.jsonl 2> task.log &
     PID=\$!
     PREV=""; START=\$(date +%s)
     while kill -0 "\$PID" 2>/dev/null; do
@@ -388,7 +401,7 @@ STEPS_EOF
       # resume не взлетел (сессия протухла/не найдена) — повтор с чистого листа
       log "resume rc=\$RC, повтор без resume"
       rm -f .session_started
-      timeout 600 "\$CODEX" exec --json --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" \$IMGARG "\$TEXT" < /dev/null >> events.jsonl 2>> task.log
+      timeout 600 "\$CODEX" exec --json --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" \$IMGARG "\$PROMPT" < /dev/null >> events.jsonl 2>> task.log
       RC=\$?
     fi
     [ \$RC -eq 0 ] && touch .session_started
@@ -415,6 +428,7 @@ STEPS_EOF
     printf '\n## %s\n**Владелец:** %s\n\n**Агент:** %s\n' "\$(date '+%H:%M')" "\$TEXT" "\$ANSWER" >> "\$WORKDIR/history/\$(date +%F).md"
     TURNS=\$(( \$(cat .turns 2>/dev/null || echo 0) + 1 )); echo "\$TURNS" > .turns
     [ "\$TURNS" -ge "\$SAVE_EVERY" ] && save_memory
+    ( timeout 600 python3 ./memsearch.py index >/dev/null 2>&1 & )
   done
 done
 BRIDGE
@@ -438,6 +452,262 @@ if [[ -z "$(ls -A "$MAIN_DIR/workspace/history" 2>/dev/null)" ]]; then
   done
   n=$(ls "$MAIN_DIR/workspace/history" 2>/dev/null | wc -l)
   ok "журнал прошлых разговоров перенесён в history/ (дней: $n)"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4b. Память по смыслу: локальная модель эмбеддингов, без ключей и денег
+# ─────────────────────────────────────────────────────────────────────────────
+# multilingual-e5-large выбран замером 25.09.2026 на сервере агента: из четырёх
+# моделей fastembed только она нашла «вернёмся к ДНС» по записи про DNS. Держит
+# ~2 ГБ памяти, поэтому нужен запас RAM+своп; нет запаса -- пропускаем, поиск
+# по словам (rg) остаётся.
+say "Память по смыслу"
+mem_mb() { awk '/MemTotal|SwapTotal/{s+=$2} END{print int(s/1024)}' /proc/meminfo; }
+if (( $(mem_mb) < 5500 )) && ! swapon --show | grep -q .; then
+  fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile \
+    && { grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab; } \
+    && ok "своп 2 ГБ для модели памяти"
+fi
+if (( $(mem_mb) < 5500 )); then
+  skip "памяти мало ($(mem_mb) МБ RAM+своп) -- поиск по смыслу пропускаю, по словам работает"
+else
+  if ! python3 -c 'import fastembed, fastapi, uvicorn' >/dev/null 2>&1; then
+    python3 -m pip --version >/dev/null 2>&1 || { DEBIAN_FRONTEND=noninteractive apt-get update -q >/dev/null 2>&1; DEBIAN_FRONTEND=noninteractive apt-get install -y -q python3-pip >/dev/null 2>&1; }
+    for attempt in 1 2; do
+      python3 -m pip install -q --user fastembed fastapi uvicorn >> "$MAIN_DIR/embed-install.log" 2>&1 && break
+      sleep 5
+    done
+  fi
+  if python3 -c 'import fastembed, fastapi, uvicorn' >/dev/null 2>&1; then
+    cat > "$MAIN_DIR/embed-server.py" <<'EOF'
+#!/usr/bin/env python3
+"""Minimal OpenAI-compatible embeddings server on fastembed (CPU, ~400 MB RSS).
+
+Serves POST /v1/embeddings so OpenViking's `provider: openai` path can use a
+local model: no API key, no money, no outbound traffic. Bound to loopback.
+"""
+from __future__ import annotations
+
+import os
+from typing import Any
+
+from fastapi import FastAPI
+from fastembed import TextEmbedding
+from pydantic import BaseModel
+
+MODEL_NAME = os.environ.get("EMBED_MODEL", "intfloat/multilingual-e5-small")
+MAX_CHARS = int(os.environ.get("EMBED_MAX_CHARS", "8000"))
+
+app = FastAPI()
+_model = TextEmbedding(model_name=MODEL_NAME, threads=1)
+
+
+class EmbedRequest(BaseModel):
+    input: str | list[str]
+    model: str | None = None
+
+
+@app.get("/health")
+def health() -> dict[str, Any]:
+    return {"status": "ok", "model": MODEL_NAME}
+
+
+@app.post("/v1/embeddings")
+def embeddings(req: EmbedRequest) -> dict[str, Any]:
+    texts = [req.input] if isinstance(req.input, str) else list(req.input)
+    # The model truncates internally at its context window; cap the payload so a
+    # huge chunk cannot stall the single worker thread.
+    texts = [t[:MAX_CHARS] for t in texts]
+    vectors = list(_model.embed(texts))
+    data = [
+        {"object": "embedding", "index": i, "embedding": [float(x) for x in vec]}
+        for i, vec in enumerate(vectors)
+    ]
+    return {"object": "list", "data": data, "model": MODEL_NAME}
+EOF
+    cat > "$MAIN_DIR/memsearch.py" <<'EOF'
+#!/usr/bin/env python3
+"""Semantic search over the Codex agent's memory: history/, memory/, open-threads.md.
+
+Embeddings come from the local embed server (fastembed, multilingual-e5-large on
+127.0.0.1:1934), so no
+key and no money. The index is a JSON cache keyed by chunk hash: re-indexing only
+embeds what is new.
+  memsearch.py index         -- embed new chunks
+  memsearch.py query "text"  -- print hits above the threshold
+Always exits 0: memory is a convenience, never a blocker.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+import os
+import re
+import sys
+import urllib.request
+from pathlib import Path
+
+WS = Path(os.environ.get("MEM_WORKSPACE", Path(__file__).resolve().parent / "workspace"))
+INDEX = WS / ".memindex.json"
+URL = os.environ.get("MEM_EMBED_URL", "http://127.0.0.1:1934/v1/embeddings")
+# multilingual-e5-large: scores sit high and close together. Measured 25.09.2026 on
+# the agent box (cosine + lexical bonus): relevant 0.80-0.90, off-topic best 0.77.
+# Borderline noise reaches the agent as «может пригодиться», and it ignores it.
+# e5 wants the "query: "/"passage: " prefixes, without them ranking degrades.
+THRESHOLD = float(os.environ.get("MEM_THRESHOLD", "0.78"))
+TOP = 3
+CHUNK_CHARS = 1500
+SNIPPET_CHARS = 400
+BATCH = 32
+
+
+def embed(texts: list[str]) -> list[list[float]]:
+    out: list[list[float]] = []
+    for i in range(0, len(texts), BATCH):
+        body = json.dumps({"input": texts[i:i + BATCH]}).encode()
+        req = urllib.request.Request(URL, body, {"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=120) as r:
+            out += [d["embedding"] for d in json.load(r)["data"]]
+    return out
+
+
+def chunks() -> list[tuple[str, str]]:
+    """(label, text) for every searchable piece of memory."""
+    res: list[tuple[str, str]] = []
+    for f in sorted((WS / "history").glob("*.md")):
+        for block in re.split(r"\n(?=## )", f.read_text(errors="ignore")):
+            block = block.strip()
+            if len(block) > 20:
+                head = block.splitlines()[0].lstrip("# ").strip()
+                res.append((f"history/{f.name} {head}", block[:CHUNK_CHARS]))
+    for f in sorted((WS / "memory").glob("*.md")):
+        res.append((f"memory/{f.name}", f.read_text(errors="ignore")[:CHUNK_CHARS]))
+    ot = WS / "open-threads.md"
+    if ot.exists():
+        for block in re.split(r"\n(?=## )", ot.read_text(errors="ignore")):
+            if block.startswith("## "):
+                res.append(("open-threads.md " + block.splitlines()[0][3:60], block[:CHUNK_CHARS]))
+    return res
+
+
+def key(text: str) -> str:
+    return hashlib.sha1(text.encode()).hexdigest()
+
+
+def load() -> dict:
+    try:
+        return json.loads(INDEX.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def index() -> dict:
+    old = load()
+    items = chunks()
+    new = {key(t): {"label": l, "text": t} for l, t in items}
+    todo = [h for h in new if h not in old]
+    if todo:
+        for h, v in zip(todo, embed(["passage: " + new[h]["text"] for h in todo])):
+            new[h]["vec"] = v
+    for h in new:
+        if "vec" not in new[h]:
+            new[h]["vec"] = old[h]["vec"]
+    INDEX.write_text(json.dumps(new, ensure_ascii=False))
+    return new
+
+
+def cos(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    na = math.sqrt(sum(x * x for x in a)); nb = math.sqrt(sum(y * y for y in b))
+    return dot / (na * nb) if na and nb else 0.0
+
+
+# Conversational filler drowns the topic: «давай вернёмся к вопросу про ДНС, на чём
+# остановились» scored the DNS note below small talk (25.09.2026). Strip it, then add
+# a lexical bonus with Cyrillic->Latin transliteration (ДНС -> dns).
+STOP = set("""давай давайте вернемся вернёмся вернуться вопрос вопросу про на чем чём мы там
+остановились остановились что как это а и в во по с со у о об же ну ка ли слушай помнишь
+обсуждали говорили было были тот та то тогда еще ещё мне меня мой моя ты тебя""".split())
+TRANSLIT = str.maketrans("абвгдезийклмнопрстуфхцыэ", "abvgdezijklmnoprstufhcye")
+LEX_WEIGHT = 0.1
+
+
+def content_words(q: str) -> list[str]:
+    return [w for w in re.findall(r"[\w-]+", q.lower()) if len(w) >= 2 and w not in STOP]
+
+
+def lexical(words: list[str], text: str) -> float:
+    if not words:
+        return 0.0
+    t = text.lower()
+    hit = sum(1 for w in words if w in t or w.translate(TRANSLIT) in t)
+    return hit / len(words)
+
+
+def query(q: str) -> str:
+    idx = load() or index()
+    if not idx or len(q.strip()) < 12:  # «привет», «живой?» -- искать нечего
+        return ""
+    words = content_words(q)
+    qv = embed(["query: " + (" ".join(words) or q)])[0]
+    scored = sorted(((cos(qv, v["vec"]) + LEX_WEIGHT * lexical(words, v["text"]), v)
+                     for v in idx.values()), key=lambda s: -s[0])
+    lines = []
+    for score, v in scored[:TOP]:
+        if score < THRESHOLD:
+            break
+        snip = re.sub(r"\s+", " ", v["text"])[:SNIPPET_CHARS]
+        lines.append(f"- [{score:.2f}] {v['label']}: {snip}")
+    return "\n".join(lines)
+
+
+def main() -> None:
+    try:
+        if sys.argv[1:2] == ["index"]:
+            n = len(index())
+            print(f"chunks: {n}")
+        elif sys.argv[1:2] == ["query"]:
+            print(query(" ".join(sys.argv[2:])))
+        else:
+            print(__doc__)
+    except Exception as e:  # memory must never break the bridge
+        print(f"memsearch: {e}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()
+EOF
+    chmod +x "$MAIN_DIR/memsearch.py"
+    cat > /etc/systemd/system/codex-embed.service <<UNIT
+[Unit]
+Description=Local embeddings for Codex agent memory (semantic search)
+After=network.target
+
+[Service]
+Environment=HOME=/root
+Environment=OMP_NUM_THREADS=1
+Environment=EMBED_MODEL=intfloat/multilingual-e5-large
+ExecStart=/root/.local/bin/uvicorn embed-server:app --host 127.0.0.1 --port 1934
+WorkingDirectory=$MAIN_DIR
+Restart=always
+MemoryMax=3000M
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+    systemctl daemon-reload; systemctl enable -q codex-embed; systemctl restart codex-embed
+    # первый старт качает модель (~2 ГБ) -- ждём до 10 минут
+    for _ in $(seq 1 120); do sleep 5; curl -sf -m 5 http://127.0.0.1:1934/health >/dev/null && break; done
+    if curl -sf -m 5 http://127.0.0.1:1934/health >/dev/null; then
+      ( cd "$MAIN_DIR" && nohup timeout 1800 python3 ./memsearch.py index >/dev/null 2>&1 & )
+      ok "поиск по смыслу работает (индекс журнала строится в фоне)"
+    else
+      warn "модель памяти не поднялась -- journalctl -u codex-embed; поиск по словам работает"
+    fi
+  else
+    warn "не встали пакеты модели памяти ($MAIN_DIR/embed-install.log) -- поиск по словам работает"
+  fi
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
