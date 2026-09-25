@@ -113,9 +113,13 @@ export PATH="$HOME/.local/bin:$PATH"
 if command -v codex >/dev/null; then
   skip "codex $(codex --version 2>/dev/null | head -1)"
 else
-  # </dev/null: установщик Codex спрашивает «Start Codex now?» — глушим stdin,
-  # чтобы он не запускал интерактивный Codex и не ронял скрипт (set -e)
-  curl -fsSL https://chatgpt.com/codex/install.sh | sh </dev/null || true
+  # Установщик Codex спрашивает «Start Codex now?» — глушим stdin (</dev/null), чтобы он
+  # не запускал интерактивный Codex. Скачиваем в файл: при «curl | sh </dev/null» sh
+  # читает скрипт из /dev/null вместо трубы, curl падает с (23) и Codex не ставится
+  # (25.09.2026, живая установка у Сани).
+  _cx=$(mktemp)
+  curl -fsSL https://chatgpt.com/codex/install.sh -o "$_cx" && sh "$_cx" </dev/null || true
+  rm -f "$_cx"
   command -v codex >/dev/null || die "codex не встал — прогони установку руками: curl -fsSL https://chatgpt.com/codex/install.sh | sh"
   ok "codex $(codex --version 2>/dev/null | head -1)"
 fi
