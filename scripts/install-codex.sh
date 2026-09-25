@@ -284,13 +284,23 @@ while :; do
     RESUME=""
     [ -f .session_started ] && RESUME="resume --last"
     OUT=\$(mktemp); : > task.log
-    timeout 600 "\$CODEX" exec \$RESUME \$IMGARG --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" > task.log 2>&1 &
+    # Опции exec -- ДО «resume»: у подкоманды resume нет --cd, и «exec resume --cd» падал
+    # с «Usage: codex exec resume ...» на каждом втором сообщении (25.09.2026).
+    # --json: шаги работы идут событиями в events.jsonl, карточка пишет их по-людски.
+    : > events.jsonl
+    timeout 600 "\$CODEX" exec --json --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" \$RESUME \$IMGARG "\$TEXT" < /dev/null > events.jsonl 2> task.log &
     PID=\$!
     PREV=""; START=\$(date +%s)
     while kill -0 "\$PID" 2>/dev/null; do
       sleep 5
       # Карточка как у dashi: «работаю — Nс» + последние шаги, текущий со стрелкой
-      STEPS=\$(grep -v '^[[:space:]]*\$' task.log | tail -3 | cut -c1-120)
+      STEPS=\$(jq -Rr 'fromjson? | if .type=="error" then "Связь с ChatGPT: переподключаюсь"
+        elif .type=="item.started" then (.item | if .type=="command_execution" then "Выполняю: " + ((.command|tostring)[0:90])
+          elif .type=="reasoning" then "Думаю" elif .type=="file_change" then "Правлю файлы"
+          elif .type=="web_search" then "Ищу в интернете" elif .type=="mcp_tool_call" then "Инструмент: " + (.tool // "?")
+          elif .type=="todo_list" then "Составляю план" elif .type=="agent_message" then "Пишу ответ" else empty end)
+        else empty end' events.jsonl 2>/dev/null | uniq | tail -3)
+      [ -z "\$STEPS" ] && STEPS="Думаю"
       N=\$(printf '%s\n' "\$STEPS" | wc -l)
       CARD="⏳ Работаю — \$(( \$(date +%s) - START ))с"
       i=0
@@ -316,11 +326,11 @@ STEPS_EOF
       # resume не взлетел (сессия протухла/не найдена) — повтор с чистого листа
       log "resume rc=\$RC, повтор без resume"
       rm -f .session_started
-      timeout 600 "\$CODEX" exec \$IMGARG --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" "\$TEXT" >> task.log 2>&1
+      timeout 600 "\$CODEX" exec --json --skip-git-repo-check --cd "\$WORKDIR" --output-last-message "\$OUT" \$IMGARG "\$TEXT" < /dev/null >> events.jsonl 2>> task.log
       RC=\$?
     fi
     [ \$RC -eq 0 ] && touch .session_started
-    cat task.log >> codex.log
+    cat events.jsonl task.log >> codex.log
     [ -n "\$MSGID" ] && curl -s -X POST "\$API/deleteMessage" \
       -d chat_id="\$TELEGRAM_CHAT_ID" -d message_id="\$MSGID" >/dev/null
     ANSWER=\$(cat "\$OUT" 2>/dev/null); rm -f "\$OUT"
@@ -329,8 +339,9 @@ STEPS_EOF
         ANSWER="Codex думал дольше 10 минут — оборвал. Попробуй задачу помельче."
         log "codex exec timeout"
       elif [ \$RC -ne 0 ]; then
-        ANSWER="Codex споткнулся (код \$RC). Хвост лога:
-\$(tail -5 codex.log)"
+        ERR=\$( { jq -Rr 'fromjson? | select(.type=="error" or .type=="turn.failed") | (.message // .error.message // empty)' events.jsonl 2>/dev/null; grep -v '^[[:space:]]*\$' task.log; } | tail -4 | cut -c1-300)
+        ANSWER="Codex споткнулся (код \$RC):
+\$ERR"
         log "codex exec rc=\$RC"
       else
         ANSWER="(Codex вернул пустой ответ — смотри codex.log на сервере)"
