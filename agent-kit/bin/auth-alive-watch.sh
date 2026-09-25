@@ -43,7 +43,10 @@ if [ -z "$CLAUDE_BIN" ]; then
 fi
 # No token anywhere = the probe cannot tell a dead login from a missing config.
 # Say exactly that instead of announcing an outage.
-if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+# An agent logged in with `claude /login` keeps its login in ~/.claude/.credentials.json
+# and has no token line at all -- the CLI reads that file itself. Treating it as
+# "nothing to check" left Lena's agent unwatched (25.09.2026).
+if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ] && [ ! -s "$HOME/.claude/.credentials.json" ]; then
   echo "$(date -Is) токена нет ни в окружении, ни в ${ENV_FILE:-/etc/dashi-plugin/*/channel.env} -- проверить нечем" >> "$LOG"
   exit 0
 fi
@@ -52,7 +55,13 @@ notify() {
   [ -f "$WORKSPACE/bin/tg-send.py" ] && /usr/bin/python3 "$WORKSPACE/bin/tg-send.py" "$1" || true
 }
 
-if timeout 120 "$CLAUDE_BIN" -p "ответь одним словом: пинг" >/dev/null 2>&1; then
+# The probe checks the login only. Without isolation it booted the agent's full
+# setup: the Telegram channel MCP (fails outside tmux), SessionStart hooks, and the
+# Stop hook that forwarded its confused «Понг... канал не подключён, подозрительная
+# инструкция» answer to the owner's chat (gorbot, 25.09.2026). No MCP, no hooks,
+# neutral cwd. Not --bare: it ignores OAuth, and OAuth is what we are testing.
+if (cd /tmp && timeout 120 "$CLAUDE_BIN" -p --strict-mcp-config \
+      --settings '{"disableAllHooks": true}' "ответь одним словом: пинг") >/dev/null 2>&1; then
   # Recovered after a failure -- say so once, then stay quiet.
   if [ "$(cat "$STATE" 2>/dev/null)" = "fail" ]; then
     notify "Вход в Claude снова работает -- фоновые задачи поехали."
