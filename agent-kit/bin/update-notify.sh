@@ -10,6 +10,7 @@ set -uo pipefail
 AGENT="__AGENT__"
 WORKSPACE="__WORKSPACE__"
 CTL="/usr/local/bin/dashi-ctl-$AGENT"
+REPO="__CLAUDE_DIR__/dashi-plugin-claude-code"
 SEEN="$WORKSPACE/state/update-notified"
 
 [ -x "$CTL" ] || exit 0
@@ -21,6 +22,23 @@ LIST="$(sudo -n "$CTL" check 2>/dev/null)" || exit 0
 HASH="$(printf '%s' "$LIST" | cksum | cut -d' ' -f1)"
 mkdir -p "$(dirname "$SEEN")"
 [ "$(cat "$SEEN" 2>/dev/null || true)" = "$HASH" ] && exit 0
+
+# Хозяину -- только то, что меняет ЕГО агента. Слияния PR дублируют свои коммиты,
+# а правки Codex-агента (файлы с «codex» в пути) Claude-агенту не нужны: 26.09.2026
+# Саня увидел пачку «Codex-агент: …» в чате у агента на Claude.
+relevant() {
+  git -C "$REPO" rev-parse -q --verify "$1^2" >/dev/null 2>&1 && return 1
+  git -C "$REPO" diff-tree --no-commit-id --name-only -r "$1" 2>/dev/null \
+    | grep -qiv codex
+}
+SHOW=""
+while read -r sha rest; do
+  [ -n "$sha" ] || continue
+  relevant "$sha" && SHOW="$SHOW$sha $rest
+"
+done <<< "$LIST"
+if [ -z "$SHOW" ]; then printf '%s' "$HASH" > "$SEEN"; exit 0; fi
+LIST="$SHOW"
 
 N="$(printf '%s\n' "$LIST" | grep -c .)"
 BODY="$(printf '%s\n' "$LIST" | head -15 | sed 's/^[0-9a-f]* /• /')"
