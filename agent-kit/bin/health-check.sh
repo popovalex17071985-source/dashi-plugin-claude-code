@@ -276,11 +276,12 @@ probe_memory() {
 
 # Считалка смыслов: без неё память принимает записи, но не индексирует.
 probe_embed() {
-  if systemctl list-unit-files 2>/dev/null | grep -q '^dashi-embed'; then
+  # Выключенная служба -- память переведена на ключ OpenAI, локальная не нужна.
+  if systemctl is-enabled --quiet dashi-embed 2>/dev/null; then
     systemctl is-active --quiet dashi-embed \
       && echo "ok|считалка смыслов работает" || echo "WARN|служба эмбеддингов лежит"
   else
-    echo "ok|локальной считалки нет"
+    echo "ok|локальной считалки нет (или память на ключе)"
   fi
 }
 
