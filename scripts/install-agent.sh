@@ -1513,6 +1513,7 @@ else
     python3 -c 'import sys,pathlib;p=pathlib.Path(sys.argv[1]);s=p.read_text();a="        stream=sys.stdout,\n    )\n";x=a+"\n    for _noisy in (\"httpx\",\"httpcore\"):\n        logging.getLogger(_noisy).setLevel(logging.WARNING)\n";p.write_text(s.replace(a,x,1)) if a in s else None' "$R_MAIN" \
       && ok "ремонтник не пишет свой токен в системный журнал"
   fi
+  R_CLI="$(command -v claude)" || die "не нашёл claude в PATH -- ремонтнику нужен общий бинарь"
   if [[ -n "$REPAIR_TOKEN" ]]; then
     # URL с токеном — через --config со stdin, чтобы токен не светился в ps
     R_USERNAME="$(printf 'url = "https://api.telegram.org/bot%s/getMe"\n' "$REPAIR_TOKEN" \
@@ -1525,7 +1526,7 @@ else
 TELEGRAM_BOT_TOKEN=$REPAIR_TOKEN
 TELEGRAM_BOT_USERNAME=$R_USERNAME
 USE_SDK=true
-CLAUDE_CLI_PATH=
+CLAUDE_CLI_PATH=$R_CLI
 ALLOWED_USERS=$USER_ID
 APPROVED_DIRECTORY=/home/$SERVICE_USER
 CLAUDE_CODE_OAUTH_TOKEN=$R_CLAUDE_TOKEN
@@ -1536,6 +1537,14 @@ ENABLE_MCP=false
 CLAUDE_ALLOWED_TOOLS=Read,Write,Edit,Bash,Glob,Grep,LS,Task,WebFetch,WebSearch
 EOF
     chown "$SERVICE_USER:$SERVICE_USER" "$R_DIR/.env"; chmod 600 "$R_DIR/.env"
+  fi
+  # Пустой CLAUDE_CLI_PATH = SDK берёт СВОЙ встроенный claude, замороженный на версии
+  # пакета и никогда не обновляемый. 23.09.2026 Томми так встал на 2.1.117 и на новой
+  # модели отвечал «400 claude_code_version_too_old». Ремонтник обязан ходить через
+  # тот же claude, что и агент (его обновляет `update-claude`). Чиним и старые .env.
+  if [[ -f "$R_DIR/.env" ]] && grep -q '^CLAUDE_CLI_PATH=$' "$R_DIR/.env"; then
+    sed -i "s#^CLAUDE_CLI_PATH=\$#CLAUDE_CLI_PATH=$R_CLI#" "$R_DIR/.env"
+    ok "ремонтник ходит через общий claude ($R_CLI), а не встроенную копию"
   fi
   chown -R "$SERVICE_USER:$SERVICE_USER" "$R_DIR"
   cat > "/etc/systemd/system/$R_UNIT.service" <<EOF
@@ -1561,7 +1570,9 @@ SyslogIdentifier=$R_UNIT
 WantedBy=multi-user.target
 EOF
   systemctl daemon-reload
-  systemctl enable --now "$R_UNIT" >/dev/null 2>&1 || true
+  # restart, не enable --now: на повторном прогоне живой ремонтник иначе не перечитает .env
+  systemctl enable "$R_UNIT" >/dev/null 2>&1 || true
+  systemctl restart "$R_UNIT" >/dev/null 2>&1 || true
   systemctl is-active --quiet "$R_UNIT" \
     && ok "ремонтник поднят (юнит $R_UNIT)" \
     || warn "ремонтник не стартовал — journalctl -u $R_UNIT -n 30"
