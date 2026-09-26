@@ -1372,6 +1372,9 @@ else
   if [[ -n "$OPENAI_KEY" ]]; then
     # Ключ только в этом файле (600, владелец — агент). Повторный прогон с ключом
     # перезаписывает его (смена ключа), без ключа — оставляет как есть.
+    # Была локальная память -- вектора другой размерности (384 против 1536), со
+    # старой базой новая модель не сработает. Запоминаем, чтобы пересчитать ниже.
+    OV_OLD_DIM="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["embedding"]["dense"].get("dimension",""))' "$OV_DIR/ov.conf" 2>/dev/null || true)"
     cat > "$OV_DIR/ov.conf" <<EOF
 {
   "server": { "host": "127.0.0.1", "port": 1933 },
@@ -1383,12 +1386,20 @@ else
   },
   "vlm": {
     "provider": "openai", "api_base": "https://api.openai.com/v1",
-    "api_key": "$OPENAI_KEY", "model": "gpt-4o-mini"
+    "api_key": "$OPENAI_KEY", "model": "gpt-4o-mini", "max_tokens": 16000
   }
 }
 EOF
     chown "$SERVICE_USER:$SERVICE_USER" "$OV_DIR/ov.conf"; chmod 600 "$OV_DIR/ov.conf"
     ok "ov.conf записан"
+    # max_tokens: OpenViking 0.4.20 по умолчанию просит 32768, gpt-4o-mini даёт не
+    # больше 16384 -- без потолка память молча ничего не сохраняла (Смит, 26.09.2026).
+    if [[ -n "$OV_OLD_DIM" && "$OV_OLD_DIM" != 1536 && -d "$OV_DIR/appdata/vectordb" ]]; then
+      docker stop openviking >/dev/null 2>&1 || true
+      mv "$OV_DIR/appdata/vectordb" "$OV_DIR/appdata/vectordb.local-$(date +%F)"
+      OV_REINDEX=1
+      ok "старая база векторов (локальная модель) отложена -- пересчитаю по ключу"
+    fi
   fi
   if [[ ! -s "$OV_DIR/claude-code-memory-plugin/config.json" ]]; then
     cat > "$OV_DIR/claude-code-memory-plugin/config.json" <<EOF
@@ -1417,6 +1428,14 @@ EOF
   for _ in $(seq 1 45); do
     curl -s -o /dev/null http://127.0.0.1:1933/ 2>/dev/null && break; sleep 2
   done
+  if [[ "${OV_REINDEX:-0}" == 1 ]]; then
+    # Память лежит файлами, вектора -- производная: пересчитываем их новой моделью.
+    for u in viking://user viking://resources; do
+      curl -s -m 600 -X POST http://127.0.0.1:1933/api/v1/content/reindex \
+        -H 'Content-Type: application/json' -d "{\"uri\":\"$u\",\"mode\":\"vectors_only\"}" >/dev/null 2>&1 || true
+    done
+    ok "память пересчитана под ключ OpenAI"
+  fi
   curl -s -o /dev/null http://127.0.0.1:1933/ 2>/dev/null && ok "сервер памяти отвечает на 1933" \
     || warn "сервер памяти не ответил за 90 сек — смотри docker logs openviking; плагин подхватит, когда поднимется"
   # Плагин Claude Code: env в settings.json + marketplace + install (всё под агентом)
