@@ -1092,6 +1092,16 @@ SHELL=/bin/bash
 EOF
   chmod 644 "/etc/cron.d/dashi-$AGENT_NAME-backup"
   ok "бэкап включён (ежедневно 03:40, локально в $WORKSPACE/backups)"
+  # Первый архив -- сразу, а не ночью: иначе до первой ночи проверка здоровья
+  # пишет «бэкап не настроен», и у свежего агента нет ни одной копии (Смит,
+  # переустановка 26.09.2026). Прогон занимает секунды.
+  if runuser -u "$SERVICE_USER" -- env DASHI_AGENT="$AGENT_NAME" DASHI_WORKSPACE="$WORKSPACE" \
+       /bin/bash "$CLAUDE_DIR/dashi-plugin-claude-code/scripts/agent-backup.sh" >/dev/null 2>&1 \
+     && ls "$WORKSPACE"/backups/*.gpg >/dev/null 2>&1; then
+    ok "первый бэкап сделан"
+  else
+    warn "первый бэкап не получился -- ночной прогон попробует снова"
+  fi
   # rclone ставим ВСЕГДА: без него облачная копия невозможна в принципе, а
   # хозяин узнавал об этом уже после смерти сервера (Саня 27.08.2026).
   command -v rclone >/dev/null 2>&1 || apt-get install -y -qq rclone >/dev/null 2>&1 || true
