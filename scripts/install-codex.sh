@@ -15,6 +15,7 @@
 # Использование:
 #   bash install-codex.sh                 # спросит всё интерактивно
 #   bash install-codex.sh --token 123:AA... --watchdog-token 456:BB... --chat-id 140141496
+#   ... --openai-key sk-...   # память по смыслу через OpenAI: не ест оперативку сервера
 #
 set -euo pipefail
 
@@ -22,7 +23,7 @@ MAIN_DIR=/root/agent-main
 WATCH_DIR=/root/agent-watchdog
 CODEX_HOME=/root/.codex
 
-BOT_TOKEN=""; WATCH_TOKEN=""; CHAT_ID=""; GROQ_KEY=""; ASSUME_YES=0
+BOT_TOKEN=""; WATCH_TOKEN=""; CHAT_ID=""; GROQ_KEY=""; OPENAI_KEY=""; ASSUME_YES=0
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
@@ -41,6 +42,7 @@ while [[ $# -gt 0 ]]; do
     --watchdog-token) WATCH_TOKEN="$2"; shift 2 ;;
     --chat-id)        CHAT_ID="$2";     shift 2 ;;
     --groq-key)       GROQ_KEY="$2";    shift 2 ;;
+    --openai-key)     OPENAI_KEY="$2";  shift 2 ;;
     --yes|-y)         ASSUME_YES=1;     shift ;;
     --help|-h)        usage ;;
     *) die "неизвестный аргумент: $1 (--help для справки)" ;;
@@ -79,6 +81,12 @@ if [[ ! -f "$MAIN_DIR/.env" || ! -f "$WATCH_DIR/.env" ]]; then
   fi
 fi
 [[ -f "$MAIN_DIR/.env" && -f "$WATCH_DIR/.env" ]] && skip "оба .env на месте"
+# Память по смыслу: без ключа локальная модель просит ~2 ГБ оперативки, на
+# типичном VPS в 4 ГБ это половина. Спрашиваем один раз, пока настройки нет.
+if [[ -z "$OPENAI_KEY" && ! -s "$MAIN_DIR/memsearch.conf" && $ASSUME_YES -eq 0 ]] \
+   && ! systemctl is-enabled --quiet codex-embed 2>/dev/null; then
+  read -r -p "Ключ OpenAI для памяти по смыслу (Enter — локальная модель, ~2 ГБ оперативки): " OPENAI_KEY </dev/tty || true
+fi
 
 if [[ $ASSUME_YES -eq 0 ]]; then
   read -r -p "Ставим Codex-агента (основной + ремонтник)? [Y/n] " a </dev/tty || true
@@ -455,13 +463,224 @@ if [[ -z "$(ls -A "$MAIN_DIR/workspace/history" 2>/dev/null)" ]]; then
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 4b. Память по смыслу: локальная модель эмбеддингов, без ключей и денег
+# 4b. Память по смыслу: по ключу OpenAI или локальной моделью
 # ─────────────────────────────────────────────────────────────────────────────
-# multilingual-e5-large выбран замером 25.09.2026 на сервере агента: из четырёх
-# моделей fastembed только она нашла «вернёмся к ДНС» по записи про DNS. Держит
-# ~2 ГБ памяти, поэтому нужен запас RAM+своп; нет запаса -- пропускаем, поиск
-# по словам (rg) остаётся.
+# Есть ключ OpenAI -- вектора считает text-embedding-3-large: на сервере ноль
+# памяти, центы в месяц. Замер 26.09.2026 на тестовой памяти: все 8 вопросов
+# нашли свою запись (в т.ч. «ДНС» -> запись про DNS, 0.42), чужие темы не выше
+# 0.30 -> порог 0.40. text-embedding-3-small тот же тест провалил.
+# Нет ключа -- локальная multilingual-e5-large (замер 25.09.2026), держит ~2 ГБ,
+# поэтому нужен запас RAM+своп; нет запаса -- пропускаем, поиск по словам (rg)
+# остаётся.
 say "Память по смыслу"
+cat > "$MAIN_DIR/memsearch.py" <<'EOF'
+#!/usr/bin/env python3
+"""Semantic search over the Codex agent's memory: history/, memory/, open-threads.md.
+
+Embeddings come either from the local embed server (fastembed, multilingual-e5-large
+on 127.0.0.1:1934: no key, but ~2 GB RAM) or, when memsearch.conf next to this script
+holds an OpenAI key, from the OpenAI API (no RAM, cents a month). The index is a JSON cache keyed by chunk hash: re-indexing only
+embeds what is new.
+  memsearch.py index         -- embed new chunks
+  memsearch.py query "text"  -- print hits above the threshold
+Always exits 0: memory is a convenience, never a blocker.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+import os
+import re
+import sys
+import urllib.request
+from pathlib import Path
+
+WS = Path(os.environ.get("MEM_WORKSPACE", Path(__file__).resolve().parent / "workspace"))
+INDEX = WS / ".memindex.json"
+
+def _conf() -> dict[str, str]:
+    """KEY=VALUE lines from memsearch.conf (mode 600); the environment wins."""
+    out: dict[str, str] = {}
+    try:
+        for line in (Path(__file__).resolve().parent / "memsearch.conf").read_text().splitlines():
+            k, sep, v = line.partition("=")
+            if sep and not k.strip().startswith("#"):
+                out[k.strip()] = v.strip()
+    except OSError:
+        pass
+    return {**out, **{k: v for k, v in os.environ.items() if k.startswith("MEM_")}}
+
+
+CONF = _conf()
+URL = CONF.get("MEM_EMBED_URL", "http://127.0.0.1:1934/v1/embeddings")
+API_KEY = CONF.get("MEM_EMBED_KEY", "")
+MODEL = CONF.get("MEM_EMBED_MODEL", "")
+# e5 wants the "query: "/"passage: " prefixes; OpenAI models do not.
+PREFIX = CONF.get("MEM_PREFIX", "0" if API_KEY else "1") == "1"
+# multilingual-e5-large: scores sit high and close together. Measured 25.09.2026 on
+# the agent box (cosine + lexical bonus): relevant 0.80-0.90, off-topic best 0.77.
+# Borderline noise reaches the agent as «может пригодиться», and it ignores it.
+# e5 wants the "query: "/"passage: " prefixes, without them ranking degrades.
+# The installer writes the threshold measured for the OpenAI model into the conf.
+THRESHOLD = float(CONF.get("MEM_THRESHOLD", "0.78"))
+BACKEND = f"{URL}|{MODEL}|{PREFIX}"  # vectors of different models do not mix
+TOP = 3
+CHUNK_CHARS = 1500
+SNIPPET_CHARS = 400
+BATCH = 32
+
+
+def embed(texts: list[str]) -> list[list[float]]:
+    out: list[list[float]] = []
+    for i in range(0, len(texts), BATCH):
+        payload: dict = {"input": texts[i:i + BATCH]}
+        headers = {"Content-Type": "application/json"}
+        if MODEL:
+            payload["model"] = MODEL
+        if API_KEY:
+            headers["Authorization"] = f"Bearer {API_KEY}"
+        req = urllib.request.Request(URL, json.dumps(payload).encode(), headers)
+        with urllib.request.urlopen(req, timeout=120) as r:
+            out += [d["embedding"] for d in json.load(r)["data"]]
+    return out
+
+
+def chunks() -> list[tuple[str, str]]:
+    """(label, text) for every searchable piece of memory."""
+    res: list[tuple[str, str]] = []
+    for f in sorted((WS / "history").glob("*.md")):
+        for block in re.split(r"\n(?=## )", f.read_text(errors="ignore")):
+            block = block.strip()
+            if len(block) > 20:
+                head = block.splitlines()[0].lstrip("# ").strip()
+                res.append((f"history/{f.name} {head}", block[:CHUNK_CHARS]))
+    for f in sorted((WS / "memory").glob("*.md")):
+        res.append((f"memory/{f.name}", f.read_text(errors="ignore")[:CHUNK_CHARS]))
+    ot = WS / "open-threads.md"
+    if ot.exists():
+        for block in re.split(r"\n(?=## )", ot.read_text(errors="ignore")):
+            if block.startswith("## "):
+                res.append(("open-threads.md " + block.splitlines()[0][3:60], block[:CHUNK_CHARS]))
+    return res
+
+
+def key(text: str) -> str:
+    return hashlib.sha1(text.encode()).hexdigest()
+
+
+def load() -> dict:
+    try:
+        idx = json.loads(INDEX.read_text())
+    except (OSError, ValueError):
+        return {}
+    # Switched model: the old vectors are useless, rebuild from scratch.
+    if idx.pop("__backend__", None) != BACKEND:
+        return {}
+    return idx
+
+
+def index() -> dict:
+    old = load()
+    items = chunks()
+    new = {key(t): {"label": l, "text": t} for l, t in items}
+    todo = [h for h in new if h not in old]
+    if todo:
+        for h, v in zip(todo, embed([("passage: " if PREFIX else "") + new[h]["text"] for h in todo])):
+            new[h]["vec"] = v
+    for h in new:
+        if "vec" not in new[h]:
+            new[h]["vec"] = old[h]["vec"]
+    INDEX.write_text(json.dumps({**new, "__backend__": BACKEND}, ensure_ascii=False))
+    return new
+
+
+def cos(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    na = math.sqrt(sum(x * x for x in a)); nb = math.sqrt(sum(y * y for y in b))
+    return dot / (na * nb) if na and nb else 0.0
+
+
+# Conversational filler drowns the topic: «давай вернёмся к вопросу про ДНС, на чём
+# остановились» scored the DNS note below small talk (25.09.2026). Strip it, then add
+# a lexical bonus with Cyrillic->Latin transliteration (ДНС -> dns).
+STOP = set("""давай давайте вернемся вернёмся вернуться вопрос вопросу про на чем чём мы там
+остановились остановились что как это а и в во по с со у о об же ну ка ли слушай помнишь
+обсуждали говорили было были тот та то тогда еще ещё мне меня мой моя ты тебя""".split())
+TRANSLIT = str.maketrans("абвгдезийклмнопрстуфхцыэ", "abvgdezijklmnoprstufhcye")
+LEX_WEIGHT = 0.1
+
+
+def content_words(q: str) -> list[str]:
+    return [w for w in re.findall(r"[\w-]+", q.lower()) if len(w) >= 2 and w not in STOP]
+
+
+def lexical(words: list[str], text: str) -> float:
+    if not words:
+        return 0.0
+    t = text.lower()
+    hit = sum(1 for w in words if w in t or w.translate(TRANSLIT) in t)
+    return hit / len(words)
+
+
+def query(q: str) -> str:
+    idx = load() or index()
+    if not idx or len(q.strip()) < 12:  # «привет», «живой?» -- искать нечего
+        return ""
+    words = content_words(q)
+    qv = embed([("query: " if PREFIX else "") + (" ".join(words) or q)])[0]
+    scored = sorted(((cos(qv, v["vec"]) + LEX_WEIGHT * lexical(words, v["text"]), v)
+                     for v in idx.values()), key=lambda s: -s[0])
+    lines = []
+    for score, v in scored[:TOP]:
+        if score < THRESHOLD:
+            break
+        snip = re.sub(r"\s+", " ", v["text"])[:SNIPPET_CHARS]
+        lines.append(f"- [{score:.2f}] {v['label']}: {snip}")
+    return "\n".join(lines)
+
+
+def main() -> None:
+    try:
+        if sys.argv[1:2] == ["index"]:
+            n = len(index())
+            print(f"chunks: {n}")
+        elif sys.argv[1:2] == ["query"]:
+            print(query(" ".join(sys.argv[2:])))
+        else:
+            print(__doc__)
+    except Exception as e:  # memory must never break the bridge
+        print(f"memsearch: {e}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()
+EOF
+chmod +x "$MAIN_DIR/memsearch.py"
+MEM_CONF="$MAIN_DIR/memsearch.conf"
+MEM_OPENAI_MODEL="text-embedding-3-large"
+MEM_OPENAI_THRESHOLD="0.40"
+if [[ -n "$OPENAI_KEY" ]]; then
+  # Ключ проверяем живым запросом: битый ключ молча оставил бы агента без памяти.
+  code="$(curl -s -o /dev/null -w '%{http_code}' -m 30 https://api.openai.com/v1/embeddings \
+    -H "Authorization: Bearer $OPENAI_KEY" -H 'Content-Type: application/json' \
+    -d "{\"model\":\"$MEM_OPENAI_MODEL\",\"input\":\"проверка\"}" || true)"
+  if [[ "$code" == 200 ]]; then
+    ( umask 077; printf 'MEM_EMBED_URL=https://api.openai.com/v1/embeddings\nMEM_EMBED_KEY=%s\nMEM_EMBED_MODEL=%s\nMEM_THRESHOLD=%s\n' \
+        "$OPENAI_KEY" "$MEM_OPENAI_MODEL" "$MEM_OPENAI_THRESHOLD" > "$MEM_CONF" )
+    ok "память по смыслу -- по ключу OpenAI, оперативку сервера не ест"
+  else
+    warn "ключ OpenAI не принят (HTTP $code) -- ставлю локальную модель"
+  fi
+fi
+if grep -q '^MEM_EMBED_KEY=.' "$MEM_CONF" 2>/dev/null; then
+  # Перешли на ключ -- локальная модель больше не нужна, отдаём её 2 ГБ обратно.
+  if systemctl is-enabled --quiet codex-embed 2>/dev/null; then
+    systemctl disable -q --now codex-embed && ok "локальная модель памяти выключена"
+  fi
+  ( cd "$MAIN_DIR" && nohup timeout 1800 python3 ./memsearch.py index >/dev/null 2>&1 & )
+  skip "память по смыслу на ключе OpenAI"
+else
 mem_mb() { awk '/MemTotal|SwapTotal/{s+=$2} END{print int(s/1024)}' /proc/meminfo; }
 if (( $(mem_mb) < 5500 )) && ! swapon --show | grep -q .; then
   fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile \
@@ -469,7 +688,7 @@ if (( $(mem_mb) < 5500 )) && ! swapon --show | grep -q .; then
     && ok "своп 2 ГБ для модели памяти"
 fi
 if (( $(mem_mb) < 5500 )); then
-  skip "памяти мало ($(mem_mb) МБ RAM+своп) -- поиск по смыслу пропускаю, по словам работает"
+  skip "памяти мало ($(mem_mb) МБ RAM+своп) -- поиск по смыслу пропускаю, по словам работает; с ключом OpenAI (--openai-key) встанет без нагрузки на память"
 else
   if ! python3 -c 'import fastembed, fastapi, uvicorn' >/dev/null 2>&1; then
     python3 -m pip --version >/dev/null 2>&1 || { DEBIAN_FRONTEND=noninteractive apt-get update -q >/dev/null 2>&1; DEBIAN_FRONTEND=noninteractive apt-get install -y -q python3-pip >/dev/null 2>&1; }
@@ -525,160 +744,6 @@ def embeddings(req: EmbedRequest) -> dict[str, Any]:
     ]
     return {"object": "list", "data": data, "model": MODEL_NAME}
 EOF
-    cat > "$MAIN_DIR/memsearch.py" <<'EOF'
-#!/usr/bin/env python3
-"""Semantic search over the Codex agent's memory: history/, memory/, open-threads.md.
-
-Embeddings come from the local embed server (fastembed, multilingual-e5-large on
-127.0.0.1:1934), so no
-key and no money. The index is a JSON cache keyed by chunk hash: re-indexing only
-embeds what is new.
-  memsearch.py index         -- embed new chunks
-  memsearch.py query "text"  -- print hits above the threshold
-Always exits 0: memory is a convenience, never a blocker.
-"""
-from __future__ import annotations
-
-import hashlib
-import json
-import math
-import os
-import re
-import sys
-import urllib.request
-from pathlib import Path
-
-WS = Path(os.environ.get("MEM_WORKSPACE", Path(__file__).resolve().parent / "workspace"))
-INDEX = WS / ".memindex.json"
-URL = os.environ.get("MEM_EMBED_URL", "http://127.0.0.1:1934/v1/embeddings")
-# multilingual-e5-large: scores sit high and close together. Measured 25.09.2026 on
-# the agent box (cosine + lexical bonus): relevant 0.80-0.90, off-topic best 0.77.
-# Borderline noise reaches the agent as «может пригодиться», and it ignores it.
-# e5 wants the "query: "/"passage: " prefixes, without them ranking degrades.
-THRESHOLD = float(os.environ.get("MEM_THRESHOLD", "0.78"))
-TOP = 3
-CHUNK_CHARS = 1500
-SNIPPET_CHARS = 400
-BATCH = 32
-
-
-def embed(texts: list[str]) -> list[list[float]]:
-    out: list[list[float]] = []
-    for i in range(0, len(texts), BATCH):
-        body = json.dumps({"input": texts[i:i + BATCH]}).encode()
-        req = urllib.request.Request(URL, body, {"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=120) as r:
-            out += [d["embedding"] for d in json.load(r)["data"]]
-    return out
-
-
-def chunks() -> list[tuple[str, str]]:
-    """(label, text) for every searchable piece of memory."""
-    res: list[tuple[str, str]] = []
-    for f in sorted((WS / "history").glob("*.md")):
-        for block in re.split(r"\n(?=## )", f.read_text(errors="ignore")):
-            block = block.strip()
-            if len(block) > 20:
-                head = block.splitlines()[0].lstrip("# ").strip()
-                res.append((f"history/{f.name} {head}", block[:CHUNK_CHARS]))
-    for f in sorted((WS / "memory").glob("*.md")):
-        res.append((f"memory/{f.name}", f.read_text(errors="ignore")[:CHUNK_CHARS]))
-    ot = WS / "open-threads.md"
-    if ot.exists():
-        for block in re.split(r"\n(?=## )", ot.read_text(errors="ignore")):
-            if block.startswith("## "):
-                res.append(("open-threads.md " + block.splitlines()[0][3:60], block[:CHUNK_CHARS]))
-    return res
-
-
-def key(text: str) -> str:
-    return hashlib.sha1(text.encode()).hexdigest()
-
-
-def load() -> dict:
-    try:
-        return json.loads(INDEX.read_text())
-    except (OSError, ValueError):
-        return {}
-
-
-def index() -> dict:
-    old = load()
-    items = chunks()
-    new = {key(t): {"label": l, "text": t} for l, t in items}
-    todo = [h for h in new if h not in old]
-    if todo:
-        for h, v in zip(todo, embed(["passage: " + new[h]["text"] for h in todo])):
-            new[h]["vec"] = v
-    for h in new:
-        if "vec" not in new[h]:
-            new[h]["vec"] = old[h]["vec"]
-    INDEX.write_text(json.dumps(new, ensure_ascii=False))
-    return new
-
-
-def cos(a: list[float], b: list[float]) -> float:
-    dot = sum(x * y for x, y in zip(a, b))
-    na = math.sqrt(sum(x * x for x in a)); nb = math.sqrt(sum(y * y for y in b))
-    return dot / (na * nb) if na and nb else 0.0
-
-
-# Conversational filler drowns the topic: «давай вернёмся к вопросу про ДНС, на чём
-# остановились» scored the DNS note below small talk (25.09.2026). Strip it, then add
-# a lexical bonus with Cyrillic->Latin transliteration (ДНС -> dns).
-STOP = set("""давай давайте вернемся вернёмся вернуться вопрос вопросу про на чем чём мы там
-остановились остановились что как это а и в во по с со у о об же ну ка ли слушай помнишь
-обсуждали говорили было были тот та то тогда еще ещё мне меня мой моя ты тебя""".split())
-TRANSLIT = str.maketrans("абвгдезийклмнопрстуфхцыэ", "abvgdezijklmnoprstufhcye")
-LEX_WEIGHT = 0.1
-
-
-def content_words(q: str) -> list[str]:
-    return [w for w in re.findall(r"[\w-]+", q.lower()) if len(w) >= 2 and w not in STOP]
-
-
-def lexical(words: list[str], text: str) -> float:
-    if not words:
-        return 0.0
-    t = text.lower()
-    hit = sum(1 for w in words if w in t or w.translate(TRANSLIT) in t)
-    return hit / len(words)
-
-
-def query(q: str) -> str:
-    idx = load() or index()
-    if not idx or len(q.strip()) < 12:  # «привет», «живой?» -- искать нечего
-        return ""
-    words = content_words(q)
-    qv = embed(["query: " + (" ".join(words) or q)])[0]
-    scored = sorted(((cos(qv, v["vec"]) + LEX_WEIGHT * lexical(words, v["text"]), v)
-                     for v in idx.values()), key=lambda s: -s[0])
-    lines = []
-    for score, v in scored[:TOP]:
-        if score < THRESHOLD:
-            break
-        snip = re.sub(r"\s+", " ", v["text"])[:SNIPPET_CHARS]
-        lines.append(f"- [{score:.2f}] {v['label']}: {snip}")
-    return "\n".join(lines)
-
-
-def main() -> None:
-    try:
-        if sys.argv[1:2] == ["index"]:
-            n = len(index())
-            print(f"chunks: {n}")
-        elif sys.argv[1:2] == ["query"]:
-            print(query(" ".join(sys.argv[2:])))
-        else:
-            print(__doc__)
-    except Exception as e:  # memory must never break the bridge
-        print(f"memsearch: {e}", file=sys.stderr)
-
-
-if __name__ == "__main__":
-    main()
-EOF
-    chmod +x "$MAIN_DIR/memsearch.py"
     cat > /etc/systemd/system/codex-embed.service <<UNIT
 [Unit]
 Description=Local embeddings for Codex agent memory (semantic search)
@@ -708,6 +773,7 @@ UNIT
   else
     warn "не встали пакеты модели памяти ($MAIN_DIR/embed-install.log) -- поиск по словам работает"
   fi
+fi
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
