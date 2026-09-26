@@ -1419,8 +1419,13 @@ EOF
     docker start openviking >/dev/null 2>&1 || true
     skip "контейнер openviking на месте"
   else
+    # appdata -> /app/data обязательно: без него вся память живёт внутри
+    # контейнера и пропадает при его пересоздании (обновление образа). Так же
+    # монтирует agent-kit/scripts/setup-memory.sh и контейнер у Jarvis.
+    as_agent "mkdir -p '$OV_DIR/appdata'"
     docker run -d --name openviking --network host --restart unless-stopped \
-      -v "$OV_DIR:/app/.openviking" -e OPENVIKING_CONFIG_FILE=/app/.openviking/ov.conf \
+      -v "$OV_DIR:/app/.openviking" -v "$OV_DIR/appdata:/app/data" \
+      -e OPENVIKING_CONFIG_FILE=/app/.openviking/ov.conf \
       -e OPENVIKING_SERVER_HOST=127.0.0.1 \
       "$OPENVIKING_IMAGE" >/dev/null 2>&1 || die "контейнер openviking не запустился (docker logs openviking)"
     ok "контейнер openviking запущен"
